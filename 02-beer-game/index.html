@@ -541,6 +541,60 @@
   }
   .footer a { color: var(--amber-dark); text-decoration: none; }
 
+  /* ===== PRESET EXPERIMENTS ===== */
+  .presets-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .presets-label {
+    font-size: 0.68em;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-muted);
+    font-weight: 700;
+    margin-right: 4px;
+    white-space: nowrap;
+  }
+  .preset-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.72em;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .preset-btn:hover {
+    border-color: var(--amber);
+    color: var(--amber);
+    background: var(--surface2);
+  }
+  .preset-btn.active {
+    border-color: var(--amber);
+    color: var(--amber);
+    background: var(--surface2);
+    box-shadow: 0 0 8px #f0a03020;
+  }
+  .preset-desc {
+    width: 100%;
+    font-size: 0.78em;
+    color: var(--text-dim);
+    font-style: italic;
+    padding: 6px 0 0;
+    line-height: 1.5;
+    display: none;
+  }
+  .preset-desc strong { color: var(--amber-light); font-style: normal; }
+
   @media (max-width: 800px) {
     .charts-grid { grid-template-columns: 1fr; }
     .supply-chain-viz { flex-wrap: wrap; gap: 8px; }
@@ -613,6 +667,18 @@
     <button class="btn" id="btnPause">&#10074;&#10074; Pause</button>
     <button class="btn" id="btnReset">&#8634; Reset</button>
   </div>
+</div>
+
+<!-- ===== PRESET EXPERIMENTS ===== -->
+<div class="presets-bar">
+  <span class="presets-label">Presets</span>
+  <button class="preset-btn active" data-preset="baseline">Baseline</button>
+  <button class="preset-btn" data-preset="rational">Rational Ordering</button>
+  <button class="preset-btn" data-preset="long-delays">Long Delays</button>
+  <button class="preset-btn" data-preset="extreme-delays">Extreme Delays</button>
+  <button class="preset-btn" data-preset="sine">Sine Demand</button>
+  <button class="preset-btn" data-preset="info-sharing">Info Sharing</button>
+  <div class="preset-desc" id="presetDesc"></div>
 </div>
 
 <!-- ===== SUPPLY CHAIN DIAGRAM ===== -->
@@ -1365,6 +1431,72 @@ function resizeCanvases() {
   updateViz();
 }
 window.addEventListener('resize', resizeCanvases);
+
+// ===== PRESET EXPERIMENTS =====
+
+const PRESETS = {
+  'baseline': {
+    ticks: 36, stepTick: 5, shipDelay: 2, alpha: 0.5, beta: 0.2, theta: 0.2,
+    demandPattern: 'step', infoSharing: false, compareMode: true,
+    desc: 'Default step demand (4 to 8) with behavioral ordering. Expect <strong>bullwhip amplification</strong> peaking at the Wholesaler (~7.9x), costs cascading upstream, and convergence around tick 30. Total cost ~$3,236.'
+  },
+  'rational': {
+    ticks: 50, stepTick: 5, shipDelay: 2, alpha: 0.5, beta: 0.2, theta: 0.2,
+    demandPattern: 'step', infoSharing: false, compareMode: true,
+    desc: 'Same setup, but watch the dashed rational lines. Behavioral agents pay a <strong>63% "bounded rationality tax"</strong> ($3,236 vs $1,984). Rational ordering flattens the cost distribution and produces monotonic bullwhip.'
+  },
+  'long-delays': {
+    ticks: 50, stepTick: 5, shipDelay: 4, alpha: 0.5, beta: 0.2, theta: 0.2,
+    demandPattern: 'step', infoSharing: false, compareMode: true,
+    desc: 'Shipping delay doubled to 4. Costs explode <strong>11x</strong> ($35,908). Inventory accumulation hits 900+ cases upstream. Bullwhip shifts to the Retailer (29x). The system enters a boom-bust cycle ending in complete order cessation.'
+  },
+  'extreme-delays': {
+    ticks: 80, stepTick: 5, shipDelay: 5, alpha: 0.5, beta: 0.2, theta: 0.2,
+    demandPattern: 'step', infoSharing: false, compareMode: true,
+    desc: 'Delay = 5. System approaches <strong>breakdown</strong>. Cost: $142,427 (<strong>44x</strong> baseline). Retailer bullwhip of 60x = signal destruction. The Brewery ends with 2,137 cases (5 years of demand). Each extra tick of delay nearly quadruples cost.'
+  },
+  'sine': {
+    ticks: 100, stepTick: 5, shipDelay: 2, alpha: 0.5, beta: 0.2, theta: 0.2,
+    demandPattern: 'sine', infoSharing: false, compareMode: true,
+    desc: 'Sine wave demand (4-12, mean 8). The system <strong>never converges</strong> because demand keeps changing. Cost: $40,211 (12.4x baseline). Phase lag creates destructive interference -- the Brewery ramps up just as demand drops.'
+  },
+  'info-sharing': {
+    ticks: 50, stepTick: 5, shipDelay: 2, alpha: 0.5, beta: 0.2, theta: 0.2,
+    demandPattern: 'step', infoSharing: true, compareMode: true,
+    desc: 'All agents see real consumer demand. <strong>43% cost reduction</strong> ($1,844 vs $3,236). The Brewery benefits most (61% savings). A purely informational intervention -- no heuristic changes -- nearly matches rational ordering.'
+  }
+};
+
+function applyPreset(name) {
+  const p = PRESETS[name];
+  if (!p) return;
+
+  document.getElementById('ticks').value = p.ticks;
+  document.getElementById('stepTick').value = p.stepTick;
+  document.getElementById('shipDelay').value = p.shipDelay;
+  document.getElementById('alpha').value = p.alpha;
+  document.getElementById('beta').value = p.beta;
+  document.getElementById('theta').value = p.theta;
+  document.getElementById('demandPattern').value = p.demandPattern;
+  document.getElementById('infoSharing').checked = p.infoSharing;
+  document.getElementById('compareMode').checked = p.compareMode;
+
+  // Update active button
+  document.querySelectorAll('.preset-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.preset === name);
+  });
+
+  // Show description
+  const descEl = document.getElementById('presetDesc');
+  descEl.innerHTML = p.desc;
+  descEl.style.display = 'block';
+
+  reset();
+}
+
+document.querySelectorAll('.preset-btn').forEach(btn => {
+  btn.addEventListener('click', () => applyPreset(btn.dataset.preset));
+});
 
 // Init
 reset();

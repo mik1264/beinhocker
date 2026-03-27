@@ -378,6 +378,99 @@ button {
     font-size: 14px;
 }
 
+/* Preset Experiments */
+.preset-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.preset-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px;
+    background: #141a2e;
+    border: 1px solid #1e2640;
+    border-radius: 6px;
+    color: #a0aab8;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+    text-align: left;
+    position: relative;
+    margin-bottom: 0;
+}
+.preset-btn:hover {
+    background: #1a2240;
+    border-color: #3a4a70;
+}
+.preset-btn .preset-tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 3px;
+    min-width: 52px;
+    text-align: center;
+    flex-shrink: 0;
+}
+.preset-tag.tag-ordered {
+    background: rgba(74,170,106,0.15);
+    color: #4aaa6a;
+    border: 1px solid rgba(74,170,106,0.3);
+}
+.preset-tag.tag-critical {
+    background: rgba(221,170,51,0.15);
+    color: #ddaa33;
+    border: 1px solid rgba(221,170,51,0.3);
+}
+.preset-tag.tag-chaotic {
+    background: rgba(204,85,85,0.15);
+    color: #cc5555;
+    border: 1px solid rgba(204,85,85,0.3);
+}
+.preset-tag.tag-hierarchy {
+    background: rgba(140,120,220,0.15);
+    color: #9988dd;
+    border: 1px solid rgba(140,120,220,0.3);
+}
+.preset-tag.tag-scale {
+    background: rgba(74,138,255,0.15);
+    color: #7eb8ff;
+    border: 1px solid rgba(74,138,255,0.3);
+}
+.preset-btn .preset-name {
+    color: #c0c8d8;
+    font-weight: 500;
+    white-space: nowrap;
+}
+.preset-btn .preset-detail {
+    color: #5a6880;
+    font-size: 11px;
+    margin-left: auto;
+    white-space: nowrap;
+}
+.preset-tooltip {
+    position: fixed;
+    padding: 8px 12px;
+    background: #1a2240;
+    border: 1px solid #3a4a70;
+    border-radius: 6px;
+    color: #c0c8e0;
+    font-size: 12px;
+    line-height: 1.4;
+    max-width: 260px;
+    pointer-events: none;
+    z-index: 999;
+    opacity: 0;
+    transition: opacity 0.2s;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+.preset-tooltip.visible {
+    opacity: 1;
+}
+
 /* Visualization Area */
 .viz-area {
     display: flex;
@@ -713,6 +806,57 @@ canvas {
                 <span class="example-name">Design committee from hell</span>
             </div>
         </div>
+
+        <!-- Preset Experiments -->
+        <div class="control-section">
+            <h3>Preset Experiments</h3>
+            <div class="control-hint">Jump to key scenarios from the findings. Each preset configures the network to reproduce a specific experimental result.</div>
+            <div class="preset-grid">
+                <button class="preset-btn" id="preset-ordered"
+                    data-n="50" data-k="1" data-bias="50" data-topology="random"
+                    data-expect="Frozen dynamics: Derrida 0.445, cascades hit only 5.8% of nodes. Perturbations are absorbed -- stable but rigid.">
+                    <span class="preset-tag tag-ordered">Ordered</span>
+                    <span class="preset-name">K=1 Frozen</span>
+                    <span class="preset-detail">N=50</span>
+                </button>
+                <button class="preset-btn" id="preset-critical"
+                    data-n="50" data-k="2" data-bias="50" data-topology="random"
+                    data-expect="Edge of chaos: Derrida 1.010, cascades range from tiny to 48% of network. The sweet spot for adaptation.">
+                    <span class="preset-tag tag-critical">Critical</span>
+                    <span class="preset-name">K=2 Edge of Chaos</span>
+                    <span class="preset-detail">N=50</span>
+                </button>
+                <button class="preset-btn" id="preset-chaotic"
+                    data-n="50" data-k="5" data-bias="50" data-topology="random"
+                    data-expect="Total chaos: Derrida 2.265, 93% cascade spread, zero attractors found. Every change propagates everywhere.">
+                    <span class="preset-tag tag-chaotic">Chaotic</span>
+                    <span class="preset-name">K=5 Chaotic</span>
+                    <span class="preset-detail">N=50</span>
+                </button>
+                <button class="preset-btn" id="preset-hierarchy"
+                    data-n="50" data-k="3" data-bias="50" data-topology="hierarchy"
+                    data-expect="Hierarchy as firebreak: K=3 is chaotic, but hierarchical wiring constrains cascades. Benefit grows dramatically at larger N.">
+                    <span class="preset-tag tag-hierarchy">Hierarchy</span>
+                    <span class="preset-name">K=3 Tames Chaos</span>
+                    <span class="preset-detail">N=50</span>
+                </button>
+                <button class="preset-btn" id="preset-large"
+                    data-n="200" data-k="2" data-bias="50" data-topology="random"
+                    data-expect="Graceful scaling: K=2 stays critical at N=200. Cascade % drops from 23% (N=20) to 7.2% (N=200). The system scales without breaking.">
+                    <span class="preset-tag tag-scale">Scale</span>
+                    <span class="preset-name">K=2 Large Network</span>
+                    <span class="preset-detail">N=200</span>
+                </button>
+                <button class="preset-btn" id="preset-smallworld"
+                    data-n="50" data-k="2" data-bias="50" data-topology="small-world"
+                    data-expect="Small-world wiring: K=2 with clustered shortcuts. Combines local order with global reach -- like real social networks.">
+                    <span class="preset-tag tag-critical">Critical</span>
+                    <span class="preset-name">K=2 Small World</span>
+                    <span class="preset-detail">N=50</span>
+                </button>
+            </div>
+        </div>
+        <div class="preset-tooltip" id="preset-tooltip"></div>
     </div>
 
     <!-- Center: Visualization -->
@@ -1383,6 +1527,80 @@ document.querySelectorAll('.example-row').forEach(row => {
         slider.value = k;
         document.getElementById('val-K').textContent = k;
         createNetwork();
+    });
+});
+
+// Preset experiment clicks
+const presetTooltip = document.getElementById('preset-tooltip');
+let presetTooltipTimeout = null;
+
+document.querySelectorAll('.preset-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const n = parseInt(btn.dataset.n);
+        const k = parseInt(btn.dataset.k);
+        const bias = parseInt(btn.dataset.bias);
+        const topology = btn.dataset.topology;
+
+        // Set slider values
+        const sliderN = document.getElementById('slider-N');
+        const sliderK = document.getElementById('slider-K');
+        const sliderBias = document.getElementById('slider-bias');
+        const selTopology = document.getElementById('sel-topology');
+
+        sliderN.value = n;
+        sliderK.value = k;
+        sliderBias.value = bias;
+        selTopology.value = topology;
+
+        // Update displayed values
+        document.getElementById('val-N').textContent = n;
+        document.getElementById('val-K').textContent = k;
+        document.getElementById('val-bias').textContent = (bias / 100).toFixed(2);
+
+        // Switch to Network tab
+        document.querySelectorAll('.viz-tab').forEach(t => t.classList.remove('active'));
+        const networkTab = document.querySelector('.viz-tab[data-tab="network"]');
+        if (networkTab) {
+            networkTab.classList.add('active');
+            activeTab = 'network';
+        }
+
+        // Create new network with these settings
+        createNetwork();
+
+        // Show tooltip with expected behavior
+        const expectText = btn.dataset.expect;
+        if (expectText) {
+            presetTooltip.textContent = expectText;
+            presetTooltip.classList.add('visible');
+            const rect = btn.getBoundingClientRect();
+            presetTooltip.style.left = (rect.right + 12) + 'px';
+            presetTooltip.style.top = rect.top + 'px';
+
+            // Reposition if off-screen right
+            requestAnimationFrame(() => {
+                const ttRect = presetTooltip.getBoundingClientRect();
+                if (ttRect.right > window.innerWidth - 10) {
+                    presetTooltip.style.left = (rect.left - ttRect.width - 12) + 'px';
+                }
+                if (ttRect.bottom > window.innerHeight - 10) {
+                    presetTooltip.style.top = (window.innerHeight - ttRect.height - 10) + 'px';
+                }
+            });
+
+            clearTimeout(presetTooltipTimeout);
+            presetTooltipTimeout = setTimeout(() => {
+                presetTooltip.classList.remove('visible');
+            }, 4000);
+        }
+    });
+
+    // Hide tooltip on hover away
+    btn.addEventListener('mouseleave', () => {
+        clearTimeout(presetTooltipTimeout);
+        presetTooltipTimeout = setTimeout(() => {
+            presetTooltip.classList.remove('visible');
+        }, 300);
     });
 });
 

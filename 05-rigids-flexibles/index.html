@@ -92,6 +92,22 @@ button:hover { background: #3a3a5a; }
 button.active { background: #4a3a6a; border-color: #7a6aaa; }
 button.reset { background: #4a2a2a; border-color: #6a3a3a; }
 
+/* Preset experiments */
+.preset-section {
+  display: flex; gap: 10px; align-items: center; padding: 10px 16px;
+  background: #12121a; border: 1px solid #2a2a3a; border-radius: 8px; margin-bottom: 16px;
+}
+.preset-section label { font-size: 0.72em; color: #aaa; text-transform: uppercase; letter-spacing: 1px; white-space: nowrap; }
+.preset-select {
+  background: #1a1a2e; border: 1px solid #333; color: #fff; padding: 6px 10px;
+  border-radius: 4px; font-family: inherit; font-size: 0.8em; cursor: pointer; flex: 1; min-width: 0;
+}
+.preset-select:hover { border-color: #7a6aaa; }
+.preset-tooltip {
+  font-size: 0.75em; color: #998; line-height: 1.4; display: none; flex: 2; min-width: 0;
+}
+.preset-tooltip.visible { display: block; }
+
 /* Dashboard grid */
 .dashboard {
   display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;
@@ -549,6 +565,21 @@ body.shaking {
       <button id="btn-step">Step</button>
       <button id="btn-reset" class="reset">Reset</button>
     </div>
+  </div>
+
+  <!-- Preset experiments -->
+  <div class="preset-section">
+    <label>Preset Experiments</label>
+    <select class="preset-select" id="preset-select" onchange="applyPreset(this.value)">
+      <option value="">-- Select a scenario --</option>
+      <option value="baseline">Baseline</option>
+      <option value="thatcher">Thatcher Trap</option>
+      <option value="volatile">High Volatility</option>
+      <option value="deep">Deep Hierarchy</option>
+      <option value="shallow">Shallow Org</option>
+      <option value="experience">Experience Dominates</option>
+    </select>
+    <div class="preset-tooltip" id="preset-tooltip"></div>
   </div>
 
   <!-- Environment bar -->
@@ -1684,6 +1715,31 @@ function drawTransitionChart() {
   ctx.fillStyle = '#888';
   ctx.textAlign = 'center';
   ctx.fillText('Performance Change (adaptation cost in yellow zones)', w / 2, h - 4);
+}
+
+// ===== PRESET EXPERIMENTS =====
+function applyPreset(key) {
+  const presets = {
+    baseline: { stability: 100, levels: 4, branching: 3, rigidFrac: 0.5, expWeight: 0.1, tooltip: 'Default setup: stability=100. Rigids reach 97.5% by tick 200, then the first switch causes a catastrophic +0.87 performance drop with 15-tick recovery. The purge-crash cycle in action.' },
+    thatcher: { stability: 500, levels: 4, branching: 3, rigidFrac: 0.5, expWeight: 0.1, tooltip: 'The Thatcher Trap: 97.5% rigid with zero switches. Performance peaks at 1.44, but the org has purged all adaptive capacity. Evidence "proves" flexibles are dead weight -- precisely when their absence is most dangerous.' },
+    volatile: { stability: 20, levels: 4, branching: 3, rigidFrac: 0.5, expWeight: 0.1, tooltip: 'Flexible dominance: 24 env switches cause an inverted hierarchy -- top level goes 100% flexible. Flexibles outperform rigids 1.18 vs 0.97. Near-zero transition costs. The Clinton/Blair model.' },
+    deep: { stability: 100, levels: 6, branching: 3, rigidFrac: 0.5, expWeight: 0.1, tooltip: 'Rigidity amplifier: every level above L0 locks to 100% rigid by tick 50. Each hierarchical level is an additional selection filter. L0 maintains 43% flexibility as organizational insurance.' },
+    shallow: { stability: 100, levels: 2, branching: 3, rigidFrac: 0.5, expWeight: 0.1, tooltip: 'Flat org with only 4 agents. Less rigidity amplification (one promotion boundary), faster recovery (6.9 ticks), but high stochastic noise. More volatile, less fragile.' },
+    experience: { stability: 100, levels: 4, branching: 3, rigidFrac: 0.5, expWeight: 0.5, tooltip: 'Seniority overwhelms strategy: experience weight 0.5 shrinks the rigid-flexible performance gap to 0.009. Transitions are painless (0.01 cost, 0 recovery). Stable but insensitive to environment -- the bureaucracy model.' },
+  };
+  const p = presets[key];
+  if (!p) { document.getElementById('preset-tooltip').classList.remove('visible'); return; }
+  document.getElementById('ctrl-stability').value = p.stability;
+  document.getElementById('val-stability').textContent = p.stability;
+  document.getElementById('ctrl-levels').value = p.levels;
+  document.getElementById('ctrl-branching').value = p.branching;
+  document.getElementById('ctrl-rigid-frac').value = p.rigidFrac;
+  document.getElementById('val-rigid-frac').textContent = (p.rigidFrac * 100).toFixed(0) + '%';
+  document.getElementById('ctrl-exp-weight').value = p.expWeight;
+  document.getElementById('val-exp-weight').textContent = p.expWeight.toFixed(2);
+  document.getElementById('preset-tooltip').textContent = p.tooltip;
+  document.getElementById('preset-tooltip').classList.add('visible');
+  init();
 }
 
 // ===== RANGE DISPLAY UPDATES =====

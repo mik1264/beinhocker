@@ -121,6 +121,34 @@ header .stat span { color: #aaaac0; font-weight: 500; }
 .btn.danger { border-color: #5a2a2a; color: #cc8888; }
 .btn.danger:hover { background: #2a1218; border-color: #cc4444; color: #ff8888; box-shadow: 0 0 12px rgba(204,68,68,0.15); }
 
+/* --- PRESET EXPERIMENTS --- */
+.preset-section { margin-bottom: 18px; }
+.preset-section h2 { font-size: 10px; font-weight: 600; color: #55556a; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid #1a1a28; }
+.preset-select {
+  width: 100%;
+  background: #14141e;
+  border: 1px solid #252538;
+  color: #c8c8d0;
+  padding: 6px 8px;
+  font-size: 11px;
+  font-family: 'JetBrains Mono', monospace;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.preset-select:hover { border-color: #4444aa; }
+.preset-tooltip {
+  margin-top: 6px;
+  padding: 6px 8px;
+  background: #12122a;
+  border: 1px solid #252548;
+  border-radius: 4px;
+  font-size: 10px;
+  color: #8888a0;
+  line-height: 1.4;
+  display: none;
+}
+.preset-tooltip.visible { display: block; }
+
 /* --- MAIN VIEW --- */
 .main-view {
   position: relative;
@@ -459,6 +487,19 @@ header .stat span { color: #aaaac0; font-weight: 500; }
       <h2>Speed</h2>
       <input type="range" id="speed" min="1" max="100" value="20">
       <div class="val" id="speed-val">20 ms</div>
+    </div>
+
+    <div class="preset-section">
+      <h2>Preset Experiments</h2>
+      <select class="preset-select" id="preset-select" onchange="applyPreset(this.value)">
+        <option value="">-- Select a scenario --</option>
+        <option value="baseline">Baseline</option>
+        <option value="small">Small Ecosystem</option>
+        <option value="large">Large Ecosystem</option>
+        <option value="dense">Dense Network</option>
+        <option value="sparse">Sparse Network</option>
+      </select>
+      <div class="preset-tooltip" id="preset-tooltip"></div>
     </div>
 
     <div class="group">
@@ -1175,6 +1216,24 @@ function resetSim() {
   render();
   updateStats();
   updateNarrative();
+}
+
+function applyPreset(key) {
+  const presets = {
+    baseline: { species: 100, conn: 5, tooltip: 'Classic setup: 100 species, 5% connectivity. Expect power-law cascades with exponent ~2.0, 24 phase transitions, and max cascade ~21. The system oscillates between RANDOM and GROWTH without sustaining ORGANIZED phase.' },
+    small: { species: 20, conn: 5, tooltip: 'Volatile small ecosystem: 94 phase transitions in 500 ticks, 10 punctuation events. Max cascade of 12 replaces 60% of all species. The system briefly achieves ORGANIZED but cannot hold it.' },
+    large: { species: 200, conn: 5, tooltip: 'Super-linear cascade scaling: mean cascade 23.4 (10x baseline). Flat cascade distribution from sizes 20-90 indicates perpetual criticality. Rare but catastrophic tail events.' },
+    dense: { species: 100, conn: 15, tooltip: 'Perpetual catastrophe: 85% cascade rate, mean cascade replaces 57% of species. Bimodal distribution -- small cascades or system-wide collapse. Connectivity destroys compartmentalization.' },
+    sparse: { species: 100, conn: 2, tooltip: 'Sustained organization: highest fitness (0.69), smallest cascades. Achieves ORGANIZED phase. Compartmentalization prevents cascading failures, but diversity drops to 0.77.' },
+  };
+  const p = presets[key];
+  if (!p) { document.getElementById('preset-tooltip').classList.remove('visible'); return; }
+  document.getElementById('param-species').value = p.species;
+  document.getElementById('param-conn').value = p.conn;
+  document.getElementById('conn-val').textContent = (p.conn / 100).toFixed(2);
+  document.getElementById('preset-tooltip').textContent = p.tooltip;
+  document.getElementById('preset-tooltip').classList.add('visible');
+  resetSim();
 }
 
 function toggleRun() {

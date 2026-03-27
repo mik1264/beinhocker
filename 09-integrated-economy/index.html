@@ -219,6 +219,18 @@ body { font-family: 'Inter', system-ui, sans-serif; background: #0a0e17; color: 
 .scenario-btn.active { background: #1a2040; border-color: #4466aa; color: #88aaff; }
 .scenario-btn .scenario-name { font-weight: 600; display: block; margin-bottom: 2px; }
 .scenario-btn .scenario-desc { font-size: 10px; color: #4a5a6a; }
+.scenario-finding {
+  margin-top: 8px;
+  padding: 8px 10px;
+  background: linear-gradient(135deg, rgba(100,100,255,0.05), rgba(60,180,120,0.03));
+  border: 1px solid #1a2a3a;
+  border-left: 3px solid #6688ff;
+  border-radius: 0 5px 5px 0;
+  font-size: 10px;
+  line-height: 1.5;
+  color: #6a7a8a;
+}
+.scenario-finding strong { color: #8aa0c0; font-weight: 600; }
 
 /* Dashboard indicators */
 .dashboard-row {
@@ -437,6 +449,9 @@ body { font-family: 'Inter', system-ui, sans-serif; background: #0a0e17; color: 
         <span class="scenario-name">Stress Test</span>
         <span class="scenario-desc">Repeated shocks testing long-run resilience.</span>
       </button>
+    </div>
+    <div class="scenario-finding" id="scenarioFinding">
+      <strong>Baseline:</strong> GDP remarkably stable (std dev 0.053). Market index declines from ~97 to ~21 as prices converge to fundamentals. Gini rises steadily to 0.70. Flexibility drifts to floor of 0.20 -- peacetime rigidity.
     </div>
 
     <h3>Parameters</h3>
@@ -1465,10 +1480,22 @@ function applyScenarioEvents(sim, scenario) {
   }
 }
 
+const scenarioFindings = {
+  normal: '<strong>Normal Operations:</strong> GDP remarkably stable (std dev 0.053). Market index declines from ~97 to ~21 as prices converge to fundamentals. Gini rises steadily to 0.70. Flexibility drifts to floor of 0.20 -- peacetime rigidity.',
+  supply_shock: '<strong>Supply Shock:</strong> Bullwhip effect visible -- GDP surges 2.4x then undershoots on normalization. Recovery takes ~15 ticks. No firm failures despite major shock. Supply-side shocks alone are insufficient to trigger cascading failures.',
+  tech_disruption: '<strong>Tech Disruption:</strong> Zero GDP impact -- the shock is absorbed. Real effect is on stock prices (-12.5%) and org flexibility (jumps from 0.20 to 0.64). Crisis selects for organizational flexibility, matching Beinhocker\'s thesis.',
+  market_crash: '<strong>Market Crash:</strong> Triple shock triggers cascade of 28 firm deaths at t=130 (10-tick delay). 67.5% unemployment. The market panic is the lethal event, not the supply shock. Gini paradoxically drops post-crash.',
+  stress_test: '<strong>Stress Test:</strong> Economy survives ALL shocks with zero failures. Spaced shocks allow recovery between hits. Flexibility ratchets upward (0.20 to 0.80) -- crises build resilience faster than stability erodes it.',
+};
+
 function selectScenario(scenario, btn) {
   currentScenario = scenario;
   document.querySelectorAll('.scenario-btn').forEach(b => b.classList.remove('active'));
   if (btn) btn.classList.add('active');
+  const findingEl = document.getElementById('scenarioFinding');
+  if (findingEl && scenarioFindings[scenario]) {
+    findingEl.innerHTML = scenarioFindings[scenario];
+  }
   resetSim();
 }
 

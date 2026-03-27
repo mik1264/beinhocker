@@ -93,6 +93,22 @@ button:hover { background: #3a3a5a; }
 button.active { background: #4a3a1a; border-color: #aa8a3a; }
 button.reset { background: #4a2a2a; border-color: #6a3a3a; }
 
+/* Preset experiments */
+.preset-section {
+  display: flex; gap: 10px; align-items: center; padding: 10px 16px;
+  background: #12121a; border: 1px solid #2a2a3a; border-radius: 8px; margin-bottom: 16px;
+}
+.preset-section label { font-size: 0.72em; color: #aaa; text-transform: uppercase; letter-spacing: 1px; white-space: nowrap; }
+.preset-select {
+  background: #1a1a2e; border: 1px solid #333; color: #fff; padding: 6px 10px;
+  border-radius: 4px; font-family: inherit; font-size: 0.8em; cursor: pointer;
+}
+.preset-select:hover { border-color: #aa8a3a; }
+.preset-tooltip {
+  font-size: 0.75em; color: #998; line-height: 1.4; display: none; flex: 2; min-width: 0;
+}
+.preset-tooltip.visible { display: block; }
+
 /* Layout: sidebar + main */
 .main-layout {
   display: grid;
@@ -266,6 +282,7 @@ button.reset { background: #4a2a2a; border-color: #6a3a3a; }
         <option value="1,4">1-4 (low)</option>
         <option value="1,6" selected>1-6 (standard)</option>
         <option value="3,6">3-6 (high)</option>
+        <option value="1,10">1-10 (extreme)</option>
         <option value="1,1">1 (equal)</option>
         <option value="6,6">6 (equal high)</option>
       </select>
@@ -276,6 +293,7 @@ button.reset { background: #4a2a2a; border-color: #6a3a3a; }
         <option value="1,4" selected>1-4 (standard)</option>
         <option value="1,2">1-2 (low)</option>
         <option value="2,4">2-4 (high)</option>
+        <option value="1,6">1-6 (extreme)</option>
         <option value="2,2">2 (equal)</option>
       </select>
     </div>
@@ -283,6 +301,7 @@ button.reset { background: #4a2a2a; border-color: #6a3a3a; }
       <label>Regrowth Rate</label>
       <select id="ctrl-regrowth">
         <option value="0">Instant</option>
+        <option value="0.25">0.25/tick (slow)</option>
         <option value="1" selected>1/tick (gradual)</option>
         <option value="2">2/tick (fast)</option>
       </select>
@@ -304,6 +323,20 @@ button.reset { background: #4a2a2a; border-color: #6a3a3a; }
       <button id="btn-step">Step</button>
       <button id="btn-reset" class="reset">Reset</button>
     </div>
+  </div>
+
+  <!-- Preset experiments -->
+  <div class="preset-section">
+    <label>Preset Experiments</label>
+    <select class="preset-select" id="preset-select" onchange="applyPreset(this.value)">
+      <option value="">-- Select a scenario --</option>
+      <option value="baseline">Baseline</option>
+      <option value="overcrowded">Overcrowded</option>
+      <option value="scarcity">Scarcity</option>
+      <option value="reproduction">With Reproduction</option>
+      <option value="extreme">Extreme Inequality</option>
+    </select>
+    <div class="preset-tooltip" id="preset-tooltip"></div>
   </div>
 
   <!-- Stats bar -->
@@ -767,7 +800,7 @@ function getConfig() {
     metabolismMax: parseInt(metabParts[1]),
     endowmentMin: 5,
     endowmentMax: 25,
-    regrowthRate: parseInt(document.getElementById('ctrl-regrowth').value),
+    regrowthRate: parseFloat(document.getElementById('ctrl-regrowth').value),
     maxSugarLevel: 4,
     reproduction: document.getElementById('ctrl-reproduction').value === 'on',
     reproductionThreshold: 50,
@@ -785,6 +818,31 @@ function getConfig() {
 
 function getSpeed() {
   return parseInt(document.getElementById('ctrl-speed').value);
+}
+
+// =========================================================================
+// PRESET EXPERIMENTS
+// =========================================================================
+
+function applyPreset(key) {
+  const presets = {
+    baseline: { agents: 400, gridSize: 50, vision: '1,6', metabolism: '1,4', regrowth: '1', reproduction: 'off', tooltip: 'Standard Sugarscape: 400 agents, 50x50 grid. Population crashes to ~175 in first 10 ticks as high-metabolism agents die. Gini rises from 0.22 to 0.375 -- moderate inequality from identical rules.' },
+    overcrowded: { agents: 800, gridSize: 50, vision: '1,6', metabolism: '1,4', regrowth: '1', reproduction: 'off', tooltip: 'Violent initial crash: 53 agents die in a single tick. Harsher selection (mean metabolism drops to 1.35). Final pop 289 -- more survive but each is 28% poorer due to competition.' },
+    scarcity: { agents: 400, gridSize: 50, vision: '1,6', metabolism: '1,4', regrowth: '0.25', reproduction: 'off', tooltip: 'The equalizer: 0.25 regrowth means only 28% survive. Extreme metabolic selection (mean=1.15). Lowest Gini (0.26) -- scarcity prevents anyone from accumulating surplus. Median exceeds mean.' },
+    reproduction: { agents: 400, gridSize: 50, vision: '1,6', metabolism: '1,4', regrowth: '1', reproduction: 'on', tooltip: 'Population explosion: from 400 to 1,302 by tick 300. Dramatic trait evolution -- 97.3% converge to metabolism=1. Lowest Gini (0.15) because reproduction splits wealth. Malthusian equilibrium emerges.' },
+    extreme: { agents: 400, gridSize: 50, vision: '1,10', metabolism: '1,6', regrowth: '1', reproduction: 'off', tooltip: 'Extreme trait ranges: vision 1-10, metabolism 1-6. Brutal selection -- no agent with metabolism>3 survives. Paradoxically lower Gini (0.31) because the poor die rather than persist. Metabolism correlation r=-0.83.' },
+  };
+  const p = presets[key];
+  if (!p) { document.getElementById('preset-tooltip').classList.remove('visible'); return; }
+  document.getElementById('ctrl-agents').value = p.agents;
+  document.getElementById('ctrl-grid-size').value = p.gridSize;
+  document.getElementById('ctrl-vision').value = p.vision;
+  document.getElementById('ctrl-metabolism').value = p.metabolism;
+  document.getElementById('ctrl-regrowth').value = p.regrowth;
+  document.getElementById('ctrl-reproduction').value = p.reproduction;
+  document.getElementById('preset-tooltip').textContent = p.tooltip;
+  document.getElementById('preset-tooltip').classList.add('visible');
+  init();
 }
 
 // =========================================================================

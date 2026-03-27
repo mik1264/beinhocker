@@ -400,6 +400,23 @@ body { font-family: 'Inter', system-ui, sans-serif; background: #0a0e17; color: 
 ::-webkit-scrollbar-track { background: #0a0e17; }
 ::-webkit-scrollbar-thumb { background: #1a2535; border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: #2a3a50; }
+
+/* Preset experiments */
+.preset-bar {
+  display: flex; gap: 10px; align-items: center; padding: 8px 16px;
+  background: linear-gradient(135deg, rgba(68,136,255,0.04), rgba(0,180,255,0.02));
+  border-bottom: 1px solid #1a2030;
+}
+.preset-bar label { font-size: 11px; font-weight: 600; color: #4a5a70; text-transform: uppercase; letter-spacing: 1px; white-space: nowrap; }
+.preset-select {
+  background: #0f1520; border: 1px solid #1a2535; color: #c8cdd8; padding: 5px 10px;
+  border-radius: 4px; font-family: 'Inter', sans-serif; font-size: 12px; cursor: pointer;
+}
+.preset-select:hover { border-color: #4488ff; }
+.preset-tooltip {
+  font-size: 11px; color: #5a7a8a; line-height: 1.4; display: none; flex: 1;
+}
+.preset-tooltip.visible { display: block; }
 </style>
 </head>
 <body>
@@ -442,6 +459,21 @@ body { font-family: 'Inter', system-ui, sans-serif; background: #0a0e17; color: 
       <button class="danger" onclick="resetSim()">Reset</button>
     </div>
   </div>
+</div>
+
+<!-- ===== PRESET BAR ===== -->
+<div class="preset-bar">
+  <label>Try a Scenario</label>
+  <select class="preset-select" id="preset-select" onchange="applyPreset(this.value)">
+    <option value="">-- Select --</option>
+    <option value="spatial">Spatial Baseline</option>
+    <option value="tournament">Tournament</option>
+    <option value="noisy">Noisy World</option>
+    <option value="perfect">Perfect Information</option>
+    <option value="highmut">High Mutation</option>
+    <option value="temptation">High Temptation</option>
+  </select>
+  <div class="preset-tooltip" id="preset-tooltip"></div>
 </div>
 
 <!-- ===== MAIN ===== -->
@@ -1042,6 +1074,35 @@ function updatePayoffDisplay() {
 ['paramT', 'paramR', 'paramP', 'paramS'].forEach(id => {
   document.getElementById(id).addEventListener('input', updatePayoffDisplay);
 });
+
+// ===================================================================
+// PRESET EXPERIMENTS
+// ===================================================================
+
+function applyPreset(key) {
+  const presets = {
+    spatial: { mode: 'spatial', noise: 0.0, mutation: 0.001, T: 5, R: 3, P: 1, S: 0, tooltip: 'Spatial grid, zero noise. Grudger dominates (46%), cooperation reaches 100%. Spatial clustering lets cooperative strategies form defensive groups that resist defector invasion.' },
+    tournament: { mode: 'tournament', noise: 0.0, mutation: 0.001, T: 5, R: 3, P: 1, S: 0, tooltip: 'Well-mixed tournament: defection dominates. AllD reaches 100% by generation 50. Without spatial protection, cooperative strategies are exploited. Final payoff collapses to 1.0 (mutual defection).' },
+    noisy: { mode: 'spatial', noise: 0.10, mutation: 0.001, T: 5, R: 3, P: 1, S: 0, tooltip: 'Pavlov dominates (98%) under 10% noise. TFT enters destructive retaliation cycles from accidental defections. Pavlov self-corrects via Win-Stay/Lose-Shift. Cooperation rate ~75%.' },
+    perfect: { mode: 'spatial', noise: 0.0, mutation: 0.001, T: 5, R: 3, P: 1, S: 0, tooltip: 'Zero noise (same as spatial baseline). Grudger dominates because permanent retaliation carries no cost when defections are never accidental. TFT is the strong second-place finisher.' },
+    highmut: { mode: 'spatial', noise: 0.0, mutation: 0.05, T: 5, R: 3, P: 1, S: 0, tooltip: 'High mutation (5%): all 7 strategies persist indefinitely via mutation-selection balance. Grudger intensifies to 71% because constant AllD mutants benefit its punishment strategy. Cooperation stays above 97%.' },
+    temptation: { mode: 'spatial', noise: 0.0, mutation: 0.001, T: 10, R: 3, P: 1, S: 0, tooltip: 'Paradox of temptation: doubling T to 10 makes Grudger surge to 94%. Higher stakes make retaliation more consequential, strengthening cooperation despite the greater temptation to defect.' },
+  };
+  const p = presets[key];
+  if (!p) { document.getElementById('preset-tooltip').classList.remove('visible'); return; }
+  document.getElementById('paramMode').value = p.mode;
+  updateMode();
+  document.getElementById('paramNoise').value = p.noise;
+  document.getElementById('paramMutation').value = p.mutation;
+  document.getElementById('paramT').value = p.T;
+  document.getElementById('paramR').value = p.R;
+  document.getElementById('paramP').value = p.P;
+  document.getElementById('paramS').value = p.S;
+  updatePayoffDisplay();
+  document.getElementById('preset-tooltip').textContent = p.tooltip;
+  document.getElementById('preset-tooltip').classList.add('visible');
+  resetSim();
+}
 
 // ===================================================================
 // SIMULATION CONTROL

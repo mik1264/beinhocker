@@ -126,6 +126,34 @@ header .stat span { color: #aaaac0; font-weight: 500; }
 .btn.danger { border-color: #5a2a2a; color: #cc8888; }
 .btn.danger:hover { background: #2a1218; border-color: #cc4444; color: #ff8888; }
 
+/* --- PRESET EXPERIMENTS --- */
+.preset-section { margin-bottom: 18px; }
+.preset-section h2 { font-size: 10px; font-weight: 600; color: #55556a; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid #1a1a28; }
+.preset-select {
+  width: 100%;
+  background: #14141e;
+  border: 1px solid #252538;
+  color: #c8c8d0;
+  padding: 6px 8px;
+  font-size: 11px;
+  font-family: 'JetBrains Mono', monospace;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.preset-select:hover { border-color: #4444aa; }
+.preset-tooltip {
+  margin-top: 6px;
+  padding: 6px 8px;
+  background: #12122a;
+  border: 1px solid #252548;
+  border-radius: 4px;
+  font-size: 10px;
+  color: #8888a0;
+  line-height: 1.4;
+  display: none;
+}
+.preset-tooltip.visible { display: block; }
+
 /* --- MAIN VIEW --- */
 .main-view {
   position: relative;
@@ -441,6 +469,19 @@ header .stat span { color: #aaaac0; font-weight: 500; }
       <h2>Speed</h2>
       <input type="range" id="speed" min="1" max="100" value="30">
       <div class="val" id="speed-val">30 ms</div>
+    </div>
+
+    <div class="preset-section">
+      <h2>Preset Experiments</h2>
+      <select class="preset-select" id="preset-select" onchange="applyPreset(this.value)">
+        <option value="">-- Select a scenario --</option>
+        <option value="baseline">Baseline (K=4, mixed)</option>
+        <option value="smooth">Smooth Landscape (K=1)</option>
+        <option value="rugged">Rugged Landscape (K=8)</option>
+        <option value="alllocal">All Local Climbers</option>
+        <option value="alljump">All Long Jumpers</option>
+      </select>
+      <div class="preset-tooltip" id="preset-tooltip"></div>
     </div>
 
     <div class="group">
@@ -1509,6 +1550,31 @@ function stepOnce() {
   updateNarrative(record);
   updatePhaseBadge(record);
   checkMilestones(record);
+}
+
+function applyPreset(key) {
+  const presets = {
+    baseline: { k: 4, random: 15, local: 40, longjump: 25, recomb: 20, tooltip: 'K=4 moderate ruggedness, mixed strategies. Local climbers dominate final population (8/15 firms). Long-jumpers eliminated. 31 creative destructions. Population self-regulates to ~15 firms.' },
+    smooth: { k: 1, random: 15, local: 40, longjump: 25, recomb: 20, tooltip: 'Hill-climber paradise: K=1 near Mt. Fuji landscape. Quick convergence by tick 50, then stagnation. Only 17 exits (half baseline). Lower absolute fitness (0.66 vs 0.80) because smooth landscapes have less variance.' },
+    rugged: { k: 8, random: 15, local: 40, longjump: 25, recomb: 20, tooltip: 'Most creative destruction: 182 innovations, 40 exits. Firms trapped on different local optima produce double the diversity (0.48). Mean fitness oscillates as firms discover new peaks. Long-jumpers survive here.' },
+    alllocal: { k: 4, random: 0, local: 100, longjump: 0, recomb: 0, tooltip: 'Fast convergence then frozen stagnation. Firms reach local optima and stop -- fewest innovations (137). Higher diversity (0.35) is misleading: firms are trapped on different peaks, not productively exploring.' },
+    alljump: { k: 4, random: 0, local: 0, longjump: 100, recomb: 0, tooltip: 'Slow, erratic convergence: flipping 3 of 12 bits per move is inherently noisy. More sustained exploration (4 firms still in growth at tick 200) but lower final fitness (0.764). Cannot perform fine-grained refinement.' },
+  };
+  const p = presets[key];
+  if (!p) { document.getElementById('preset-tooltip').classList.remove('visible'); return; }
+  document.getElementById('param-k').value = p.k;
+  document.getElementById('k-val').textContent = p.k;
+  document.getElementById('strat-random').value = p.random;
+  document.getElementById('strat-random-val').textContent = p.random + '%';
+  document.getElementById('strat-local').value = p.local;
+  document.getElementById('strat-local-val').textContent = p.local + '%';
+  document.getElementById('strat-longjump').value = p.longjump;
+  document.getElementById('strat-longjump-val').textContent = p.longjump + '%';
+  document.getElementById('strat-recomb').value = p.recomb;
+  document.getElementById('strat-recomb-val').textContent = p.recomb + '%';
+  document.getElementById('preset-tooltip').textContent = p.tooltip;
+  document.getElementById('preset-tooltip').classList.add('visible');
+  resetSim();
 }
 
 function resetSim() {

@@ -397,6 +397,47 @@ body { font-family: 'Inter', system-ui, sans-serif; background: #0a0e17; color: 
 .mode-badge.rational { background: #2a1a0d; color: #ffaa44; border: 1px solid #3a2810; }
 .mode-badge.compare { background: #0d1a2a; color: #44aaff; border: 1px solid #102a3a; }
 
+/* ===== PRESET EXPERIMENTS ===== */
+.preset-group { margin-bottom: 4px; }
+.preset-group select {
+  width: 100%;
+  padding: 6px 8px;
+  background: #111820;
+  border: 1px solid #1a2535;
+  color: #b0c0d8;
+  border-radius: 4px;
+  font-size: 12px;
+  font-family: 'Inter', system-ui, sans-serif;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%235a6a80'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  padding-right: 24px;
+}
+.preset-group select:hover { border-color: #2a3a50; }
+.preset-group select:focus { border-color: #00cc66; outline: none; }
+.preset-toast {
+  margin-top: 6px;
+  padding: 8px 10px;
+  background: linear-gradient(135deg, rgba(0,255,100,0.06), rgba(0,180,80,0.03));
+  border: 1px solid #1a3a28;
+  border-left: 3px solid #00cc66;
+  border-radius: 0 4px 4px 0;
+  font-size: 11px;
+  line-height: 1.45;
+  color: #8aaa98;
+  display: none;
+  animation: presetFadeIn 0.25s ease;
+}
+.preset-toast.visible { display: block; }
+.preset-toast strong { color: #b0ffd0; font-weight: 600; }
+@keyframes presetFadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: #0a0e17; }
@@ -457,6 +498,20 @@ body { font-family: 'Inter', system-ui, sans-serif; background: #0a0e17; color: 
           <option value="compare">Compare</option>
         </select>
       </div>
+    </div>
+
+    <h3>Preset Experiments</h3>
+    <div class="preset-group">
+      <select id="presetSelect" onchange="applyPreset(this.value)">
+        <option value="">-- Select a preset --</option>
+        <option value="baseline">Baseline Learning</option>
+        <option value="rational">Rational Expectations</option>
+        <option value="highMutation">High Mutation</option>
+        <option value="largePop">Large Population</option>
+        <option value="lowRisk">Low Risk Aversion</option>
+        <option value="fastGA">Fast Evolution</option>
+      </select>
+      <div class="preset-toast" id="presetToast"></div>
     </div>
 
     <h3>Market</h3>
@@ -1418,6 +1473,74 @@ function kurtosis(arr) {
   let sum4 = 0;
   for (const v of arr) sum4 += ((v - m) / s) ** 4;
   return sum4 / n - 3;
+}
+
+// ===== Preset Experiments =====
+
+const PRESETS = {
+  baseline: {
+    label: 'Baseline Learning',
+    desc: 'Default SFI parameters. <strong>Expect fat tails</strong> (kurtosis ~45), volatility clustering, and a Hill exponent near the empirical cubic law (~2.55).',
+    params: { paramMode: 'learning', paramAgents: 25, paramMutation: 0.03, paramCrossover: 0.3, paramGA: 250, paramRisk: 0.5, paramRate: 0.10, paramDbar: 10, paramRho: 0.95, paramRules: 100 }
+  },
+  rational: {
+    label: 'Rational Expectations',
+    desc: 'All agents use a fixed equilibrium formula. <strong>Watch the market go flat</strong> — near-zero volume, no volatility clustering, and thin Gaussian tails. The "boring" baseline.',
+    params: { paramMode: 'rational', paramAgents: 25, paramMutation: 0.03, paramCrossover: 0.3, paramGA: 250, paramRisk: 0.5, paramRate: 0.10, paramDbar: 10, paramRho: 0.95, paramRules: 100 }
+  },
+  highMutation: {
+    label: 'High Mutation',
+    desc: 'Mutation rate tripled to 0.10. <strong>Heavier tails emerge</strong> — Hill exponent drops to ~2.50, kurtosis rises to ~52. More exploratory agents create larger price displacements.',
+    params: { paramMode: 'learning', paramAgents: 25, paramMutation: 0.10, paramCrossover: 0.3, paramGA: 250, paramRisk: 0.5, paramRate: 0.10, paramDbar: 10, paramRho: 0.95, paramRules: 100 }
+  },
+  largePop: {
+    label: 'Large Population',
+    desc: 'Population quadrupled to 100 agents. <strong>A calmer market</strong> — kurtosis drops ~60%, volatility falls 37%. Strategy diversity acts as a stabilizing buffer against herding.',
+    params: { paramMode: 'learning', paramAgents: 100, paramMutation: 0.03, paramCrossover: 0.3, paramGA: 250, paramRisk: 0.5, paramRate: 0.10, paramDbar: 10, paramRho: 0.95, paramRules: 100 }
+  },
+  lowRisk: {
+    label: 'Low Risk Aversion',
+    desc: 'Risk aversion cut to 0.1. <strong>Bubble-prone market</strong> — kurtosis jumps to ~69.5, positive skewness doubles. Agents take 5x larger positions, amplifying price spikes.',
+    params: { paramMode: 'learning', paramAgents: 25, paramMutation: 0.03, paramCrossover: 0.3, paramGA: 250, paramRisk: 0.1, paramRate: 0.10, paramDbar: 10, paramRho: 0.95, paramRules: 100 }
+  },
+  fastGA: {
+    label: 'Fast Evolution',
+    desc: 'GA interval cut to 50. <strong>Watch for extreme tail events</strong> from rapid strategy turnover — kurtosis triples to ~141, skewness hits ~5. The Red Queen effect in action.',
+    params: { paramMode: 'learning', paramAgents: 25, paramMutation: 0.03, paramCrossover: 0.3, paramGA: 50, paramRisk: 0.5, paramRate: 0.10, paramDbar: 10, paramRho: 0.95, paramRules: 100 }
+  }
+};
+
+function applyPreset(key) {
+  if (!key || !PRESETS[key]) {
+    document.getElementById('presetToast').classList.remove('visible');
+    return;
+  }
+  const preset = PRESETS[key];
+  const p = preset.params;
+
+  // Set all parameter inputs
+  document.getElementById('paramMode').value = p.paramMode;
+  document.getElementById('paramAgents').value = p.paramAgents;
+  document.getElementById('paramMutation').value = p.paramMutation;
+  document.getElementById('paramCrossover').value = p.paramCrossover;
+  document.getElementById('paramGA').value = p.paramGA;
+  document.getElementById('paramRisk').value = p.paramRisk;
+  document.getElementById('paramRate').value = p.paramRate;
+  document.getElementById('paramDbar').value = p.paramDbar;
+  document.getElementById('paramRho').value = p.paramRho;
+  document.getElementById('paramRules').value = p.paramRules;
+
+  // Update mode indicator and reset simulation
+  updateModeIndicator();
+  resetSim();
+
+  // Show tooltip description
+  const toast = document.getElementById('presetToast');
+  toast.innerHTML = preset.desc;
+  toast.classList.remove('visible');
+  // Force reflow for re-triggering animation
+  void toast.offsetWidth;
+  toast.classList.add('visible');
 }
 
 // ===== Init =====
