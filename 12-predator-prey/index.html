@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Predator-Prey: Endogenous Oscillations in Complex Systems</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Courier New', monospace; background: #0a0a0f; color: #e0e0e0; overflow-x: hidden; }
+
+.container { max-width: 1440px; margin: 0 auto; padding: 20px; }
+
+h1 { text-align: center; font-size: 1.8em; margin-bottom: 4px; color: #fff;
+     letter-spacing: 3px; text-transform: uppercase; }
+.subtitle { text-align: center; font-size: 0.85em; color: #888; margin-bottom: 24px; }
+
+/* Intro / Hero section */
+.intro-section {
+  background: linear-gradient(135deg, #12121a 0%, #1a0a0a 100%);
+  border: 1px solid #4a2020;
+  border-radius: 12px;
+  padding: 28px 32px;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+}
+.intro-section::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #4a4, #c44, #4a4, #c44);
+}
+.intro-section h2 {
+  font-size: 1.2em;
+  color: #afa;
+  margin-bottom: 12px;
+  letter-spacing: 1px;
+}
+.intro-section p {
+  font-size: 0.95em;
+  line-height: 1.7;
+  color: #bbb;
+}
+.intro-section p strong { color: #fff; }
+
+/* Key insight callout */
+.key-insight {
+  background: linear-gradient(135deg, #1a1a10, #0a1a0a);
+  border: 1px solid #2a4a20;
+  border-left: 4px solid #afa;
+  border-radius: 8px;
+  padding: 20px 24px;
+  margin-bottom: 24px;
+}
+.key-insight h3 {
+  font-size: 0.9em;
+  color: #afa;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+}
+.key-insight p {
+  font-size: 0.9em;
+  line-height: 1.7;
+  color: #bba;
+}
+.key-insight p strong { color: #fff; }
+
+/* Controls */
+.controls {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 10px; padding: 16px; background: #12121a; border: 1px solid #2a2a3a;
+  border-radius: 8px; margin-bottom: 20px;
+}
+.control-group { display: flex; flex-direction: column; gap: 4px; }
+.control-group label { font-size: 0.72em; color: #aaa; text-transform: uppercase; letter-spacing: 1px; }
+.control-group input, .control-group select {
+  background: #1a1a2e; border: 1px solid #333; color: #fff; padding: 6px 10px;
+  border-radius: 4px; font-family: inherit; font-size: 0.85em;
+}
+.control-group input:focus, .control-group select:focus {
+  outline: none; border-color: #4a4;
+}
+
+.btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+.btn {
+  background: #1a2a1a; border: 1px solid #4a4; color: #afa; padding: 8px 20px;
+  border-radius: 6px; cursor: pointer; font-family: inherit; font-size: 0.85em;
+  transition: all 0.2s;
+}
+.btn:hover { background: #2a3a2a; border-color: #6c6; }
+.btn.active { background: #3a4a3a; border-color: #8f8; color: #fff; }
+.btn.danger { background: #2a1a1a; border-color: #a44; color: #faa; }
+.btn.danger:hover { background: #3a2a2a; border-color: #c66; }
+
+/* Presets */
+.presets {
+  display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px;
+}
+.preset-btn {
+  background: #16161e; border: 1px solid #3a3a4a; color: #aaa; padding: 6px 14px;
+  border-radius: 20px; cursor: pointer; font-family: inherit; font-size: 0.78em;
+  transition: all 0.2s;
+}
+.preset-btn:hover { border-color: #6a6; color: #cfc; }
+
+/* Main layout */
+.main-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+@media (max-width: 900px) {
+  .main-grid { grid-template-columns: 1fr; }
+}
+
+.panel {
+  background: #12121a;
+  border: 1px solid #2a2a3a;
+  border-radius: 8px;
+  padding: 16px;
+  min-height: 0;
+  overflow: hidden;
+}
+.panel h3 {
+  font-size: 0.85em;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 12px;
+}
+
+/* Canvas for spatial grid */
+#grid-canvas {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 4px;
+  image-rendering: pixelated;
+  background: #000;
+}
+
+/* Chart panels */
+.chart-panel {
+  height: 280px;
+  min-height: 0;
+  overflow: hidden;
+}
+.chart-panel canvas {
+  width: 100%;
+  height: 100%;
+}
+
+/* Stats row */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.stat-card {
+  background: #12121a;
+  border: 1px solid #2a2a3a;
+  border-radius: 8px;
+  padding: 14px;
+  text-align: center;
+}
+.stat-card .stat-value {
+  font-size: 1.4em;
+  color: #fff;
+  font-weight: bold;
+}
+.stat-card .stat-label {
+  font-size: 0.7em;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 4px;
+}
+.stat-card.prey .stat-value { color: #4f4; }
+.stat-card.predator .stat-value { color: #f44; }
+.stat-card.grass .stat-value { color: #292; }
+.stat-card.tick .stat-value { color: #aaf; }
+.stat-card.period .stat-value { color: #fa4; }
+
+/* Legend */
+.legend {
+  display: flex; gap: 20px; justify-content: center; margin: 12px 0;
+  font-size: 0.8em;
+}
+.legend-item { display: flex; align-items: center; gap: 6px; }
+.legend-swatch {
+  width: 14px; height: 14px; border-radius: 3px;
+}
+
+/* Mode tabs */
+.mode-tabs {
+  display: flex; gap: 0; margin-bottom: 20px;
+}
+.mode-tab {
+  padding: 10px 24px;
+  background: #16161e;
+  border: 1px solid #2a2a3a;
+  color: #888;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.85em;
+  transition: all 0.2s;
+}
+.mode-tab:first-child { border-radius: 8px 0 0 8px; }
+.mode-tab:last-child { border-radius: 0 8px 8px 0; }
+.mode-tab.active {
+  background: #1a2a1a;
+  border-color: #4a4;
+  color: #afa;
+}
+
+/* ODE section */
+.ode-section { display: none; }
+.ode-section.visible { display: block; }
+.spatial-section.hidden { display: none; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Predator -- Prey</h1>
+  <p class="subtitle">Lotka-Volterra dynamics / Beinhocker Ch 8 p.168</p>
+
+  <div class="intro-section">
+    <h2>Endogenous Oscillations in Complex Adaptive Systems</h2>
+    <p>
+      The predator-prey system is one of the most fundamental examples of <strong>endogenous dynamics</strong>
+      in complex systems. No external force drives the population cycles -- they arise purely from the
+      internal logic of the interactions: prey reproduce, predators eat prey, predators starve when
+      prey are scarce, prey rebound when predators decline.
+    </p>
+    <p style="margin-top:10px;">
+      Beinhocker uses Lotka-Volterra as a stepping stone toward the broader argument that
+      <strong>economic systems are far-from-equilibrium</strong> -- they do not settle into a static
+      optimum but continually oscillate, adapt, and restructure. The "invisible hand" is not a
+      force toward equilibrium but a driver of perpetual motion through fitness landscapes.
+    </p>
+  </div>
+
+  <div class="key-insight">
+    <h3>Key Insight</h3>
+    <p>
+      The classic ODE model produces <strong>perfectly periodic orbits</strong> -- the system traces
+      closed loops in phase space forever. But the agent-based spatial version introduces
+      <strong>stochasticity, spatial heterogeneity, and the possibility of extinction</strong>.
+      Small populations can vanish through random fluctuations even when the ODE predicts survival.
+      This gap between the deterministic and stochastic views is central to Beinhocker's critique
+      of traditional equilibrium economics.
+    </p>
+  </div>
+
+  <!-- Mode selector -->
+  <div class="mode-tabs">
+    <div class="mode-tab active" onclick="setMode('spatial')">Spatial Agent-Based</div>
+    <div class="mode-tab" onclick="setMode('ode')">Classic ODE</div>
+  </div>
+
+  <!-- Preset experiments -->
+  <div class="presets">
+    <div class="preset-btn" onclick="loadPreset('default')">Default</div>
+    <div class="preset-btn" onclick="loadPreset('boom')">Prey Boom</div>
+    <div class="preset-btn" onclick="loadPreset('predator_heavy')">Predator Heavy</div>
+    <div class="preset-btn" onclick="loadPreset('fast_starve')">Fast Starvation</div>
+    <div class="preset-btn" onclick="loadPreset('slow_breed')">Slow Breeding</div>
+    <div class="preset-btn" onclick="loadPreset('large_world')">Large World (100x100)</div>
+    <div class="preset-btn" onclick="loadPreset('tiny_world')">Tiny World (20x20)</div>
+    <div class="preset-btn" onclick="loadPreset('fragile')">Fragile Ecosystem</div>
+  </div>
+
+  <!-- Controls -->
+  <div class="controls" id="spatial-controls">
+    <div class="control-group">
+      <label>Grid Size</label>
+      <input type="number" id="ctrl-grid-size" value="50" min="10" max="200">
+    </div>
+    <div class="control-group">
+      <label>Initial Prey</label>
+      <input type="number" id="ctrl-initial-prey" value="200" min="1" max="5000">
+    </div>
+    <div class="control-group">
+      <label>Initial Predators</label>
+      <input type="number" id="ctrl-initial-predators" value="30" min="1" max="2000">
+    </div>
+    <div class="control-group">
+      <label>Prey Reproduce %</label>
+      <input type="number" id="ctrl-prey-reproduce" value="8" min="0" max="100" step="0.1">
+    </div>
+    <div class="control-group">
+      <label>Predator Reproduce %</label>
+      <input type="number" id="ctrl-predator-reproduce" value="2" min="0" max="100" step="0.1">
+    </div>
+    <div class="control-group">
+      <label>Predator Starve (energy)</label>
+      <input type="number" id="ctrl-predator-starve" value="10" min="1" max="200">
+    </div>
+    <div class="control-group">
+      <label>Grass Regrow Ticks</label>
+      <input type="number" id="ctrl-grass-regrow" value="8" min="1" max="200">
+    </div>
+    <div class="control-group">
+      <label>Speed (ms/tick)</label>
+      <input type="number" id="ctrl-speed" value="50" min="1" max="1000">
+    </div>
+  </div>
+
+  <div class="controls ode-section" id="ode-controls">
+    <div class="control-group">
+      <label>Alpha (prey birth)</label>
+      <input type="number" id="ctrl-alpha" value="1.0" step="0.1" min="0">
+    </div>
+    <div class="control-group">
+      <label>Beta (predation)</label>
+      <input type="number" id="ctrl-beta" value="0.1" step="0.01" min="0">
+    </div>
+    <div class="control-group">
+      <label>Delta (pred efficiency)</label>
+      <input type="number" id="ctrl-delta" value="0.075" step="0.005" min="0">
+    </div>
+    <div class="control-group">
+      <label>Gamma (pred death)</label>
+      <input type="number" id="ctrl-gamma" value="1.5" step="0.1" min="0">
+    </div>
+    <div class="control-group">
+      <label>Initial Prey</label>
+      <input type="number" id="ctrl-ode-prey" value="40" min="0" step="1">
+    </div>
+    <div class="control-group">
+      <label>Initial Predators</label>
+      <input type="number" id="ctrl-ode-predators" value="9" min="0" step="1">
+    </div>
+    <div class="control-group">
+      <label>Speed (ms/tick)</label>
+      <input type="number" id="ctrl-ode-speed" value="20" min="1" max="1000">
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn" id="btn-start" onclick="startSim()">Start</button>
+    <button class="btn" id="btn-pause" onclick="pauseSim()">Pause</button>
+    <button class="btn danger" id="btn-reset" onclick="resetSim()">Reset</button>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card tick">
+      <div class="stat-value" id="stat-tick">0</div>
+      <div class="stat-label">Tick</div>
+    </div>
+    <div class="stat-card prey">
+      <div class="stat-value" id="stat-prey">0</div>
+      <div class="stat-label">Prey (Rabbits)</div>
+    </div>
+    <div class="stat-card predator">
+      <div class="stat-value" id="stat-predators">0</div>
+      <div class="stat-label">Predators (Foxes)</div>
+    </div>
+    <div class="stat-card grass">
+      <div class="stat-value" id="stat-grass">100%</div>
+      <div class="stat-label">Grass Coverage</div>
+    </div>
+    <div class="stat-card period">
+      <div class="stat-value" id="stat-period">--</div>
+      <div class="stat-label">Est. Period</div>
+    </div>
+  </div>
+
+  <!-- Main visualization grid -->
+  <div class="main-grid">
+    <!-- Spatial grid -->
+    <div class="panel spatial-section" id="panel-grid">
+      <h3>Spatial Grid</h3>
+      <div class="legend">
+        <div class="legend-item"><div class="legend-swatch" style="background:#1a3a1a"></div> Grass</div>
+        <div class="legend-item"><div class="legend-swatch" style="background:#4f4"></div> Prey</div>
+        <div class="legend-item"><div class="legend-swatch" style="background:#f44"></div> Predator</div>
+        <div class="legend-item"><div class="legend-swatch" style="background:#111"></div> Bare</div>
+      </div>
+      <canvas id="grid-canvas"></canvas>
+    </div>
+
+    <!-- Population chart -->
+    <div class="panel">
+      <h3>Population Over Time</h3>
+      <div class="chart-panel">
+        <canvas id="pop-chart"></canvas>
+      </div>
+    </div>
+
+    <!-- Phase space -->
+    <div class="panel">
+      <h3>Phase Space (Prey vs Predators)</h3>
+      <div class="chart-panel">
+        <canvas id="phase-chart"></canvas>
+      </div>
+    </div>
+
+    <!-- Grass chart -->
+    <div class="panel spatial-section" id="panel-grass">
+      <h3>Grass Coverage Over Time</h3>
+      <div class="chart-panel">
+        <canvas id="grass-chart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// =========================================================================
+//  State
+// =========================================================================
+let mode = 'spatial'; // 'spatial' or 'ode'
+let running = false;
+let timer = null;
+let tick = 0;
+
+// Spatial state
+let gridSize = 50;
+let grass = [];       // 2D: 0 = alive, >0 = regrow countdown
+let preyAgents = [];
+let predatorAgents = [];
+let nextId = 0;
+
+// ODE state
+let odeX = 40, odeY = 9;
+const odeDt = 0.01;
+
+// History for charts
+let histPrey = [];
+let histPred = [];
+let histGrass = [];
+let histTick = [];
+
+// Charts
+let popChart, phaseChart, grassChart;
+const MAX_HISTORY = 2000;
+
+// =========================================================================
+//  Config helpers
+// =========================================================================
+function getVal(id) { return parseFloat(document.getElementById(id).value); }
+function setVal(id, v) { document.getElementById(id).value = v; }
+
+function getSpatialConfig() {
+  return {
+    gridSize: Math.round(getVal('ctrl-grid-size')),
+    initialPrey: Math.round(getVal('ctrl-initial-prey')),
+    initialPredators: Math.round(getVal('ctrl-initial-predators')),
+    preyReproduce: getVal('ctrl-prey-reproduce') / 100,
+    predatorReproduce: getVal('ctrl-predator-reproduce') / 100,
+    predatorStarve: Math.round(getVal('ctrl-predator-starve')),
+    grassRegrow: Math.round(getVal('ctrl-grass-regrow')),
+    speed: Math.round(getVal('ctrl-speed')),
+  };
+}
+
+function getODEConfig() {
+  return {
+    alpha: getVal('ctrl-alpha'),
+    beta: getVal('ctrl-beta'),
+    delta: getVal('ctrl-delta'),
+    gamma: getVal('ctrl-gamma'),
+    initialPrey: getVal('ctrl-ode-prey'),
+    initialPredators: getVal('ctrl-ode-predators'),
+    speed: Math.round(getVal('ctrl-ode-speed')),
+  };
+}
+
+// =========================================================================
+//  Mode switching
+// =========================================================================
+function setMode(m) {
+  mode = m;
+  document.querySelectorAll('.mode-tab').forEach((t, i) => {
+    t.classList.toggle('active', (i === 0 && m === 'spatial') || (i === 1 && m === 'ode'));
+  });
+  document.getElementById('spatial-controls').style.display = m === 'spatial' ? '' : 'none';
+  document.getElementById('ode-controls').classList.toggle('visible', m === 'ode');
+  document.querySelectorAll('.spatial-section').forEach(el => {
+    el.classList.toggle('hidden', m === 'ode');
+  });
+  resetSim();
+}
+
+// =========================================================================
+//  Presets
+// =========================================================================
+function loadPreset(name) {
+  const presets = {
+    default:        { gridSize:50, prey:200, pred:30, preyR:8, predR:2, starve:10, regrow:8 },
+    boom:           { gridSize:50, prey:400, pred:5,  preyR:10,predR:2, starve:10, regrow:8 },
+    predator_heavy: { gridSize:50, prey:200, pred:80, preyR:8, predR:2, starve:10, regrow:8 },
+    fast_starve:    { gridSize:50, prey:200, pred:30, preyR:8, predR:2, starve:3,  regrow:8 },
+    slow_breed:     { gridSize:50, prey:200, pred:30, preyR:3, predR:1, starve:10, regrow:8 },
+    large_world:    { gridSize:100,prey:800, pred:100,preyR:8, predR:2, starve:10, regrow:8 },
+    tiny_world:     { gridSize:20, prey:60,  pred:8,  preyR:8, predR:2, starve:10, regrow:8 },
+    fragile:        { gridSize:30, prey:50,  pred:15, preyR:4, predR:3, starve:6,  regrow:20 },
+  };
+  const p = presets[name];
+  if (!p) return;
+  setVal('ctrl-grid-size', p.gridSize);
+  setVal('ctrl-initial-prey', p.prey);
+  setVal('ctrl-initial-predators', p.pred);
+  setVal('ctrl-prey-reproduce', p.preyR);
+  setVal('ctrl-predator-reproduce', p.predR);
+  setVal('ctrl-predator-starve', p.starve);
+  setVal('ctrl-grass-regrow', p.regrow);
+  if (mode === 'spatial') resetSim();
+}
+
+// =========================================================================
+//  Spatial model
+// =========================================================================
+const DIRS = [[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[-1,1],[1,-1],[1,1]];
+
+function wrap(v, sz) { return ((v % sz) + sz) % sz; }
+
+function initSpatial() {
+  const cfg = getSpatialConfig();
+  gridSize = cfg.gridSize;
+  grass = [];
+  for (let r = 0; r < gridSize; r++) {
+    grass[r] = new Int16Array(gridSize); // 0 = alive
+  }
+  preyAgents = [];
+  predatorAgents = [];
+  nextId = 0;
+  for (let i = 0; i < cfg.initialPrey; i++) {
+    preyAgents.push({
+      id: nextId++,
+      x: Math.floor(Math.random() * gridSize),
+      y: Math.floor(Math.random() * gridSize),
+      energy: 1 + Math.floor(Math.random() * 8),
+    });
+  }
+  for (let i = 0; i < cfg.initialPredators; i++) {
+    predatorAgents.push({
+      id: nextId++,
+      x: Math.floor(Math.random() * gridSize),
+      y: Math.floor(Math.random() * gridSize),
+      energy: 1 + Math.floor(Math.random() * 2 * cfg.predatorStarve),
+    });
+  }
+}
+
+function stepSpatial() {
+  const cfg = getSpatialConfig();
+
+  // Grass regrowth
+  for (let r = 0; r < gridSize; r++) {
+    for (let c = 0; c < gridSize; c++) {
+      if (grass[r][c] > 0) grass[r][c]--;
+    }
+  }
+
+  // Shuffle prey
+  shuffle(preyAgents);
+  const newPrey = [];
+  for (const p of preyAgents) {
+    // Move random
+    const d = DIRS[Math.floor(Math.random() * DIRS.length)];
+    p.x = wrap(p.x + d[0], gridSize);
+    p.y = wrap(p.y + d[1], gridSize);
+    p.energy--;
+    // Eat grass
+    if (grass[p.y][p.x] === 0) {
+      p.energy += 5;
+      grass[p.y][p.x] = cfg.grassRegrow;
+    }
+    // Reproduce
+    if (Math.random() < cfg.preyReproduce) {
+      p.energy = Math.floor(p.energy / 2);
+      newPrey.push({ id: nextId++, x: p.x, y: p.y, energy: p.energy });
+    }
+  }
+  preyAgents = preyAgents.filter(p => p.energy > 0);
+  preyAgents.push(...newPrey);
+
+  // Build prey location map
+  const preyMap = {};
+  for (const p of preyAgents) {
+    const k = p.x + ',' + p.y;
+    if (!preyMap[k]) preyMap[k] = [];
+    preyMap[k].push(p);
+  }
+
+  // Predators
+  shuffle(predatorAgents);
+  const newPred = [];
+  const eatenIds = new Set();
+  for (const pred of predatorAgents) {
+    // Move toward nearest prey (limited search)
+    let bestDist = Infinity, bestDx = 0, bestDy = 0, found = false;
+    for (const prey of preyAgents) {
+      let dx = prey.x - pred.x;
+      let dy = prey.y - pred.y;
+      if (Math.abs(dx) > gridSize / 2) dx = dx > 0 ? dx - gridSize : dx + gridSize;
+      if (Math.abs(dy) > gridSize / 2) dy = dy > 0 ? dy - gridSize : dy + gridSize;
+      const dist = Math.abs(dx) + Math.abs(dy);
+      if (dist < bestDist && dist <= 2) {
+        bestDist = dist; bestDx = Math.sign(dx); bestDy = Math.sign(dy); found = true;
+      }
+    }
+    if (found && bestDist > 0) {
+      if (Math.random() < 0.5 && bestDx !== 0) pred.x = wrap(pred.x + bestDx, gridSize);
+      else if (bestDy !== 0) pred.y = wrap(pred.y + bestDy, gridSize);
+      else pred.x = wrap(pred.x + bestDx, gridSize);
+    } else {
+      const d = DIRS[Math.floor(Math.random() * DIRS.length)];
+      pred.x = wrap(pred.x + d[0], gridSize);
+      pred.y = wrap(pred.y + d[1], gridSize);
+    }
+    pred.energy--;
+
+    // Eat prey
+    const k = pred.x + ',' + pred.y;
+    if (preyMap[k] && preyMap[k].length > 0) {
+      const victim = preyMap[k].pop();
+      eatenIds.add(victim.id);
+      pred.energy += 5;
+    }
+
+    // Reproduce
+    if (Math.random() < cfg.predatorReproduce) {
+      pred.energy = Math.floor(pred.energy / 2);
+      newPred.push({ id: nextId++, x: pred.x, y: pred.y, energy: pred.energy });
+    }
+  }
+  predatorAgents = predatorAgents.filter(p => p.energy > 0);
+  predatorAgents.push(...newPred);
+  preyAgents = preyAgents.filter(p => !eatenIds.has(p.id));
+}
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
+
+// =========================================================================
+//  ODE model
+// =========================================================================
+function initODE() {
+  const cfg = getODEConfig();
+  odeX = cfg.initialPrey;
+  odeY = cfg.initialPredators;
+}
+
+function stepODE() {
+  const cfg = getODEConfig();
+  const subSteps = 100;
+  const dt = 0.01;
+  for (let i = 0; i < subSteps; i++) {
+    const dx = cfg.alpha * odeX - cfg.beta * odeX * odeY;
+    const dy = cfg.delta * odeX * odeY - cfg.gamma * odeY;
+    odeX = Math.max(0, odeX + dx * dt);
+    odeY = Math.max(0, odeY + dy * dt);
+  }
+}
+
+// =========================================================================
+//  Drawing
+// =========================================================================
+const gridCanvas = document.getElementById('grid-canvas');
+const gridCtx = gridCanvas.getContext('2d');
+
+function drawGrid() {
+  gridCanvas.width = gridSize;
+  gridCanvas.height = gridSize;
+  const img = gridCtx.createImageData(gridSize, gridSize);
+  const d = img.data;
+
+  for (let r = 0; r < gridSize; r++) {
+    for (let c = 0; c < gridSize; c++) {
+      const idx = (r * gridSize + c) * 4;
+      if (grass[r][c] === 0) {
+        // Live grass
+        d[idx] = 26; d[idx+1] = 58; d[idx+2] = 26; d[idx+3] = 255;
+      } else {
+        // Bare
+        d[idx] = 17; d[idx+1] = 17; d[idx+2] = 17; d[idx+3] = 255;
+      }
+    }
+  }
+
+  // Prey
+  for (const p of preyAgents) {
+    const idx = (p.y * gridSize + p.x) * 4;
+    d[idx] = 68; d[idx+1] = 255; d[idx+2] = 68; d[idx+3] = 255;
+  }
+  // Predators
+  for (const p of predatorAgents) {
+    const idx = (p.y * gridSize + p.x) * 4;
+    d[idx] = 255; d[idx+1] = 68; d[idx+2] = 68; d[idx+3] = 255;
+  }
+
+  gridCtx.putImageData(img, 0, 0);
+}
+
+// =========================================================================
+//  Charts
+// =========================================================================
+function initCharts() {
+  const darkGrid = { color: 'rgba(255,255,255,0.06)' };
+  const darkTick = { color: '#666' };
+
+  // Population over time
+  const popCtx = document.getElementById('pop-chart').getContext('2d');
+  popChart = new Chart(popCtx, {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [
+        { label: 'Prey', data: [], borderColor: '#4f4', backgroundColor: 'rgba(68,255,68,0.08)',
+          borderWidth: 1.5, pointRadius: 0, tension: 0.2, fill: true },
+        { label: 'Predators', data: [], borderColor: '#f44', backgroundColor: 'rgba(255,68,68,0.08)',
+          borderWidth: 1.5, pointRadius: 0, tension: 0.2, fill: true },
+      ],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, animation: false,
+      scales: {
+        x: { grid: darkGrid, ticks: darkTick, title: { display: true, text: 'Tick', color: '#888' } },
+        y: { grid: darkGrid, ticks: darkTick, title: { display: true, text: 'Population', color: '#888' }, beginAtZero: true },
+      },
+      plugins: { legend: { labels: { color: '#ccc', font: { size: 11 } } } },
+    },
+  });
+
+  // Phase space
+  const phaseCtx = document.getElementById('phase-chart').getContext('2d');
+  phaseChart = new Chart(phaseCtx, {
+    type: 'scatter',
+    data: {
+      datasets: [{
+        label: 'Phase trajectory',
+        data: [],
+        borderColor: 'rgba(170,136,255,0.5)',
+        backgroundColor: 'rgba(170,136,255,0.15)',
+        pointRadius: 1.5,
+        pointBackgroundColor: 'rgba(170,136,255,0.5)',
+        showLine: true,
+        borderWidth: 1,
+        tension: 0.1,
+        fill: false,
+      }],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, animation: false,
+      scales: {
+        x: { grid: darkGrid, ticks: darkTick, title: { display: true, text: 'Prey', color: '#888' }, beginAtZero: true },
+        y: { grid: darkGrid, ticks: darkTick, title: { display: true, text: 'Predators', color: '#888' }, beginAtZero: true },
+      },
+      plugins: { legend: { display: false } },
+    },
+  });
+
+  // Grass coverage
+  const grassCtx = document.getElementById('grass-chart').getContext('2d');
+  grassChart = new Chart(grassCtx, {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [{
+        label: 'Grass %',
+        data: [],
+        borderColor: '#292',
+        backgroundColor: 'rgba(34,153,34,0.12)',
+        borderWidth: 1.5,
+        pointRadius: 0,
+        tension: 0.2,
+        fill: true,
+      }],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, animation: false,
+      scales: {
+        x: { grid: darkGrid, ticks: darkTick, title: { display: true, text: 'Tick', color: '#888' } },
+        y: { grid: darkGrid, ticks: darkTick, title: { display: true, text: 'Coverage %', color: '#888' },
+             min: 0, max: 100 },
+      },
+      plugins: { legend: { display: false } },
+    },
+  });
+}
+
+function updateCharts() {
+  // Trim to max history
+  const maxPts = MAX_HISTORY;
+  if (histTick.length > maxPts) {
+    const trim = histTick.length - maxPts;
+    histTick.splice(0, trim);
+    histPrey.splice(0, trim);
+    histPred.splice(0, trim);
+    histGrass.splice(0, trim);
+  }
+
+  popChart.data.labels = histTick;
+  popChart.data.datasets[0].data = histPrey;
+  popChart.data.datasets[1].data = histPred;
+  popChart.update('none');
+
+  // Phase: last 500 points
+  const n = Math.min(histPrey.length, 500);
+  const phaseData = [];
+  for (let i = histPrey.length - n; i < histPrey.length; i++) {
+    phaseData.push({ x: histPrey[i], y: histPred[i] });
+  }
+  phaseChart.data.datasets[0].data = phaseData;
+  phaseChart.update('none');
+
+  if (mode === 'spatial') {
+    grassChart.data.labels = histTick;
+    grassChart.data.datasets[0].data = histGrass;
+    grassChart.update('none');
+  }
+}
+
+// =========================================================================
+//  Stats
+// =========================================================================
+function updateStats() {
+  document.getElementById('stat-tick').textContent = tick;
+  if (mode === 'spatial') {
+    document.getElementById('stat-prey').textContent = preyAgents.length;
+    document.getElementById('stat-predators').textContent = predatorAgents.length;
+    let gc = 0, total = gridSize * gridSize;
+    for (let r = 0; r < gridSize; r++)
+      for (let c = 0; c < gridSize; c++)
+        if (grass[r][c] === 0) gc++;
+    document.getElementById('stat-grass').textContent = Math.round(100 * gc / total) + '%';
+  } else {
+    document.getElementById('stat-prey').textContent = odeX.toFixed(1);
+    document.getElementById('stat-predators').textContent = odeY.toFixed(1);
+    document.getElementById('stat-grass').textContent = '--';
+  }
+
+  // Estimate period from prey peaks
+  if (histPrey.length > 30) {
+    const vals = histPrey;
+    const peaks = [];
+    for (let i = 2; i < vals.length - 2; i++) {
+      if (vals[i] > vals[i-1] && vals[i] > vals[i+1] && vals[i] > 5) {
+        peaks.push(histTick[i]);
+      }
+    }
+    if (peaks.length >= 2) {
+      let sum = 0;
+      for (let i = 0; i < peaks.length - 1; i++) sum += peaks[i+1] - peaks[i];
+      const period = sum / (peaks.length - 1);
+      document.getElementById('stat-period').textContent = period.toFixed(0);
+    }
+  }
+}
+
+// =========================================================================
+//  Main loop
+// =========================================================================
+function doTick() {
+  tick++;
+  let prey, pred, grassFrac;
+
+  if (mode === 'spatial') {
+    stepSpatial();
+    prey = preyAgents.length;
+    pred = predatorAgents.length;
+    let gc = 0, total = gridSize * gridSize;
+    for (let r = 0; r < gridSize; r++)
+      for (let c = 0; c < gridSize; c++)
+        if (grass[r][c] === 0) gc++;
+    grassFrac = 100 * gc / total;
+    drawGrid();
+  } else {
+    stepODE();
+    prey = odeX;
+    pred = odeY;
+    grassFrac = 0;
+  }
+
+  histTick.push(tick);
+  histPrey.push(prey);
+  histPred.push(pred);
+  histGrass.push(grassFrac);
+
+  if (tick % 5 === 0) {
+    updateCharts();
+    updateStats();
+  }
+}
+
+function startSim() {
+  if (running) return;
+  running = true;
+  document.getElementById('btn-start').classList.add('active');
+  const speed = mode === 'spatial' ? getSpatialConfig().speed : getODEConfig().speed;
+  timer = setInterval(doTick, speed);
+}
+
+function pauseSim() {
+  running = false;
+  document.getElementById('btn-start').classList.remove('active');
+  if (timer) { clearInterval(timer); timer = null; }
+}
+
+function resetSim() {
+  pauseSim();
+  tick = 0;
+  histPrey = []; histPred = []; histGrass = []; histTick = [];
+
+  if (mode === 'spatial') {
+    initSpatial();
+    drawGrid();
+  } else {
+    initODE();
+  }
+
+  updateStats();
+  if (popChart) {
+    popChart.data.labels = [];
+    popChart.data.datasets[0].data = [];
+    popChart.data.datasets[1].data = [];
+    popChart.update('none');
+    phaseChart.data.datasets[0].data = [];
+    phaseChart.update('none');
+    grassChart.data.labels = [];
+    grassChart.data.datasets[0].data = [];
+    grassChart.update('none');
+  }
+  document.getElementById('stat-period').textContent = '--';
+}
+
+// =========================================================================
+//  Init
+// =========================================================================
+initCharts();
+initSpatial();
+drawGrid();
+updateStats();
+</script>
+</body>
+</html>

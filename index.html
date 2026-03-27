@@ -165,6 +165,21 @@ body {
 .card[data-sim="09"]::before { background: linear-gradient(90deg, #88ddff, #aaeeff); }
 .card[data-sim="09"]:hover { border-color: #1a2a3a; box-shadow: 0 12px 40px rgba(136,221,255,0.08); }
 
+.card[data-sim="10"]::before { background: linear-gradient(90deg, #ff9944, #ffbb77); }
+.card[data-sim="10"]:hover { border-color: #3a2a18; box-shadow: 0 12px 40px rgba(255,153,68,0.08); }
+
+.card[data-sim="11"]::before { background: linear-gradient(90deg, #ee6688, #ff99aa); }
+.card[data-sim="11"]:hover { border-color: #3a1a28; box-shadow: 0 12px 40px rgba(238,102,136,0.08); }
+
+.card[data-sim="12"]::before { background: linear-gradient(90deg, #44bb66, #77dd99); }
+.card[data-sim="12"]:hover { border-color: #1a3a24; box-shadow: 0 12px 40px rgba(68,187,102,0.08); }
+
+.card[data-sim="13"]::before { background: linear-gradient(90deg, #ddaa44, #eecc77); }
+.card[data-sim="13"]:hover { border-color: #3a3018; box-shadow: 0 12px 40px rgba(221,170,68,0.08); }
+
+.card[data-sim="14"]::before { background: linear-gradient(90deg, #bb77ff, #dd99ff); }
+.card[data-sim="14"]:hover { border-color: #2a1a3a; box-shadow: 0 12px 40px rgba(187,119,255,0.08); }
+
 .card-header {
   display: flex;
   align-items: flex-start;
@@ -193,6 +208,11 @@ body {
 .card[data-sim="07"] .card-number { background: linear-gradient(135deg, #0a2a2a, #143a38); color: #66eedd; }
 .card[data-sim="08"] .card-number { background: linear-gradient(135deg, #2a0a1a, #3a1428); color: #ff66aa; }
 .card[data-sim="09"] .card-number { background: linear-gradient(135deg, #0a1a2a, #142838); color: #88ddff; }
+.card[data-sim="10"] .card-number { background: linear-gradient(135deg, #2a1a0a, #3a2814); color: #ff9944; }
+.card[data-sim="11"] .card-number { background: linear-gradient(135deg, #2a0a18, #3a1428); color: #ee6688; }
+.card[data-sim="12"] .card-number { background: linear-gradient(135deg, #0a2a14, #143a20); color: #44bb66; }
+.card[data-sim="13"] .card-number { background: linear-gradient(135deg, #2a2408, #3a3014); color: #ddaa44; }
+.card[data-sim="14"] .card-number { background: linear-gradient(135deg, #1a0a2a, #2a143a); color: #bb77ff; }
 
 .card-title {
   font-size: 17px;
@@ -227,6 +247,11 @@ body {
 .card[data-sim="07"] .card-tag { color: #66eedd; border-color: rgba(102,238,221,0.15); background: rgba(102,238,221,0.06); }
 .card[data-sim="08"] .card-tag { color: #ff66aa; border-color: rgba(255,102,170,0.15); background: rgba(255,102,170,0.06); }
 .card[data-sim="09"] .card-tag { color: #88ddff; border-color: rgba(136,221,255,0.15); background: rgba(136,221,255,0.06); }
+.card[data-sim="10"] .card-tag { color: #ff9944; border-color: rgba(255,153,68,0.15); background: rgba(255,153,68,0.06); }
+.card[data-sim="11"] .card-tag { color: #ee6688; border-color: rgba(238,102,136,0.15); background: rgba(238,102,136,0.06); }
+.card[data-sim="12"] .card-tag { color: #44bb66; border-color: rgba(68,187,102,0.15); background: rgba(68,187,102,0.06); }
+.card[data-sim="13"] .card-tag { color: #ddaa44; border-color: rgba(221,170,68,0.15); background: rgba(221,170,68,0.06); }
+.card[data-sim="14"] .card-tag { color: #bb77ff; border-color: rgba(187,119,255,0.15); background: rgba(187,119,255,0.06); }
 
 .card-status {
   display: inline-block;
@@ -360,9 +385,9 @@ body {
     <p class="intro">
       In 2006, Eric Beinhocker argued that <strong>the economy is not a machine in equilibrium</strong> but a
       <strong>complex adaptive system</strong> — an evolving ecology of interacting agents whose collective
-      behavior produces emergent phenomena no individual intended. These eight simulations bring that
+      behavior produces emergent phenomena no individual intended. These fourteen simulations bring that
       thesis to life: from fat-tailed stock returns and bullwhip cascades to the spontaneous emergence
-      of cooperation and inequality from nothing more than simple rules and local interaction.
+      of cooperation, segregation, and inequality from nothing more than simple rules and local interaction.
     </p>
     <div style="margin-top: 20px;">
       <a href="findings.html" style="display: inline-block; padding: 10px 24px; background: linear-gradient(135deg, #1a2a3a, #2a3a4a); border: 1px solid #3a4a5a; border-radius: 6px; color: #88ddff; text-decoration: none; font-size: 14px; font-weight: 600; transition: all 0.2s;">Research Findings &rarr;</a>
@@ -515,6 +540,86 @@ body {
         creative destruction, and adapt their organizational structure &mdash; all at once.
       </div>
       <span class="card-tag">Cross-model integration &middot; Emergent macro</span>
+      <span class="card-arrow">&rarr;</span>
+    </a>
+
+    <!-- 10 -->
+    <a href="10-el-farol-bar/index.html" class="card" data-sim="10">
+      <div class="card-header">
+        <div class="card-number">10</div>
+        <div>
+          <div class="card-title">El Farol Bar Problem</div>
+        </div>
+      </div>
+      <div class="card-desc">
+        Arthur's bar problem: agents with competing prediction strategies decide whether to attend.
+        No equilibrium exists &mdash; attendance oscillates endogenously as strategies chase their own tails.
+      </div>
+      <span class="card-tag">Inductive reasoning &middot; No equilibrium</span>
+      <span class="card-arrow">&rarr;</span>
+    </a>
+
+    <!-- 11 -->
+    <a href="11-schelling-segregation/index.html" class="card" data-sim="11">
+      <div class="card-header">
+        <div class="card-number">11</div>
+        <div>
+          <div class="card-title">Schelling Segregation</div>
+        </div>
+      </div>
+      <div class="card-desc">
+        Mild individual preferences for similar neighbors produce extreme macro-level segregation.
+        A 30% tolerance threshold generates 75% neighborhood homogeneity.
+      </div>
+      <span class="card-tag">Emergence &middot; Micro to macro</span>
+      <span class="card-arrow">&rarr;</span>
+    </a>
+
+    <!-- 12 -->
+    <a href="12-predator-prey/index.html" class="card" data-sim="12">
+      <div class="card-header">
+        <div class="card-number">12</div>
+        <div>
+          <div class="card-title">Predator-Prey</div>
+        </div>
+      </div>
+      <div class="card-desc">
+        Lotka-Volterra dynamics in both ODE and spatial agent-based variants. Populations oscillate
+        endogenously &mdash; no external shocks needed to produce boom and bust.
+      </div>
+      <span class="card-tag">Endogenous oscillations &middot; Extinction risk</span>
+      <span class="card-arrow">&rarr;</span>
+    </a>
+
+    <!-- 13 -->
+    <a href="13-sand-pile/index.html" class="card" data-sim="13">
+      <div class="card-header">
+        <div class="card-number">13</div>
+        <div>
+          <div class="card-title">Sand Pile / SOC</div>
+        </div>
+      </div>
+      <div class="card-desc">
+        Bak's sandpile: grains dropped one at a time self-organize to criticality. Avalanche sizes
+        follow a power law &mdash; there is no 'typical' event size.
+      </div>
+      <span class="card-tag">Self-organized criticality &middot; Power laws</span>
+      <span class="card-arrow">&rarr;</span>
+    </a>
+
+    <!-- 14 -->
+    <a href="14-business-plans/index.html" class="card" data-sim="14">
+      <div class="card-header">
+        <div class="card-number">14</div>
+        <div>
+          <div class="card-title">Business Plan Evolution</div>
+        </div>
+      </div>
+      <div class="card-desc">
+        Business Plans as economic DNA. Wealth emerges from the co-evolution of Physical Technology,
+        Social Technology, and Strategy on fitness landscapes.
+      </div>
+      <span class="card-tag">Wealth as fit order &middot; G-R Conditions</span>
       <span class="card-arrow">&rarr;</span>
     </a>
 

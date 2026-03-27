@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sand Pile / Self-Organized Criticality Simulation</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #0a0e17;
+    color: #e0e6f0;
+    overflow-x: hidden;
+}
+
+/* Intro Section */
+.intro-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(6, 8, 16, 0.97);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.intro-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(1.05);
+}
+.intro-card {
+    max-width: 720px;
+    padding: 48px 56px;
+    background: linear-gradient(135deg, #141a30 0%, #0d1220 100%);
+    border: 1px solid #2a3060;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 0 120px rgba(255, 160, 50, 0.08);
+}
+.intro-card h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #ffb347;
+    margin-bottom: 8px;
+}
+.intro-card .tagline {
+    font-size: 14px;
+    color: #8890a8;
+    margin-bottom: 28px;
+}
+.intro-card .metaphor {
+    font-size: 16px;
+    line-height: 1.7;
+    color: #c0c8e0;
+    margin-bottom: 32px;
+    text-align: left;
+}
+.intro-card .metaphor strong {
+    color: #ffb347;
+}
+.intro-card .key-insight {
+    background: linear-gradient(135deg, #2a1a0a 0%, #1a1408 100%);
+    border-left: 3px solid #ddaa33;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 32px;
+    text-align: left;
+}
+.intro-card .key-insight h3 {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #ddaa33;
+    margin-bottom: 8px;
+}
+.intro-card .key-insight p {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #b0b8d0;
+}
+.btn-start {
+    background: linear-gradient(135deg, #ffb347 0%, #ff8800 100%);
+    color: #0a0e17;
+    border: none;
+    padding: 14px 40px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.btn-start:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(255, 160, 50, 0.3);
+}
+
+/* Main Layout */
+.main-container {
+    display: grid;
+    grid-template-columns: 280px 1fr 300px;
+    gap: 16px;
+    padding: 16px;
+    min-height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.panel {
+    background: #111827;
+    border: 1px solid #1e2a40;
+    border-radius: 10px;
+    padding: 16px;
+}
+.panel h3 {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #ffb347;
+    margin-bottom: 12px;
+}
+.param-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+.param-row label {
+    font-size: 13px;
+    color: #8890a8;
+}
+.param-row input, .param-row select {
+    width: 80px;
+    background: #0d1220;
+    border: 1px solid #2a3060;
+    color: #e0e6f0;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 13px;
+    text-align: right;
+}
+.btn-action {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 6px;
+    transition: transform 0.15s, background 0.2s;
+}
+.btn-action:hover { transform: translateY(-1px); }
+.btn-run { background: linear-gradient(135deg, #ffb347, #ff8800); color: #0a0e17; }
+.btn-pause { background: linear-gradient(135deg, #6699cc, #4477aa); color: #fff; }
+.btn-reset { background: linear-gradient(135deg, #444, #333); color: #ccc; }
+.btn-drop { background: linear-gradient(135deg, #cc6644, #aa4422); color: #fff; }
+
+.stat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+}
+.stat-item {
+    background: #0d1220;
+    border-radius: 6px;
+    padding: 8px 10px;
+    text-align: center;
+}
+.stat-item .stat-val {
+    font-size: 18px;
+    font-weight: 700;
+    color: #ffb347;
+}
+.stat-item .stat-label {
+    font-size: 10px;
+    color: #667088;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Presets */
+.preset-btn {
+    display: block;
+    width: 100%;
+    padding: 8px 10px;
+    margin-bottom: 6px;
+    background: #0d1220;
+    border: 1px solid #1e2a40;
+    border-radius: 6px;
+    color: #c0c8e0;
+    font-size: 12px;
+    cursor: pointer;
+    text-align: left;
+    transition: border-color 0.2s;
+}
+.preset-btn:hover { border-color: #ffb347; }
+.preset-btn strong { color: #ffb347; display: block; margin-bottom: 2px; font-size: 13px; }
+
+/* Center Content */
+.center-content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.grid-container {
+    background: #111827;
+    border: 1px solid #1e2a40;
+    border-radius: 10px;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 460px;
+    overflow: hidden;
+}
+#sandCanvas {
+    image-rendering: pixelated;
+    border-radius: 4px;
+}
+
+.charts-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    min-height: 0;
+    overflow: hidden;
+}
+.chart-panel {
+    background: #111827;
+    border: 1px solid #1e2a40;
+    border-radius: 10px;
+    padding: 12px;
+    height: 240px;
+    min-height: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+.chart-panel h4 {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #8890a8;
+    margin-bottom: 8px;
+    flex-shrink: 0;
+}
+.chart-panel canvas {
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+}
+
+/* Right Sidebar - Narrative */
+.right-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.narrative-panel {
+    background: #111827;
+    border: 1px solid #1e2a40;
+    border-radius: 10px;
+    padding: 16px;
+}
+.narrative-panel h3 {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #ddaa33;
+    margin-bottom: 10px;
+}
+.narrative-panel p {
+    font-size: 13px;
+    line-height: 1.7;
+    color: #9098b0;
+    margin-bottom: 10px;
+}
+.narrative-panel .highlight {
+    color: #ffb347;
+    font-weight: 600;
+}
+.avalanche-log {
+    max-height: 200px;
+    overflow-y: auto;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 11px;
+    color: #667088;
+    line-height: 1.6;
+}
+.avalanche-log .big {
+    color: #ff6644;
+    font-weight: 600;
+}
+.avalanche-log .medium {
+    color: #ffb347;
+}
+
+/* Speed control */
+.speed-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+}
+.speed-row label { font-size: 12px; color: #667088; }
+.speed-row input[type="range"] { flex: 1; accent-color: #ffb347; }
+.speed-row .speed-val { font-size: 12px; color: #ffb347; min-width: 40px; text-align: right; }
+</style>
+</head>
+<body>
+
+<!-- Intro Overlay -->
+<div class="intro-overlay" id="introOverlay">
+    <div class="intro-card">
+        <h1>Self-Organized Criticality</h1>
+        <div class="tagline">Bak, Tang & Wiesenfeld (1987) -- Beinhocker Ch 8, p.178</div>
+        <div class="metaphor">
+            <p>Imagine slowly piling sand on a table. At first, nothing much happens. But as the pile
+            grows steeper, a single grain can trigger <strong>avalanches of all sizes</strong> -- from
+            tiny slips to catastrophic collapses that reshape the entire pile.</p>
+            <br>
+            <p>This is <strong>self-organized criticality</strong>: the system drives itself to a
+            critical state where events of all magnitudes occur, following a <strong>power law</strong>.
+            No tuning required -- criticality emerges spontaneously.</p>
+        </div>
+        <div class="key-insight">
+            <h3>Beinhocker's Insight</h3>
+            <p>The same mathematics governs earthquakes, stock market crashes, forest fires, and
+            species extinctions. These systems sit at the "edge of chaos" -- poised between order and
+            disorder. <strong>Small causes can have enormous effects</strong>, and the distribution of
+            event sizes follows a power law, not a bell curve. This is why "normal" risk models
+            systematically underestimate the probability of extreme events.</p>
+        </div>
+        <button class="btn-start" onclick="startSimulation()">Drop the First Grain</button>
+    </div>
+</div>
+
+<!-- Main Layout -->
+<div class="main-container">
+
+    <!-- Left Sidebar: Controls -->
+    <div class="sidebar">
+        <div class="panel">
+            <h3>Parameters</h3>
+            <div class="param-row">
+                <label>Grid Size</label>
+                <input type="number" id="paramGridSize" value="50" min="10" max="200">
+            </div>
+            <div class="param-row">
+                <label>Threshold</label>
+                <input type="number" id="paramThreshold" value="4" min="2" max="16">
+            </div>
+            <div class="speed-row">
+                <label>Speed</label>
+                <input type="range" id="speedSlider" min="1" max="100" value="10">
+                <span class="speed-val" id="speedVal">10/tick</span>
+            </div>
+        </div>
+
+        <div class="panel">
+            <button class="btn-action btn-run" id="btnRun" onclick="toggleRun()">Run</button>
+            <button class="btn-action btn-pause" onclick="pauseSim()">Pause</button>
+            <button class="btn-action btn-drop" onclick="dropOne()">Drop 1 Grain</button>
+            <button class="btn-action btn-reset" onclick="resetSim()">Reset</button>
+        </div>
+
+        <div class="panel">
+            <h3>Live Statistics</h3>
+            <div class="stat-grid">
+                <div class="stat-item">
+                    <div class="stat-val" id="statTick">0</div>
+                    <div class="stat-label">Grains Dropped</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-val" id="statOnGrid">0</div>
+                    <div class="stat-label">On Grid</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-val" id="statLost">0</div>
+                    <div class="stat-label">Lost (edges)</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-val" id="statMeanH">0.00</div>
+                    <div class="stat-label">Mean Height</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-val" id="statAvalanches">0</div>
+                    <div class="stat-label">Avalanches</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-val" id="statMaxAval">0</div>
+                    <div class="stat-label">Max Avalanche</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-val" id="statAlpha">--</div>
+                    <div class="stat-label">Power-Law Exp</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-val" id="statMaxH">0</div>
+                    <div class="stat-label">Max Height</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h3>Experiments</h3>
+            <button class="preset-btn" onclick="loadPreset(50, 4, 10)">
+                <strong>Classic BTW</strong>50x50, threshold 4
+            </button>
+            <button class="preset-btn" onclick="loadPreset(25, 4, 20)">
+                <strong>Small Grid</strong>25x25, threshold 4 (more edge losses)
+            </button>
+            <button class="preset-btn" onclick="loadPreset(100, 4, 50)">
+                <strong>Large Grid</strong>100x100, threshold 4 (cleaner power law)
+            </button>
+            <button class="preset-btn" onclick="loadPreset(50, 2, 10)">
+                <strong>Low Threshold</strong>50x50, threshold 2 (frequent avalanches)
+            </button>
+            <button class="preset-btn" onclick="loadPreset(50, 8, 10)">
+                <strong>High Threshold</strong>50x50, threshold 8 (rare but larger)
+            </button>
+        </div>
+    </div>
+
+    <!-- Center: Grid + Charts -->
+    <div class="center-content">
+        <div class="grid-container">
+            <canvas id="sandCanvas"></canvas>
+        </div>
+        <div class="charts-row">
+            <div class="chart-panel">
+                <h4>Avalanche Size Distribution (Log-Log)</h4>
+                <canvas id="chartSizeDist"></canvas>
+            </div>
+            <div class="chart-panel">
+                <h4>Avalanche Time Series</h4>
+                <canvas id="chartTimeSeries"></canvas>
+            </div>
+        </div>
+        <div class="charts-row">
+            <div class="chart-panel">
+                <h4>Cumulative Grains on Grid</h4>
+                <canvas id="chartGrains"></canvas>
+            </div>
+            <div class="chart-panel">
+                <h4>Height Distribution</h4>
+                <canvas id="chartHeightDist"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Sidebar: Narrative -->
+    <div class="right-sidebar">
+        <div class="narrative-panel">
+            <h3>What You're Seeing</h3>
+            <p>The grid shows <span class="highlight">sand grain heights</span> as a heatmap.
+            Dark cells are nearly empty; bright cells are near the critical threshold.</p>
+            <p>Watch for <span class="highlight">cascading avalanches</span> -- a single grain
+            can trigger a chain reaction across the entire grid.</p>
+            <p id="narrativePhase">Drop grains to begin building toward criticality...</p>
+        </div>
+
+        <div class="narrative-panel">
+            <h3>The Power Law</h3>
+            <p>If the system is truly at criticality, the avalanche size distribution on the
+            log-log plot should form a <span class="highlight">straight line</span>. This means
+            there is no "typical" avalanche size -- events of all scales occur.</p>
+            <p>The slope of this line is the <span class="highlight">power-law exponent</span>.
+            For the 2D BTW model, theory predicts values around 1.0-1.2.</p>
+        </div>
+
+        <div class="narrative-panel">
+            <h3>Earthquakes & Markets</h3>
+            <p>Beinhocker (p.178): <em>"The same statistical signature -- power-law distributions --
+            appears in earthquake magnitudes, stock market returns, city sizes, and species
+            extinctions."</em></p>
+            <p>The sandpile is the simplest model that produces this behavior. It demonstrates
+            that <span class="highlight">extreme events are not outliers</span> -- they are an
+            inherent property of the system's dynamics.</p>
+        </div>
+
+        <div class="narrative-panel">
+            <h3>Recent Avalanches</h3>
+            <div class="avalanche-log" id="avalancheLog">
+                Waiting for avalanches...
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ============================================================
+// Sandpile Simulation Engine
+// ============================================================
+
+class SandPileEngine {
+    constructor(gridSize, threshold) {
+        this.gridSize = gridSize;
+        this.threshold = threshold;
+        this.heights = new Int32Array(gridSize * gridSize);
+        this.tick = 0;
+        this.totalGrains = 0;
+        this.totalAdded = 0;
+        this.totalLost = 0;
+        this.avalancheSizes = [];
+        this.avalancheDurations = [];
+        this.grainsHistory = [];
+        this.recentAvalanches = [];
+        this.maxAvalanche = 0;
+    }
+
+    idx(r, c) { return r * this.gridSize + c; }
+
+    inBounds(r, c) {
+        return r >= 0 && r < this.gridSize && c >= 0 && c < this.gridSize;
+    }
+
+    dropGrain() {
+        const r = Math.floor(Math.random() * this.gridSize);
+        const c = Math.floor(Math.random() * this.gridSize);
+        this.heights[this.idx(r, c)]++;
+        this.totalGrains++;
+        this.totalAdded++;
+        this.tick++;
+
+        // Resolve topplings
+        let avalancheSize = 0;
+        let avalancheDuration = 0;
+        let grainLost = 0;
+
+        let toTopple = new Set();
+        if (this.heights[this.idx(r, c)] >= this.threshold) {
+            toTopple.add(this.idx(r, c));
+        }
+
+        const neighbors = [[-1,0],[1,0],[0,-1],[0,1]];
+
+        while (toTopple.size > 0) {
+            avalancheDuration++;
+            const nextTopple = new Set();
+
+            for (const idx of toTopple) {
+                const cr = Math.floor(idx / this.gridSize);
+                const cc = idx % this.gridSize;
+
+                while (this.heights[idx] >= this.threshold) {
+                    avalancheSize++;
+                    this.heights[idx] -= this.threshold;
+
+                    for (let i = 0; i < this.threshold; i++) {
+                        const [dr, dc] = neighbors[i % 4];
+                        const nr = cr + dr;
+                        const nc = cc + dc;
+                        if (this.inBounds(nr, nc)) {
+                            const ni = this.idx(nr, nc);
+                            this.heights[ni]++;
+                            if (this.heights[ni] >= this.threshold) {
+                                nextTopple.add(ni);
+                            }
+                        } else {
+                            grainLost++;
+                            this.totalGrains--;
+                            this.totalLost++;
+                        }
+                    }
+                }
+            }
+            toTopple = nextTopple;
+        }
+
+        if (avalancheSize > 0) {
+            this.avalancheSizes.push(avalancheSize);
+            this.avalancheDurations.push(avalancheDuration);
+            if (avalancheSize > this.maxAvalanche) this.maxAvalanche = avalancheSize;
+            this.recentAvalanches.push({ tick: this.tick, size: avalancheSize, duration: avalancheDuration });
+            if (this.recentAvalanches.length > 200) this.recentAvalanches.shift();
+        }
+
+        this.grainsHistory.push(this.totalGrains);
+        if (this.grainsHistory.length > 2000) this.grainsHistory.shift();
+
+        return { size: avalancheSize, duration: avalancheDuration, row: r, col: c };
+    }
+
+    getMeanHeight() {
+        let sum = 0;
+        for (let i = 0; i < this.heights.length; i++) sum += this.heights[i];
+        return sum / this.heights.length;
+    }
+
+    getMaxHeight() {
+        let mx = 0;
+        for (let i = 0; i < this.heights.length; i++) {
+            if (this.heights[i] > mx) mx = this.heights[i];
+        }
+        return mx;
+    }
+
+    getSizeDistribution() {
+        const dist = {};
+        for (const s of this.avalancheSizes) {
+            dist[s] = (dist[s] || 0) + 1;
+        }
+        return dist;
+    }
+
+    getHeightDistribution() {
+        const dist = {};
+        for (let i = 0; i < this.heights.length; i++) {
+            const h = this.heights[i];
+            dist[h] = (dist[h] || 0) + 1;
+        }
+        return dist;
+    }
+
+    estimatePowerLaw() {
+        const sizes = this.avalancheSizes.filter(s => s >= 1);
+        if (sizes.length < 20) return null;
+        const n = sizes.length;
+        const xMin = 1;
+        let logSum = 0;
+        for (const x of sizes) {
+            logSum += Math.log(x / (xMin - 0.5));
+        }
+        if (logSum === 0) return null;
+        return 1.0 + n / logSum;
+    }
+}
+
+// ============================================================
+// Visualization
+// ============================================================
+
+let engine = null;
+let running = false;
+let animId = null;
+
+const canvas = document.getElementById('sandCanvas');
+const ctx = canvas.getContext('2d');
+
+function initEngine() {
+    const gs = parseInt(document.getElementById('paramGridSize').value) || 50;
+    const th = parseInt(document.getElementById('paramThreshold').value) || 4;
+    engine = new SandPileEngine(gs, th);
+    resizeCanvas();
+    drawGrid();
+    updateStats();
+    document.getElementById('avalancheLog').innerHTML = 'Waiting for avalanches...';
+    document.getElementById('narrativePhase').textContent = 'Drop grains to begin building toward criticality...';
+}
+
+function resizeCanvas() {
+    const container = document.querySelector('.grid-container');
+    const maxSize = Math.min(container.clientWidth - 24, container.clientHeight - 24);
+    const gs = engine.gridSize;
+    const cellSize = Math.max(1, Math.floor(maxSize / gs));
+    canvas.width = gs * cellSize;
+    canvas.height = gs * cellSize;
+    canvas.style.width = canvas.width + 'px';
+    canvas.style.height = canvas.height + 'px';
+}
+
+function heightToColor(h, threshold) {
+    const ratio = Math.min(h / (threshold - 1), 1.0);
+    if (h === 0) return [10, 14, 30];
+    if (h >= threshold) return [255, 80, 40]; // Should not appear (already toppled)
+
+    // Gradient: dark blue -> teal -> yellow -> bright orange
+    if (ratio < 0.33) {
+        const t = ratio / 0.33;
+        return [
+            Math.floor(10 + 20 * t),
+            Math.floor(20 + 60 * t),
+            Math.floor(60 + 80 * t)
+        ];
+    } else if (ratio < 0.66) {
+        const t = (ratio - 0.33) / 0.33;
+        return [
+            Math.floor(30 + 100 * t),
+            Math.floor(80 + 80 * t),
+            Math.floor(140 - 60 * t)
+        ];
+    } else {
+        const t = (ratio - 0.66) / 0.34;
+        return [
+            Math.floor(130 + 125 * t),
+            Math.floor(160 + 60 * t),
+            Math.floor(80 - 50 * t)
+        ];
+    }
+}
+
+function drawGrid() {
+    if (!engine) return;
+    const gs = engine.gridSize;
+    const cellSize = canvas.width / gs;
+    const imageData = ctx.createImageData(canvas.width, canvas.height);
+    const data = imageData.data;
+
+    for (let r = 0; r < gs; r++) {
+        for (let c = 0; c < gs; c++) {
+            const h = engine.heights[engine.idx(r, c)];
+            const [cr, cg, cb] = heightToColor(h, engine.threshold);
+            const startX = Math.floor(c * cellSize);
+            const startY = Math.floor(r * cellSize);
+            const endX = Math.floor((c + 1) * cellSize);
+            const endY = Math.floor((r + 1) * cellSize);
+
+            for (let py = startY; py < endY; py++) {
+                for (let px = startX; px < endX; px++) {
+                    const i = (py * canvas.width + px) * 4;
+                    data[i] = cr;
+                    data[i + 1] = cg;
+                    data[i + 2] = cb;
+                    data[i + 3] = 255;
+                }
+            }
+        }
+    }
+    ctx.putImageData(imageData, 0, 0);
+}
+
+function updateStats() {
+    if (!engine) return;
+    document.getElementById('statTick').textContent = engine.tick.toLocaleString();
+    document.getElementById('statOnGrid').textContent = engine.totalGrains.toLocaleString();
+    document.getElementById('statLost').textContent = engine.totalLost.toLocaleString();
+    document.getElementById('statMeanH').textContent = engine.getMeanHeight().toFixed(2);
+    document.getElementById('statAvalanches').textContent = engine.avalancheSizes.length.toLocaleString();
+    document.getElementById('statMaxAval').textContent = engine.maxAvalanche.toLocaleString();
+    document.getElementById('statMaxH').textContent = engine.getMaxHeight();
+
+    const alpha = engine.estimatePowerLaw();
+    document.getElementById('statAlpha').textContent = alpha ? alpha.toFixed(2) : '--';
+
+    // Narrative update
+    const meanH = engine.getMeanHeight();
+    const th = engine.threshold;
+    const narrativeEl = document.getElementById('narrativePhase');
+    if (engine.tick < 100) {
+        narrativeEl.textContent = 'Early phase: the grid is mostly empty, few avalanches yet...';
+    } else if (meanH < th * 0.4) {
+        narrativeEl.textContent = 'Building up: sand is accumulating, the pile is growing steeper...';
+    } else if (meanH < th * 0.6) {
+        narrativeEl.textContent = 'Approaching criticality: avalanches are becoming more frequent and larger...';
+    } else {
+        narrativeEl.textContent = 'Critical state reached! The system is now self-organized: avalanches of all sizes occur following a power law.';
+    }
+}
+
+// --- Charts ---
+
+function drawSizeDistChart() {
+    const cvs = document.getElementById('chartSizeDist');
+    const c = cvs.getContext('2d');
+    const w = cvs.width = cvs.parentElement.clientWidth - 24;
+    const h = cvs.height = cvs.parentElement.clientHeight - 40;
+    c.clearRect(0, 0, w, h);
+
+    if (!engine || engine.avalancheSizes.length < 5) {
+        c.fillStyle = '#4a5068';
+        c.font = '12px system-ui';
+        c.fillText('Need more data...', w / 2 - 50, h / 2);
+        return;
+    }
+
+    const dist = engine.getSizeDistribution();
+    const entries = Object.entries(dist).map(([s, cnt]) => [parseInt(s), cnt]).filter(([s]) => s > 0);
+    if (entries.length === 0) return;
+
+    const logEntries = entries.map(([s, cnt]) => [Math.log10(s), Math.log10(cnt)]);
+    const minX = Math.min(...logEntries.map(e => e[0]));
+    const maxX = Math.max(...logEntries.map(e => e[0]));
+    const minY = Math.min(...logEntries.map(e => e[1]));
+    const maxY = Math.max(...logEntries.map(e => e[1]));
+
+    const pad = 40;
+    const pw = w - pad * 2;
+    const ph = h - pad * 2;
+    const rangeX = Math.max(maxX - minX, 0.1);
+    const rangeY = Math.max(maxY - minY, 0.1);
+
+    // Axes
+    c.strokeStyle = '#2a3060';
+    c.lineWidth = 1;
+    c.beginPath();
+    c.moveTo(pad, pad);
+    c.lineTo(pad, h - pad);
+    c.lineTo(w - pad, h - pad);
+    c.stroke();
+
+    // Axis labels
+    c.fillStyle = '#667088';
+    c.font = '10px system-ui';
+    c.fillText('log(size)', w / 2, h - 5);
+    c.save();
+    c.translate(10, h / 2);
+    c.rotate(-Math.PI / 2);
+    c.fillText('log(count)', 0, 0);
+    c.restore();
+
+    // Data points
+    c.fillStyle = '#ffb347';
+    for (const [lx, ly] of logEntries) {
+        const px = pad + ((lx - minX) / rangeX) * pw;
+        const py = h - pad - ((ly - minY) / rangeY) * ph;
+        c.beginPath();
+        c.arc(px, py, 3, 0, Math.PI * 2);
+        c.fill();
+    }
+
+    // Best fit line (simple linear regression on log-log)
+    if (logEntries.length >= 3) {
+        const n = logEntries.length;
+        let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
+        for (const [lx, ly] of logEntries) {
+            sumX += lx; sumY += ly; sumXY += lx * ly; sumX2 += lx * lx;
+        }
+        const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+        const intercept = (sumY - slope * sumX) / n;
+
+        c.strokeStyle = 'rgba(255, 100, 60, 0.6)';
+        c.lineWidth = 2;
+        c.setLineDash([6, 4]);
+        c.beginPath();
+        const x1 = minX, y1 = slope * x1 + intercept;
+        const x2 = maxX, y2 = slope * x2 + intercept;
+        c.moveTo(pad + ((x1 - minX) / rangeX) * pw, h - pad - ((y1 - minY) / rangeY) * ph);
+        c.lineTo(pad + ((x2 - minX) / rangeX) * pw, h - pad - ((y2 - minY) / rangeY) * ph);
+        c.stroke();
+        c.setLineDash([]);
+
+        c.fillStyle = '#ff6644';
+        c.font = '11px system-ui';
+        c.fillText(`slope = ${slope.toFixed(2)}`, w - pad - 80, pad + 15);
+    }
+}
+
+function drawTimeSeriesChart() {
+    const cvs = document.getElementById('chartTimeSeries');
+    const c = cvs.getContext('2d');
+    const w = cvs.width = cvs.parentElement.clientWidth - 24;
+    const h = cvs.height = cvs.parentElement.clientHeight - 40;
+    c.clearRect(0, 0, w, h);
+
+    if (!engine || engine.recentAvalanches.length < 2) {
+        c.fillStyle = '#4a5068';
+        c.font = '12px system-ui';
+        c.fillText('Need more data...', w / 2 - 50, h / 2);
+        return;
+    }
+
+    const data = engine.recentAvalanches;
+    const maxSize = Math.max(...data.map(a => a.size), 1);
+    const pad = 40;
+    const pw = w - pad * 2;
+    const ph = h - pad * 2;
+
+    // Axes
+    c.strokeStyle = '#2a3060';
+    c.lineWidth = 1;
+    c.beginPath();
+    c.moveTo(pad, pad);
+    c.lineTo(pad, h - pad);
+    c.lineTo(w - pad, h - pad);
+    c.stroke();
+
+    c.fillStyle = '#667088';
+    c.font = '10px system-ui';
+    c.fillText('time', w / 2, h - 5);
+
+    // Bars
+    const barW = Math.max(1, pw / data.length - 1);
+    for (let i = 0; i < data.length; i++) {
+        const barH = (data[i].size / maxSize) * ph;
+        const x = pad + (i / data.length) * pw;
+        const y = h - pad - barH;
+
+        if (data[i].size > maxSize * 0.5) {
+            c.fillStyle = '#ff6644';
+        } else if (data[i].size > maxSize * 0.2) {
+            c.fillStyle = '#ffb347';
+        } else {
+            c.fillStyle = '#4a7090';
+        }
+        c.fillRect(x, y, barW, barH);
+    }
+}
+
+function drawGrainsChart() {
+    const cvs = document.getElementById('chartGrains');
+    const c = cvs.getContext('2d');
+    const w = cvs.width = cvs.parentElement.clientWidth - 24;
+    const h = cvs.height = cvs.parentElement.clientHeight - 40;
+    c.clearRect(0, 0, w, h);
+
+    if (!engine || engine.grainsHistory.length < 2) {
+        c.fillStyle = '#4a5068';
+        c.font = '12px system-ui';
+        c.fillText('Need more data...', w / 2 - 50, h / 2);
+        return;
+    }
+
+    const data = engine.grainsHistory;
+    const maxVal = Math.max(...data, 1);
+    const minVal = Math.min(...data, 0);
+    const pad = 40;
+    const pw = w - pad * 2;
+    const ph = h - pad * 2;
+    const range = Math.max(maxVal - minVal, 1);
+
+    // Axes
+    c.strokeStyle = '#2a3060';
+    c.lineWidth = 1;
+    c.beginPath();
+    c.moveTo(pad, pad);
+    c.lineTo(pad, h - pad);
+    c.lineTo(w - pad, h - pad);
+    c.stroke();
+
+    c.fillStyle = '#6670aa';
+    c.font = '10px system-ui';
+    c.fillText('time', w / 2, h - 5);
+
+    // Line
+    c.strokeStyle = '#66bbff';
+    c.lineWidth = 1.5;
+    c.beginPath();
+    for (let i = 0; i < data.length; i++) {
+        const x = pad + (i / (data.length - 1)) * pw;
+        const y = h - pad - ((data[i] - minVal) / range) * ph;
+        if (i === 0) c.moveTo(x, y);
+        else c.lineTo(x, y);
+    }
+    c.stroke();
+}
+
+function drawHeightDistChart() {
+    const cvs = document.getElementById('chartHeightDist');
+    const c = cvs.getContext('2d');
+    const w = cvs.width = cvs.parentElement.clientWidth - 24;
+    const h = cvs.height = cvs.parentElement.clientHeight - 40;
+    c.clearRect(0, 0, w, h);
+
+    if (!engine) return;
+
+    const dist = engine.getHeightDistribution();
+    const entries = Object.entries(dist).map(([ht, cnt]) => [parseInt(ht), cnt]).sort((a, b) => a[0] - b[0]);
+    if (entries.length === 0) return;
+
+    const maxCount = Math.max(...entries.map(e => e[1]), 1);
+    const pad = 40;
+    const pw = w - pad * 2;
+    const ph = h - pad * 2;
+
+    // Axes
+    c.strokeStyle = '#2a3060';
+    c.lineWidth = 1;
+    c.beginPath();
+    c.moveTo(pad, pad);
+    c.lineTo(pad, h - pad);
+    c.lineTo(w - pad, h - pad);
+    c.stroke();
+
+    c.fillStyle = '#6670aa';
+    c.font = '10px system-ui';
+    c.fillText('height', w / 2, h - 5);
+
+    // Bars
+    const barW = Math.max(8, pw / Math.max(entries.length, 1) - 2);
+    for (let i = 0; i < entries.length; i++) {
+        const [ht, cnt] = entries[i];
+        const barH = (cnt / maxCount) * ph;
+        const x = pad + (i / Math.max(entries.length, 1)) * pw;
+        const y = h - pad - barH;
+
+        const ratio = ht / (engine.threshold - 1);
+        if (ratio >= 0.9) c.fillStyle = '#ff8844';
+        else if (ratio >= 0.5) c.fillStyle = '#88aa44';
+        else c.fillStyle = '#4488aa';
+
+        c.fillRect(x, y, barW, barH);
+
+        // Label
+        c.fillStyle = '#6670aa';
+        c.font = '10px system-ui';
+        c.fillText(ht.toString(), x + barW / 2 - 3, h - pad + 14);
+    }
+}
+
+function updateAllCharts() {
+    drawSizeDistChart();
+    drawTimeSeriesChart();
+    drawGrainsChart();
+    drawHeightDistChart();
+}
+
+function updateAvalancheLog(event) {
+    if (event.size === 0) return;
+    const log = document.getElementById('avalancheLog');
+    const cls = event.size >= 50 ? 'big' : event.size >= 10 ? 'medium' : '';
+    const entry = `<div class="${cls}">t=${event.tick}: size=${event.size} dur=${event.duration} @(${event.row},${event.col})</div>`;
+    log.innerHTML = entry + log.innerHTML;
+    // Keep limited
+    if (log.children.length > 100) {
+        while (log.children.length > 100) log.removeChild(log.lastChild);
+    }
+}
+
+// ============================================================
+// Control
+// ============================================================
+
+let chartUpdateCounter = 0;
+
+function animationLoop() {
+    if (!running || !engine) return;
+
+    const speed = parseInt(document.getElementById('speedSlider').value);
+    let lastEvent = null;
+
+    for (let i = 0; i < speed; i++) {
+        lastEvent = engine.dropGrain();
+        if (lastEvent.size > 0) updateAvalancheLog({ tick: engine.tick, ...lastEvent });
+    }
+
+    drawGrid();
+    updateStats();
+
+    chartUpdateCounter++;
+    if (chartUpdateCounter % 5 === 0) {
+        updateAllCharts();
+    }
+
+    animId = requestAnimationFrame(animationLoop);
+}
+
+function toggleRun() {
+    if (!engine) initEngine();
+    running = !running;
+    document.getElementById('btnRun').textContent = running ? 'Running...' : 'Run';
+    if (running) animationLoop();
+}
+
+function pauseSim() {
+    running = false;
+    document.getElementById('btnRun').textContent = 'Run';
+    if (animId) cancelAnimationFrame(animId);
+}
+
+function dropOne() {
+    if (!engine) initEngine();
+    const event = engine.dropGrain();
+    if (event.size > 0) updateAvalancheLog({ tick: engine.tick, ...event });
+    drawGrid();
+    updateStats();
+    updateAllCharts();
+}
+
+function resetSim() {
+    pauseSim();
+    initEngine();
+    updateAllCharts();
+}
+
+function loadPreset(gridSize, threshold, speed) {
+    pauseSim();
+    document.getElementById('paramGridSize').value = gridSize;
+    document.getElementById('paramThreshold').value = threshold;
+    document.getElementById('speedSlider').value = speed;
+    document.getElementById('speedVal').textContent = speed + '/tick';
+    initEngine();
+    updateAllCharts();
+}
+
+function startSimulation() {
+    document.getElementById('introOverlay').classList.add('hidden');
+    initEngine();
+    updateAllCharts();
+}
+
+// Speed slider display
+document.getElementById('speedSlider').addEventListener('input', function() {
+    document.getElementById('speedVal').textContent = this.value + '/tick';
+});
+
+// Init on load
+window.addEventListener('load', () => {
+    initEngine();
+    updateAllCharts();
+});
+</script>
+</body>
+</html>

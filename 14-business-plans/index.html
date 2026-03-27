@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Business Plan Evolution: Wealth as Fit Order</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Courier New', monospace; background: #0a0a0f; color: #e0e0e0; overflow-x: hidden; }
+
+.container { max-width: 1440px; margin: 0 auto; padding: 20px; }
+
+h1 { text-align: center; font-size: 1.8em; margin-bottom: 4px; color: #fff;
+     letter-spacing: 3px; text-transform: uppercase; }
+.subtitle { text-align: center; font-size: 0.85em; color: #888; margin-bottom: 24px; }
+
+/* Intro section */
+.intro-section {
+  background: linear-gradient(135deg, #12121a 0%, #0f1a28 100%);
+  border: 1px solid #1a3a5a;
+  border-radius: 12px;
+  padding: 28px 32px;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+}
+.intro-section::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #4a8, #6ce, #ea6, #e66);
+}
+.intro-section h2 {
+  font-size: 1.2em;
+  color: #8cd8ff;
+  margin-bottom: 12px;
+  letter-spacing: 1px;
+}
+.intro-section p {
+  font-size: 0.95em;
+  line-height: 1.7;
+  color: #bbb;
+}
+.intro-section p strong { color: #fff; }
+
+/* Key insight callout */
+.key-insight {
+  background: linear-gradient(135deg, #1a1a10, #22200a);
+  border: 1px solid #554a20;
+  border-left: 4px solid #eea;
+  border-radius: 8px;
+  padding: 20px 24px;
+  margin-bottom: 24px;
+}
+.key-insight h3 {
+  font-size: 0.9em;
+  color: #eea;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+}
+.key-insight p {
+  font-size: 0.9em;
+  line-height: 1.7;
+  color: #bba;
+}
+.key-insight p strong { color: #fff; }
+
+/* Controls */
+.controls {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px; padding: 16px; background: #12121a; border: 1px solid #2a2a3a;
+  border-radius: 8px; margin-bottom: 20px;
+}
+.control-group { display: flex; flex-direction: column; gap: 4px; }
+.control-group label { font-size: 0.75em; color: #aaa; text-transform: uppercase; letter-spacing: 1px; }
+.control-group input, .control-group select {
+  background: #1a1a2e; border: 1px solid #333; color: #fff; padding: 6px 10px;
+  border-radius: 4px; font-family: inherit; font-size: 0.85em;
+}
+.control-group input:focus, .control-group select:focus {
+  outline: none; border-color: #4a8;
+}
+
+.btn-row { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
+button {
+  background: linear-gradient(135deg, #2a5a4a, #1a4a3a);
+  border: 1px solid #4a8;
+  color: #fff; padding: 8px 20px; border-radius: 4px;
+  cursor: pointer; font-family: inherit; font-size: 0.85em;
+  transition: all 0.2s;
+}
+button:hover { background: linear-gradient(135deg, #3a7a5a, #2a6a4a); }
+button.secondary {
+  background: linear-gradient(135deg, #2a2a3e, #1a1a2e);
+  border-color: #555;
+}
+button.secondary:hover { background: linear-gradient(135deg, #3a3a5e, #2a2a4e); }
+
+/* Presets */
+.presets {
+  display: flex; gap: 8px; flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.presets button {
+  font-size: 0.75em; padding: 5px 12px;
+  background: linear-gradient(135deg, #1a2a3a, #122238);
+  border-color: #3a6a8a;
+}
+.presets button:hover {
+  background: linear-gradient(135deg, #2a4a5a, #1a3a4a);
+}
+
+/* Layout */
+.main-grid {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 20px;
+}
+
+/* Charts */
+.chart-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.chart-panel {
+  background: #12121a;
+  border: 1px solid #2a2a3a;
+  border-radius: 8px;
+  padding: 16px;
+  min-height: 0;
+  overflow: hidden;
+}
+.chart-panel h3 {
+  font-size: 0.8em;
+  color: #8cd8ff;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+}
+.chart-panel canvas {
+  display: block;
+  width: 100%;
+  height: 220px;
+}
+.chart-panel.tall canvas {
+  height: 280px;
+}
+
+/* Sidebar */
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.stat-card {
+  background: #12121a;
+  border: 1px solid #2a2a3a;
+  border-radius: 8px;
+  padding: 16px;
+}
+.stat-card h3 {
+  font-size: 0.8em;
+  color: #8cd8ff;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+}
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.82em;
+  padding: 4px 0;
+  border-bottom: 1px solid #1a1a2a;
+}
+.stat-row:last-child { border-bottom: none; }
+.stat-label { color: #888; }
+.stat-value { color: #fff; font-weight: bold; }
+.stat-value.green { color: #4a8; }
+.stat-value.yellow { color: #ea6; }
+.stat-value.red { color: #e66; }
+.stat-value.blue { color: #6ce; }
+
+/* BP genome visualization */
+.genome-display {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+.genome-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.genome-label {
+  font-size: 0.7em;
+  color: #888;
+  width: 50px;
+  text-align: right;
+}
+.genome-bits {
+  display: flex;
+  gap: 1px;
+}
+.genome-bit {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+}
+.genome-bit.on { background: #4a8; }
+.genome-bit.off { background: #1a2a2a; border: 1px solid #2a3a3a; }
+
+/* Legend */
+.legend {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72em;
+  color: #aaa;
+}
+.legend-swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+}
+
+/* Events log */
+.events-log {
+  max-height: 200px;
+  overflow-y: auto;
+  font-size: 0.72em;
+  color: #888;
+  padding: 8px;
+  background: #0a0a12;
+  border-radius: 4px;
+  margin-top: 8px;
+}
+.events-log .event {
+  padding: 2px 0;
+  border-bottom: 1px solid #151520;
+}
+.events-log .event-tick { color: #555; }
+.events-log .event-destroy { color: #e66; }
+.events-log .event-entry { color: #6ce; }
+
+/* Status bar */
+.status-bar {
+  margin-top: 20px;
+  padding: 10px 16px;
+  background: #12121a;
+  border: 1px solid #2a2a3a;
+  border-radius: 8px;
+  font-size: 0.8em;
+  color: #888;
+  text-align: center;
+}
+.status-bar .running { color: #4a8; }
+.status-bar .paused { color: #ea6; }
+
+@media (max-width: 1000px) {
+  .main-grid { grid-template-columns: 1fr; }
+  .chart-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Business Plan Evolution</h1>
+  <p class="subtitle">Beinhocker Ch.14 -- Business Plans as the DNA of the Economy</p>
+
+  <div class="intro-section">
+    <h2>Wealth is Fit Order</h2>
+    <p>
+      Beinhocker argues that <strong>wealth is not money</strong> -- it is <strong>fit order</strong>.
+      Wealth creation requires transformations that are (1) irreversible, (2) entropy-reducing, and
+      (3) fitness-enhancing. <strong>Business Plans are the "DNA" of the economy</strong> -- they
+      encode strategies for creating fit order by combining three elements:
+      <strong>Physical Technology</strong> (how to make things),
+      <strong>Social Technology</strong> (how to organize people), and
+      <strong>Strategy</strong> (which market to serve). All three must work together --
+      fitness is multiplicative. A brilliant product with bad organization fails.
+      A well-run company making the wrong thing also fails.
+    </p>
+  </div>
+
+  <div class="key-insight">
+    <h3>The Three G-R Conditions</h3>
+    <p>
+      For wealth to be created, business plans must satisfy the <strong>Generalized-Replication</strong>
+      conditions: they must encode <strong>Physical Technologies</strong> that transform matter/energy
+      irreversibly, <strong>Social Technologies</strong> that coordinate humans to reduce entropy
+      (create order), and <strong>Strategies</strong> that ensure the resulting products/services are
+      <strong>fit for human purposes</strong>. The economy evolves by differentially selecting among
+      competing business plans -- <strong>creative destruction</strong> is the mechanism.
+    </p>
+  </div>
+
+  <div class="controls">
+    <div class="control-group">
+      <label>Population</label>
+      <input type="number" id="population" value="50" min="10" max="500" step="10">
+    </div>
+    <div class="control-group">
+      <label>Ticks</label>
+      <input type="number" id="ticks" value="300" min="50" max="2000" step="50">
+    </div>
+    <div class="control-group">
+      <label>Mutation Rate</label>
+      <input type="number" id="mutationRate" value="0.05" min="0" max="0.5" step="0.01">
+    </div>
+    <div class="control-group">
+      <label>Preference Shift Rate</label>
+      <input type="number" id="preferenceShiftRate" value="0.02" min="0" max="0.3" step="0.01">
+    </div>
+    <div class="control-group">
+      <label>PT Length</label>
+      <input type="number" id="ptLength" value="8" min="4" max="20" step="1">
+    </div>
+    <div class="control-group">
+      <label>ST Length</label>
+      <input type="number" id="stLength" value="8" min="4" max="20" step="1">
+    </div>
+    <div class="control-group">
+      <label>Strategy Length</label>
+      <input type="number" id="strategyLength" value="8" min="4" max="20" step="1">
+    </div>
+    <div class="control-group">
+      <label>K (Epistasis)</label>
+      <input type="number" id="kEpistasis" value="3" min="0" max="7" step="1">
+    </div>
+    <div class="control-group btn-row">
+      <button id="btnRun" onclick="runSimulation()">Run</button>
+      <button id="btnPause" class="secondary" onclick="togglePause()">Pause</button>
+      <button id="btnReset" class="secondary" onclick="resetSimulation()">Reset</button>
+    </div>
+  </div>
+
+  <div class="presets">
+    <button onclick="applyPreset('baseline')">Baseline</button>
+    <button onclick="applyPreset('stable')">Stable Preferences</button>
+    <button onclick="applyPreset('volatile')">Volatile Market</button>
+    <button onclick="applyPreset('lowInnovation')">Low Innovation</button>
+    <button onclick="applyPreset('highInnovation')">High Innovation</button>
+    <button onclick="applyPreset('largeEconomy')">Large Economy</button>
+    <button onclick="applyPreset('ruggedLandscape')">Rugged Landscape</button>
+  </div>
+
+  <div class="main-grid">
+    <div class="chart-grid">
+      <div class="chart-panel tall">
+        <h3>Total Wealth (Fit Order)</h3>
+        <canvas id="chartWealth"></canvas>
+      </div>
+      <div class="chart-panel tall">
+        <h3>Average Fitness by Component</h3>
+        <canvas id="chartComponents"></canvas>
+        <div class="legend">
+          <div class="legend-item"><div class="legend-swatch" style="background:#4a8"></div> Physical Tech</div>
+          <div class="legend-item"><div class="legend-swatch" style="background:#6ce"></div> Social Tech</div>
+          <div class="legend-item"><div class="legend-swatch" style="background:#ea6"></div> Strategy</div>
+          <div class="legend-item"><div class="legend-swatch" style="background:#fff"></div> Total (mean)</div>
+        </div>
+      </div>
+      <div class="chart-panel">
+        <h3>Population Diversity</h3>
+        <canvas id="chartDiversity"></canvas>
+      </div>
+      <div class="chart-panel">
+        <h3>Market Share Inequality (Gini)</h3>
+        <canvas id="chartGini"></canvas>
+      </div>
+      <div class="chart-panel">
+        <h3>Creative Destruction Events</h3>
+        <canvas id="chartDestruction"></canvas>
+      </div>
+      <div class="chart-panel">
+        <h3>Best vs Mean Fitness</h3>
+        <canvas id="chartBestMean"></canvas>
+        <div class="legend">
+          <div class="legend-item"><div class="legend-swatch" style="background:#e66"></div> Best</div>
+          <div class="legend-item"><div class="legend-swatch" style="background:#888"></div> Mean</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar">
+      <div class="stat-card">
+        <h3>Current State</h3>
+        <div class="stat-row"><span class="stat-label">Tick</span><span class="stat-value" id="statTick">0</span></div>
+        <div class="stat-row"><span class="stat-label">Population</span><span class="stat-value" id="statPop">0</span></div>
+        <div class="stat-row"><span class="stat-label">Total Wealth</span><span class="stat-value green" id="statWealth">0</span></div>
+        <div class="stat-row"><span class="stat-label">Best Fitness</span><span class="stat-value yellow" id="statBest">0</span></div>
+        <div class="stat-row"><span class="stat-label">Mean Fitness</span><span class="stat-value" id="statMean">0</span></div>
+      </div>
+
+      <div class="stat-card">
+        <h3>Component Fitness</h3>
+        <div class="stat-row"><span class="stat-label">Physical Tech</span><span class="stat-value green" id="statPT">0</span></div>
+        <div class="stat-row"><span class="stat-label">Social Tech</span><span class="stat-value blue" id="statST">0</span></div>
+        <div class="stat-row"><span class="stat-label">Strategy</span><span class="stat-value yellow" id="statStrat">0</span></div>
+      </div>
+
+      <div class="stat-card">
+        <h3>Market Structure</h3>
+        <div class="stat-row"><span class="stat-label">Diversity</span><span class="stat-value" id="statDiversity">0</span></div>
+        <div class="stat-row"><span class="stat-label">Gini</span><span class="stat-value" id="statGini">0</span></div>
+        <div class="stat-row"><span class="stat-label">Destructions</span><span class="stat-value red" id="statDestructions">0</span></div>
+        <div class="stat-row"><span class="stat-label">Entries</span><span class="stat-value blue" id="statEntries">0</span></div>
+        <div class="stat-row"><span class="stat-label">Innovations</span><span class="stat-value green" id="statInnovations">0</span></div>
+      </div>
+
+      <div class="stat-card">
+        <h3>Top BP Genome</h3>
+        <div id="topGenome" class="genome-display"></div>
+      </div>
+
+      <div class="stat-card">
+        <h3>Recent Events</h3>
+        <div id="eventsLog" class="events-log"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="status-bar" id="statusBar">Ready. Configure parameters and click Run.</div>
+</div>
+
+<script>
+// ==================== NK Landscape ====================
+class NKComponent {
+  constructor(n, k, rng) {
+    this.n = n;
+    this.k = Math.min(k, n - 1);
+    this.rng = rng;
+    this.interactions = [];
+    this.fitnessTables = [];
+
+    for (let i = 0; i < n; i++) {
+      const others = [];
+      for (let j = 0; j < n; j++) if (j !== i) others.push(j);
+      const partners = this.k > 0 ? this._sample(others, this.k) : [];
+      this.interactions.push(partners);
+    }
+
+    for (let i = 0; i < n; i++) {
+      const table = new Map();
+      const numCombos = 1 << (this.k + 1);
+      for (let c = 0; c < numCombos; c++) {
+        const bits = [];
+        for (let b = 0; b <= this.k; b++) bits.push((c >> b) & 1);
+        table.set(bits.join(','), rng());
+      }
+      this.fitnessTables.push(table);
+    }
+  }
+
+  _sample(arr, k) {
+    const copy = arr.slice();
+    const result = [];
+    for (let i = 0; i < k && copy.length > 0; i++) {
+      const idx = Math.floor(this.rng() * copy.length);
+      result.push(copy[idx]);
+      copy.splice(idx, 1);
+    }
+    return result.sort((a, b) => a - b);
+  }
+
+  fitness(bits) {
+    let total = 0;
+    for (let i = 0; i < this.n; i++) {
+      const key = [bits[i]];
+      for (const p of this.interactions[i]) key.push(bits[p]);
+      total += this.fitnessTables[i].get(key.join(',')) || 0;
+    }
+    return total / this.n;
+  }
+}
+
+// ==================== Seeded RNG ====================
+function mulberry32(seed) {
+  let s = seed | 0;
+  return function() {
+    s = (s + 0x6D2B79F5) | 0;
+    let t = Math.imul(s ^ (s >>> 15), 1 | s);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+// ==================== Market Environment ====================
+class MarketEnvironment {
+  constructor(strategyLength, shiftRate, rng) {
+    this.strategyLength = strategyLength;
+    this.shiftRate = shiftRate;
+    this.rng = rng;
+    this.preferences = [];
+    for (let i = 0; i < strategyLength; i++) this.preferences.push(rng() < 0.5 ? 1 : 0);
+  }
+
+  shift() {
+    for (let i = 0; i < this.strategyLength; i++) {
+      if (this.rng() < this.shiftRate) this.preferences[i] = 1 - this.preferences[i];
+    }
+  }
+
+  marketFit(strategyBits) {
+    if (this.strategyLength === 0) return 1;
+    let matches = 0;
+    for (let i = 0; i < this.strategyLength; i++) {
+      if (strategyBits[i] === this.preferences[i]) matches++;
+    }
+    return 0.1 + 0.9 * (matches / this.strategyLength);
+  }
+}
+
+// ==================== Business Plan ====================
+let nextBPId = 0;
+
+function createBP(ptBits, stBits, strategyBits) {
+  return {
+    id: nextBPId++,
+    ptBits, stBits, strategyBits,
+    ptFitness: 0, stFitness: 0, strategyFitness: 0, totalFitness: 0,
+    marketShare: 0, age: 0,
+  };
+}
+
+// ==================== Simulation ====================
+let sim = null;
+let history = [];
+let events = [];
+let running = false;
+let paused = false;
+let animFrame = null;
+
+function createSimulation() {
+  const pop = parseInt(document.getElementById('population').value);
+  const ptLen = parseInt(document.getElementById('ptLength').value);
+  const stLen = parseInt(document.getElementById('stLength').value);
+  const stratLen = parseInt(document.getElementById('strategyLength').value);
+  const k = parseInt(document.getElementById('kEpistasis').value);
+  const mutRate = parseFloat(document.getElementById('mutationRate').value);
+  const prefShift = parseFloat(document.getElementById('preferenceShiftRate').value);
+  const ticks = parseInt(document.getElementById('ticks').value);
+
+  const rng = mulberry32(42);
+
+  const ptLandscape = new NKComponent(ptLen, k, rng);
+  const stLandscape = new NKComponent(stLen, k, rng);
+  const market = new MarketEnvironment(stratLen, prefShift, rng);
+
+  const population = [];
+  nextBPId = 0;
+
+  for (let i = 0; i < pop; i++) {
+    const pt = [], st = [], strat = [];
+    for (let j = 0; j < ptLen; j++) pt.push(rng() < 0.5 ? 1 : 0);
+    for (let j = 0; j < stLen; j++) st.push(rng() < 0.5 ? 1 : 0);
+    for (let j = 0; j < stratLen; j++) strat.push(rng() < 0.5 ? 1 : 0);
+    const bp = createBP(pt, st, strat);
+    bp.ptFitness = ptLandscape.fitness(pt);
+    bp.stFitness = stLandscape.fitness(st);
+    bp.strategyFitness = market.marketFit(strat);
+    bp.totalFitness = bp.ptFitness * bp.stFitness * bp.strategyFitness;
+    population.push(bp);
+  }
+
+  return {
+    population, ptLandscape, stLandscape, market, rng,
+    ptLen, stLen, stratLen, k, mutRate, prefShift, ticks,
+    tick: 0, totalDestructions: 0, totalEntries: 0, totalInnovations: 0,
+    exitFraction: 0.10, entryRate: 0.03, crossoverRate: 0.3,
+  };
+}
+
+function evaluate(s, bp) {
+  bp.ptFitness = s.ptLandscape.fitness(bp.ptBits);
+  bp.stFitness = s.stLandscape.fitness(bp.stBits);
+  bp.strategyFitness = s.market.marketFit(bp.strategyBits);
+  bp.totalFitness = bp.ptFitness * bp.stFitness * bp.strategyFitness;
+}
+
+function computeShares(pop) {
+  const total = pop.reduce((s, bp) => s + bp.totalFitness, 0);
+  if (total <= 0) {
+    const share = 1 / Math.max(pop.length, 1);
+    pop.forEach(bp => bp.marketShare = share);
+  } else {
+    pop.forEach(bp => bp.marketShare = bp.totalFitness / total);
+  }
+}
+
+function mutateBits(bits, rate, rng) {
+  return bits.map(b => rng() < rate ? 1 - b : b);
+}
+
+function crossover(a, b, rng) {
+  return a.map((v, i) => rng() < 0.5 ? v : b[i]);
+}
+
+function selectParent(pop, rng) {
+  const total = pop.reduce((s, bp) => s + bp.totalFitness, 0);
+  if (total <= 0) return pop[Math.floor(rng() * pop.length)];
+  let r = rng() * total;
+  for (const bp of pop) {
+    r -= bp.totalFitness;
+    if (r <= 0) return bp;
+  }
+  return pop[pop.length - 1];
+}
+
+function giniCoefficient(pop) {
+  if (pop.length < 2) return 0;
+  const shares = pop.map(bp => bp.marketShare).sort((a, b) => a - b);
+  const n = shares.length;
+  let num = 0;
+  for (let i = 0; i < n; i++) num += (2 * (i + 1) - n - 1) * shares[i];
+  const den = n * shares.reduce((a, b) => a + b, 0);
+  return den === 0 ? 0 : num / den;
+}
+
+function diversity(pop, totalLen) {
+  if (pop.length < 2) return 0;
+  const sample = pop.slice(0, 50);
+  let totalDist = 0, count = 0;
+  for (let i = 0; i < sample.length; i++) {
+    const gi = sample[i].ptBits.concat(sample[i].stBits, sample[i].strategyBits);
+    for (let j = i + 1; j < sample.length; j++) {
+      const gj = sample[j].ptBits.concat(sample[j].stBits, sample[j].strategyBits);
+      let d = 0;
+      for (let k = 0; k < gi.length; k++) if (gi[k] !== gj[k]) d++;
+      totalDist += d;
+      count++;
+    }
+  }
+  return count > 0 ? (totalDist / count) / totalLen : 0;
+}
+
+function simStep(s) {
+  s.tick++;
+  let innovations = 0, destructions = 0, entries = 0;
+
+  // Shift market
+  s.market.shift();
+
+  // Re-evaluate
+  s.population.forEach(bp => { evaluate(s, bp); bp.age++; });
+  computeShares(s.population);
+
+  // Selection: cull bottom fraction
+  s.population.sort((a, b) => a.totalFitness - b.totalFitness);
+  const nCull = Math.max(1, Math.floor(s.population.length * s.exitFraction));
+  const culled = s.population.splice(0, nCull);
+  destructions = culled.length;
+
+  if (s.population.length > 0) {
+    const bestBP = s.population[s.population.length - 1];
+    for (const bp of culled) {
+      events.push({
+        tick: s.tick, type: 'destroy',
+        msg: `BP#${bp.id} destroyed (f=${bp.totalFitness.toFixed(3)}) by BP#${bestBP.id}`
+      });
+    }
+  }
+
+  // Replicate to refill
+  for (let i = 0; i < nCull; i++) {
+    const parent = selectParent(s.population, s.rng);
+    let pt = parent.ptBits.slice(), st = parent.stBits.slice(), strat = parent.strategyBits.slice();
+
+    if (s.rng() < s.crossoverRate && s.population.length > 1) {
+      const other = selectParent(s.population, s.rng);
+      pt = crossover(pt, other.ptBits, s.rng);
+      st = crossover(st, other.stBits, s.rng);
+      strat = crossover(strat, other.strategyBits, s.rng);
+    }
+
+    pt = mutateBits(pt, s.mutRate, s.rng);
+    st = mutateBits(st, s.mutRate, s.rng);
+    strat = mutateBits(strat, s.mutRate, s.rng);
+
+    const child = createBP(pt, st, strat);
+    evaluate(s, child);
+    if (child.totalFitness > parent.totalFitness) innovations++;
+    s.population.push(child);
+  }
+
+  // New entrants
+  if (s.rng() < s.entryRate) {
+    let pt, st, strat;
+    if (s.population.length > 0 && s.rng() < 0.5) {
+      const p1 = selectParent(s.population, s.rng);
+      const p2 = selectParent(s.population, s.rng);
+      pt = mutateBits(crossover(p1.ptBits, p2.ptBits, s.rng), s.mutRate, s.rng);
+      st = mutateBits(crossover(p1.stBits, p2.stBits, s.rng), s.mutRate, s.rng);
+      strat = mutateBits(crossover(p1.strategyBits, p2.strategyBits, s.rng), s.mutRate, s.rng);
+    } else {
+      pt = []; st = []; strat = [];
+      for (let j = 0; j < s.ptLen; j++) pt.push(s.rng() < 0.5 ? 1 : 0);
+      for (let j = 0; j < s.stLen; j++) st.push(s.rng() < 0.5 ? 1 : 0);
+      for (let j = 0; j < s.stratLen; j++) strat.push(s.rng() < 0.5 ? 1 : 0);
+    }
+    const entrant = createBP(pt, st, strat);
+    evaluate(s, entrant);
+    s.population.push(entrant);
+    entries++;
+    events.push({
+      tick: s.tick, type: 'entry',
+      msg: `BP#${entrant.id} entered (f=${entrant.totalFitness.toFixed(3)})`
+    });
+  }
+
+  computeShares(s.population);
+
+  s.totalDestructions += destructions;
+  s.totalEntries += entries;
+  s.totalInnovations += innovations;
+
+  const totalLen = s.ptLen + s.stLen + s.stratLen;
+  const n = s.population.length;
+  const fitnesses = s.population.map(bp => bp.totalFitness);
+  const totalWealth = s.population.reduce((sum, bp) => sum + bp.totalFitness * bp.marketShare, 0) * n;
+
+  const record = {
+    tick: s.tick,
+    population: n,
+    totalWealth,
+    meanFitness: fitnesses.reduce((a, b) => a + b, 0) / n,
+    bestFitness: Math.max(...fitnesses),
+    meanPT: s.population.reduce((sum, bp) => sum + bp.ptFitness, 0) / n,
+    meanST: s.population.reduce((sum, bp) => sum + bp.stFitness, 0) / n,
+    meanStrat: s.population.reduce((sum, bp) => sum + bp.strategyFitness, 0) / n,
+    diversity: diversity(s.population, totalLen),
+    gini: giniCoefficient(s.population),
+    destructions, entries, innovations,
+  };
+  history.push(record);
+  return record;
+}
+
+// ==================== Charts ====================
+function getCtx(id) {
+  const canvas = document.getElementById(id);
+  return canvas.getContext('2d');
+}
+
+function drawChart(ctx, data, options = {}) {
+  const canvas = ctx.canvas;
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  ctx.scale(dpr, dpr);
+  const w = rect.width;
+  const h = rect.height;
+
+  ctx.clearRect(0, 0, w, h);
+
+  const pad = { top: 10, right: 10, bottom: 24, left: 48 };
+  const plotW = w - pad.left - pad.right;
+  const plotH = h - pad.top - pad.bottom;
+
+  // Grid
+  ctx.strokeStyle = '#1a1a2a';
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= 4; i++) {
+    const y = pad.top + plotH * i / 4;
+    ctx.beginPath();
+    ctx.moveTo(pad.left, y);
+    ctx.lineTo(pad.left + plotW, y);
+    ctx.stroke();
+  }
+
+  if (!data || data.length === 0) return;
+
+  const series = Array.isArray(data[0]) ? data : [data];
+  const colors = options.colors || ['#4a8', '#6ce', '#ea6', '#e66', '#fff', '#c8f'];
+
+  // Compute y range
+  let yMin = options.yMin !== undefined ? options.yMin : Infinity;
+  let yMax = options.yMax !== undefined ? options.yMax : -Infinity;
+  if (yMin === Infinity || yMax === -Infinity) {
+    for (const s of series) {
+      for (const v of s) {
+        if (v < yMin) yMin = v;
+        if (v > yMax) yMax = v;
+      }
+    }
+  }
+  if (yMax === yMin) { yMax = yMin + 1; }
+  const yRange = yMax - yMin;
+
+  // Y axis labels
+  ctx.fillStyle = '#555';
+  ctx.font = '10px monospace';
+  ctx.textAlign = 'right';
+  for (let i = 0; i <= 4; i++) {
+    const val = yMax - yRange * i / 4;
+    const y = pad.top + plotH * i / 4;
+    ctx.fillText(val.toFixed(options.yDecimals !== undefined ? options.yDecimals : 2), pad.left - 4, y + 3);
+  }
+
+  // X axis labels
+  ctx.textAlign = 'center';
+  const maxTick = series[0].length;
+  for (let i = 0; i <= 4; i++) {
+    const tick = Math.round(maxTick * i / 4);
+    const x = pad.left + plotW * i / 4;
+    ctx.fillText(tick, x, h - 4);
+  }
+
+  // Draw series
+  for (let si = 0; si < series.length; si++) {
+    const s = series[si];
+    ctx.strokeStyle = colors[si % colors.length];
+    ctx.lineWidth = si === 0 && series.length === 1 ? 2 : 1.5;
+    ctx.beginPath();
+    for (let i = 0; i < s.length; i++) {
+      const x = pad.left + (i / Math.max(s.length - 1, 1)) * plotW;
+      const y = pad.top + (1 - (s[i] - yMin) / yRange) * plotH;
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+  }
+
+  // Fill for single series
+  if (series.length === 1 && options.fill) {
+    const s = series[0];
+    ctx.fillStyle = options.fillColor || 'rgba(68, 170, 136, 0.15)';
+    ctx.beginPath();
+    for (let i = 0; i < s.length; i++) {
+      const x = pad.left + (i / Math.max(s.length - 1, 1)) * plotW;
+      const y = pad.top + (1 - (s[i] - yMin) / yRange) * plotH;
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.lineTo(pad.left + plotW, pad.top + plotH);
+    ctx.lineTo(pad.left, pad.top + plotH);
+    ctx.closePath();
+    ctx.fill();
+  }
+}
+
+function drawBarChart(ctx, data, options = {}) {
+  const canvas = ctx.canvas;
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  ctx.scale(dpr, dpr);
+  const w = rect.width;
+  const h = rect.height;
+
+  ctx.clearRect(0, 0, w, h);
+
+  const pad = { top: 10, right: 10, bottom: 24, left: 48 };
+  const plotW = w - pad.left - pad.right;
+  const plotH = h - pad.top - pad.bottom;
+
+  if (!data || data.length === 0) return;
+
+  const maxVal = Math.max(...data, 1);
+
+  // Grid
+  ctx.strokeStyle = '#1a1a2a';
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= 4; i++) {
+    const y = pad.top + plotH * i / 4;
+    ctx.beginPath();
+    ctx.moveTo(pad.left, y);
+    ctx.lineTo(pad.left + plotW, y);
+    ctx.stroke();
+  }
+
+  // Y labels
+  ctx.fillStyle = '#555';
+  ctx.font = '10px monospace';
+  ctx.textAlign = 'right';
+  for (let i = 0; i <= 4; i++) {
+    const val = maxVal - maxVal * i / 4;
+    const y = pad.top + plotH * i / 4;
+    ctx.fillText(Math.round(val), pad.left - 4, y + 3);
+  }
+
+  // Bars (aggregate into bins)
+  const binSize = Math.max(1, Math.ceil(data.length / 60));
+  const bins = [];
+  for (let i = 0; i < data.length; i += binSize) {
+    let sum = 0;
+    let count = 0;
+    for (let j = i; j < i + binSize && j < data.length; j++) {
+      sum += data[j];
+      count++;
+    }
+    bins.push(sum);
+  }
+
+  const barW = Math.max(2, plotW / bins.length - 1);
+  const binMax = Math.max(...bins, 1);
+  ctx.fillStyle = options.color || '#e66';
+  for (let i = 0; i < bins.length; i++) {
+    const x = pad.left + (i / bins.length) * plotW;
+    const barH = (bins[i] / binMax) * plotH;
+    ctx.fillRect(x, pad.top + plotH - barH, barW, barH);
+  }
+}
+
+// ==================== UI Update ====================
+function updateUI(record) {
+  document.getElementById('statTick').textContent = record.tick;
+  document.getElementById('statPop').textContent = record.population;
+  document.getElementById('statWealth').textContent = record.totalWealth.toFixed(3);
+  document.getElementById('statBest').textContent = record.bestFitness.toFixed(4);
+  document.getElementById('statMean').textContent = record.meanFitness.toFixed(4);
+  document.getElementById('statPT').textContent = record.meanPT.toFixed(4);
+  document.getElementById('statST').textContent = record.meanST.toFixed(4);
+  document.getElementById('statStrat').textContent = record.meanStrat.toFixed(4);
+  document.getElementById('statDiversity').textContent = record.diversity.toFixed(4);
+  document.getElementById('statGini').textContent = record.gini.toFixed(4);
+  document.getElementById('statDestructions').textContent = sim.totalDestructions;
+  document.getElementById('statEntries').textContent = sim.totalEntries;
+  document.getElementById('statInnovations').textContent = sim.totalInnovations;
+
+  // Top BP genome
+  if (sim.population.length > 0) {
+    const best = sim.population.reduce((a, b) => a.totalFitness > b.totalFitness ? a : b);
+    const container = document.getElementById('topGenome');
+    container.innerHTML = '';
+
+    const rows = [
+      { label: 'PT', bits: best.ptBits, color: '#4a8' },
+      { label: 'ST', bits: best.stBits, color: '#6ce' },
+      { label: 'Strat', bits: best.strategyBits, color: '#ea6' },
+    ];
+
+    for (const row of rows) {
+      const div = document.createElement('div');
+      div.className = 'genome-row';
+      div.innerHTML = `<span class="genome-label">${row.label}</span><div class="genome-bits">` +
+        row.bits.map(b =>
+          `<div class="genome-bit ${b ? 'on' : 'off'}" style="${b ? 'background:' + row.color : ''}"></div>`
+        ).join('') + '</div>';
+      container.appendChild(div);
+    }
+
+    const info = document.createElement('div');
+    info.style.cssText = 'font-size:0.7em; color:#888; margin-top:4px;';
+    info.textContent = `BP#${best.id} f=${best.totalFitness.toFixed(4)} age=${best.age}`;
+    container.appendChild(info);
+  }
+
+  // Events log
+  const logEl = document.getElementById('eventsLog');
+  const recentEvents = events.slice(-30).reverse();
+  logEl.innerHTML = recentEvents.map(e =>
+    `<div class="event"><span class="event-tick">t${e.tick}</span> ` +
+    `<span class="event-${e.type}">${e.msg}</span></div>`
+  ).join('');
+}
+
+function updateCharts() {
+  if (history.length === 0) return;
+
+  const wealth = history.map(r => r.totalWealth);
+  const meanPT = history.map(r => r.meanPT);
+  const meanST = history.map(r => r.meanST);
+  const meanStrat = history.map(r => r.meanStrat);
+  const meanFit = history.map(r => r.meanFitness);
+  const divData = history.map(r => r.diversity);
+  const giniData = history.map(r => r.gini);
+  const destData = history.map(r => r.destructions);
+  const bestData = history.map(r => r.bestFitness);
+
+  drawChart(getCtx('chartWealth'), [wealth], { colors: ['#4a8'], fill: true, yMin: 0 });
+  drawChart(getCtx('chartComponents'), [meanPT, meanST, meanStrat, meanFit],
+    { colors: ['#4a8', '#6ce', '#ea6', '#fff'], yMin: 0, yMax: 1 });
+  drawChart(getCtx('chartDiversity'), [divData], { colors: ['#c8f'], fill: true, fillColor: 'rgba(200,136,255,0.12)', yMin: 0, yMax: 1 });
+  drawChart(getCtx('chartGini'), [giniData], { colors: ['#ea6'], fill: true, fillColor: 'rgba(238,170,102,0.12)', yMin: 0, yMax: 1 });
+  drawBarChart(getCtx('chartDestruction'), destData, { color: '#e66' });
+  drawChart(getCtx('chartBestMean'), [bestData, meanFit], { colors: ['#e66', '#888'], yMin: 0 });
+}
+
+// ==================== Simulation Control ====================
+function runSimulation() {
+  if (running && !paused) return;
+
+  if (!sim || paused === false) {
+    history = [];
+    events = [];
+    sim = createSimulation();
+  }
+
+  running = true;
+  paused = false;
+  document.getElementById('statusBar').innerHTML = '<span class="running">Running simulation...</span>';
+
+  const ticksPerFrame = 3;
+  const maxTicks = sim.ticks;
+
+  function frame() {
+    if (!running || paused) return;
+    for (let i = 0; i < ticksPerFrame && sim.tick < maxTicks; i++) {
+      const record = simStep(sim);
+    }
+    if (history.length > 0) {
+      updateUI(history[history.length - 1]);
+    }
+    updateCharts();
+
+    if (sim.tick >= maxTicks) {
+      running = false;
+      document.getElementById('statusBar').innerHTML =
+        `Simulation complete: ${maxTicks} ticks. Total wealth: ${history[history.length - 1].totalWealth.toFixed(3)}`;
+      return;
+    }
+    animFrame = requestAnimationFrame(frame);
+  }
+  frame();
+}
+
+function togglePause() {
+  if (!running) return;
+  paused = !paused;
+  if (paused) {
+    document.getElementById('statusBar').innerHTML = '<span class="paused">Paused at tick ' + sim.tick + '</span>';
+  } else {
+    document.getElementById('statusBar').innerHTML = '<span class="running">Running simulation...</span>';
+    const ticksPerFrame = 3;
+    function frame() {
+      if (!running || paused) return;
+      for (let i = 0; i < ticksPerFrame && sim.tick < sim.ticks; i++) {
+        simStep(sim);
+      }
+      if (history.length > 0) updateUI(history[history.length - 1]);
+      updateCharts();
+      if (sim.tick >= sim.ticks) {
+        running = false;
+        document.getElementById('statusBar').innerHTML =
+          `Simulation complete: ${sim.ticks} ticks. Total wealth: ${history[history.length - 1].totalWealth.toFixed(3)}`;
+        return;
+      }
+      animFrame = requestAnimationFrame(frame);
+    }
+    frame();
+  }
+}
+
+function resetSimulation() {
+  running = false;
+  paused = false;
+  if (animFrame) cancelAnimationFrame(animFrame);
+  sim = null;
+  history = [];
+  events = [];
+
+  // Clear canvases
+  ['chartWealth', 'chartComponents', 'chartDiversity', 'chartGini', 'chartDestruction', 'chartBestMean'].forEach(id => {
+    const canvas = document.getElementById(id);
+    const ctx = canvas.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  });
+
+  document.getElementById('statTick').textContent = '0';
+  document.getElementById('statPop').textContent = '0';
+  document.getElementById('statWealth').textContent = '0';
+  document.getElementById('statBest').textContent = '0';
+  document.getElementById('statMean').textContent = '0';
+  document.getElementById('statPT').textContent = '0';
+  document.getElementById('statST').textContent = '0';
+  document.getElementById('statStrat').textContent = '0';
+  document.getElementById('statDiversity').textContent = '0';
+  document.getElementById('statGini').textContent = '0';
+  document.getElementById('statDestructions').textContent = '0';
+  document.getElementById('statEntries').textContent = '0';
+  document.getElementById('statInnovations').textContent = '0';
+  document.getElementById('topGenome').innerHTML = '';
+  document.getElementById('eventsLog').innerHTML = '';
+  document.getElementById('statusBar').innerHTML = 'Ready. Configure parameters and click Run.';
+}
+
+// ==================== Presets ====================
+function applyPreset(name) {
+  resetSimulation();
+  const presets = {
+    baseline: { population: 50, ticks: 300, mutationRate: 0.05, preferenceShiftRate: 0.02, ptLength: 8, stLength: 8, strategyLength: 8, kEpistasis: 3 },
+    stable: { population: 50, ticks: 300, mutationRate: 0.05, preferenceShiftRate: 0.0, ptLength: 8, stLength: 8, strategyLength: 8, kEpistasis: 3 },
+    volatile: { population: 50, ticks: 300, mutationRate: 0.05, preferenceShiftRate: 0.10, ptLength: 8, stLength: 8, strategyLength: 8, kEpistasis: 3 },
+    lowInnovation: { population: 50, ticks: 300, mutationRate: 0.01, preferenceShiftRate: 0.02, ptLength: 8, stLength: 8, strategyLength: 8, kEpistasis: 3 },
+    highInnovation: { population: 50, ticks: 300, mutationRate: 0.15, preferenceShiftRate: 0.02, ptLength: 8, stLength: 8, strategyLength: 8, kEpistasis: 3 },
+    largeEconomy: { population: 200, ticks: 300, mutationRate: 0.05, preferenceShiftRate: 0.02, ptLength: 8, stLength: 8, strategyLength: 8, kEpistasis: 3 },
+    ruggedLandscape: { population: 50, ticks: 300, mutationRate: 0.05, preferenceShiftRate: 0.02, ptLength: 10, stLength: 10, strategyLength: 10, kEpistasis: 6 },
+  };
+  const p = presets[name];
+  if (!p) return;
+  document.getElementById('population').value = p.population;
+  document.getElementById('ticks').value = p.ticks;
+  document.getElementById('mutationRate').value = p.mutationRate;
+  document.getElementById('preferenceShiftRate').value = p.preferenceShiftRate;
+  document.getElementById('ptLength').value = p.ptLength;
+  document.getElementById('stLength').value = p.stLength;
+  document.getElementById('strategyLength').value = p.strategyLength;
+  document.getElementById('kEpistasis').value = p.kEpistasis;
+}
+</script>
+</body>
+</html>
