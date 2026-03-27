@@ -1,0 +1,2158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Boolean Network / Complexity Catastrophe Simulation</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #0a0e17;
+    color: #e0e6f0;
+    overflow-x: hidden;
+}
+
+/* Intro Section */
+.intro-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(6, 8, 16, 0.97);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.intro-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(1.05);
+}
+.intro-card {
+    max-width: 720px;
+    padding: 48px 56px;
+    background: linear-gradient(135deg, #141a30 0%, #0d1220 100%);
+    border: 1px solid #2a3060;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 0 120px rgba(74, 138, 255, 0.08);
+}
+.intro-card h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #7eb8ff;
+    margin-bottom: 8px;
+}
+.intro-card .tagline {
+    font-size: 14px;
+    color: #8890a8;
+    margin-bottom: 28px;
+}
+.intro-card .metaphor {
+    font-size: 16px;
+    line-height: 1.7;
+    color: #c0c8e0;
+    margin-bottom: 32px;
+    text-align: left;
+}
+.intro-card .metaphor strong {
+    color: #7eb8ff;
+}
+.intro-card .key-insight {
+    background: linear-gradient(135deg, #1a2a4a 0%, #142040 100%);
+    border-left: 3px solid #ddaa33;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 32px;
+    text-align: left;
+}
+.intro-card .key-insight h3 {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #ddaa33;
+    margin-bottom: 8px;
+}
+.intro-card .key-insight p {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #b0b8d0;
+}
+.intro-start-btn {
+    display: inline-block;
+    padding: 14px 40px;
+    background: linear-gradient(135deg, #2a5aaa, #3a6abb);
+    color: #e0e8ff;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.intro-start-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(74, 138, 255, 0.25);
+}
+
+/* Header */
+.header {
+    background: linear-gradient(135deg, #1a1f35 0%, #0d1220 100%);
+    border-bottom: 1px solid #2a3050;
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+.header h1 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #7eb8ff;
+}
+.header .subtitle {
+    font-size: 12px;
+    color: #8890a8;
+}
+
+/* Regime Banner */
+.regime-banner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+    padding: 0 24px;
+    height: 48px;
+    background: #0c1019;
+    border-bottom: 1px solid #1e2640;
+    transition: background 0.5s;
+}
+.regime-banner.regime-ordered {
+    background: linear-gradient(90deg, rgba(74,170,106,0.08) 0%, #0c1019 50%, rgba(74,170,106,0.08) 100%);
+}
+.regime-banner.regime-chaotic {
+    background: linear-gradient(90deg, rgba(204,85,85,0.08) 0%, #0c1019 50%, rgba(204,85,85,0.08) 100%);
+}
+.regime-banner.regime-critical {
+    background: linear-gradient(90deg, rgba(221,170,51,0.08) 0%, #0c1019 50%, rgba(221,170,51,0.08) 100%);
+}
+.regime-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #5a6a8a;
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid transparent;
+    transition: all 0.4s;
+}
+.regime-indicator.active {
+    border-color: currentColor;
+    font-weight: 600;
+}
+.regime-indicator.active-ordered {
+    color: #4aaa6a;
+    background: rgba(74,170,106,0.1);
+    border-color: rgba(74,170,106,0.3);
+}
+.regime-indicator.active-chaotic {
+    color: #cc5555;
+    background: rgba(204,85,85,0.1);
+    border-color: rgba(204,85,85,0.3);
+}
+.regime-indicator.active-critical {
+    color: #ddaa33;
+    background: rgba(221,170,51,0.1);
+    border-color: rgba(221,170,51,0.3);
+}
+.regime-emoji {
+    font-size: 18px;
+}
+.regime-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+}
+.regime-metaphor {
+    font-size: 11px;
+    opacity: 0.7;
+    font-style: italic;
+}
+
+/* Narrative Banner */
+.narrative-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 24px;
+    min-height: 36px;
+    background: #0f1424;
+    border-bottom: 1px solid #1e2640;
+    font-size: 13px;
+    color: #8890a8;
+    transition: color 0.4s, background 0.4s;
+    text-align: center;
+}
+.narrative-bar.narrative-ordered { color: #6ac08a; }
+.narrative-bar.narrative-chaotic { color: #dd7777; }
+.narrative-bar.narrative-critical { color: #ddaa33; }
+
+.main {
+    display: grid;
+    grid-template-columns: 300px 1fr 320px;
+    height: calc(100vh - 56px - 48px - 36px);
+}
+
+/* Controls Panel */
+.controls {
+    background: #0f1424;
+    border-right: 1px solid #1e2640;
+    padding: 16px;
+    overflow-y: auto;
+}
+.control-section {
+    margin-bottom: 20px;
+}
+.control-section h3 {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #5a6a8a;
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #1e2640;
+}
+.control-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+.control-row label {
+    font-size: 13px;
+    color: #a0aab8;
+}
+.control-row .value {
+    font-size: 13px;
+    color: #7eb8ff;
+    font-weight: 600;
+    min-width: 36px;
+    text-align: right;
+}
+input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 4px;
+    background: #1e2640;
+    border-radius: 2px;
+    margin: 4px 0 8px;
+}
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    background: #4a8aff;
+    border-radius: 50%;
+    cursor: pointer;
+}
+select {
+    width: 100%;
+    padding: 6px 8px;
+    background: #1a2035;
+    color: #c0c8d8;
+    border: 1px solid #2a3050;
+    border-radius: 4px;
+    font-size: 13px;
+    margin-top: 4px;
+}
+button {
+    width: 100%;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-bottom: 6px;
+    transition: background 0.2s;
+}
+.btn-primary {
+    background: #2a5aaa;
+    color: #e0e8ff;
+}
+.btn-primary:hover { background: #3a6abb; }
+.btn-secondary {
+    background: #1e2640;
+    color: #a0aab8;
+    border: 1px solid #2a3050;
+}
+.btn-secondary:hover { background: #2a3450; }
+.btn-danger {
+    background: #5a2020;
+    color: #ffaaaa;
+}
+.btn-danger:hover { background: #6a2a2a; }
+.btn-accent {
+    background: #2a6a3a;
+    color: #aaffbb;
+}
+.btn-accent:hover { background: #3a7a4a; }
+
+/* Explanation hints on controls */
+.control-hint {
+    font-size: 11px;
+    color: #5a6880;
+    line-height: 1.4;
+    margin-bottom: 10px;
+    padding: 6px 8px;
+    background: rgba(74, 138, 255, 0.04);
+    border-radius: 4px;
+    border-left: 2px solid #2a3a60;
+}
+
+/* Bureaucracy Meter */
+.bureaucracy-meter {
+    margin-top: 8px;
+    padding: 10px;
+    background: #141a2e;
+    border: 1px solid #1e2640;
+    border-radius: 6px;
+}
+.bureaucracy-meter h4 {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: #5a6a8a;
+    margin-bottom: 6px;
+}
+.bureaucracy-bar-bg {
+    width: 100%;
+    height: 8px;
+    background: #1e2640;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 6px;
+}
+.bureaucracy-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.4s, background 0.4s;
+}
+.bureaucracy-label {
+    font-size: 12px;
+    color: #8890a8;
+}
+.bureaucracy-meetings {
+    font-size: 18px;
+    font-weight: 700;
+    color: #7eb8ff;
+}
+
+/* Real-world examples panel */
+.examples-panel {
+    margin-top: 12px;
+}
+.example-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    margin-bottom: 4px;
+    border-radius: 4px;
+    font-size: 12px;
+    transition: background 0.3s;
+}
+.example-row.active-example {
+    background: rgba(74, 138, 255, 0.1);
+}
+.example-k {
+    font-weight: 700;
+    color: #7eb8ff;
+    min-width: 32px;
+}
+.example-name {
+    color: #a0aab8;
+}
+.example-emoji {
+    font-size: 14px;
+}
+
+/* Visualization Area */
+.viz-area {
+    display: flex;
+    flex-direction: column;
+    background: #0c1019;
+    min-height: 0;
+    overflow: hidden;
+}
+.viz-tabs {
+    display: flex;
+    background: #0f1424;
+    border-bottom: 1px solid #1e2640;
+}
+.viz-tab {
+    padding: 10px 20px;
+    font-size: 13px;
+    color: #6a7a9a;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+}
+.viz-tab:hover { color: #a0b0d0; }
+.viz-tab.active {
+    color: #7eb8ff;
+    border-bottom-color: #4a8aff;
+}
+/* Contextual explanation below viz tabs */
+.viz-explanation {
+    padding: 8px 16px;
+    font-size: 12px;
+    color: #6a7a9a;
+    line-height: 1.5;
+    background: rgba(15, 20, 36, 0.6);
+    border-bottom: 1px solid #1a2030;
+    min-height: 38px;
+    transition: opacity 0.3s;
+}
+.viz-content {
+    flex: 1;
+    position: relative;
+    min-height: 0;
+    overflow: hidden;
+}
+canvas {
+    display: block;
+}
+
+/* Metrics Panel */
+.metrics {
+    background: #0f1424;
+    border-left: 1px solid #1e2640;
+    padding: 16px;
+    overflow-y: auto;
+}
+.metric-card {
+    background: #141a2e;
+    border: 1px solid #1e2640;
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 10px;
+}
+.metric-card h4 {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: #5a6a8a;
+    margin-bottom: 6px;
+}
+.metric-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: #7eb8ff;
+}
+.metric-value.ordered { color: #4aaa6a; }
+.metric-value.chaotic { color: #cc5555; }
+.metric-value.critical { color: #ddaa33; }
+.metric-sub {
+    font-size: 11px;
+    color: #6a7a9a;
+    margin-top: 2px;
+}
+.cascade-bar {
+    display: flex;
+    align-items: center;
+    margin: 2px 0;
+}
+.cascade-bar .bar {
+    height: 6px;
+    background: #4a8aff;
+    border-radius: 3px;
+    margin-left: 8px;
+}
+.cascade-bar .label {
+    font-size: 10px;
+    color: #6a7a9a;
+    min-width: 24px;
+}
+
+/* Phase diagram legend */
+.legend {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+}
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: #8890a8;
+}
+.legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+.speed-display {
+    font-size: 11px;
+    color: #6a7a9a;
+    text-align: center;
+    margin-top: 4px;
+}
+
+/* Key insight card in metrics */
+.insight-card {
+    background: linear-gradient(135deg, #1a2a4a 0%, #142040 100%);
+    border: 1px solid #2a3a60;
+    border-left: 3px solid #ddaa33;
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 10px;
+}
+.insight-card h4 {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: #ddaa33;
+    margin-bottom: 6px;
+}
+.insight-card p {
+    font-size: 12px;
+    line-height: 1.5;
+    color: #a0aac0;
+}
+
+/* Cascade ripple animation on canvas overlay */
+@keyframes ripple {
+    0% { transform: scale(0.5); opacity: 0.8; }
+    100% { transform: scale(3); opacity: 0; }
+}
+.ripple-ring {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid #ff6644;
+    pointer-events: none;
+    animation: ripple 0.8s ease-out forwards;
+}
+</style>
+</head>
+<body>
+
+<!-- Intro Overlay -->
+<div class="intro-overlay" id="intro-overlay">
+    <div class="intro-card">
+        <h1>The Complexity Catastrophe</h1>
+        <div class="tagline">Kauffman NK Model -- Why organizations freeze, melt, or thrive</div>
+        <div class="metaphor">
+            <strong>Imagine your company as a network of Christmas tree lights.</strong> Each person (light) makes decisions based on what their colleagues (neighboring lights) do. When the network is sparse, it's orderly but rigid. When it's dense, tiny changes cascade everywhere -- the "complexity catastrophe." This is why bureaucracy grows, why IBM couldn't respond to Dell, and why hierarchy actually saves meetings.
+        </div>
+        <div class="key-insight">
+            <h3>Key Insight</h3>
+            <p>Stuart Kauffman discovered that networks with 2-4 connections per node sit at the sweet spot between order and chaos -- exactly the size of real-world working groups (5-9 people). Evolution didn't stumble on this by accident. Our ancestors who organized in groups this size survived. Those who tried 30-person decision committees didn't.</p>
+        </div>
+        <button class="intro-start-btn" id="btn-start">Explore the Simulation</button>
+    </div>
+</div>
+
+<div class="header">
+    <div>
+        <h1>Boolean Network / Complexity Catastrophe</h1>
+        <div class="subtitle">Kauffman NK Model -- Phase Transitions, Cascades & Attractors</div>
+    </div>
+</div>
+
+<!-- Regime indicators banner -->
+<div class="regime-banner" id="regime-banner">
+    <div class="regime-indicator" id="regime-frozen">
+        <span class="regime-emoji">&#x1F9CA;</span>
+        <div>
+            <div class="regime-label">Frozen</div>
+            <div class="regime-metaphor">like a rigid bureaucracy</div>
+        </div>
+    </div>
+    <div class="regime-indicator" id="regime-edge">
+        <span class="regime-emoji">&#x1F30A;</span>
+        <div>
+            <div class="regime-label">Edge of Chaos</div>
+            <div class="regime-metaphor">like a jazz band</div>
+        </div>
+    </div>
+    <div class="regime-indicator" id="regime-chaotic">
+        <span class="regime-emoji">&#x1F525;</span>
+        <div>
+            <div class="regime-label">Chaotic</div>
+            <div class="regime-metaphor">like a room full of toddlers</div>
+        </div>
+    </div>
+</div>
+
+<!-- Narrative bar -->
+<div class="narrative-bar" id="narrative-bar">
+    Create a network to begin exploring complexity.
+</div>
+
+<div class="main">
+    <!-- Left: Controls -->
+    <div class="controls">
+        <div class="control-section">
+            <h3>Network Parameters</h3>
+            <div class="control-hint">K is the key parameter. Low K = rigid order. High K = chaos. The magic happens around K=2-4.</div>
+            <div class="control-row">
+                <label>Nodes (N)</label>
+                <span class="value" id="val-N">50</span>
+            </div>
+            <input type="range" id="slider-N" min="10" max="200" value="50" step="5">
+
+            <div class="control-row">
+                <label>Connectivity (K)</label>
+                <span class="value" id="val-K">2</span>
+            </div>
+            <input type="range" id="slider-K" min="1" max="10" value="2">
+
+            <div class="control-row">
+                <label>Bias (p)</label>
+                <span class="value" id="val-bias">0.50</span>
+            </div>
+            <input type="range" id="slider-bias" min="5" max="95" value="50">
+
+            <div class="control-row">
+                <label>Topology</label>
+            </div>
+            <select id="sel-topology">
+                <option value="random">Random (Kauffman)</option>
+                <option value="lattice">Ring Lattice</option>
+                <option value="hierarchy">Hierarchical</option>
+                <option value="small-world">Small World</option>
+            </select>
+        </div>
+
+        <div class="control-section">
+            <h3>Simulation</h3>
+            <button class="btn-primary" id="btn-reset">New Network</button>
+            <button class="btn-accent" id="btn-play">Play / Pause</button>
+            <button class="btn-secondary" id="btn-step">Single Step</button>
+            <button class="btn-danger" id="btn-perturb">Perturb Random Node</button>
+            <div class="control-row">
+                <label>Speed</label>
+                <span class="value" id="val-speed">5</span>
+            </div>
+            <input type="range" id="slider-speed" min="1" max="20" value="5">
+            <div class="speed-display" id="speed-display">200ms per step</div>
+        </div>
+
+        <div class="control-section">
+            <h3>Phase Diagram</h3>
+            <button class="btn-primary" id="btn-phase">Compute Phase Diagram</button>
+            <div class="control-row">
+                <label>K range</label>
+                <span class="value">1-8</span>
+            </div>
+            <div class="legend">
+                <div class="legend-item"><div class="legend-dot" style="background:#4aaa6a"></div> Ordered</div>
+                <div class="legend-item"><div class="legend-dot" style="background:#ddaa33"></div> Critical</div>
+                <div class="legend-item"><div class="legend-dot" style="background:#cc5555"></div> Chaotic</div>
+            </div>
+        </div>
+
+        <div class="control-section">
+            <h3>Analysis</h3>
+            <button class="btn-secondary" id="btn-derrida">Derrida Curve</button>
+            <button class="btn-secondary" id="btn-attractor">Find Attractor</button>
+        </div>
+
+        <!-- Bureaucracy Meter -->
+        <div class="control-section">
+            <h3>Bureaucracy Meter</h3>
+            <div class="bureaucracy-meter" id="bureaucracy-meter">
+                <div class="bureaucracy-bar-bg">
+                    <div class="bureaucracy-bar-fill" id="bureaucracy-bar" style="width:0%;background:#4aaa6a"></div>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:baseline">
+                    <span class="bureaucracy-label" id="bureaucracy-label">No network yet</span>
+                    <span class="bureaucracy-meetings" id="bureaucracy-meetings">--</span>
+                </div>
+                <div style="font-size:10px;color:#5a6880;margin-top:4px" id="bureaucracy-desc">meetings needed</div>
+            </div>
+        </div>
+
+        <!-- Real-world examples -->
+        <div class="control-section examples-panel">
+            <h3>Real-World Analogies</h3>
+            <div class="example-row" data-k="1" id="ex-k1">
+                <span class="example-emoji">&#x1F3ED;</span>
+                <span class="example-k">K=1</span>
+                <span class="example-name">Assembly line</span>
+            </div>
+            <div class="example-row" data-k="2" id="ex-k2">
+                <span class="example-emoji">&#x1FA96;</span>
+                <span class="example-k">K=2</span>
+                <span class="example-name">Army platoon</span>
+            </div>
+            <div class="example-row" data-k="3" id="ex-k3">
+                <span class="example-emoji">&#x1F3B7;</span>
+                <span class="example-k">K=3</span>
+                <span class="example-name">Jazz quartet</span>
+            </div>
+            <div class="example-row" data-k="4" id="ex-k4">
+                <span class="example-emoji">&#x1F680;</span>
+                <span class="example-k">K=4</span>
+                <span class="example-name">Startup team</span>
+            </div>
+            <div class="example-row" data-k="6" id="ex-k6">
+                <span class="example-emoji">&#x1F4CB;</span>
+                <span class="example-k">K=6</span>
+                <span class="example-name">Corporate board</span>
+            </div>
+            <div class="example-row" data-k="8" id="ex-k8">
+                <span class="example-emoji">&#x1F4A5;</span>
+                <span class="example-k">K=8</span>
+                <span class="example-name">Design committee from hell</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Center: Visualization -->
+    <div class="viz-area">
+        <div class="viz-tabs">
+            <div class="viz-tab active" data-tab="network">Network</div>
+            <div class="viz-tab" data-tab="phase">Phase Diagram</div>
+            <div class="viz-tab" data-tab="derrida">Derrida Curve</div>
+            <div class="viz-tab" data-tab="history">State History</div>
+        </div>
+        <div class="viz-explanation" id="viz-explanation">
+            Each node is a decision-maker. Click one to "change their mind" and watch whether the change stays local (ordered) or cascades wildly (chaotic).
+        </div>
+        <div class="viz-content">
+            <canvas id="canvas"></canvas>
+        </div>
+    </div>
+
+    <!-- Right: Metrics -->
+    <div class="metrics">
+        <div class="metric-card">
+            <h4>Regime</h4>
+            <div class="metric-value" id="metric-regime">--</div>
+            <div class="metric-sub" id="metric-regime-sub">Create a network to analyze</div>
+        </div>
+
+        <div class="insight-card">
+            <h4>Key Insight</h4>
+            <p>Networks with K=2-4 connections per node sit at the sweet spot between order and chaos. This mirrors real working groups of 5-9 people -- the size evolution selected for.</p>
+        </div>
+
+        <div class="metric-card">
+            <h4>Derrida Parameter (&lambda;)</h4>
+            <div class="metric-value" id="metric-derrida">--</div>
+            <div class="metric-sub" id="metric-derrida-sub">
+                &lambda; &lt; 1: ordered | &lambda; = 1: critical | &lambda; &gt; 1: chaotic
+            </div>
+        </div>
+        <div class="metric-card">
+            <h4>Theoretical &lambda;</h4>
+            <div class="metric-value" id="metric-theory">--</div>
+            <div class="metric-sub">2K &middot; p(1-p)</div>
+        </div>
+        <div class="metric-card">
+            <h4>Tick</h4>
+            <div class="metric-value" id="metric-tick">0</div>
+        </div>
+        <div class="metric-card">
+            <h4>Active Nodes</h4>
+            <div class="metric-value" id="metric-active">--</div>
+            <div class="metric-sub" id="metric-active-sub"></div>
+        </div>
+        <div class="metric-card">
+            <h4>Cycle Length</h4>
+            <div class="metric-value" id="metric-cycle">--</div>
+            <div class="metric-sub" id="metric-cycle-sub">Click "Find Attractor"</div>
+        </div>
+        <div class="metric-card">
+            <h4>Last Cascade</h4>
+            <div class="metric-value" id="metric-cascade">--</div>
+            <div class="metric-sub" id="metric-cascade-sub">Click a node or "Perturb" to measure</div>
+        </div>
+        <div class="metric-card">
+            <h4>Cascade Distribution</h4>
+            <div id="cascade-dist"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ============================================================
+// Boolean Network Simulation Engine
+// ============================================================
+
+class BoolNode {
+    constructor(index, K, bias) {
+        this.index = index;
+        this.state = Math.random() < 0.5 ? 1 : 0;
+        this.inputs = [];
+        this.bias = bias;
+        this.truthTable = [];
+        for (let i = 0; i < (1 << K); i++) {
+            this.truthTable.push(Math.random() < bias ? 1 : 0);
+        }
+    }
+
+    computeNext(inputStates) {
+        let idx = 0;
+        for (let k = 0; k < inputStates.length; k++) {
+            idx += inputStates[k] << k;
+        }
+        return this.truthTable[idx];
+    }
+}
+
+class BoolNetwork {
+    constructor(N, K, bias, topology, rewiringProb = 0.1) {
+        this.N = N;
+        this.K = K;
+        this.bias = bias;
+        this.topology = topology;
+        this.rewiringProb = rewiringProb;
+        this.tick = 0;
+        this.nodes = [];
+        this.nodePositions = [];
+
+        for (let i = 0; i < N; i++) {
+            this.nodes.push(new BoolNode(i, K, bias));
+        }
+        this.wireTopology();
+        this.computeLayout();
+    }
+
+    wireTopology() {
+        switch (this.topology) {
+            case 'random': this.wireRandom(); break;
+            case 'lattice': this.wireLattice(); break;
+            case 'hierarchy': this.wireHierarchy(); break;
+            case 'small-world': this.wireSmallWorld(); break;
+        }
+    }
+
+    wireRandom() {
+        for (const node of this.nodes) {
+            const candidates = [];
+            for (let i = 0; i < this.N; i++) {
+                if (i !== node.index) candidates.push(i);
+            }
+            node.inputs = shuffle(candidates).slice(0, Math.min(this.K, candidates.length));
+        }
+    }
+
+    wireLattice() {
+        for (const node of this.nodes) {
+            const inputs = [];
+            for (let j = 1; j <= Math.floor(this.K / 2); j++) {
+                inputs.push((node.index + j) % this.N);
+                inputs.push(((node.index - j) + this.N) % this.N);
+            }
+            if (this.K % 2 === 1) {
+                inputs.push((node.index + Math.floor(this.K / 2) + 1) % this.N);
+            }
+            node.inputs = inputs.slice(0, this.K);
+        }
+    }
+
+    wireHierarchy() {
+        const numLeaves = Math.max(4, Math.floor(Math.sqrt(this.N)));
+        const moduleSize = Math.max(1, Math.floor(this.N / numLeaves));
+
+        const getModule = (idx) => Math.min(Math.floor(idx / moduleSize), numLeaves - 1);
+
+        const modules = {};
+        for (let i = 0; i < this.N; i++) {
+            const m = getModule(i);
+            if (!modules[m]) modules[m] = [];
+            modules[m].push(i);
+        }
+
+        for (const node of this.nodes) {
+            const myModule = getModule(node.index);
+            const siblings = (modules[myModule] || []).filter(x => x !== node.index);
+            const others = [];
+            for (let i = 0; i < this.N; i++) {
+                if (getModule(i) !== myModule) others.push(i);
+            }
+
+            const intraK = Math.max(1, Math.round(this.K * 0.7));
+            const interK = this.K - intraK;
+            const inputs = [];
+
+            if (siblings.length > 0) {
+                inputs.push(...shuffle(siblings).slice(0, Math.min(intraK, siblings.length)));
+            }
+            if (others.length > 0 && interK > 0) {
+                inputs.push(...shuffle(others).slice(0, Math.min(interK, others.length)));
+            }
+            while (inputs.length < this.K) {
+                const candidates = [];
+                for (let i = 0; i < this.N; i++) {
+                    if (i !== node.index && !inputs.includes(i)) candidates.push(i);
+                }
+                if (candidates.length === 0) break;
+                inputs.push(candidates[Math.floor(Math.random() * candidates.length)]);
+            }
+            node.inputs = inputs.slice(0, this.K);
+        }
+    }
+
+    wireSmallWorld() {
+        this.wireLattice();
+        for (const node of this.nodes) {
+            const newInputs = [];
+            for (const inp of node.inputs) {
+                if (Math.random() < this.rewiringProb) {
+                    const candidates = [];
+                    for (let i = 0; i < this.N; i++) {
+                        if (i !== node.index && !newInputs.includes(i)) candidates.push(i);
+                    }
+                    if (candidates.length > 0) {
+                        newInputs.push(candidates[Math.floor(Math.random() * candidates.length)]);
+                    } else {
+                        newInputs.push(inp);
+                    }
+                } else {
+                    newInputs.push(inp);
+                }
+            }
+            node.inputs = newInputs;
+        }
+    }
+
+    computeLayout() {
+        this.nodePositions = [];
+        if (this.topology === 'lattice' || this.topology === 'small-world') {
+            for (let i = 0; i < this.N; i++) {
+                const angle = (2 * Math.PI * i) / this.N - Math.PI / 2;
+                this.nodePositions.push({
+                    x: 0.5 + 0.4 * Math.cos(angle),
+                    y: 0.5 + 0.4 * Math.sin(angle)
+                });
+            }
+        } else if (this.topology === 'hierarchy') {
+            const numLeaves = Math.max(4, Math.floor(Math.sqrt(this.N)));
+            const moduleSize = Math.max(1, Math.floor(this.N / numLeaves));
+            for (let i = 0; i < this.N; i++) {
+                const m = Math.min(Math.floor(i / moduleSize), numLeaves - 1);
+                const posInModule = i - m * moduleSize;
+                const moduleAngle = (2 * Math.PI * m) / numLeaves - Math.PI / 2;
+                const modCenterX = 0.5 + 0.3 * Math.cos(moduleAngle);
+                const modCenterY = 0.5 + 0.3 * Math.sin(moduleAngle);
+                const innerAngle = (2 * Math.PI * posInModule) / moduleSize;
+                const r = 0.06 + 0.02 * Math.sqrt(moduleSize);
+                this.nodePositions.push({
+                    x: modCenterX + r * Math.cos(innerAngle),
+                    y: modCenterY + r * Math.sin(innerAngle)
+                });
+            }
+        } else {
+            // Force-directed layout for random topology
+            for (let i = 0; i < this.N; i++) {
+                const angle = (2 * Math.PI * i) / this.N + (Math.random() - 0.5) * 0.3;
+                const r = 0.25 + Math.random() * 0.15;
+                this.nodePositions.push({
+                    x: 0.5 + r * Math.cos(angle),
+                    y: 0.5 + r * Math.sin(angle)
+                });
+            }
+            // Simple force-directed relaxation
+            for (let iter = 0; iter < 100; iter++) {
+                const forces = this.nodePositions.map(() => ({ x: 0, y: 0 }));
+                // Repulsion
+                for (let i = 0; i < this.N; i++) {
+                    for (let j = i + 1; j < this.N; j++) {
+                        const dx = this.nodePositions[i].x - this.nodePositions[j].x;
+                        const dy = this.nodePositions[i].y - this.nodePositions[j].y;
+                        const dist = Math.sqrt(dx * dx + dy * dy) + 0.001;
+                        const force = 0.0005 / (dist * dist);
+                        forces[i].x += (dx / dist) * force;
+                        forces[i].y += (dy / dist) * force;
+                        forces[j].x -= (dx / dist) * force;
+                        forces[j].y -= (dy / dist) * force;
+                    }
+                }
+                // Attraction along edges
+                for (const node of this.nodes) {
+                    for (const inp of node.inputs) {
+                        const dx = this.nodePositions[inp].x - this.nodePositions[node.index].x;
+                        const dy = this.nodePositions[inp].y - this.nodePositions[node.index].y;
+                        const dist = Math.sqrt(dx * dx + dy * dy) + 0.001;
+                        const force = dist * 0.01;
+                        forces[node.index].x += (dx / dist) * force;
+                        forces[node.index].y += (dy / dist) * force;
+                        forces[inp].x -= (dx / dist) * force;
+                        forces[inp].y -= (dy / dist) * force;
+                    }
+                }
+                // Center gravity
+                for (let i = 0; i < this.N; i++) {
+                    forces[i].x += (0.5 - this.nodePositions[i].x) * 0.005;
+                    forces[i].y += (0.5 - this.nodePositions[i].y) * 0.005;
+                }
+                // Apply
+                for (let i = 0; i < this.N; i++) {
+                    this.nodePositions[i].x += forces[i].x;
+                    this.nodePositions[i].y += forces[i].y;
+                    this.nodePositions[i].x = Math.max(0.05, Math.min(0.95, this.nodePositions[i].x));
+                    this.nodePositions[i].y = Math.max(0.05, Math.min(0.95, this.nodePositions[i].y));
+                }
+            }
+        }
+    }
+
+    getState() {
+        return this.nodes.map(n => n.state);
+    }
+
+    setState(state) {
+        for (let i = 0; i < this.N; i++) {
+            this.nodes[i].state = state[i];
+        }
+    }
+
+    step() {
+        const nextStates = [];
+        for (const node of this.nodes) {
+            const inputStates = node.inputs.map(i => this.nodes[i].state);
+            nextStates.push(node.computeNext(inputStates));
+        }
+        // Track which nodes changed this step
+        this.lastChangedNodes = [];
+        for (let i = 0; i < this.N; i++) {
+            if (this.nodes[i].state !== nextStates[i]) {
+                this.lastChangedNodes.push(i);
+            }
+            this.nodes[i].state = nextStates[i];
+        }
+        this.tick++;
+        return this.getState();
+    }
+
+    perturb(nodeIndex) {
+        this.nodes[nodeIndex].state = 1 - this.nodes[nodeIndex].state;
+    }
+
+    hamming(s1, s2) {
+        let d = 0;
+        for (let i = 0; i < s1.length; i++) {
+            if (s1[i] !== s2[i]) d++;
+        }
+        return d;
+    }
+
+    derridaParameter(numPairs = 200) {
+        let totalSpread = 0;
+        for (let p = 0; p < numPairs; p++) {
+            const s1 = Array.from({ length: this.N }, () => Math.random() < 0.5 ? 1 : 0);
+            const flipIdx = Math.floor(Math.random() * this.N);
+            const s2 = [...s1];
+            s2[flipIdx] = 1 - s2[flipIdx];
+
+            this.setState(s1);
+            this.step();
+            const s1Next = this.getState();
+            this.tick--;
+
+            this.setState(s2);
+            this.step();
+            const s2Next = this.getState();
+            this.tick--;
+
+            totalSpread += this.hamming(s1Next, s2Next);
+        }
+        return totalSpread / numPairs;
+    }
+
+    derridaCurve(numPairs = 100, numDistances = 15) {
+        const curve = [];
+        for (let di = 1; di <= numDistances; di++) {
+            const dIn = Math.max(1, Math.round(this.N * di / numDistances));
+            let dOutTotal = 0;
+            for (let p = 0; p < numPairs; p++) {
+                const s1 = Array.from({ length: this.N }, () => Math.random() < 0.5 ? 1 : 0);
+                const s2 = [...s1];
+                const indices = shuffle([...Array(this.N).keys()]).slice(0, dIn);
+                for (const idx of indices) s2[idx] = 1 - s2[idx];
+
+                this.setState(s1);
+                this.step();
+                const s1Next = this.getState();
+                this.tick--;
+
+                this.setState(s2);
+                this.step();
+                const s2Next = this.getState();
+                this.tick--;
+
+                dOutTotal += this.hamming(s1Next, s2Next) / this.N;
+            }
+            curve.push([dIn / this.N, dOutTotal / numPairs]);
+        }
+        return curve;
+    }
+
+    findAttractor(maxSteps = 5000) {
+        const seen = new Map();
+        let state = this.getState();
+        for (let t = 0; t < maxSteps; t++) {
+            const key = state.join('');
+            if (seen.has(key)) {
+                return { cycleLength: t - seen.get(key), transient: seen.get(key), found: true };
+            }
+            seen.set(key, t);
+            this.step();
+            state = this.getState();
+        }
+        return { cycleLength: null, transient: null, found: false };
+    }
+
+    measureCascade(nodeIndex, steps = 30) {
+        const originalState = this.getState();
+        const origTick = this.tick;
+
+        // Unperturbed
+        this.setState(originalState);
+        const unperturbed = [this.getState()];
+        for (let i = 0; i < steps; i++) {
+            this.step();
+            unperturbed.push(this.getState());
+        }
+        this.tick = origTick;
+
+        // Perturbed
+        this.setState(originalState);
+        this.perturb(nodeIndex);
+        const perturbed = [this.getState()];
+        for (let i = 0; i < steps; i++) {
+            this.step();
+            perturbed.push(this.getState());
+        }
+        this.tick = origTick;
+
+        const hammingSeries = [];
+        const affectedNodes = new Set();
+        // Track which nodes are affected at each timestep for cascade animation
+        const affectedPerStep = [];
+        for (let t = 0; t < unperturbed.length; t++) {
+            hammingSeries.push(this.hamming(unperturbed[t], perturbed[t]));
+            const stepAffected = [];
+            for (let i = 0; i < this.N; i++) {
+                if (unperturbed[t][i] !== perturbed[t][i]) {
+                    affectedNodes.add(i);
+                    stepAffected.push(i);
+                }
+            }
+            affectedPerStep.push(stepAffected);
+        }
+
+        this.setState(originalState);
+        return {
+            cascadeSize: affectedNodes.size,
+            maxHamming: Math.max(...hammingSeries),
+            hammingSeries,
+            affectedNodes: [...affectedNodes],
+            affectedPerStep
+        };
+    }
+}
+
+function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+
+// ============================================================
+// UI State and Rendering
+// ============================================================
+
+let net = null;
+let playing = false;
+let animFrame = null;
+let lastStepTime = 0;
+let activeTab = 'network';
+let stateHistory = [];
+let phaseData = null;
+let derridaCurveData = null;
+let cascadeHistory = [];
+let perturbedNodes = new Set();
+let hoveredNode = -1;
+let currentRegime = null;
+
+// Cascade animation state
+let cascadeAnim = null; // { affectedPerStep, startTime, sourceNode, duration }
+let nodeGlowState = {}; // nodeIndex -> { intensity, color, decayStart }
+let nodeChangeFlash = {}; // nodeIndex -> timestamp of last change
+
+// Pulse animation
+let pulsePhase = 0;
+
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+// Contextual explanation strings per tab
+const vizExplanations = {
+    network: 'Each node is a decision-maker. Click one to "change their mind" and watch whether the change stays local (ordered) or cascades wildly (chaotic).',
+    phase: 'The boundary between order and chaos is where organizations are most adaptive. Too orderly = can\'t innovate. Too chaotic = can\'t execute. The sweet spot is the "edge of chaos."',
+    derrida: 'This measures how sensitive the network is to small changes. When the curve is above the diagonal, small perturbations grow -- the system is chaotic.',
+    history: 'Each row is a moment in time. Each column is a node. Blue = ON, dark = OFF. Look for frozen columns (ordered) vs flickering columns (chaotic).'
+};
+
+// Intro dismiss
+document.getElementById('btn-start').addEventListener('click', () => {
+    document.getElementById('intro-overlay').classList.add('hidden');
+});
+
+function resizeCanvas() {
+    const container = canvas.parentElement;
+    canvas.width = container.clientWidth * devicePixelRatio;
+    canvas.height = container.clientHeight * devicePixelRatio;
+    canvas.style.width = container.clientWidth + 'px';
+    canvas.style.height = container.clientHeight + 'px';
+    ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+    render();
+}
+window.addEventListener('resize', resizeCanvas);
+
+// Slider bindings
+function bindSlider(id, valId, formatter) {
+    const slider = document.getElementById(id);
+    const valEl = document.getElementById(valId);
+    slider.addEventListener('input', () => {
+        valEl.textContent = formatter ? formatter(slider.value) : slider.value;
+    });
+}
+bindSlider('slider-N', 'val-N');
+bindSlider('slider-K', 'val-K');
+bindSlider('slider-bias', 'val-bias', v => (v / 100).toFixed(2));
+bindSlider('slider-speed', 'val-speed');
+
+document.getElementById('slider-speed').addEventListener('input', (e) => {
+    const speed = parseInt(e.target.value);
+    const ms = Math.round(1000 / speed);
+    document.getElementById('speed-display').textContent = ms + 'ms per step';
+});
+
+// Tab switching
+document.querySelectorAll('.viz-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+        document.querySelectorAll('.viz-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        activeTab = tab.dataset.tab;
+        document.getElementById('viz-explanation').textContent = vizExplanations[activeTab] || '';
+        render();
+    });
+});
+
+// Canvas click for node perturbation
+canvas.addEventListener('click', (e) => {
+    if (!net || activeTab !== 'network') return;
+    const rect = canvas.getBoundingClientRect();
+    const mx = (e.clientX - rect.left) / rect.width;
+    const my = (e.clientY - rect.top) / rect.height;
+
+    let closest = -1;
+    let closestDist = Infinity;
+    for (let i = 0; i < net.N; i++) {
+        const nx = net.nodePositions[i].x;
+        const ny = net.nodePositions[i].y;
+        const dx = mx - nx;
+        const dy = my - ny;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < closestDist) {
+            closestDist = dist;
+            closest = i;
+        }
+    }
+
+    if (closest >= 0 && closestDist < 0.05) {
+        const savedState = net.getState();
+        net.perturb(closest);
+        perturbedNodes.add(closest);
+        const cascade = net.measureCascade(closest, 30);
+        net.setState(savedState);
+        net.perturb(closest);  // Keep the perturbation
+
+        // Start cascade animation
+        startCascadeAnimation(cascade, closest);
+
+        updateMetric('metric-cascade', cascade.cascadeSize);
+        document.getElementById('metric-cascade-sub').textContent =
+            `Node ${closest} | Max Hamming: ${cascade.maxHamming}`;
+        cascadeHistory.push(cascade.cascadeSize);
+        updateCascadeDist();
+
+        // Spawn ripple effect at click position
+        spawnRipple(e.clientX, e.clientY, cascade.cascadeSize);
+
+        render();
+    }
+});
+
+canvas.addEventListener('mousemove', (e) => {
+    if (!net || activeTab !== 'network') return;
+    const rect = canvas.getBoundingClientRect();
+    const mx = (e.clientX - rect.left) / rect.width;
+    const my = (e.clientY - rect.top) / rect.height;
+
+    let closest = -1;
+    let closestDist = Infinity;
+    for (let i = 0; i < net.N; i++) {
+        const dx = mx - net.nodePositions[i].x;
+        const dy = my - net.nodePositions[i].y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < closestDist) {
+            closestDist = dist;
+            closest = i;
+        }
+    }
+    const newHovered = closestDist < 0.05 ? closest : -1;
+    if (newHovered !== hoveredNode) {
+        hoveredNode = newHovered;
+        canvas.style.cursor = hoveredNode >= 0 ? 'pointer' : 'default';
+        render();
+    }
+});
+
+// Buttons
+document.getElementById('btn-reset').addEventListener('click', createNetwork);
+document.getElementById('btn-play').addEventListener('click', togglePlay);
+document.getElementById('btn-step').addEventListener('click', () => {
+    if (net) {
+        net.step();
+        // Flash changed nodes
+        if (net.lastChangedNodes) {
+            const now = performance.now();
+            for (const idx of net.lastChangedNodes) {
+                nodeChangeFlash[idx] = now;
+            }
+        }
+        stateHistory.push(net.getState());
+        if (stateHistory.length > 200) stateHistory.shift();
+        updateMetrics();
+        render();
+    }
+});
+document.getElementById('btn-perturb').addEventListener('click', () => {
+    if (!net) return;
+    const idx = Math.floor(Math.random() * net.N);
+    const savedState = net.getState();
+    const cascade = net.measureCascade(idx, 30);
+    net.setState(savedState);
+    net.perturb(idx);
+    perturbedNodes.add(idx);
+
+    // Start cascade animation
+    startCascadeAnimation(cascade, idx);
+
+    updateMetric('metric-cascade', cascade.cascadeSize);
+    document.getElementById('metric-cascade-sub').textContent =
+        `Node ${idx} | Max Hamming: ${cascade.maxHamming}`;
+    cascadeHistory.push(cascade.cascadeSize);
+    updateCascadeDist();
+
+    // Ripple at canvas center as fallback
+    const rect = canvas.getBoundingClientRect();
+    const pos = net.nodePositions[idx];
+    spawnRipple(
+        rect.left + pos.x * rect.width,
+        rect.top + pos.y * rect.height,
+        cascade.cascadeSize
+    );
+
+    render();
+});
+document.getElementById('btn-phase').addEventListener('click', computePhaseDiagram);
+document.getElementById('btn-derrida').addEventListener('click', computeDerrida);
+document.getElementById('btn-attractor').addEventListener('click', findAttractor);
+
+// Example row clicks - set K slider
+document.querySelectorAll('.example-row').forEach(row => {
+    row.addEventListener('click', () => {
+        const k = parseInt(row.dataset.k);
+        const slider = document.getElementById('slider-K');
+        slider.value = k;
+        document.getElementById('val-K').textContent = k;
+        createNetwork();
+    });
+});
+
+function startCascadeAnimation(cascade, sourceNode) {
+    cascadeAnim = {
+        affectedPerStep: cascade.affectedPerStep,
+        startTime: performance.now(),
+        sourceNode,
+        duration: 2000 // 2 seconds for the full cascade animation
+    };
+    // Set glow on source node immediately
+    nodeGlowState[sourceNode] = {
+        intensity: 1.0,
+        color: '#ff6644',
+        decayStart: performance.now() + 500
+    };
+}
+
+function spawnRipple(x, y, cascadeSize) {
+    const vizContent = document.querySelector('.viz-content');
+    const numRings = Math.min(Math.max(1, Math.floor(cascadeSize / 5)), 5);
+    for (let i = 0; i < numRings; i++) {
+        const ring = document.createElement('div');
+        ring.className = 'ripple-ring';
+        const rect = vizContent.getBoundingClientRect();
+        ring.style.left = (x - rect.left - 20) + 'px';
+        ring.style.top = (y - rect.top - 20) + 'px';
+        ring.style.animationDelay = (i * 150) + 'ms';
+
+        // Color based on cascade size
+        if (cascadeSize > net.N * 0.3) {
+            ring.style.borderColor = '#ff4444';
+        } else if (cascadeSize > net.N * 0.1) {
+            ring.style.borderColor = '#ddaa33';
+        } else {
+            ring.style.borderColor = '#4aaa6a';
+        }
+
+        vizContent.appendChild(ring);
+        setTimeout(() => ring.remove(), 1200);
+    }
+}
+
+function createNetwork() {
+    const N = parseInt(document.getElementById('slider-N').value);
+    const K = parseInt(document.getElementById('slider-K').value);
+    const bias = parseInt(document.getElementById('slider-bias').value) / 100;
+    const topology = document.getElementById('sel-topology').value;
+
+    net = new BoolNetwork(N, K, bias, topology);
+    stateHistory = [net.getState()];
+    cascadeHistory = [];
+    perturbedNodes.clear();
+    cascadeAnim = null;
+    nodeGlowState = {};
+    nodeChangeFlash = {};
+    playing = false;
+    document.getElementById('btn-play').textContent = 'Play / Pause';
+
+    // Compute Derrida parameter
+    const savedState = net.getState();
+    const savedTick = net.tick;
+    const derrida = net.derridaParameter(200);
+    net.setState(savedState);
+    net.tick = savedTick;
+
+    const theory = 2 * K * bias * (1 - bias);
+    let regime = 'critical';
+    if (derrida < 0.8) regime = 'ordered';
+    else if (derrida > 1.2) regime = 'chaotic';
+
+    currentRegime = regime;
+
+    updateMetric('metric-derrida', derrida.toFixed(3));
+    updateMetric('metric-theory', theory.toFixed(3));
+    updateMetric('metric-regime', regime.charAt(0).toUpperCase() + regime.slice(1));
+    document.getElementById('metric-regime').className = 'metric-value ' + regime;
+    document.getElementById('metric-regime-sub').textContent =
+        `N=${N}, K=${K}, p=${bias.toFixed(2)}, ${topology}`;
+
+    updateRegimeBanner(regime, K, derrida);
+    updateBureaucracyMeter(N, K);
+    updateExampleHighlight(K);
+    updateNarrative(regime, K, topology);
+
+    updateMetrics();
+    resizeCanvas();
+}
+
+function updateRegimeBanner(regime, K, derrida) {
+    const banner = document.getElementById('regime-banner');
+    banner.className = 'regime-banner regime-' + regime;
+
+    const frozen = document.getElementById('regime-frozen');
+    const edge = document.getElementById('regime-edge');
+    const chaotic = document.getElementById('regime-chaotic');
+
+    frozen.className = 'regime-indicator' + (regime === 'ordered' ? ' active active-ordered' : '');
+    edge.className = 'regime-indicator' + (regime === 'critical' ? ' active active-critical' : '');
+    chaotic.className = 'regime-indicator' + (regime === 'chaotic' ? ' active active-chaotic' : '');
+}
+
+function updateBureaucracyMeter(N, K) {
+    const totalEdges = N * K;
+    const meetings = Math.round(totalEdges / 2);
+    const maxMeetings = N * 10 / 2;
+    const pct = Math.min(100, (meetings / maxMeetings) * 100);
+
+    const bar = document.getElementById('bureaucracy-bar');
+    bar.style.width = pct + '%';
+
+    let color, label;
+    if (K <= 2) {
+        color = '#4aaa6a';
+        label = 'Lean & efficient';
+    } else if (K <= 4) {
+        color = '#ddaa33';
+        label = 'Getting crowded';
+    } else if (K <= 6) {
+        color = '#dd7733';
+        label = 'Meeting overload';
+    } else {
+        color = '#cc5555';
+        label = 'Calendar apocalypse';
+    }
+    bar.style.background = color;
+    document.getElementById('bureaucracy-label').textContent = label;
+    document.getElementById('bureaucracy-meetings').textContent = meetings;
+    document.getElementById('bureaucracy-desc').textContent =
+        `coordination meetings (${totalEdges} connections)`;
+}
+
+function updateExampleHighlight(K) {
+    document.querySelectorAll('.example-row').forEach(row => {
+        const rowK = parseInt(row.dataset.k);
+        row.classList.toggle('active-example', rowK === K || (rowK === K - 1) || (rowK === K + 1));
+        if (rowK === K) {
+            row.style.background = 'rgba(74, 138, 255, 0.15)';
+            row.style.borderLeft = '2px solid #4a8aff';
+        } else {
+            row.style.background = '';
+            row.style.borderLeft = '';
+        }
+    });
+}
+
+function updateNarrative(regime, K, topology) {
+    const bar = document.getElementById('narrative-bar');
+    bar.className = 'narrative-bar narrative-' + regime;
+
+    const narratives = {
+        ordered: [
+            `Network is in the ORDERED regime -- perturbations die out quickly. This is like a rigid bureaucracy. Try adding more connections (increase K)...`,
+            `With K=${K}, each node listens to few neighbors. Changes can't spread. Stable but inflexible, like an assembly line that can't adapt.`,
+            `The system quickly settles into a fixed pattern. Great for predictability, terrible for innovation. Crank up K to see what happens.`
+        ],
+        critical: [
+            `You've found the EDGE OF CHAOS -- the sweet spot! Like a jazz band: enough structure to play together, enough freedom to improvise.`,
+            `At K=${K}, the network balances between frozen rigidity and wild chaos. This is where evolution, markets, and the best teams operate.`,
+            `The system is poised between order and chaos. Small changes sometimes cascade, sometimes don't. This is where adaptation lives.`
+        ],
+        chaotic: [
+            `CHAOTIC regime -- every small change cascades wildly! This is the "complexity catastrophe." Like a room full of toddlers: nothing stays put.`,
+            `With K=${K}, each node has too many connections. A single flip triggers an avalanche. This is why 30-person meetings never decide anything.`,
+            `The system can never settle down. Every perturbation creates a butterfly effect. Try reducing K to find the sweet spot...`
+        ]
+    };
+
+    const options = narratives[regime] || narratives.ordered;
+    bar.textContent = options[Math.floor(Math.random() * options.length)];
+}
+
+function togglePlay() {
+    if (!net) createNetwork();
+    playing = !playing;
+    document.getElementById('btn-play').textContent = playing ? 'Pause' : 'Play / Pause';
+    if (playing) animate();
+}
+
+function animate() {
+    if (!playing || !net) return;
+    const now = performance.now();
+    const speed = parseInt(document.getElementById('slider-speed').value);
+    const interval = 1000 / speed;
+    if (now - lastStepTime >= interval) {
+        net.step();
+        // Flash changed nodes
+        if (net.lastChangedNodes) {
+            for (const idx of net.lastChangedNodes) {
+                nodeChangeFlash[idx] = now;
+            }
+        }
+        stateHistory.push(net.getState());
+        if (stateHistory.length > 200) stateHistory.shift();
+        updateMetrics();
+        lastStepTime = now;
+    }
+    render();
+    animFrame = requestAnimationFrame(animate);
+}
+
+function updateMetrics() {
+    if (!net) return;
+    const state = net.getState();
+    const active = state.filter(s => s === 1).length;
+    updateMetric('metric-tick', net.tick);
+    updateMetric('metric-active', active);
+    document.getElementById('metric-active-sub').textContent =
+        `${active}/${net.N} (${(100 * active / net.N).toFixed(0)}%)`;
+}
+
+function updateMetric(id, value) {
+    document.getElementById(id).textContent = value;
+}
+
+function updateCascadeDist() {
+    const container = document.getElementById('cascade-dist');
+    if (cascadeHistory.length === 0) {
+        container.innerHTML = '<div style="font-size:11px;color:#6a7a9a">No data yet</div>';
+        return;
+    }
+    const counts = {};
+    for (const s of cascadeHistory) {
+        const bucket = Math.floor(s / 5) * 5;
+        counts[bucket] = (counts[bucket] || 0) + 1;
+    }
+    const maxCount = Math.max(...Object.values(counts));
+    let html = '';
+    for (const [bucket, count] of Object.entries(counts).sort((a, b) => parseInt(a[0]) - parseInt(b[0]))) {
+        const pct = (count / maxCount * 100).toFixed(0);
+        html += `<div class="cascade-bar">
+            <span class="label">${bucket}</span>
+            <div class="bar" style="width:${pct}%;min-width:2px"></div>
+        </div>`;
+    }
+    container.innerHTML = html;
+}
+
+function computePhaseDiagram() {
+    updateMetric('metric-regime', 'Computing...');
+    document.getElementById('metric-regime').className = 'metric-value';
+
+    setTimeout(() => {
+        const N = parseInt(document.getElementById('slider-N').value);
+        const topology = document.getElementById('sel-topology').value;
+        const Ks = [1, 2, 3, 4, 5, 6, 7, 8];
+        const biases = [];
+        for (let b = 0.10; b <= 0.91; b += 0.05) biases.push(Math.round(b * 100) / 100);
+
+        phaseData = [];
+        for (const K of Ks) {
+            for (const bias of biases) {
+                const testNet = new BoolNetwork(Math.min(N, 40), K, bias, topology);
+                const savedState = testNet.getState();
+                const derrida = testNet.derridaParameter(80);
+                testNet.setState(savedState);
+
+                const theory = 2 * K * bias * (1 - bias);
+                let cls = 'critical';
+                if (derrida < 0.8) cls = 'ordered';
+                else if (derrida > 1.2) cls = 'chaotic';
+
+                phaseData.push({ K, bias, derrida, theory, cls });
+            }
+        }
+
+        activeTab = 'phase';
+        document.querySelectorAll('.viz-tab').forEach(t => {
+            t.classList.toggle('active', t.dataset.tab === 'phase');
+        });
+        document.getElementById('viz-explanation').textContent = vizExplanations.phase;
+        updateMetric('metric-regime', 'See diagram');
+        document.getElementById('metric-regime').className = 'metric-value';
+        render();
+    }, 50);
+}
+
+function computeDerrida() {
+    if (!net) createNetwork();
+    updateMetric('metric-derrida', 'Computing...');
+
+    setTimeout(() => {
+        const savedState = net.getState();
+        const savedTick = net.tick;
+        derridaCurveData = net.derridaCurve(80, 15);
+        net.setState(savedState);
+        net.tick = savedTick;
+
+        const derrida = net.derridaParameter(200);
+        net.setState(savedState);
+        net.tick = savedTick;
+
+        updateMetric('metric-derrida', derrida.toFixed(3));
+
+        activeTab = 'derrida';
+        document.querySelectorAll('.viz-tab').forEach(t => {
+            t.classList.toggle('active', t.dataset.tab === 'derrida');
+        });
+        document.getElementById('viz-explanation').textContent = vizExplanations.derrida;
+        render();
+    }, 50);
+}
+
+function findAttractor() {
+    if (!net) createNetwork();
+    updateMetric('metric-cycle', 'Searching...');
+
+    setTimeout(() => {
+        const savedTick = net.tick;
+        const savedState = net.getState();
+        const result = net.findAttractor(5000);
+        net.setState(savedState);
+        net.tick = savedTick;
+
+        if (result.found) {
+            updateMetric('metric-cycle', result.cycleLength);
+            document.getElementById('metric-cycle-sub').textContent =
+                `Transient: ${result.transient} steps`;
+        } else {
+            updateMetric('metric-cycle', '>5000');
+            document.getElementById('metric-cycle-sub').textContent = 'No cycle found in 5000 steps';
+        }
+    }, 50);
+}
+
+// ============================================================
+// Rendering
+// ============================================================
+
+function render() {
+    const w = canvas.width / devicePixelRatio;
+    const h = canvas.height / devicePixelRatio;
+    ctx.clearRect(0, 0, w, h);
+
+    pulsePhase = (performance.now() / 1000) % (Math.PI * 2);
+
+    switch (activeTab) {
+        case 'network': renderNetwork(w, h); break;
+        case 'phase': renderPhaseDiagram(w, h); break;
+        case 'derrida': renderDerridaCurve(w, h); break;
+        case 'history': renderHistory(w, h); break;
+    }
+}
+
+function renderNetwork(w, h) {
+    if (!net) {
+        ctx.fillStyle = '#4a5a7a';
+        ctx.font = '14px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('Click "New Network" to begin', w / 2, h / 2);
+        return;
+    }
+
+    const now = performance.now();
+    const size = Math.min(w, h);
+    const ox = (w - size) / 2;
+    const oy = (h - size) / 2;
+
+    // Compute cascade glow for nodes
+    const cascadeGlow = {};
+    if (cascadeAnim) {
+        const elapsed = now - cascadeAnim.startTime;
+        const progress = Math.min(1, elapsed / cascadeAnim.duration);
+        const stepToShow = Math.floor(progress * cascadeAnim.affectedPerStep.length);
+
+        for (let t = 0; t <= stepToShow && t < cascadeAnim.affectedPerStep.length; t++) {
+            const stepAge = (stepToShow - t) / cascadeAnim.affectedPerStep.length;
+            const intensity = Math.max(0, 1 - stepAge * 2);
+            for (const nodeIdx of cascadeAnim.affectedPerStep[t]) {
+                if (!cascadeGlow[nodeIdx] || cascadeGlow[nodeIdx] < intensity) {
+                    cascadeGlow[nodeIdx] = intensity;
+                }
+            }
+        }
+
+        if (progress >= 1) {
+            cascadeAnim = null;
+        }
+    }
+
+    // Draw edges
+    ctx.globalAlpha = 0.12;
+    ctx.strokeStyle = '#4a6a9a';
+    ctx.lineWidth = 0.5;
+    for (const node of net.nodes) {
+        const nx = ox + net.nodePositions[node.index].x * size;
+        const ny = oy + net.nodePositions[node.index].y * size;
+        for (const inp of node.inputs) {
+            const ix = ox + net.nodePositions[inp].x * size;
+            const iy = oy + net.nodePositions[inp].y * size;
+
+            // If both nodes are glowing from cascade, make edge visible
+            if (cascadeGlow[node.index] && cascadeGlow[inp]) {
+                ctx.globalAlpha = 0.3 + 0.4 * Math.min(cascadeGlow[node.index], cascadeGlow[inp]);
+                ctx.strokeStyle = '#ff8844';
+                ctx.lineWidth = 1.5;
+            } else {
+                ctx.globalAlpha = 0.12;
+                ctx.strokeStyle = '#4a6a9a';
+                ctx.lineWidth = 0.5;
+            }
+
+            ctx.beginPath();
+            ctx.moveTo(ix, iy);
+            ctx.lineTo(nx, ny);
+            ctx.stroke();
+        }
+    }
+
+    // Highlight edges for hovered node
+    if (hoveredNode >= 0) {
+        ctx.globalAlpha = 0.6;
+        ctx.strokeStyle = '#7eb8ff';
+        ctx.lineWidth = 1.5;
+        const hnode = net.nodes[hoveredNode];
+        const hx = ox + net.nodePositions[hoveredNode].x * size;
+        const hy = oy + net.nodePositions[hoveredNode].y * size;
+        for (const inp of hnode.inputs) {
+            const ix = ox + net.nodePositions[inp].x * size;
+            const iy = oy + net.nodePositions[inp].y * size;
+            ctx.beginPath();
+            ctx.moveTo(ix, iy);
+            ctx.lineTo(hx, hy);
+            ctx.stroke();
+        }
+    }
+    ctx.globalAlpha = 1;
+
+    // Draw nodes
+    const nodeRadius = Math.max(3, Math.min(8, 120 / Math.sqrt(net.N)));
+    for (let i = 0; i < net.N; i++) {
+        const nx = ox + net.nodePositions[i].x * size;
+        const ny = oy + net.nodePositions[i].y * size;
+
+        // Pulse: nodes gently breathe
+        const pulse = 0.85 + 0.15 * Math.sin(pulsePhase + i * 0.3);
+        const r = nodeRadius * pulse;
+
+        // Cascade glow effect
+        const glow = cascadeGlow[i] || 0;
+        const flashAge = nodeChangeFlash[i] ? (now - nodeChangeFlash[i]) : 9999;
+        const flash = flashAge < 300 ? (1 - flashAge / 300) : 0;
+
+        // Draw glow halo
+        if (glow > 0.1 || flash > 0.1) {
+            const glowR = r * (2 + glow * 2);
+            const glowIntensity = Math.max(glow, flash);
+            const gradient = ctx.createRadialGradient(nx, ny, r, nx, ny, glowR);
+            if (glow > flash) {
+                gradient.addColorStop(0, `rgba(255, 102, 68, ${0.5 * glowIntensity})`);
+                gradient.addColorStop(1, `rgba(255, 102, 68, 0)`);
+            } else {
+                gradient.addColorStop(0, `rgba(120, 180, 255, ${0.4 * flash})`);
+                gradient.addColorStop(1, `rgba(120, 180, 255, 0)`);
+            }
+            ctx.beginPath();
+            ctx.arc(nx, ny, glowR, 0, Math.PI * 2);
+            ctx.fillStyle = gradient;
+            ctx.fill();
+        }
+
+        // Draw node
+        ctx.beginPath();
+        ctx.arc(nx, ny, r, 0, Math.PI * 2);
+
+        if (glow > 0.3) {
+            // Cascade coloring: orange-red wave
+            const r255 = Math.round(255);
+            const g255 = Math.round(100 + (1 - glow) * 100);
+            const b255 = Math.round(50);
+            ctx.fillStyle = `rgb(${r255},${g255},${b255})`;
+        } else if (perturbedNodes.has(i)) {
+            ctx.fillStyle = net.nodes[i].state ? '#ff6644' : '#662222';
+        } else if (i === hoveredNode) {
+            ctx.fillStyle = net.nodes[i].state ? '#aaddff' : '#334466';
+        } else {
+            ctx.fillStyle = net.nodes[i].state ? '#4a9aff' : '#1a2540';
+        }
+        ctx.fill();
+
+        // Node border
+        if (glow > 0.3) {
+            ctx.strokeStyle = `rgba(255, 150, 80, ${glow})`;
+            ctx.lineWidth = 2;
+        } else {
+            ctx.strokeStyle = net.nodes[i].state ? '#6ab0ff' : '#2a3a5a';
+            ctx.lineWidth = i === hoveredNode ? 2 : 1;
+        }
+        ctx.stroke();
+    }
+
+    // Info text
+    ctx.fillStyle = '#5a6a8a';
+    ctx.font = '11px sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText(`Tick: ${net.tick}  |  K=${net.K}  |  Click a node to perturb`, 10, h - 10);
+
+    // If cascade animation is running, request another frame
+    if (cascadeAnim) {
+        requestAnimationFrame(() => render());
+    }
+}
+
+function renderPhaseDiagram(w, h) {
+    if (!phaseData || phaseData.length === 0) {
+        ctx.fillStyle = '#4a5a7a';
+        ctx.font = '14px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('Click "Compute Phase Diagram" to generate', w / 2, h / 2);
+        return;
+    }
+
+    const margin = { top: 50, right: 40, bottom: 60, left: 60 };
+    const pw = w - margin.left - margin.right;
+    const ph = h - margin.top - margin.bottom;
+
+    const Ks = [...new Set(phaseData.map(d => d.K))].sort((a, b) => a - b);
+    const biases = [...new Set(phaseData.map(d => d.bias))].sort((a, b) => a - b);
+
+    const cellW = pw / biases.length;
+    const cellH = ph / Ks.length;
+
+    // Draw cells
+    for (const d of phaseData) {
+        const xi = biases.indexOf(d.bias);
+        const yi = Ks.indexOf(d.K);
+        const x = margin.left + xi * cellW;
+        const y = margin.top + yi * cellH;
+
+        const colors = {
+            ordered: `rgba(74,170,106,${0.3 + 0.7 * Math.max(0, 1 - d.derrida)})`,
+            chaotic: `rgba(204,85,85,${0.3 + 0.5 * Math.min(1, (d.derrida - 1) / 3)})`,
+            critical: `rgba(221,170,51,0.7)`
+        };
+        ctx.fillStyle = colors[d.cls];
+        ctx.fillRect(x, y, cellW - 1, cellH - 1);
+
+        // Draw lambda value
+        if (cellW > 25) {
+            ctx.fillStyle = '#e0e6f0';
+            ctx.font = '9px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(d.derrida.toFixed(1), x + cellW / 2, y + cellH / 2 + 3);
+        }
+    }
+
+    // Draw critical boundary: 2Kp(1-p) = 1
+    ctx.strokeStyle = '#ffdd44';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([5, 3]);
+    ctx.beginPath();
+    let started = false;
+    for (let p = 0.1; p <= 0.9; p += 0.01) {
+        const Kc = 1 / (2 * p * (1 - p));
+        if (Kc >= Ks[0] && Kc <= Ks[Ks.length - 1]) {
+            const x = margin.left + ((p - biases[0]) / (biases[biases.length - 1] - biases[0])) * pw;
+            const y = margin.top + ((Kc - Ks[0]) / (Ks[Ks.length - 1] - Ks[0])) * ph;
+            if (!started) { ctx.moveTo(x, y); started = true; }
+            else ctx.lineTo(x, y);
+        }
+    }
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Axes
+    ctx.fillStyle = '#8890a8';
+    ctx.font = '12px sans-serif';
+    ctx.textAlign = 'center';
+
+    // X axis labels
+    for (let i = 0; i < biases.length; i += 2) {
+        ctx.fillText(biases[i].toFixed(2), margin.left + i * cellW + cellW / 2, h - margin.bottom + 20);
+    }
+    ctx.fillText('Bias (p)', w / 2, h - 10);
+
+    // Y axis labels
+    ctx.textAlign = 'right';
+    for (let i = 0; i < Ks.length; i++) {
+        ctx.fillText('K=' + Ks[i], margin.left - 10, margin.top + i * cellH + cellH / 2 + 4);
+    }
+
+    // Title
+    ctx.fillStyle = '#7eb8ff';
+    ctx.font = '14px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Phase Diagram: K vs Bias', w / 2, 25);
+    ctx.fillStyle = '#6a7a9a';
+    ctx.font = '11px sans-serif';
+    ctx.fillText('Yellow dashed line: theoretical critical boundary 2Kp(1-p)=1', w / 2, 42);
+}
+
+function renderDerridaCurve(w, h) {
+    if (!derridaCurveData) {
+        ctx.fillStyle = '#4a5a7a';
+        ctx.font = '14px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('Click "Derrida Curve" to compute', w / 2, h / 2);
+        return;
+    }
+
+    const margin = { top: 50, right: 40, bottom: 60, left: 60 };
+    const pw = w - margin.left - margin.right;
+    const ph = h - margin.top - margin.bottom;
+
+    // Draw diagonal (identity line)
+    ctx.strokeStyle = '#3a4a6a';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([5, 5]);
+    ctx.beginPath();
+    ctx.moveTo(margin.left, margin.top + ph);
+    ctx.lineTo(margin.left + pw, margin.top);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Label
+    ctx.fillStyle = '#4a5a6a';
+    ctx.font = '10px sans-serif';
+    ctx.save();
+    ctx.translate(margin.left + pw * 0.75, margin.top + ph * 0.2);
+    ctx.rotate(-Math.atan2(ph, pw));
+    ctx.fillText('d_out = d_in', 0, -5);
+    ctx.restore();
+
+    // Fill the area between curve and diagonal for visual emphasis
+    if (derridaCurveData.length > 1) {
+        ctx.globalAlpha = 0.08;
+        ctx.beginPath();
+        for (let i = 0; i < derridaCurveData.length; i++) {
+            const [dIn, dOut] = derridaCurveData[i];
+            const x = margin.left + dIn * pw;
+            const y = margin.top + ph - dOut * ph;
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+        }
+        // Close back along diagonal
+        for (let i = derridaCurveData.length - 1; i >= 0; i--) {
+            const [dIn] = derridaCurveData[i];
+            const x = margin.left + dIn * pw;
+            const y = margin.top + ph - dIn * ph; // diagonal point
+            ctx.lineTo(x, y);
+        }
+        ctx.closePath();
+        const isAbove = derridaCurveData[0][1] > derridaCurveData[0][0];
+        ctx.fillStyle = isAbove ? '#cc5555' : '#4aaa6a';
+        ctx.fill();
+        ctx.globalAlpha = 1;
+    }
+
+    // Draw Derrida curve
+    ctx.strokeStyle = '#4a9aff';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    for (let i = 0; i < derridaCurveData.length; i++) {
+        const [dIn, dOut] = derridaCurveData[i];
+        const x = margin.left + dIn * pw;
+        const y = margin.top + ph - dOut * ph;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+
+    // Draw points
+    ctx.fillStyle = '#7eb8ff';
+    for (const [dIn, dOut] of derridaCurveData) {
+        const x = margin.left + dIn * pw;
+        const y = margin.top + ph - dOut * ph;
+        ctx.beginPath();
+        ctx.arc(x, y, 4, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    // Axes
+    ctx.fillStyle = '#8890a8';
+    ctx.font = '12px sans-serif';
+    ctx.textAlign = 'center';
+
+    for (let i = 0; i <= 10; i += 2) {
+        const v = i / 10;
+        ctx.fillText(v.toFixed(1), margin.left + v * pw, margin.top + ph + 20);
+        ctx.textAlign = 'right';
+        ctx.fillText(v.toFixed(1), margin.left - 8, margin.top + ph - v * ph + 4);
+        ctx.textAlign = 'center';
+    }
+
+    ctx.fillText('d_in (normalized Hamming distance)', w / 2, h - 10);
+    ctx.save();
+    ctx.translate(15, h / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.fillText('d_out (after one step)', 0, 0);
+    ctx.restore();
+
+    // Title
+    ctx.fillStyle = '#7eb8ff';
+    ctx.font = '14px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Derrida Curve', w / 2, 25);
+
+    // Regime annotation
+    if (derridaCurveData.length > 0) {
+        const [d1In, d1Out] = derridaCurveData[0];
+        const slope = d1Out / d1In;
+        let regimeText = slope < 0.9 ? 'ORDERED (curve below diagonal)' :
+                         slope > 1.1 ? 'CHAOTIC (curve above diagonal)' :
+                         'CRITICAL (curve tangent to diagonal)';
+        const regimeColor = slope < 0.9 ? '#4aaa6a' : slope > 1.1 ? '#cc5555' : '#ddaa33';
+        ctx.fillStyle = regimeColor;
+        ctx.font = '12px sans-serif';
+        ctx.fillText(regimeText, w / 2, 42);
+    }
+}
+
+function renderHistory(w, h) {
+    if (!net || stateHistory.length === 0) {
+        ctx.fillStyle = '#4a5a7a';
+        ctx.font = '14px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('Run the simulation to see state history', w / 2, h / 2);
+        return;
+    }
+
+    const margin = { top: 40, right: 20, bottom: 40, left: 50 };
+    const pw = w - margin.left - margin.right;
+    const ph = h - margin.top - margin.bottom;
+
+    const numSteps = stateHistory.length;
+    const N = net.N;
+    const cellW = pw / N;
+    const cellH = Math.min(ph / numSteps, 4);
+    const visibleSteps = Math.min(numSteps, Math.floor(ph / cellH));
+    const startStep = Math.max(0, numSteps - visibleSteps);
+
+    for (let t = startStep; t < numSteps; t++) {
+        const y = margin.top + (t - startStep) * cellH;
+        for (let i = 0; i < N; i++) {
+            const x = margin.left + i * cellW;
+            ctx.fillStyle = stateHistory[t][i] ? '#4a9aff' : '#0c1019';
+            ctx.fillRect(x, y, Math.max(cellW - 0.5, 1), Math.max(cellH - 0.5, 1));
+        }
+    }
+
+    // Axes
+    ctx.fillStyle = '#8890a8';
+    ctx.font = '12px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Node index', w / 2, h - 10);
+
+    ctx.save();
+    ctx.translate(15, h / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.fillText('Time (ticks)', 0, 0);
+    ctx.restore();
+
+    // Title
+    ctx.fillStyle = '#7eb8ff';
+    ctx.font = '14px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('State History (blue=ON, dark=OFF)', w / 2, 20);
+}
+
+// Continuous animation loop for pulse effects
+function animationLoop() {
+    if (activeTab === 'network' && net && !playing) {
+        render();
+    }
+    requestAnimationFrame(animationLoop);
+}
+
+// Initialize
+resizeCanvas();
+animationLoop();
+</script>
+</body>
+</html>

@@ -1,0 +1,1755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rigids vs Flexibles: Organizational Adaptation</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Courier New', monospace; background: #0a0a0f; color: #e0e0e0; overflow-x: hidden; }
+
+.container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+
+h1 { text-align: center; font-size: 1.8em; margin-bottom: 4px; color: #fff;
+     letter-spacing: 3px; text-transform: uppercase; }
+.subtitle { text-align: center; font-size: 0.85em; color: #888; margin-bottom: 24px; }
+
+/* Intro section */
+.intro-section {
+  background: linear-gradient(135deg, #12121a 0%, #1a1428 100%);
+  border: 1px solid #3a2a5a;
+  border-radius: 12px;
+  padding: 28px 32px;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+}
+.intro-section::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #c44, #e86, #48c, #6ae);
+}
+.intro-section h2 {
+  font-size: 1.2em;
+  color: #e8c8ff;
+  margin-bottom: 12px;
+  letter-spacing: 1px;
+}
+.intro-section p {
+  font-size: 0.95em;
+  line-height: 1.7;
+  color: #bbb;
+}
+.intro-section p strong { color: #fff; }
+
+/* Key insight callout */
+.key-insight {
+  background: linear-gradient(135deg, #1a1a10, #22200a);
+  border: 1px solid #554a20;
+  border-left: 4px solid #eea;
+  border-radius: 8px;
+  padding: 20px 24px;
+  margin-bottom: 24px;
+}
+.key-insight h3 {
+  font-size: 0.9em;
+  color: #eea;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+}
+.key-insight p {
+  font-size: 0.9em;
+  line-height: 1.7;
+  color: #bba;
+}
+.key-insight p strong { color: #fff; }
+
+/* Controls */
+.controls {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px; padding: 16px; background: #12121a; border: 1px solid #2a2a3a;
+  border-radius: 8px; margin-bottom: 20px;
+}
+.control-group { display: flex; flex-direction: column; gap: 4px; }
+.control-group label { font-size: 0.75em; color: #aaa; text-transform: uppercase; letter-spacing: 1px; }
+.control-group input, .control-group select {
+  background: #1a1a2e; border: 1px solid #333; color: #fff; padding: 6px 10px;
+  border-radius: 4px; font-family: inherit; font-size: 0.85em;
+}
+.control-group input[type="range"] { padding: 2px; }
+.range-value { font-size: 0.8em; color: #7af; text-align: right; }
+
+.buttons { display: flex; gap: 10px; align-items: end; }
+button {
+  background: #2a2a4a; border: 1px solid #444; color: #fff; padding: 8px 18px;
+  border-radius: 4px; cursor: pointer; font-family: inherit; font-size: 0.85em;
+  transition: background 0.2s;
+}
+button:hover { background: #3a3a5a; }
+button.active { background: #4a3a6a; border-color: #7a6aaa; }
+button.reset { background: #4a2a2a; border-color: #6a3a3a; }
+
+/* Dashboard grid */
+.dashboard {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;
+}
+@media (max-width: 900px) { .dashboard { grid-template-columns: 1fr; } }
+
+.panel {
+  background: #12121a; border: 1px solid #2a2a3a; border-radius: 8px;
+  padding: 16px; position: relative;
+}
+.panel-title {
+  font-size: 0.8em; text-transform: uppercase; letter-spacing: 1px;
+  color: #888; margin-bottom: 8px; border-bottom: 1px solid #2a2a3a;
+  padding-bottom: 6px;
+}
+.panel-explanation {
+  font-size: 0.78em;
+  color: #777;
+  line-height: 1.5;
+  margin-bottom: 10px;
+  padding: 6px 8px;
+  background: rgba(255,255,255,0.02);
+  border-radius: 4px;
+  border-left: 2px solid #3a3a5a;
+}
+.panel.full-width { grid-column: 1 / -1; }
+
+/* Environment indicator */
+.env-bar {
+  display: flex; align-items: center; gap: 12px; padding: 10px 16px;
+  background: #12121a; border: 1px solid #2a2a3a; border-radius: 8px;
+  margin-bottom: 16px; flex-wrap: wrap;
+}
+.env-state {
+  font-size: 1.4em; font-weight: bold; padding: 4px 16px; border-radius: 4px;
+  min-width: 40px; text-align: center;
+  transition: all 0.3s;
+}
+.env-state.state-A { background: #2a4a2a; color: #6f6; border: 1px solid #4a6a4a; }
+.env-state.state-B { background: #4a2a2a; color: #f66; border: 1px solid #6a4a4a; }
+.env-info { font-size: 0.85em; color: #aaa; }
+.env-info span { color: #fff; }
+
+/* Stats bar */
+.stats-bar {
+  display: flex; gap: 20px; flex-wrap: wrap;
+}
+.stat { text-align: center; }
+.stat-value { font-size: 1.3em; font-weight: bold; color: #7af; }
+.stat-label { font-size: 0.7em; color: #888; text-transform: uppercase; }
+
+/* Narrative box */
+.narrative-box {
+  background: linear-gradient(135deg, #0e0e1a, #141420);
+  border: 1px solid #2a2a4a;
+  border-radius: 8px;
+  padding: 14px 18px;
+  margin-bottom: 16px;
+  min-height: 46px;
+  position: relative;
+}
+.narrative-label {
+  font-size: 0.7em;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #666;
+  margin-bottom: 6px;
+}
+.narrative-text {
+  font-size: 0.88em;
+  line-height: 1.5;
+  color: #ccc;
+  transition: opacity 0.3s;
+}
+.narrative-text .highlight { color: #eea; font-weight: bold; }
+
+/* News ticker */
+.ticker-container {
+  background: #0a0a12;
+  border: 1px solid #2a2a3a;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 16px;
+  height: 32px;
+  position: relative;
+}
+.ticker-label {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  background: #c44;
+  color: #fff;
+  font-size: 0.7em;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  z-index: 2;
+}
+.ticker-track {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  animation: ticker-scroll 30s linear infinite;
+  white-space: nowrap;
+  padding-left: 80px;
+}
+.ticker-item {
+  font-size: 0.8em;
+  color: #aaa;
+  padding: 0 32px;
+  white-space: nowrap;
+}
+.ticker-item .sep { color: #444; margin-left: 32px; }
+@keyframes ticker-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* Corporate Health Dashboard */
+.health-dashboard {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+@media (max-width: 700px) { .health-dashboard { grid-template-columns: repeat(2, 1fr); } }
+
+.health-gauge {
+  background: #12121a;
+  border: 1px solid #2a2a3a;
+  border-radius: 8px;
+  padding: 12px;
+  text-align: center;
+}
+.gauge-label {
+  font-size: 0.7em;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #888;
+  margin-bottom: 8px;
+}
+.gauge-bar-outer {
+  width: 100%;
+  height: 8px;
+  background: #1a1a2e;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+.gauge-bar-inner {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.5s, background 0.5s;
+}
+.gauge-value {
+  font-size: 1.1em;
+  font-weight: bold;
+}
+
+/* Adaptation score */
+.adaptation-score {
+  background: #12121a;
+  border: 1px solid #2a2a3a;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.adaptation-score .score-label {
+  font-size: 0.7em;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #888;
+}
+.adaptation-score .score-value {
+  font-size: 1.4em;
+  font-weight: bold;
+  color: #7af;
+}
+.adaptation-score .score-detail {
+  font-size: 0.8em;
+  color: #777;
+}
+
+/* Pyramid visualization */
+.pyramid-container { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.pyramid-level {
+  display: flex; gap: 3px; justify-content: center; flex-wrap: wrap;
+  position: relative;
+}
+.agent-cell {
+  width: 38px; height: 28px;
+  border-radius: 4px;
+  border: 1px solid #333;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.55em;
+  line-height: 1.1;
+  transition: all 0.4s;
+  position: relative;
+  cursor: default;
+  overflow: hidden;
+}
+.agent-cell .agent-icon { font-size: 1.4em; line-height: 1; }
+.agent-cell .agent-name {
+  font-size: 0.85em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  color: #ccc;
+}
+.agent-cell.rigid-A { background: #3a1a1a; border-color: #c44; }
+.agent-cell.rigid-B { background: #3a2a1a; border-color: #c64; }
+.agent-cell.flexible { background: #1a2a3a; border-color: #48c; }
+.agent-cell.promoted {
+  transform: scale(1.15);
+  box-shadow: 0 0 12px rgba(255,255,100,0.7);
+  z-index: 2;
+}
+.agent-cell.demoted {
+  opacity: 0.6;
+}
+.agent-cell.new-agent { border-color: #ff0; border-width: 2px; }
+.agent-cell .archetype-badge {
+  position: absolute;
+  top: -2px; right: -2px;
+  font-size: 0.9em;
+  line-height: 1;
+}
+.level-label {
+  font-size: 0.7em; color: #888; text-align: right; min-width: 50px;
+  padding-right: 8px; line-height: 28px;
+}
+
+/* Canvas charts */
+canvas { width: 100%; height: 200px; display: block; }
+canvas.tall { height: 280px; }
+
+/* Disruption overlay */
+.disruption-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(255, 40, 40, 0.12);
+  z-index: 100;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.disruption-overlay.active {
+  opacity: 1;
+  animation: shake 0.5s ease-in-out;
+}
+.disruption-banner {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  z-index: 101;
+  pointer-events: none;
+  background: linear-gradient(135deg, #a00, #c00);
+  color: #fff;
+  font-size: 2.5em;
+  font-weight: bold;
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  padding: 16px 48px;
+  border-radius: 8px;
+  box-shadow: 0 0 60px rgba(255,0,0,0.5);
+  opacity: 0;
+  white-space: nowrap;
+}
+.disruption-banner.active {
+  animation: banner-in 0.4s ease-out forwards, banner-out 0.4s ease-in 1.5s forwards;
+}
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+  20%, 40%, 60%, 80% { transform: translateX(4px); }
+}
+@keyframes banner-in {
+  0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+  60% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+@keyframes banner-out {
+  0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+}
+
+/* Achievement notifications */
+.achievement-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+.achievement {
+  background: #1a1a2e;
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 12px 18px;
+  max-width: 340px;
+  animation: achievement-in 0.4s ease-out, achievement-out 0.5s ease-in 3.5s forwards;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+.achievement-title {
+  font-size: 0.75em;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+.achievement-text {
+  font-size: 0.8em;
+  color: #aaa;
+}
+.achievement.gold { border-color: #ca4; }
+.achievement.gold .achievement-title { color: #eea; }
+.achievement.danger { border-color: #c44; }
+.achievement.danger .achievement-title { color: #f66; }
+.achievement.info { border-color: #48c; }
+.achievement.info .achievement-title { color: #6ae; }
+
+@keyframes achievement-in {
+  0% { transform: translateX(120%); opacity: 0; }
+  100% { transform: translateX(0); opacity: 1; }
+}
+@keyframes achievement-out {
+  0% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-10px); }
+}
+
+/* Transition highlight */
+.transition-alert {
+  position: absolute; top: 8px; right: 8px; background: #ff4; color: #000;
+  font-size: 0.7em; padding: 2px 8px; border-radius: 3px; font-weight: bold;
+  display: none;
+}
+.transition-alert.visible { display: block; animation: pulse 0.5s ease-in-out infinite alternate; }
+@keyframes pulse { from { opacity: 0.7; } to { opacity: 1.0; } }
+
+/* Legend */
+.legend { display: flex; gap: 16px; justify-content: center; margin-top: 8px; font-size: 0.75em; flex-wrap: wrap; }
+.legend-item { display: flex; align-items: center; gap: 4px; }
+.legend-swatch { width: 12px; height: 12px; border-radius: 2px; border: 1px solid #555; }
+
+/* Screenshake on body */
+body.shaking {
+  animation: body-shake 0.5s ease-in-out;
+}
+@keyframes body-shake {
+  0%, 100% { transform: translateX(0) translateY(0); }
+  10% { transform: translateX(-3px) translateY(1px); }
+  20% { transform: translateX(3px) translateY(-1px); }
+  30% { transform: translateX(-2px) translateY(2px); }
+  40% { transform: translateX(2px) translateY(-2px); }
+  50% { transform: translateX(-3px) translateY(1px); }
+  60% { transform: translateX(3px) translateY(-1px); }
+  70% { transform: translateX(-1px) translateY(2px); }
+  80% { transform: translateX(1px) translateY(-1px); }
+  90% { transform: translateX(-2px) translateY(1px); }
+}
+
+/* Tooltip */
+.agent-tooltip {
+  position: fixed;
+  background: #1a1a2e;
+  border: 1px solid #555;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 0.75em;
+  color: #ddd;
+  z-index: 300;
+  pointer-events: none;
+  display: none;
+  max-width: 200px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+}
+.agent-tooltip .tip-name { font-weight: bold; margin-bottom: 2px; }
+.agent-tooltip .tip-detail { color: #999; font-size: 0.9em; }
+</style>
+</head>
+<body>
+<div class="disruption-overlay" id="disruption-overlay"></div>
+<div class="disruption-banner" id="disruption-banner">DISRUPTION!</div>
+<div class="achievement-container" id="achievement-container"></div>
+<div class="agent-tooltip" id="agent-tooltip"></div>
+
+<div class="container">
+  <h1>Rigids vs Flexibles</h1>
+  <p class="subtitle">Organizational Adaptation &amp; Punctuated Equilibrium &mdash; after Harrington (1999) &amp; Beinhocker (2006)</p>
+
+  <!-- Intro Section -->
+  <div class="intro-section">
+    <h2>Why Do Successful Companies Fail?</h2>
+    <p>This simulation reveals a paradox: <strong>the very traits that make leaders effective in stable times &mdash; deep expertise, unwavering conviction, consistent strategy &mdash; become fatal when the environment shifts.</strong> Watch as "Rigid" leaders rise to the top through sheer competence, then drag the whole organization down when the world changes under their feet.</p>
+  </div>
+
+  <!-- Controls -->
+  <div class="controls">
+    <div class="control-group">
+      <label>Hierarchy Levels</label>
+      <input type="number" id="ctrl-levels" value="4" min="2" max="6" step="1">
+    </div>
+    <div class="control-group">
+      <label>Branching Factor</label>
+      <input type="number" id="ctrl-branching" value="3" min="2" max="5" step="1">
+    </div>
+    <div class="control-group">
+      <label>Initial Rigid Fraction</label>
+      <input type="range" id="ctrl-rigid-frac" value="0.5" min="0" max="1" step="0.05">
+      <span class="range-value" id="val-rigid-frac">50%</span>
+    </div>
+    <div class="control-group">
+      <label>Env Stability (ticks)</label>
+      <input type="range" id="ctrl-stability" value="80" min="5" max="300" step="5">
+      <span class="range-value" id="val-stability">80</span>
+    </div>
+    <div class="control-group">
+      <label>Experience Weight</label>
+      <input type="range" id="ctrl-exp-weight" value="0.1" min="0" max="0.5" step="0.01">
+      <span class="range-value" id="val-exp-weight">0.10</span>
+    </div>
+    <div class="control-group">
+      <label>Flexible Noise</label>
+      <input type="range" id="ctrl-noise" value="0.1" min="0" max="0.5" step="0.01">
+      <span class="range-value" id="val-noise">0.10</span>
+    </div>
+    <div class="control-group">
+      <label>Environment Mode</label>
+      <select id="ctrl-mode">
+        <option value="punctuated" selected>Punctuated</option>
+        <option value="random">Random</option>
+      </select>
+    </div>
+    <div class="control-group">
+      <label>Speed (ms/tick)</label>
+      <input type="range" id="ctrl-speed" value="100" min="10" max="500" step="10">
+      <span class="range-value" id="val-speed">100ms</span>
+    </div>
+    <div class="buttons">
+      <button id="btn-start">Start</button>
+      <button id="btn-step">Step</button>
+      <button id="btn-reset" class="reset">Reset</button>
+    </div>
+  </div>
+
+  <!-- Environment bar -->
+  <div class="env-bar">
+    <div class="env-state state-A" id="env-state-display">A</div>
+    <div class="env-info">
+      Tick: <span id="info-tick">0</span> &nbsp;|&nbsp;
+      Stable for: <span id="info-stable">0</span> ticks &nbsp;|&nbsp;
+      Switches: <span id="info-switches">0</span>
+    </div>
+    <div class="stats-bar" style="margin-left: auto;">
+      <div class="stat">
+        <div class="stat-value" id="stat-perf">0.00</div>
+        <div class="stat-label">Org Performance</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="stat-rigid-pct" style="color:#e66;">50%</div>
+        <div class="stat-label">Rigid %</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="stat-flex-pct" style="color:#6ae;">50%</div>
+        <div class="stat-label">Flexible %</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- News Ticker -->
+  <div class="ticker-container">
+    <div class="ticker-label">LIVE</div>
+    <div class="ticker-track" id="ticker-track">
+      <span class="ticker-item">Simulation ready. Press Start to begin.</span>
+      <span class="ticker-item">Simulation ready. Press Start to begin.</span>
+    </div>
+  </div>
+
+  <!-- What's Happening Narrative -->
+  <div class="narrative-box">
+    <div class="narrative-label">What's Happening</div>
+    <div class="narrative-text" id="narrative-text">
+      Press <span class="highlight">Start</span> to watch the organizational dynamics unfold. Rigids will lock into a strategy; Flexibles will adapt to the environment.
+    </div>
+  </div>
+
+  <!-- Corporate Health Dashboard -->
+  <div class="health-dashboard">
+    <div class="health-gauge">
+      <div class="gauge-label">Adaptability</div>
+      <div class="gauge-bar-outer"><div class="gauge-bar-inner" id="gauge-adaptability" style="width:50%; background:#4a4;"></div></div>
+      <div class="gauge-value" id="gauge-adaptability-val" style="color:#4a4;">50</div>
+    </div>
+    <div class="health-gauge">
+      <div class="gauge-label">Experience Depth</div>
+      <div class="gauge-bar-outer"><div class="gauge-bar-inner" id="gauge-experience" style="width:0%; background:#48c;"></div></div>
+      <div class="gauge-value" id="gauge-experience-val" style="color:#48c;">0</div>
+    </div>
+    <div class="health-gauge">
+      <div class="gauge-label">Diversity</div>
+      <div class="gauge-bar-outer"><div class="gauge-bar-inner" id="gauge-diversity" style="width:50%; background:#c8e;"></div></div>
+      <div class="gauge-value" id="gauge-diversity-val" style="color:#c8e;">50</div>
+    </div>
+    <div class="health-gauge">
+      <div class="gauge-label">Vulnerability</div>
+      <div class="gauge-bar-outer"><div class="gauge-bar-inner" id="gauge-vulnerability" style="width:0%; background:#c44;"></div></div>
+      <div class="gauge-value" id="gauge-vulnerability-val" style="color:#c44;">0</div>
+    </div>
+  </div>
+
+  <!-- Adaptation Score -->
+  <div class="adaptation-score">
+    <div>
+      <div class="score-label">Adaptation Score</div>
+      <div class="score-value" id="adaptation-score-val">--</div>
+    </div>
+    <div class="score-detail" id="adaptation-score-detail">
+      Measures how quickly the organization recovers after each regime change. Lower is better.
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div class="dashboard">
+    <!-- Pyramid -->
+    <div class="panel">
+      <div class="panel-title">Organizational Hierarchy</div>
+      <div class="panel-explanation">
+        <span style="color:#c44;">Red agents</span> are "Rigids" &mdash; they always play the same strategy. <span style="color:#48c;">Blue agents</span> are "Flexibles" &mdash; they adapt. Notice how the top fills up with Rigids during stable periods. They're not wrong to be there &mdash; experience matters. Until the environment flips.
+      </div>
+      <div class="transition-alert" id="transition-alert">REGIME CHANGE</div>
+      <div class="pyramid-container" id="pyramid"></div>
+      <div class="legend">
+        <div class="legend-item"><div class="legend-swatch" style="background:#c44;"></div> Rigid-A</div>
+        <div class="legend-item"><div class="legend-swatch" style="background:#c64;"></div> Rigid-B</div>
+        <div class="legend-item"><div class="legend-swatch" style="background:#48c;"></div> Flexible</div>
+      </div>
+    </div>
+
+    <!-- Performance chart -->
+    <div class="panel">
+      <div class="panel-title">Performance Over Time</div>
+      <div class="panel-explanation">
+        See those sharp drops? Those are regime changes. The deeper the Rigid dominance was during the stable period, the more catastrophic the crash when things change.
+      </div>
+      <canvas id="chart-performance" class="tall"></canvas>
+    </div>
+
+    <!-- Composition per level -->
+    <div class="panel">
+      <div class="panel-title">Rigid Fraction by Level</div>
+      <div class="panel-explanation">
+        Watch the Rigid/Flexible ratio at each level. During stable periods, Rigids colonize the top. After a transition, Flexibles briefly surge &mdash; but then the cycle repeats.
+      </div>
+      <canvas id="chart-composition"></canvas>
+    </div>
+
+    <!-- Transition analysis -->
+    <div class="panel">
+      <div class="panel-title">Adaptation Cost at Regime Changes</div>
+      <canvas id="chart-transitions"></canvas>
+    </div>
+  </div>
+
+  <!-- Key Insight -->
+  <div class="key-insight">
+    <h3>Key Insight</h3>
+    <p>Harrington's devastating finding: <strong>the less frequent the transitions, the MORE dominant Rigids become, and the MORE catastrophic the eventual crash.</strong> Organizations that maintain a "reserve of Flexibles" &mdash; people who might seem less impressive in stable times &mdash; survive transitions with far less damage. This is the <strong>explore/exploit tradeoff in human form</strong>. The optimal organization sacrifices some efficiency during calm periods to buy insurance against disruption.</p>
+  </div>
+</div>
+
+<script>
+// ===== EXECUTIVE NAME GENERATOR =====
+const FIRST_NAMES = [
+  'James','Margaret','Robert','Patricia','John','Linda','David','Barbara',
+  'William','Elizabeth','Richard','Susan','Charles','Jessica','Thomas','Sarah',
+  'Daniel','Karen','Michael','Nancy','Paul','Helen','Mark','Ruth','Steven',
+  'Laura','Edward','Donna','Brian','Carol','George','Janet','Kenneth','Maria',
+  'Ronald','Diane','Anthony','Lisa','Sandra','Dorothy','Andrew','Ashley',
+  'Raymond','Deborah','Frank','Cynthia','Peter','Catherine','Henry','Pamela',
+  'Arthur','Virginia','Alexander','Christine','Philip','Rebecca','Douglas','Judith',
+  'Roger','Frances','Gerald','Kathleen','Albert','Martha','Harold','Teresa'
+];
+const LAST_NAMES = [
+  'Anderson','Blake','Collins','Dawson','Edwards','Foster','Graham','Harrison',
+  'Ingram','Jenkins','Keller','Lambert','Mitchell','Nash','Owens','Palmer',
+  'Quinn','Reynolds','Shaw','Turner','Underwood','Vance','Wallace','York',
+  'Zimmerman','Archer','Bennett','Crawford','Drake','Ellis','Fletcher','Grant',
+  'Hawkins','Irving','Joyce','Knight','Lawson','Monroe','Nolan','Osborne',
+  'Pierce','Randall','Spencer','Thornton','Upton','Vaughn','Watson','Xavier'
+];
+
+function generateName(id) {
+  const fi = (id * 7 + 13) % FIRST_NAMES.length;
+  const li = (id * 11 + 3) % LAST_NAMES.length;
+  return FIRST_NAMES[fi] + ' ' + LAST_NAMES[li][0] + '.';
+}
+
+function getShortName(id) {
+  const fi = (id * 7 + 13) % FIRST_NAMES.length;
+  const li = (id * 11 + 3) % LAST_NAMES.length;
+  return FIRST_NAMES[fi].substring(0, 3);
+}
+
+// ===== SIMULATION ENGINE =====
+
+class Agent {
+  constructor(id, type, strategy, level) {
+    this.id = id;
+    this.type = type;
+    this.strategy = strategy;
+    this.experience = 0;
+    this.level = level;
+    this.age = 0;
+    this.lastPerf = 0;
+    this.justPromoted = false;
+    this.justDemoted = false;
+    this.isNew = false;
+    this.name = generateName(id);
+    this.shortName = getShortName(id);
+  }
+
+  chooseStrategy(envState, noise) {
+    if (this.type === "rigid") return this.strategy;
+    return Math.random() < noise
+      ? (envState === "A" ? "B" : "A")
+      : envState;
+  }
+
+  getPerformance(envState, noise, expWeight) {
+    const chosen = this.chooseStrategy(envState, noise);
+    const match = chosen === envState ? 1.0 : 0.0;
+    const expBonus = expWeight * Math.log1p(this.experience);
+    this.lastPerf = match + expBonus;
+    return this.lastPerf;
+  }
+
+  tickExperience(rigidRate = 1.0, flexRate = 0.5) {
+    this.experience += this.type === "rigid" ? rigidRate : flexRate;
+    this.age++;
+  }
+}
+
+class SimEnvironment {
+  constructor(stability, mode) {
+    this.stability = Math.max(stability, 1);
+    this.mode = mode;
+    this.state = Math.random() < 0.5 ? "A" : "B";
+    this.ticksInState = 0;
+    this.nextSwitchAt = mode === "punctuated" ? this._drawDuration() : null;
+    this.switchHistory = [];
+    this.justSwitched = false;
+  }
+
+  _drawDuration() {
+    const p = 1.0 / this.stability;
+    return Math.max(1, Math.ceil(Math.log(1 - Math.random()) / Math.log(1 - p)));
+  }
+
+  step(tick) {
+    this.ticksInState++;
+    this.justSwitched = false;
+    if (this.mode === "punctuated") {
+      if (this.ticksInState >= this.nextSwitchAt) this._switch(tick);
+    } else {
+      if (Math.random() < 1.0 / this.stability) this._switch(tick);
+    }
+  }
+
+  _switch(tick) {
+    this.state = this.state === "A" ? "B" : "A";
+    this.switchHistory.push(tick);
+    this.ticksInState = 0;
+    this.justSwitched = true;
+    if (this.mode === "punctuated") this.nextSwitchAt = this._drawDuration();
+  }
+}
+
+class Hierarchy {
+  constructor(levels, branching, rigidFrac) {
+    this.levels = levels;
+    this.branching = branching;
+    this.nextId = 0;
+    this.agentsByLevel = {};
+    for (let l = 0; l < levels; l++) {
+      const count = Math.pow(branching, levels - 1 - l);
+      this.agentsByLevel[l] = [];
+      for (let i = 0; i < count; i++) {
+        this.agentsByLevel[l].push(this._makeAgent(l, rigidFrac));
+      }
+    }
+  }
+
+  _makeAgent(level, rigidFrac) {
+    const type = Math.random() < rigidFrac ? "rigid" : "flexible";
+    const strategy = Math.random() < 0.5 ? "A" : "B";
+    const a = new Agent(this.nextId++, type, strategy, level);
+    a.isNew = true;
+    return a;
+  }
+
+  totalAgents() {
+    let t = 0;
+    for (let l = 0; l < this.levels; l++) t += this.agentsByLevel[l].length;
+    return t;
+  }
+
+  allAgents() {
+    const all = [];
+    for (let l = 0; l < this.levels; l++) all.push(...this.agentsByLevel[l]);
+    return all;
+  }
+
+  getRigidFraction(level) {
+    const agents = level !== undefined ? this.agentsByLevel[level] : this.allAgents();
+    if (!agents.length) return 0;
+    return agents.filter(a => a.type === "rigid").length / agents.length;
+  }
+
+  getTopRigidFraction() {
+    return this.getRigidFraction(this.levels - 1);
+  }
+
+  promoteAndExit(performances, rigidFrac) {
+    for (const a of this.allAgents()) { a.justPromoted = false; a.justDemoted = false; a.isNew = false; }
+
+    const promotions = [];
+    for (let l = 0; l < this.levels - 1; l++) {
+      const lower = this.agentsByLevel[l];
+      const upper = this.agentsByLevel[l + 1];
+      if (!lower.length || !upper.length) continue;
+
+      let bestIdx = 0, bestPerf = -Infinity;
+      for (let i = 0; i < lower.length; i++) {
+        const p = performances.get(lower[i].id) || 0;
+        if (p > bestPerf) { bestPerf = p; bestIdx = i; }
+      }
+
+      let worstIdx = 0, worstPerf = Infinity;
+      for (let i = 0; i < upper.length; i++) {
+        const p = performances.get(upper[i].id) || 0;
+        if (p < worstPerf) { worstPerf = p; worstIdx = i; }
+      }
+
+      const promoted = lower.splice(bestIdx, 1)[0];
+      const demoted = upper.splice(worstIdx, 1)[0];
+
+      promoted.level = l + 1;
+      promoted.justPromoted = true;
+      demoted.level = l;
+      demoted.justDemoted = true;
+
+      upper.push(promoted);
+      lower.push(demoted);
+
+      promotions.push({ promoted, demoted, fromLevel: l, toLevel: l + 1 });
+    }
+
+    // Remove worst at bottom, add new
+    const bottom = this.agentsByLevel[0];
+    if (bottom.length) {
+      let worstIdx = 0, worstPerf = Infinity;
+      for (let i = 0; i < bottom.length; i++) {
+        const p = performances.get(bottom[i].id) || 0;
+        if (p < worstPerf) { worstPerf = p; worstIdx = i; }
+      }
+      bottom.splice(worstIdx, 1);
+      const newAgent = this._makeAgent(0, rigidFrac);
+      bottom.push(newAgent);
+    }
+
+    return promotions;
+  }
+}
+
+// ===== UI STATE =====
+let sim = null;
+let env = null;
+let hierarchy = null;
+let running = false;
+let timer = null;
+let tick = 0;
+let ticksSinceSwitch = 0;
+
+// History arrays
+let perfHistory = [];
+let rigidPerfHistory = [];
+let flexPerfHistory = [];
+let envHistory = [];
+let levelRigidHistory = [];
+let switchTicks = [];
+
+// For adaptation score tracking
+let recoveryTicks = []; // ticks to recover after each switch
+let preTransitionPerf = []; // performance just before each switch
+let postTransitionMinPerf = []; // min performance after each switch
+
+// Achievement tracking
+let achievementCooldown = {};
+let lastTickerUpdate = -10;
+
+// Ticker messages
+let tickerMessages = [];
+let lastPromotions = [];
+
+function getParams() {
+  return {
+    levels: parseInt(document.getElementById('ctrl-levels').value),
+    branching: parseInt(document.getElementById('ctrl-branching').value),
+    rigidFrac: parseFloat(document.getElementById('ctrl-rigid-frac').value),
+    stability: parseFloat(document.getElementById('ctrl-stability').value),
+    expWeight: parseFloat(document.getElementById('ctrl-exp-weight').value),
+    noise: parseFloat(document.getElementById('ctrl-noise').value),
+    mode: document.getElementById('ctrl-mode').value,
+    speed: parseInt(document.getElementById('ctrl-speed').value),
+  };
+}
+
+function init() {
+  const p = getParams();
+  env = new SimEnvironment(p.stability, p.mode);
+  hierarchy = new Hierarchy(p.levels, p.branching, p.rigidFrac);
+  tick = 0;
+  ticksSinceSwitch = 0;
+  perfHistory = [];
+  rigidPerfHistory = [];
+  flexPerfHistory = [];
+  envHistory = [];
+  levelRigidHistory = [];
+  switchTicks = [];
+  recoveryTicks = [];
+  preTransitionPerf = [];
+  postTransitionMinPerf = [];
+  achievementCooldown = {};
+  tickerMessages = ['Simulation initialized. The board is set.'];
+  lastPromotions = [];
+  running = false;
+  if (timer) clearInterval(timer);
+  timer = null;
+  document.getElementById('btn-start').textContent = 'Start';
+  document.getElementById('btn-start').classList.remove('active');
+  document.getElementById('narrative-text').innerHTML = 'Press <span class="highlight">Start</span> to watch the organizational dynamics unfold. Rigids will lock into a strategy; Flexibles will adapt to the environment.';
+  document.getElementById('adaptation-score-val').textContent = '--';
+  document.getElementById('adaptation-score-detail').textContent = 'Measures how quickly the organization recovers after each regime change. Lower is better.';
+  buildPyramid();
+  updateDisplay();
+  clearCharts();
+  updateTicker();
+  updateHealthGauges();
+}
+
+function stepSim() {
+  const p = getParams();
+  env.step(tick);
+
+  if (env.justSwitched) {
+    // Record pre-transition perf
+    if (perfHistory.length > 0) {
+      const recentPerf = perfHistory.slice(-5);
+      preTransitionPerf.push(recentPerf.reduce((a,b) => a+b, 0) / recentPerf.length);
+    }
+    ticksSinceSwitch = 0;
+    switchTicks.push(tick);
+    triggerDisruption();
+  } else {
+    ticksSinceSwitch++;
+  }
+
+  const performances = new Map();
+  let rigidPerfs = [], flexPerfs = [];
+
+  for (const agent of hierarchy.allAgents()) {
+    const perf = agent.getPerformance(env.state, p.noise, p.expWeight);
+    performances.set(agent.id, perf);
+    if (agent.type === "rigid") rigidPerfs.push(perf);
+    else flexPerfs.push(perf);
+    agent.tickExperience();
+  }
+
+  lastPromotions = hierarchy.promoteAndExit(performances, p.rigidFrac);
+
+  const allPerfs = [...performances.values()];
+  const orgPerf = allPerfs.reduce((a, b) => a + b, 0) / allPerfs.length;
+  const rigidAvg = rigidPerfs.length ? rigidPerfs.reduce((a, b) => a + b, 0) / rigidPerfs.length : 0;
+  const flexAvg = flexPerfs.length ? flexPerfs.reduce((a, b) => a + b, 0) / flexPerfs.length : 0;
+
+  perfHistory.push(orgPerf);
+  rigidPerfHistory.push(rigidAvg);
+  flexPerfHistory.push(flexAvg);
+  envHistory.push(env.state);
+
+  const levelFracs = [];
+  for (let l = 0; l < hierarchy.levels; l++) {
+    levelFracs.push(hierarchy.getRigidFraction(l));
+  }
+  levelRigidHistory.push(levelFracs);
+
+  // Track recovery after transitions
+  computeAdaptationScore();
+
+  tick++;
+  updateDisplay();
+  drawCharts();
+  updateNarrative();
+  updateHealthGauges();
+  checkAchievements();
+
+  // Update ticker every ~8 ticks
+  if (tick - lastTickerUpdate >= 8) {
+    generateTickerMessages();
+    updateTicker();
+    lastTickerUpdate = tick;
+  }
+}
+
+// ===== DISRUPTION EFFECTS =====
+function triggerDisruption() {
+  // Screen shake
+  document.body.classList.add('shaking');
+  setTimeout(() => document.body.classList.remove('shaking'), 500);
+
+  // Red overlay
+  const overlay = document.getElementById('disruption-overlay');
+  overlay.classList.add('active');
+  setTimeout(() => overlay.classList.remove('active'), 800);
+
+  // Banner
+  const banner = document.getElementById('disruption-banner');
+  banner.classList.remove('active');
+  void banner.offsetWidth; // force reflow
+  banner.classList.add('active');
+  setTimeout(() => banner.classList.remove('active'), 2500);
+}
+
+// ===== ACHIEVEMENTS =====
+function showAchievement(id, title, text, type) {
+  if (achievementCooldown[id] && tick - achievementCooldown[id] < 40) return;
+  achievementCooldown[id] = tick;
+
+  const container = document.getElementById('achievement-container');
+  const el = document.createElement('div');
+  el.className = `achievement ${type}`;
+  el.innerHTML = `<div class="achievement-title">${title}</div><div class="achievement-text">${text}</div>`;
+  container.appendChild(el);
+  setTimeout(() => { if (el.parentNode) el.parentNode.removeChild(el); }, 4500);
+}
+
+function checkAchievements() {
+  const topRigid = hierarchy.getTopRigidFraction();
+  const totalRigid = hierarchy.getRigidFraction();
+
+  // Iron Grip
+  if (topRigid >= 0.9) {
+    showAchievement('iron-grip', 'Iron Grip!', `${(topRigid*100).toFixed(0)}% Rigids at the top. The board is locked in.`, 'gold');
+  }
+
+  // Catastrophic Failure - shortly after a switch with big performance drop
+  if (switchTicks.length > 0) {
+    const lastSwitch = switchTicks[switchTicks.length - 1];
+    if (tick - lastSwitch === 8 && perfHistory.length > 10) {
+      const before = perfHistory.slice(Math.max(0, lastSwitch - 5), lastSwitch);
+      const after = perfHistory.slice(lastSwitch, tick);
+      if (before.length && after.length) {
+        const avgBefore = before.reduce((a,b) => a+b,0) / before.length;
+        const avgAfter = after.reduce((a,b) => a+b,0) / after.length;
+        if (avgBefore - avgAfter > 0.3) {
+          showAchievement('catastrophic', 'Catastrophic Failure!', `Performance collapsed by ${((avgBefore-avgAfter)/avgBefore*100).toFixed(0)}% after the transition.`, 'danger');
+        }
+      }
+    }
+  }
+
+  // Flexible Surge - after transition flexibles start outperforming
+  if (switchTicks.length > 0 && ticksSinceSwitch >= 3 && ticksSinceSwitch <= 10) {
+    if (flexPerfHistory.length > 0 && rigidPerfHistory.length > 0) {
+      const recentFlex = flexPerfHistory[flexPerfHistory.length - 1];
+      const recentRigid = rigidPerfHistory[rigidPerfHistory.length - 1];
+      if (recentFlex > recentRigid * 1.5) {
+        showAchievement('flex-surge', 'Flexible Surge!', 'Adaptable agents are outperforming the old guard.', 'info');
+      }
+    }
+  }
+
+  // Diversity Crisis
+  if (totalRigid > 0.85) {
+    showAchievement('monoculture', 'Monoculture Warning!', `${(totalRigid*100).toFixed(0)}% of the org is Rigid. One disruption could be devastating.`, 'danger');
+  }
+
+  // Resilient Org
+  if (switchTicks.length >= 3 && recoveryTicks.length >= 2) {
+    const lastRecovery = recoveryTicks[recoveryTicks.length - 1];
+    if (lastRecovery <= 10 && lastRecovery > 0) {
+      showAchievement('resilient', 'Quick Recovery!', `Organization recovered in just ${lastRecovery} ticks. Flexible reserves paid off.`, 'info');
+    }
+  }
+}
+
+// ===== ADAPTATION SCORE =====
+function computeAdaptationScore() {
+  if (switchTicks.length === 0) return;
+
+  const lastSwitch = switchTicks[switchTicks.length - 1];
+  const ticksAfter = tick - lastSwitch;
+
+  // Check if we've recovered from the most recent switch
+  if (ticksAfter > 2 && preTransitionPerf.length > 0) {
+    const targetPerf = preTransitionPerf[preTransitionPerf.length - 1] * 0.9;
+    const currentPerf = perfHistory[perfHistory.length - 1];
+
+    if (recoveryTicks.length < switchTicks.length && currentPerf >= targetPerf) {
+      recoveryTicks.push(ticksAfter);
+    }
+  }
+
+  // Update display
+  if (recoveryTicks.length > 0) {
+    const avgRecovery = recoveryTicks.reduce((a,b) => a+b, 0) / recoveryTicks.length;
+    document.getElementById('adaptation-score-val').textContent = avgRecovery.toFixed(1);
+    const color = avgRecovery < 15 ? '#4a4' : avgRecovery < 30 ? '#ea5' : '#c44';
+    document.getElementById('adaptation-score-val').style.color = color;
+    document.getElementById('adaptation-score-detail').textContent =
+      `Avg ${avgRecovery.toFixed(1)} ticks to recover across ${recoveryTicks.length} transition(s). ${avgRecovery < 15 ? 'Excellent adaptability!' : avgRecovery < 30 ? 'Moderate recovery speed.' : 'Dangerously slow to adapt.'}`;
+  } else if (switchTicks.length > 0 && ticksAfter > 20) {
+    document.getElementById('adaptation-score-val').textContent = '>' + ticksAfter;
+    document.getElementById('adaptation-score-val').style.color = '#c44';
+    document.getElementById('adaptation-score-detail').textContent = `Still recovering from last transition (${ticksAfter} ticks ago). Organization is struggling.`;
+  }
+}
+
+// ===== HEALTH GAUGES =====
+function updateHealthGauges() {
+  if (!hierarchy) return;
+
+  const flexFrac = 1 - hierarchy.getRigidFraction();
+  const topFlexFrac = 1 - hierarchy.getTopRigidFraction();
+
+  // Adaptability: based on flexible fraction weighted by level
+  const adaptability = Math.round(flexFrac * 60 + topFlexFrac * 40);
+  setGauge('adaptability', adaptability, adaptability > 50 ? '#4a4' : adaptability > 25 ? '#ea5' : '#c44');
+
+  // Experience Depth: avg experience of all agents
+  const allAgents = hierarchy.allAgents();
+  const avgExp = allAgents.reduce((s, a) => s + a.experience, 0) / (allAgents.length || 1);
+  const expScore = Math.min(100, Math.round(avgExp / 2));
+  setGauge('experience', expScore, '#48c');
+
+  // Diversity: based on strategy and type mix
+  const rigidA = allAgents.filter(a => a.type === 'rigid' && a.strategy === 'A').length;
+  const rigidB = allAgents.filter(a => a.type === 'rigid' && a.strategy === 'B').length;
+  const flex = allAgents.filter(a => a.type === 'flexible').length;
+  const total = allAgents.length || 1;
+  // Shannon entropy-ish
+  const fracs = [rigidA/total, rigidB/total, flex/total].filter(f => f > 0);
+  const entropy = -fracs.reduce((s, f) => s + f * Math.log2(f), 0);
+  const maxEntropy = Math.log2(3);
+  const diversity = Math.round((entropy / maxEntropy) * 100);
+  setGauge('diversity', diversity, diversity > 60 ? '#c8e' : diversity > 30 ? '#ea5' : '#c44');
+
+  // Vulnerability: high rigid concentration at top + wrong strategy
+  const topAgents = hierarchy.agentsByLevel[hierarchy.levels - 1];
+  const wrongRigids = topAgents.filter(a => a.type === 'rigid' && a.strategy !== env.state).length;
+  const vulnerability = Math.round((wrongRigids / (topAgents.length || 1)) * 100);
+  setGauge('vulnerability', vulnerability, vulnerability < 30 ? '#4a4' : vulnerability < 60 ? '#ea5' : '#c44');
+}
+
+function setGauge(name, value, color) {
+  const bar = document.getElementById(`gauge-${name}`);
+  const val = document.getElementById(`gauge-${name}-val`);
+  bar.style.width = value + '%';
+  bar.style.background = color;
+  val.textContent = value;
+  val.style.color = color;
+}
+
+// ===== NARRATIVE =====
+function updateNarrative() {
+  const el = document.getElementById('narrative-text');
+  const topRigid = hierarchy.getTopRigidFraction();
+  const totalRigid = hierarchy.getRigidFraction();
+  const topAgents = hierarchy.agentsByLevel[hierarchy.levels - 1];
+  const wrongTopRigids = topAgents.filter(a => a.type === 'rigid' && a.strategy !== env.state).length;
+  const wrongTopPct = Math.round((wrongTopRigids / (topAgents.length || 1)) * 100);
+
+  let narrative = '';
+
+  if (env.justSwitched || ticksSinceSwitch < 3) {
+    // Just switched
+    const prevState = env.state === 'A' ? 'B' : 'A';
+    narrative = `<span class="highlight">REGIME CHANGE!</span> The environment just flipped from ${prevState} to ${env.state}. ${wrongTopPct}% of top leadership was playing the wrong strategy. ` +
+      (wrongTopPct > 60 ? 'The C-suite is in chaos. Years of accumulated expertise are suddenly worthless.' :
+       wrongTopPct > 30 ? 'Significant disruption at the top. Some leaders will need to be replaced.' :
+       'The organization had enough diversity to absorb this shock.');
+  } else if (ticksSinceSwitch < 15) {
+    // Recovery phase
+    narrative = `Recovery phase. The organization is ${wrongTopPct > 40 ? 'struggling badly' : 'adjusting'} after the last disruption. ` +
+      `Flexibles are ${totalRigid < 0.5 ? 'stepping up across all levels' : 'trying to fill the gaps'}. ` +
+      `${wrongTopPct > 0 ? wrongTopPct + '% of leadership is still misaligned.' : 'Leadership has realigned.'}`;
+  } else if (ticksSinceSwitch > 30 && topRigid > 0.7) {
+    // Stable but dangerous
+    const env_strat = env.state;
+    const rightRigidPct = Math.round(topAgents.filter(a => a.type === 'rigid' && a.strategy === env.state).length / (topAgents.length || 1) * 100);
+    narrative = `Environment favors Strategy <span class="highlight">${env_strat}</span>. ` +
+      `The Rigids playing ${env_strat} are accumulating experience and climbing fast. ` +
+      `<span class="highlight">${rightRigidPct}%</span> of the C-suite is now Rigid-${env_strat}. ` +
+      `If the environment switches to ${env_strat === 'A' ? 'B' : 'A'}, this organization is in serious trouble...`;
+  } else if (ticksSinceSwitch > 20) {
+    // Stable period
+    narrative = `Stable period (${ticksSinceSwitch} ticks). ` +
+      `Top is ${(topRigid*100).toFixed(0)}% Rigid. ` +
+      (topRigid > 0.5 ? 'Experience-heavy leaders are consolidating power. Efficient, but brittle.' :
+       'A healthy mix of adaptable and experienced leaders. More resilient, but perhaps less optimal.');
+  } else {
+    // General
+    narrative = `Tick ${tick}. Organization is ${ticksSinceSwitch > 10 ? 'settling into' : 'finding'} its rhythm. ` +
+      `Overall Rigid fraction: ${(totalRigid*100).toFixed(0)}%.`;
+  }
+
+  el.innerHTML = narrative;
+}
+
+// ===== TICKER =====
+function generateTickerMessages() {
+  const msgs = [];
+  const topAgents = hierarchy.agentsByLevel[hierarchy.levels - 1];
+  const topRigid = hierarchy.getTopRigidFraction();
+  const totalRigid = hierarchy.getRigidFraction();
+
+  // Promotion news
+  if (lastPromotions.length > 0) {
+    for (const promo of lastPromotions) {
+      if (promo.toLevel === hierarchy.levels - 1) {
+        const icon = promo.promoted.type === 'rigid' ? '\uD83D\uDC54' : '\uD83C\uDFAD';
+        msgs.push(`${icon} ${promo.promoted.name} promoted to C-suite (${promo.promoted.type}, Strategy ${promo.promoted.strategy})`);
+      }
+    }
+  }
+
+  // Environment commentary
+  if (env.justSwitched || ticksSinceSwitch < 3) {
+    msgs.push(`REGIME CHANGE: Strategy ${env.state} is now optimal!`);
+    msgs.push(`Markets in turmoil as environment shifts`);
+  }
+
+  // Rigid dominance
+  if (topRigid > 0.8 && ticksSinceSwitch > 15) {
+    const topRigidAgent = topAgents.find(a => a.type === 'rigid');
+    if (topRigidAgent) {
+      msgs.push(`\uD83D\uDC54 CEO ${topRigidAgent.name} doubles down on Strategy ${topRigidAgent.strategy}`);
+    }
+    msgs.push(`Board confidence at all-time high as Rigids dominate leadership`);
+  }
+
+  // Flexible underdog
+  if (topRigid > 0.7) {
+    const midFlex = hierarchy.agentsByLevel[Math.floor(hierarchy.levels / 2)];
+    const flexAgent = midFlex ? midFlex.find(a => a.type === 'flexible') : null;
+    if (flexAgent) {
+      msgs.push(`\uD83C\uDFAD Flexible middle manager ${flexAgent.name} sees trouble ahead but can't be heard`);
+    }
+  }
+
+  // Vulnerability warning
+  const wrongTopRigids = topAgents.filter(a => a.type === 'rigid' && a.strategy !== env.state).length;
+  if (wrongTopRigids > 0 && ticksSinceSwitch < 10) {
+    msgs.push(`${wrongTopRigids} top leader(s) playing the wrong strategy -- performance suffering`);
+  }
+
+  // General flavor
+  if (tick > 0 && tick % 25 === 0) {
+    msgs.push(`Q${Math.floor(tick/25)} earnings: Org performance at ${perfHistory[perfHistory.length-1].toFixed(2)}`);
+  }
+
+  if (msgs.length > 0) {
+    tickerMessages = msgs;
+  }
+}
+
+function updateTicker() {
+  const track = document.getElementById('ticker-track');
+  let html = '';
+  // Duplicate for seamless loop
+  for (let rep = 0; rep < 2; rep++) {
+    for (const msg of tickerMessages) {
+      html += `<span class="ticker-item">${msg}<span class="sep">|</span></span>`;
+    }
+  }
+  track.innerHTML = html;
+
+  // Reset animation
+  track.style.animation = 'none';
+  void track.offsetWidth;
+  const duration = Math.max(15, tickerMessages.join('').length * 0.15);
+  track.style.animation = `ticker-scroll ${duration}s linear infinite`;
+}
+
+// ===== PYRAMID VISUALIZATION =====
+function buildPyramid() {
+  const container = document.getElementById('pyramid');
+  container.innerHTML = '';
+  for (let l = hierarchy.levels - 1; l >= 0; l--) {
+    const row = document.createElement('div');
+    row.style.display = 'flex';
+    row.style.alignItems = 'center';
+    row.style.gap = '3px';
+    row.style.justifyContent = 'center';
+
+    const label = document.createElement('span');
+    label.className = 'level-label';
+    label.textContent = l === hierarchy.levels - 1 ? 'C-Suite' : l === hierarchy.levels - 2 ? 'SVP' : l === hierarchy.levels - 3 ? 'VP' : `L${l}`;
+    row.appendChild(label);
+
+    const levelDiv = document.createElement('div');
+    levelDiv.className = 'pyramid-level';
+    levelDiv.id = `level-${l}`;
+
+    const agents = hierarchy.agentsByLevel[l];
+    for (const agent of agents) {
+      levelDiv.appendChild(createAgentCell(agent));
+    }
+    row.appendChild(levelDiv);
+    container.appendChild(row);
+  }
+}
+
+function createAgentCell(agent) {
+  const cell = document.createElement('div');
+  cell.className = 'agent-cell';
+  cell.id = `agent-${agent.id}`;
+  updateCellClass(cell, agent);
+
+  const icon = document.createElement('span');
+  icon.className = 'agent-icon';
+  icon.textContent = agent.type === 'rigid' ? '\uD83D\uDC54' : '\uD83C\uDFAD';
+  cell.appendChild(icon);
+
+  const name = document.createElement('span');
+  name.className = 'agent-name';
+  name.textContent = agent.shortName;
+  cell.appendChild(name);
+
+  // Tooltip on hover
+  cell.addEventListener('mouseenter', (e) => showTooltip(e, agent));
+  cell.addEventListener('mouseleave', hideTooltip);
+
+  return cell;
+}
+
+function updateCellClass(cell, agent) {
+  let cls = 'agent-cell';
+  if (agent.type === 'rigid') {
+    cls += agent.strategy === 'A' ? ' rigid-A' : ' rigid-B';
+  } else {
+    cls += ' flexible';
+  }
+  if (agent.justPromoted) cls += ' promoted';
+  if (agent.justDemoted) cls += ' demoted';
+  if (agent.isNew) cls += ' new-agent';
+  cell.className = cls;
+}
+
+function showTooltip(e, agent) {
+  const tip = document.getElementById('agent-tooltip');
+  const archetype = agent.type === 'rigid' ? '\uD83C\uDDEC\uD83C\uDDE7 "The lady\'s not for turning"' : '\uD83C\uDDFA\uD83C\uDDF8 "The Comeback Kid"';
+  tip.innerHTML = `<div class="tip-name">${agent.type === 'rigid' ? '\uD83D\uDC54' : '\uD83C\uDFAD'} ${agent.name}</div>` +
+    `<div class="tip-detail">Type: ${agent.type === 'rigid' ? 'Rigid (Thatcher)' : 'Flexible (Clinton)'}</div>` +
+    `<div class="tip-detail">Strategy: ${agent.type === 'rigid' ? agent.strategy : 'Adapts'}</div>` +
+    `<div class="tip-detail">Experience: ${agent.experience.toFixed(0)}</div>` +
+    `<div class="tip-detail">Age: ${agent.age} ticks</div>` +
+    `<div class="tip-detail">Last perf: ${agent.lastPerf.toFixed(2)}</div>` +
+    `<div class="tip-detail" style="margin-top:4px; color:#888; font-style:italic;">${archetype}</div>`;
+  tip.style.display = 'block';
+  tip.style.left = Math.min(e.clientX + 12, window.innerWidth - 220) + 'px';
+  tip.style.top = (e.clientY + 12) + 'px';
+}
+
+function hideTooltip() {
+  document.getElementById('agent-tooltip').style.display = 'none';
+}
+
+function updatePyramid() {
+  for (let l = hierarchy.levels - 1; l >= 0; l--) {
+    const levelDiv = document.getElementById(`level-${l}`);
+    if (!levelDiv) { buildPyramid(); return; }
+    // Clear and rebuild cells
+    levelDiv.innerHTML = '';
+    const agents = hierarchy.agentsByLevel[l];
+    for (const agent of agents) {
+      levelDiv.appendChild(createAgentCell(agent));
+    }
+  }
+}
+
+// ===== UPDATE DISPLAY =====
+function updateDisplay() {
+  // Environment
+  const envDisp = document.getElementById('env-state-display');
+  envDisp.textContent = env.state;
+  envDisp.className = `env-state state-${env.state}`;
+
+  document.getElementById('info-tick').textContent = tick;
+  document.getElementById('info-stable').textContent = ticksSinceSwitch;
+  document.getElementById('info-switches').textContent = switchTicks.length;
+
+  // Transition alert
+  const alert = document.getElementById('transition-alert');
+  if (ticksSinceSwitch < 5 && tick > 0) {
+    alert.classList.add('visible');
+  } else {
+    alert.classList.remove('visible');
+  }
+
+  // Stats
+  const lastPerf = perfHistory.length ? perfHistory[perfHistory.length - 1] : 0;
+  document.getElementById('stat-perf').textContent = lastPerf.toFixed(3);
+
+  const rigidFrac = hierarchy.getRigidFraction();
+  const flexFrac = 1 - rigidFrac;
+  document.getElementById('stat-rigid-pct').textContent = (rigidFrac * 100).toFixed(0) + '%';
+  document.getElementById('stat-flex-pct').textContent = (flexFrac * 100).toFixed(0) + '%';
+
+  // Pyramid
+  updatePyramid();
+}
+
+// ===== CHARTS =====
+function getCtx(id) {
+  const canvas = document.getElementById(id);
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width * window.devicePixelRatio;
+  canvas.height = rect.height * window.devicePixelRatio;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+  return { ctx, w: rect.width, h: rect.height };
+}
+
+function clearCharts() {
+  for (const id of ['chart-performance', 'chart-composition', 'chart-transitions']) {
+    const { ctx, w, h } = getCtx(id);
+    ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = '#1a1a2e';
+    ctx.fillRect(0, 0, w, h);
+    ctx.fillStyle = '#555';
+    ctx.font = '12px Courier New';
+    ctx.textAlign = 'center';
+    ctx.fillText('Waiting for data...', w / 2, h / 2);
+  }
+}
+
+function drawCharts() {
+  drawPerformanceChart();
+  drawCompositionChart();
+  drawTransitionChart();
+}
+
+function drawEnvBackground(ctx, w, h, margin, dataLen) {
+  if (!dataLen) return;
+  const plotW = w - margin.left - margin.right;
+  const barW = plotW / dataLen;
+  for (let i = 0; i < dataLen; i++) {
+    ctx.fillStyle = envHistory[i] === 'A'
+      ? 'rgba(40, 80, 40, 0.25)'
+      : 'rgba(80, 40, 40, 0.25)';
+    ctx.fillRect(margin.left + i * barW, margin.top, barW, h - margin.top - margin.bottom);
+  }
+  for (const st of switchTicks) {
+    if (st < dataLen) {
+      const x = margin.left + st * barW;
+      ctx.strokeStyle = 'rgba(255, 255, 0, 0.5)';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath(); ctx.moveTo(x, margin.top); ctx.lineTo(x, h - margin.bottom); ctx.stroke();
+      ctx.setLineDash([]);
+    }
+  }
+}
+
+function drawLine(ctx, data, w, h, margin, color, minVal, maxVal) {
+  if (data.length < 2) return;
+  const plotW = w - margin.left - margin.right;
+  const plotH = h - margin.top - margin.bottom;
+  const range = maxVal - minVal || 1;
+
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  for (let i = 0; i < data.length; i++) {
+    const x = margin.left + (i / (data.length - 1)) * plotW;
+    const y = margin.top + plotH - ((data[i] - minVal) / range) * plotH;
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+}
+
+function drawPerformanceChart() {
+  const { ctx, w, h } = getCtx('chart-performance');
+  ctx.clearRect(0, 0, w, h);
+  ctx.fillStyle = '#0e0e18';
+  ctx.fillRect(0, 0, w, h);
+
+  const margin = { top: 20, right: 60, bottom: 30, left: 50 };
+
+  if (perfHistory.length < 2) return;
+
+  const smoothed = [];
+  for (let i = 0; i < perfHistory.length; i++) {
+    const start = Math.max(0, i - 9);
+    let sum = 0;
+    for (let j = start; j <= i; j++) sum += perfHistory[j];
+    smoothed.push(sum / (i - start + 1));
+  }
+
+  const allVals = [...perfHistory, ...rigidPerfHistory, ...flexPerfHistory];
+  const minV = Math.min(...allVals) * 0.95;
+  const maxV = Math.max(...allVals) * 1.05;
+
+  drawEnvBackground(ctx, w, h, margin, perfHistory.length);
+  drawLine(ctx, perfHistory, w, h, margin, '#7af', minV, maxV);
+  drawLine(ctx, rigidPerfHistory, w, h, margin, 'rgba(200,80,80,0.6)', minV, maxV);
+  drawLine(ctx, flexPerfHistory, w, h, margin, 'rgba(70,140,200,0.6)', minV, maxV);
+  drawLine(ctx, smoothed, w, h, margin, '#fff', minV, maxV);
+
+  ctx.strokeStyle = '#444';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(margin.left, margin.top);
+  ctx.lineTo(margin.left, h - margin.bottom);
+  ctx.lineTo(w - margin.right, h - margin.bottom);
+  ctx.stroke();
+
+  ctx.fillStyle = '#888';
+  ctx.font = '10px Courier New';
+  ctx.textAlign = 'right';
+  for (let i = 0; i <= 4; i++) {
+    const val = minV + (maxV - minV) * i / 4;
+    const y = margin.top + (h - margin.top - margin.bottom) * (1 - i / 4);
+    ctx.fillText(val.toFixed(2), margin.left - 4, y + 3);
+  }
+
+  ctx.textAlign = 'left';
+  const lx = w - margin.right + 4;
+  ctx.fillStyle = '#fff'; ctx.fillText('Smoothed', lx, margin.top + 12);
+  ctx.fillStyle = '#7af'; ctx.fillText('Raw', lx, margin.top + 24);
+  ctx.fillStyle = '#c55'; ctx.fillText('Rigid', lx, margin.top + 36);
+  ctx.fillStyle = '#48c'; ctx.fillText('Flex', lx, margin.top + 48);
+
+  ctx.fillStyle = '#888';
+  ctx.textAlign = 'center';
+  ctx.fillText(`Tick ${tick}`, w / 2, h - 4);
+}
+
+function drawCompositionChart() {
+  const { ctx, w, h } = getCtx('chart-composition');
+  ctx.clearRect(0, 0, w, h);
+  ctx.fillStyle = '#0e0e18';
+  ctx.fillRect(0, 0, w, h);
+
+  const margin = { top: 20, right: 80, bottom: 30, left: 50 };
+
+  if (levelRigidHistory.length < 2) return;
+
+  const numLevels = hierarchy.levels;
+  const colors = ['#e55', '#e95', '#ea5', '#5e5', '#5ae', '#55e'];
+
+  drawEnvBackground(ctx, w, h, margin, levelRigidHistory.length);
+
+  for (let l = 0; l < numLevels; l++) {
+    const data = levelRigidHistory.map(r => r[l]);
+    const smoothed = [];
+    for (let i = 0; i < data.length; i++) {
+      const start = Math.max(0, i - 4);
+      let sum = 0;
+      for (let j = start; j <= i; j++) sum += data[j];
+      smoothed.push(sum / (i - start + 1));
+    }
+    drawLine(ctx, smoothed, w, h, margin, colors[l % colors.length], 0, 1);
+  }
+
+  ctx.strokeStyle = '#444';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(margin.left, margin.top);
+  ctx.lineTo(margin.left, h - margin.bottom);
+  ctx.lineTo(w - margin.right, h - margin.bottom);
+  ctx.stroke();
+
+  ctx.fillStyle = '#888';
+  ctx.font = '10px Courier New';
+  ctx.textAlign = 'right';
+  for (let i = 0; i <= 4; i++) {
+    const pct = i * 25;
+    const y = margin.top + (h - margin.top - margin.bottom) * (1 - i / 4);
+    ctx.fillText(pct + '%', margin.left - 4, y + 3);
+  }
+
+  ctx.textAlign = 'left';
+  const lx = w - margin.right + 4;
+  for (let l = 0; l < numLevels; l++) {
+    ctx.fillStyle = colors[l % colors.length];
+    const label = l === numLevels - 1 ? 'C-Suite' : l === numLevels - 2 ? 'SVP' : l === numLevels - 3 ? 'VP' : `L${l}`;
+    ctx.fillText(label, lx, margin.top + 12 + l * 14);
+  }
+
+  ctx.fillStyle = '#888';
+  ctx.textAlign = 'center';
+  ctx.fillText('Rigid % by Level', w / 2, h - 4);
+}
+
+function drawTransitionChart() {
+  const { ctx, w, h } = getCtx('chart-transitions');
+  ctx.clearRect(0, 0, w, h);
+  ctx.fillStyle = '#0e0e18';
+  ctx.fillRect(0, 0, w, h);
+
+  const margin = { top: 20, right: 20, bottom: 30, left: 50 };
+
+  if (perfHistory.length < 2) return;
+
+  const delta = [];
+  for (let i = 0; i < perfHistory.length; i++) {
+    if (i < 5) { delta.push(0); continue; }
+    const before = perfHistory.slice(Math.max(0, i - 10), i - 5);
+    const after = perfHistory.slice(i - 5, i);
+    const beforeAvg = before.reduce((a, b) => a + b, 0) / (before.length || 1);
+    const afterAvg = after.reduce((a, b) => a + b, 0) / (after.length || 1);
+    delta.push(afterAvg - beforeAvg);
+  }
+
+  const maxAbs = Math.max(0.1, ...delta.map(Math.abs));
+
+  drawEnvBackground(ctx, w, h, margin, delta.length);
+
+  const plotH = h - margin.top - margin.bottom;
+  const zeroY = margin.top + plotH / 2;
+  ctx.strokeStyle = '#444';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([3, 3]);
+  ctx.beginPath(); ctx.moveTo(margin.left, zeroY); ctx.lineTo(w - margin.right, zeroY); ctx.stroke();
+  ctx.setLineDash([]);
+
+  const barW = (w - margin.left - margin.right) / delta.length;
+  for (let i = 0; i < delta.length; i++) {
+    const x = margin.left + i * barW;
+    const barH = (Math.abs(delta[i]) / maxAbs) * (plotH / 2);
+    if (delta[i] >= 0) {
+      ctx.fillStyle = 'rgba(100, 200, 100, 0.6)';
+      ctx.fillRect(x, zeroY - barH, Math.max(barW - 0.5, 0.5), barH);
+    } else {
+      ctx.fillStyle = 'rgba(200, 100, 100, 0.6)';
+      ctx.fillRect(x, zeroY, Math.max(barW - 0.5, 0.5), barH);
+    }
+  }
+
+  for (const st of switchTicks) {
+    if (st < delta.length) {
+      const x = margin.left + st * barW;
+      ctx.fillStyle = 'rgba(255, 255, 0, 0.15)';
+      ctx.fillRect(x, margin.top, 20 * barW, plotH);
+    }
+  }
+
+  ctx.strokeStyle = '#444';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(margin.left, margin.top);
+  ctx.lineTo(margin.left, h - margin.bottom);
+  ctx.lineTo(w - margin.right, h - margin.bottom);
+  ctx.stroke();
+
+  ctx.fillStyle = '#888';
+  ctx.font = '10px Courier New';
+  ctx.textAlign = 'right';
+  ctx.fillText('+' + maxAbs.toFixed(2), margin.left - 4, margin.top + 10);
+  ctx.fillText('0', margin.left - 4, zeroY + 3);
+  ctx.fillText('-' + maxAbs.toFixed(2), margin.left - 4, h - margin.bottom - 2);
+
+  ctx.fillStyle = '#888';
+  ctx.textAlign = 'center';
+  ctx.fillText('Performance Change (adaptation cost in yellow zones)', w / 2, h - 4);
+}
+
+// ===== RANGE DISPLAY UPDATES =====
+function setupRangeDisplays() {
+  const ranges = [
+    { id: 'ctrl-rigid-frac', display: 'val-rigid-frac', fmt: v => (v * 100).toFixed(0) + '%' },
+    { id: 'ctrl-stability', display: 'val-stability', fmt: v => v },
+    { id: 'ctrl-exp-weight', display: 'val-exp-weight', fmt: v => parseFloat(v).toFixed(2) },
+    { id: 'ctrl-noise', display: 'val-noise', fmt: v => parseFloat(v).toFixed(2) },
+    { id: 'ctrl-speed', display: 'val-speed', fmt: v => v + 'ms' },
+  ];
+  for (const r of ranges) {
+    const el = document.getElementById(r.id);
+    el.addEventListener('input', () => {
+      document.getElementById(r.display).textContent = r.fmt(el.value);
+    });
+  }
+}
+
+// ===== BUTTONS =====
+document.getElementById('btn-start').addEventListener('click', () => {
+  if (running) {
+    running = false;
+    clearInterval(timer);
+    timer = null;
+    document.getElementById('btn-start').textContent = 'Start';
+    document.getElementById('btn-start').classList.remove('active');
+  } else {
+    if (!hierarchy) init();
+    running = true;
+    document.getElementById('btn-start').textContent = 'Pause';
+    document.getElementById('btn-start').classList.add('active');
+    const speed = getParams().speed;
+    timer = setInterval(() => {
+      stepSim();
+    }, speed);
+  }
+});
+
+document.getElementById('btn-step').addEventListener('click', () => {
+  if (!hierarchy) init();
+  if (running) {
+    running = false;
+    clearInterval(timer);
+    timer = null;
+    document.getElementById('btn-start').textContent = 'Start';
+    document.getElementById('btn-start').classList.remove('active');
+  }
+  stepSim();
+});
+
+document.getElementById('btn-reset').addEventListener('click', () => {
+  init();
+});
+
+// Speed change while running
+document.getElementById('ctrl-speed').addEventListener('input', () => {
+  if (running) {
+    clearInterval(timer);
+    const speed = getParams().speed;
+    timer = setInterval(() => stepSim(), speed);
+  }
+});
+
+// ===== INIT =====
+setupRangeDisplays();
+init();
+</script>
+</body>
+</html>

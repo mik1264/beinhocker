@@ -1,0 +1,2650 @@
+{
+  "params": {
+    "n_species": 50,
+    "connection_prob": 0.05,
+    "weight_range": [
+      -1.0,
+      1.0
+    ]
+  },
+  "state": {
+    "tick": 100,
+    "phase": "random",
+    "nodes": [
+      {
+        "id": 0,
+        "fitness": 0.3396,
+        "age": 1,
+        "is_keystone": false,
+        "category": "new"
+      },
+      {
+        "id": 1,
+        "fitness": 0.6303,
+        "age": 8,
+        "is_keystone": false,
+        "category": "growing"
+      },
+      {
+        "id": 2,
+        "fitness": 0.3335,
+        "age": 12,
+        "is_keystone": false,
+        "category": "growing"
+      },
+      {
+        "id": 3,
+        "fitness": 0.9493,
+        "age": 56,
+        "is_keystone": true,
+        "category": "keystone"
+      },
+      {
+        "id": 4,
+        "fitness": 0.8186,
+        "age": 100,
+        "is_keystone": false,
+        "category": "established"
+      },
+      {
+        "id": 5,
+        "fitness": 0.7389,
+        "age": 93,
+        "is_keystone": true,
+        "category": "keystone"
+      },
+      {
+        "id": 6,
+        "fitness": 0.5579,
+        "age": 0,
+        "is_keystone": false,
+        "category": "new"
+      },
+      {
+        "id": 7,
+        "fitness": 0.894,
+        "age": 100,
+        "is_keystone": false,
+        "category": "established"
+      },
+      {
+        "id": 8,
+        "fitness": 0.2689,
+        "age": 40,
+        "is_keystone": false,
+        "category": "growing"
+      },
+      {
+        "id": 9,
+        "fitness": 0.3758,
+        "age": 100,
+        "is_keystone": false,
+        "category": "established"
+      },
+      {
+        "id": 10,
+        "fitness": 0.565,
+        "age": 48,
+        "is_keystone": false,
+        "category": "growing"
+      },
+      {
+        "id": 11,
+        "fitness": 0.5327,
+        "age": 51,
+        "is_keystone": false,
+        "category": "established"
+      },
+      {
+        "id": 12,
+        "fitness": 0.7913,
+        "age": 74,
+        "is_keystone": false,
+        "category": "established"
+      },
+      {
+        "id": 13,
+        "fitness": 0.5212,
+        "age": 7,
+        "is_keystone": false,
+        "category": "growing"
+      },
+      {
+        "id": 14,
+        "fitness": 0.8546,
+        "age": 73,
+        "is_keystone": true,
+        "category": "keystone"
+      },
+      {
+        "id": 15,
+        "fitness": 0.62,
+        "age": 40,
+        "is_keystone": false,
+        "category": "growing"
+      },
+      {
+        "id": 16,
+        "fitness": 0.815,
+        "age": 100,
+        "is_keystone": false,
+        "category": "established"
+      },
+      {
+        "id": 17,
+        "fitness": 0.5049,
+        "age": 89,
+        "is_keystone": false,
+        "category": "established"
+      },
+      {
+        "id": 18,
+        "fitness": 0.5848,
+        "age": 50,
+        "is_keystone": false,
+        "category": "growing"
+      },
+      {
+        "id": 19,
+        "fitness": 0.8073,
+        "age": 11,
+        "is_keystone": false,
+        "category": "growing"
+      },
+      {
+        "id": 20,
+        "fitness": 0.5235,
+        "age": 95,
+        "is_keystone": false,
+        "category": "established"
+      },
+      {
+        "id": 21,
+        "fitness": 0.3701,
+        "age": 5,
+        "is_keystone": false,
+        "category": "growing"
+      },
+      {
+        "id": 22,
+        "fitness": 0.5159,
+        "age": 100,
+        "is_keystone": false,
+        "category": "established"
+      },
+      {
+        "id": 23,
+        "fitness": 0.5984,
+        "age": 27,
+        "is_keystone": false,
+        "category": "growing"
+      },
+      {
+        "id": 24,
+        "fitness": 0.5632,
+        "age": 0,
+        "is_keystone": false,
+        "category": "new"
+      },
+      {
+        "id": 25,
+        "fitness": 0.9242,
+        "age": 100,
+        "is_keystone": false,
+        "category": "established"
+      },
+      {
+        "id": 26,
+        "fitness": 0.9687,
+        "age": 59,
+        "is_keystone": false,
+        "category": "established"
+      },
+      {
+        "id": 27,
+        "fitness": 0.8829,
+        "age": 55,
+        "is_keystone": false,
+        "category": "established"
+      },
+      {
+        "id": 28,
+        "fitness": 0.6005,
+        "age": 100,
+        "is_keystone": true,
+        "category": "keystone"
+      },
+      {
+        "id": 29,
+        "fitness": 0.5532,
+        "age": 25,
+        "is_keystone": false,
+        "category": "growing"
+      },
+      {
+        "id": 30,
+        "fitness": 0.3043,
+        "age": 100,
+        "is_keystone": false,
+        "category": "established"
+      },
+      {
+        "id": 31,
+        "fitness": 0.652,
+        "age": 52,
+        "is_keystone": false,
+        "category": "established"
+      },
+      {
+        "id": 32,
+        "fitness": 0.9219,
+        "age": 6,
+        "is_keystone": false,
+        "category": "growing"
+      },
+      {
+        "id": 33,
+        "fitness": 0.8314,
+        "age": 12,
+        "is_keystone": false,
+        "category": "growing"
+      },
+      {
+        "id": 34,
+        "fitness": 0.8239,
+        "age": 49,
+        "is_keystone": false,
+        "category": "growing"
+      },
+      {
+        "id": 35,
+        "fitness": 0.5883,
+        "age": 50,
+        "is_keystone": false,
+        "category": "growing"
+      },
+      {
+        "id": 36,
+        "fitness": 0.7288,
+        "age": 13,
+        "is_keystone": false,
+        "category": "growing"
+      },
+      {
+        "id": 37,
+        "fitness": 0.8745,
+        "age": 61,
+        "is_keystone": false,
+        "category": "established"
+      },
+      {
+        "id": 38,
+        "fitness": 0.6305,
+        "age": 100,
+        "is_keystone": false,
+        "category": "established"
+      },
+      {
+        "id": 39,
+        "fitness": 0.9653,
+        "age": 11,
+        "is_keystone": true,
+        "category": "keystone"
+      },
+      {
+        "id": 40,
+        "fitness": 0.6633,
+        "age": 50,
+        "is_keystone": false,
+        "category": "growing"
+      },
+      {
+        "id": 41,
+        "fitness": 0.7165,
+        "age": 6,
+        "is_keystone": false,
+        "category": "growing"
+      },
+      {
+        "id": 42,
+        "fitness": 0.7491,
+        "age": 8,
+        "is_keystone": false,
+        "category": "growing"
+      },
+      {
+        "id": 43,
+        "fitness": 0.5078,
+        "age": 6,
+        "is_keystone": false,
+        "category": "growing"
+      },
+      {
+        "id": 44,
+        "fitness": 0.8787,
+        "age": 27,
+        "is_keystone": false,
+        "category": "growing"
+      },
+      {
+        "id": 45,
+        "fitness": 0.8746,
+        "age": 100,
+        "is_keystone": false,
+        "category": "established"
+      },
+      {
+        "id": 46,
+        "fitness": 0.7527,
+        "age": 24,
+        "is_keystone": false,
+        "category": "growing"
+      },
+      {
+        "id": 47,
+        "fitness": 0.8343,
+        "age": 19,
+        "is_keystone": false,
+        "category": "growing"
+      },
+      {
+        "id": 48,
+        "fitness": 0.5437,
+        "age": 11,
+        "is_keystone": false,
+        "category": "growing"
+      },
+      {
+        "id": 49,
+        "fitness": 0.3822,
+        "age": 51,
+        "is_keystone": false,
+        "category": "established"
+      }
+    ],
+    "edges": [
+      {
+        "source": 6,
+        "target": 0,
+        "weight": -0.128
+      },
+      {
+        "source": 11,
+        "target": 0,
+        "weight": -0.8029
+      },
+      {
+        "source": 28,
+        "target": 0,
+        "weight": 0.9928
+      },
+      {
+        "source": 36,
+        "target": 0,
+        "weight": 0.6515
+      },
+      {
+        "source": 39,
+        "target": 0,
+        "weight": -0.922
+      },
+      {
+        "source": 9,
+        "target": 1,
+        "weight": -0.9919
+      },
+      {
+        "source": 16,
+        "target": 1,
+        "weight": -0.3619
+      },
+      {
+        "source": 31,
+        "target": 1,
+        "weight": 0.719
+      },
+      {
+        "source": 36,
+        "target": 1,
+        "weight": 0.0292
+      },
+      {
+        "source": 39,
+        "target": 1,
+        "weight": 0.4646
+      },
+      {
+        "source": 7,
+        "target": 2,
+        "weight": -0.979
+      },
+      {
+        "source": 14,
+        "target": 2,
+        "weight": 0.6024
+      },
+      {
+        "source": 2,
+        "target": 3,
+        "weight": 0.0212
+      },
+      {
+        "source": 4,
+        "target": 3,
+        "weight": 0.1153
+      },
+      {
+        "source": 7,
+        "target": 3,
+        "weight": 0.9051
+      },
+      {
+        "source": 30,
+        "target": 3,
+        "weight": 0.7664
+      },
+      {
+        "source": 31,
+        "target": 3,
+        "weight": 0.087
+      },
+      {
+        "source": 32,
+        "target": 3,
+        "weight": 0.2861
+      },
+      {
+        "source": 3,
+        "target": 4,
+        "weight": 0.9265
+      },
+      {
+        "source": 5,
+        "target": 4,
+        "weight": -0.5473
+      },
+      {
+        "source": 14,
+        "target": 4,
+        "weight": 0.7197
+      },
+      {
+        "source": 29,
+        "target": 4,
+        "weight": 0.3741
+      },
+      {
+        "source": 32,
+        "target": 4,
+        "weight": -0.0508
+      },
+      {
+        "source": 42,
+        "target": 4,
+        "weight": -0.6859
+      },
+      {
+        "source": 28,
+        "target": 5,
+        "weight": 0.8662
+      },
+      {
+        "source": 24,
+        "target": 6,
+        "weight": 0.4356
+      },
+      {
+        "source": 49,
+        "target": 6,
+        "weight": 0.2941
+      },
+      {
+        "source": 3,
+        "target": 7,
+        "weight": 0.5284
+      },
+      {
+        "source": 8,
+        "target": 7,
+        "weight": 0.2537
+      },
+      {
+        "source": 11,
+        "target": 7,
+        "weight": 0.8114
+      },
+      {
+        "source": 3,
+        "target": 9,
+        "weight": -0.3628
+      },
+      {
+        "source": 13,
+        "target": 9,
+        "weight": -0.1408
+      },
+      {
+        "source": 34,
+        "target": 9,
+        "weight": 0.1991
+      },
+      {
+        "source": 8,
+        "target": 10,
+        "weight": 0.4847
+      },
+      {
+        "source": 43,
+        "target": 10,
+        "weight": 0.0006
+      },
+      {
+        "source": 49,
+        "target": 11,
+        "weight": 0.1722
+      },
+      {
+        "source": 5,
+        "target": 12,
+        "weight": 0.902
+      },
+      {
+        "source": 39,
+        "target": 13,
+        "weight": 0.0439
+      },
+      {
+        "source": 5,
+        "target": 14,
+        "weight": 0.2999
+      },
+      {
+        "source": 21,
+        "target": 14,
+        "weight": 0.567
+      },
+      {
+        "source": 43,
+        "target": 14,
+        "weight": 0.9
+      },
+      {
+        "source": 38,
+        "target": 15,
+        "weight": -0.3078
+      },
+      {
+        "source": 39,
+        "target": 15,
+        "weight": 0.4547
+      },
+      {
+        "source": 9,
+        "target": 16,
+        "weight": 0.3065
+      },
+      {
+        "source": 26,
+        "target": 16,
+        "weight": 0.6456
+      },
+      {
+        "source": 13,
+        "target": 17,
+        "weight": -0.7621
+      },
+      {
+        "source": 16,
+        "target": 17,
+        "weight": 0.4993
+      },
+      {
+        "source": 1,
+        "target": 18,
+        "weight": -0.2459
+      },
+      {
+        "source": 9,
+        "target": 18,
+        "weight": 0.8682
+      },
+      {
+        "source": 39,
+        "target": 19,
+        "weight": 0.7423
+      },
+      {
+        "source": 15,
+        "target": 20,
+        "weight": -0.0098
+      },
+      {
+        "source": 29,
+        "target": 20,
+        "weight": -0.2114
+      },
+      {
+        "source": 41,
+        "target": 20,
+        "weight": 0.2373
+      },
+      {
+        "source": 6,
+        "target": 21,
+        "weight": -0.6355
+      },
+      {
+        "source": 37,
+        "target": 21,
+        "weight": -0.3028
+      },
+      {
+        "source": 43,
+        "target": 21,
+        "weight": 0.6688
+      },
+      {
+        "source": 4,
+        "target": 22,
+        "weight": -0.4115
+      },
+      {
+        "source": 17,
+        "target": 22,
+        "weight": 0.7304
+      },
+      {
+        "source": 22,
+        "target": 23,
+        "weight": 0.731
+      },
+      {
+        "source": 25,
+        "target": 23,
+        "weight": -0.1923
+      },
+      {
+        "source": 7,
+        "target": 24,
+        "weight": 0.1422
+      },
+      {
+        "source": 1,
+        "target": 25,
+        "weight": 0.8799
+      },
+      {
+        "source": 5,
+        "target": 25,
+        "weight": 0.9416
+      },
+      {
+        "source": 14,
+        "target": 26,
+        "weight": 0.7345
+      },
+      {
+        "source": 28,
+        "target": 26,
+        "weight": 0.0636
+      },
+      {
+        "source": 34,
+        "target": 26,
+        "weight": 0.3738
+      },
+      {
+        "source": 42,
+        "target": 26,
+        "weight": 0.9918
+      },
+      {
+        "source": 14,
+        "target": 27,
+        "weight": 0.511
+      },
+      {
+        "source": 15,
+        "target": 27,
+        "weight": 0.9245
+      },
+      {
+        "source": 5,
+        "target": 28,
+        "weight": 0.2757
+      },
+      {
+        "source": 38,
+        "target": 29,
+        "weight": 0.1694
+      },
+      {
+        "source": 3,
+        "target": 30,
+        "weight": 0.3914
+      },
+      {
+        "source": 10,
+        "target": 30,
+        "weight": 0.1629
+      },
+      {
+        "source": 33,
+        "target": 30,
+        "weight": -0.4671
+      },
+      {
+        "source": 36,
+        "target": 30,
+        "weight": -0.6718
+      },
+      {
+        "source": 1,
+        "target": 31,
+        "weight": 0.2257
+      },
+      {
+        "source": 8,
+        "target": 31,
+        "weight": -0.0634
+      },
+      {
+        "source": 10,
+        "target": 31,
+        "weight": 0.0886
+      },
+      {
+        "source": 20,
+        "target": 31,
+        "weight": 0.6048
+      },
+      {
+        "source": 30,
+        "target": 31,
+        "weight": -0.5851
+      },
+      {
+        "source": 4,
+        "target": 32,
+        "weight": 0.3995
+      },
+      {
+        "source": 39,
+        "target": 32,
+        "weight": 0.9398
+      },
+      {
+        "source": 21,
+        "target": 33,
+        "weight": 0.206
+      },
+      {
+        "source": 38,
+        "target": 33,
+        "weight": 0.4287
+      },
+      {
+        "source": 42,
+        "target": 33,
+        "weight": 0.6022
+      },
+      {
+        "source": 12,
+        "target": 34,
+        "weight": 0.975
+      },
+      {
+        "source": 38,
+        "target": 35,
+        "weight": 0.283
+      },
+      {
+        "source": 11,
+        "target": 36,
+        "weight": -0.1894
+      },
+      {
+        "source": 13,
+        "target": 36,
+        "weight": -0.4034
+      },
+      {
+        "source": 16,
+        "target": 36,
+        "weight": 0.7757
+      },
+      {
+        "source": 19,
+        "target": 36,
+        "weight": 0.0679
+      },
+      {
+        "source": 34,
+        "target": 36,
+        "weight": 0.1439
+      },
+      {
+        "source": 4,
+        "target": 37,
+        "weight": 0.489
+      },
+      {
+        "source": 18,
+        "target": 37,
+        "weight": 0.1883
+      },
+      {
+        "source": 34,
+        "target": 37,
+        "weight": 0.221
+      },
+      {
+        "source": 35,
+        "target": 37,
+        "weight": 0.4725
+      },
+      {
+        "source": 26,
+        "target": 38,
+        "weight": 0.2757
+      },
+      {
+        "source": 7,
+        "target": 39,
+        "weight": 0.8379
+      },
+      {
+        "source": 17,
+        "target": 39,
+        "weight": -0.7258
+      },
+      {
+        "source": 18,
+        "target": 39,
+        "weight": 0.3854
+      },
+      {
+        "source": 31,
+        "target": 39,
+        "weight": 0.56
+      },
+      {
+        "source": 33,
+        "target": 39,
+        "weight": 0.8304
+      },
+      {
+        "source": 1,
+        "target": 40,
+        "weight": 0.3097
+      },
+      {
+        "source": 2,
+        "target": 40,
+        "weight": 0.8443
+      },
+      {
+        "source": 28,
+        "target": 40,
+        "weight": 0.8217
+      },
+      {
+        "source": 36,
+        "target": 40,
+        "weight": -0.8662
+      },
+      {
+        "source": 11,
+        "target": 41,
+        "weight": 0.4333
+      },
+      {
+        "source": 48,
+        "target": 41,
+        "weight": 0.4282
+      },
+      {
+        "source": 3,
+        "target": 42,
+        "weight": 0.9645
+      },
+      {
+        "source": 25,
+        "target": 42,
+        "weight": -0.3991
+      },
+      {
+        "source": 10,
+        "target": 43,
+        "weight": 0.4314
+      },
+      {
+        "source": 26,
+        "target": 43,
+        "weight": 0.2253
+      },
+      {
+        "source": 28,
+        "target": 43,
+        "weight": 0.3848
+      },
+      {
+        "source": 45,
+        "target": 43,
+        "weight": -0.7734
+      },
+      {
+        "source": 13,
+        "target": 44,
+        "weight": 0.4844
+      },
+      {
+        "source": 27,
+        "target": 44,
+        "weight": 0.8357
+      },
+      {
+        "source": 0,
+        "target": 45,
+        "weight": -0.2979
+      },
+      {
+        "source": 13,
+        "target": 45,
+        "weight": 0.5871
+      },
+      {
+        "source": 14,
+        "target": 45,
+        "weight": 0.7479
+      },
+      {
+        "source": 22,
+        "target": 45,
+        "weight": 0.2218
+      },
+      {
+        "source": 47,
+        "target": 45,
+        "weight": 0.0152
+      },
+      {
+        "source": 33,
+        "target": 46,
+        "weight": -0.2444
+      },
+      {
+        "source": 34,
+        "target": 46,
+        "weight": 0.9221
+      },
+      {
+        "source": 5,
+        "target": 47,
+        "weight": 0.6756
+      },
+      {
+        "source": 12,
+        "target": 47,
+        "weight": 0.0041
+      },
+      {
+        "source": 20,
+        "target": 47,
+        "weight": -0.1065
+      },
+      {
+        "source": 23,
+        "target": 47,
+        "weight": 0.6038
+      },
+      {
+        "source": 33,
+        "target": 48,
+        "weight": 0.1053
+      },
+      {
+        "source": 7,
+        "target": 49,
+        "weight": -0.8901
+      },
+      {
+        "source": 13,
+        "target": 49,
+        "weight": 0.6618
+      },
+      {
+        "source": 31,
+        "target": 49,
+        "weight": 0.6894
+      },
+      {
+        "source": 48,
+        "target": 49,
+        "weight": -0.4391
+      }
+    ],
+    "stats": {
+      "mean_fitness": 0.6646,
+      "max_fitness": 0.9687,
+      "min_fitness": 0.2689,
+      "density": 0.0539,
+      "diversity": 0.769,
+      "num_keystones": 5,
+      "species_count": 50
+    }
+  },
+  "history": [
+    {
+      "tick": 1,
+      "species_count": 50,
+      "mean_fitness": 0.4409,
+      "max_fitness": 0.8264,
+      "min_fitness": 0.0387,
+      "density": 0.0531,
+      "clustering": 0,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "random",
+      "cascade_size": 2,
+      "diversity": 0.8478
+    },
+    {
+      "tick": 2,
+      "species_count": 50,
+      "mean_fitness": 0.4495,
+      "max_fitness": 0.8714,
+      "min_fitness": 0.0486,
+      "density": 0.0518,
+      "clustering": 0,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "random",
+      "cascade_size": 0,
+      "diversity": 0.8499
+    },
+    {
+      "tick": 3,
+      "species_count": 50,
+      "mean_fitness": 0.4568,
+      "max_fitness": 0.8709,
+      "min_fitness": 0.1021,
+      "density": 0.0498,
+      "clustering": 0,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "random",
+      "cascade_size": 0,
+      "diversity": 0.8193
+    },
+    {
+      "tick": 4,
+      "species_count": 50,
+      "mean_fitness": 0.4591,
+      "max_fitness": 0.8763,
+      "min_fitness": 0.0559,
+      "density": 0.0502,
+      "clustering": 0,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "random",
+      "cascade_size": 0,
+      "diversity": 0.8678
+    },
+    {
+      "tick": 5,
+      "species_count": 50,
+      "mean_fitness": 0.4849,
+      "max_fitness": 0.876,
+      "min_fitness": 0.116,
+      "density": 0.0506,
+      "clustering": 0,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "random",
+      "cascade_size": 0,
+      "diversity": 0.8547
+    },
+    {
+      "tick": 6,
+      "species_count": 50,
+      "mean_fitness": 0.5045,
+      "max_fitness": 0.8993,
+      "min_fitness": 0.1239,
+      "density": 0.0506,
+      "clustering": 0,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "random",
+      "cascade_size": 2,
+      "diversity": 0.8402
+    },
+    {
+      "tick": 7,
+      "species_count": 50,
+      "mean_fitness": 0.5329,
+      "max_fitness": 0.8931,
+      "min_fitness": 0.1582,
+      "density": 0.051,
+      "clustering": 0,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "random",
+      "cascade_size": 0,
+      "diversity": 0.866
+    },
+    {
+      "tick": 8,
+      "species_count": 50,
+      "mean_fitness": 0.5344,
+      "max_fitness": 0.8955,
+      "min_fitness": 0.1755,
+      "density": 0.051,
+      "clustering": 0,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "random",
+      "cascade_size": 0,
+      "diversity": 0.851
+    },
+    {
+      "tick": 9,
+      "species_count": 50,
+      "mean_fitness": 0.5408,
+      "max_fitness": 0.9054,
+      "min_fitness": 0.0655,
+      "density": 0.0518,
+      "clustering": 0,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "random",
+      "cascade_size": 1,
+      "diversity": 0.9172
+    },
+    {
+      "tick": 10,
+      "species_count": 50,
+      "mean_fitness": 0.554,
+      "max_fitness": 0.9088,
+      "min_fitness": 0.1692,
+      "density": 0.0514,
+      "clustering": 0.0819,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "random",
+      "cascade_size": 0,
+      "diversity": 0.891
+    },
+    {
+      "tick": 11,
+      "species_count": 50,
+      "mean_fitness": 0.5389,
+      "max_fitness": 0.8767,
+      "min_fitness": 0.0376,
+      "density": 0.0555,
+      "clustering": 0.0819,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "random",
+      "cascade_size": 1,
+      "diversity": 0.868
+    },
+    {
+      "tick": 12,
+      "species_count": 50,
+      "mean_fitness": 0.5497,
+      "max_fitness": 0.8637,
+      "min_fitness": 0.1625,
+      "density": 0.0531,
+      "clustering": 0.0819,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "random",
+      "cascade_size": 0,
+      "diversity": 0.8289
+    },
+    {
+      "tick": 13,
+      "species_count": 50,
+      "mean_fitness": 0.5648,
+      "max_fitness": 0.9337,
+      "min_fitness": 0.1356,
+      "density": 0.0498,
+      "clustering": 0.0819,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "random",
+      "cascade_size": 2,
+      "diversity": 0.8816
+    },
+    {
+      "tick": 14,
+      "species_count": 50,
+      "mean_fitness": 0.5576,
+      "max_fitness": 0.9337,
+      "min_fitness": 0.2057,
+      "density": 0.0498,
+      "clustering": 0.0819,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "random",
+      "cascade_size": 0,
+      "diversity": 0.837
+    },
+    {
+      "tick": 15,
+      "species_count": 50,
+      "mean_fitness": 0.5537,
+      "max_fitness": 0.9322,
+      "min_fitness": 0.0193,
+      "density": 0.0514,
+      "clustering": 0.0819,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "random",
+      "cascade_size": 2,
+      "diversity": 0.892
+    },
+    {
+      "tick": 16,
+      "species_count": 50,
+      "mean_fitness": 0.565,
+      "max_fitness": 0.9323,
+      "min_fitness": 0.2105,
+      "density": 0.051,
+      "clustering": 0.0819,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "random",
+      "cascade_size": 0,
+      "diversity": 0.8703
+    },
+    {
+      "tick": 17,
+      "species_count": 50,
+      "mean_fitness": 0.5836,
+      "max_fitness": 0.9315,
+      "min_fitness": 0.216,
+      "density": 0.0518,
+      "clustering": 0.0819,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "random",
+      "cascade_size": 0,
+      "diversity": 0.8742
+    },
+    {
+      "tick": 18,
+      "species_count": 50,
+      "mean_fitness": 0.5884,
+      "max_fitness": 0.9388,
+      "min_fitness": 0.1785,
+      "density": 0.0518,
+      "clustering": 0.0819,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "random",
+      "cascade_size": 1,
+      "diversity": 0.8836
+    },
+    {
+      "tick": 19,
+      "species_count": 50,
+      "mean_fitness": 0.5796,
+      "max_fitness": 0.9182,
+      "min_fitness": 0.1634,
+      "density": 0.0486,
+      "clustering": 0.0819,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "random",
+      "cascade_size": 1,
+      "diversity": 0.8701
+    },
+    {
+      "tick": 20,
+      "species_count": 50,
+      "mean_fitness": 0.5756,
+      "max_fitness": 0.9119,
+      "min_fitness": 0.2592,
+      "density": 0.0478,
+      "clustering": 0.082,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "growth",
+      "cascade_size": 0,
+      "diversity": 0.8309
+    },
+    {
+      "tick": 21,
+      "species_count": 50,
+      "mean_fitness": 0.5853,
+      "max_fitness": 0.9075,
+      "min_fitness": 0.1296,
+      "density": 0.0482,
+      "clustering": 0.082,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "growth",
+      "cascade_size": 0,
+      "diversity": 0.8854
+    },
+    {
+      "tick": 22,
+      "species_count": 50,
+      "mean_fitness": 0.5836,
+      "max_fitness": 0.912,
+      "min_fitness": 0.2653,
+      "density": 0.0478,
+      "clustering": 0.082,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "growth",
+      "cascade_size": 0,
+      "diversity": 0.8549
+    },
+    {
+      "tick": 23,
+      "species_count": 50,
+      "mean_fitness": 0.5821,
+      "max_fitness": 0.9248,
+      "min_fitness": 0.2689,
+      "density": 0.0478,
+      "clustering": 0.082,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "growth",
+      "cascade_size": 0,
+      "diversity": 0.8303
+    },
+    {
+      "tick": 24,
+      "species_count": 50,
+      "mean_fitness": 0.5888,
+      "max_fitness": 0.9277,
+      "min_fitness": 0.2319,
+      "density": 0.0482,
+      "clustering": 0.082,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "growth",
+      "cascade_size": 0,
+      "diversity": 0.8237
+    },
+    {
+      "tick": 25,
+      "species_count": 50,
+      "mean_fitness": 0.5908,
+      "max_fitness": 0.9294,
+      "min_fitness": 0.1836,
+      "density": 0.0498,
+      "clustering": 0.082,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "growth",
+      "cascade_size": 0,
+      "diversity": 0.872
+    },
+    {
+      "tick": 26,
+      "species_count": 50,
+      "mean_fitness": 0.5909,
+      "max_fitness": 0.9416,
+      "min_fitness": 0.1828,
+      "density": 0.0478,
+      "clustering": 0.082,
+      "largest_component": 50,
+      "num_keystones": 4,
+      "phase": "growth",
+      "cascade_size": 3,
+      "diversity": 0.8738
+    },
+    {
+      "tick": 27,
+      "species_count": 50,
+      "mean_fitness": 0.6004,
+      "max_fitness": 0.9419,
+      "min_fitness": 0.2689,
+      "density": 0.0478,
+      "clustering": 0.082,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "growth",
+      "cascade_size": 0,
+      "diversity": 0.8414
+    },
+    {
+      "tick": 28,
+      "species_count": 50,
+      "mean_fitness": 0.6063,
+      "max_fitness": 0.9419,
+      "min_fitness": 0.127,
+      "density": 0.049,
+      "clustering": 0.082,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "growth",
+      "cascade_size": 0,
+      "diversity": 0.8799
+    },
+    {
+      "tick": 29,
+      "species_count": 50,
+      "mean_fitness": 0.6097,
+      "max_fitness": 0.9436,
+      "min_fitness": 0.1695,
+      "density": 0.0478,
+      "clustering": 0.082,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "growth",
+      "cascade_size": 0,
+      "diversity": 0.8664
+    },
+    {
+      "tick": 30,
+      "species_count": 50,
+      "mean_fitness": 0.6196,
+      "max_fitness": 0.9452,
+      "min_fitness": 0.0515,
+      "density": 0.051,
+      "clustering": 0.1033,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "growth",
+      "cascade_size": 1,
+      "diversity": 0.8745
+    },
+    {
+      "tick": 31,
+      "species_count": 50,
+      "mean_fitness": 0.6191,
+      "max_fitness": 0.9452,
+      "min_fitness": 0.203,
+      "density": 0.0502,
+      "clustering": 0.1033,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "growth",
+      "cascade_size": 0,
+      "diversity": 0.8495
+    },
+    {
+      "tick": 32,
+      "species_count": 50,
+      "mean_fitness": 0.6243,
+      "max_fitness": 0.9446,
+      "min_fitness": 0.2337,
+      "density": 0.0498,
+      "clustering": 0.1033,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "growth",
+      "cascade_size": 0,
+      "diversity": 0.8569
+    },
+    {
+      "tick": 33,
+      "species_count": 50,
+      "mean_fitness": 0.6279,
+      "max_fitness": 0.9666,
+      "min_fitness": 0.0355,
+      "density": 0.0514,
+      "clustering": 0.1033,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "growth",
+      "cascade_size": 1,
+      "diversity": 0.8697
+    },
+    {
+      "tick": 34,
+      "species_count": 50,
+      "mean_fitness": 0.6409,
+      "max_fitness": 0.966,
+      "min_fitness": 0.2689,
+      "density": 0.0522,
+      "clustering": 0.1033,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "growth",
+      "cascade_size": 0,
+      "diversity": 0.8563
+    },
+    {
+      "tick": 35,
+      "species_count": 50,
+      "mean_fitness": 0.6476,
+      "max_fitness": 0.966,
+      "min_fitness": 0.2689,
+      "density": 0.0547,
+      "clustering": 0.1033,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "growth",
+      "cascade_size": 0,
+      "diversity": 0.8532
+    },
+    {
+      "tick": 36,
+      "species_count": 50,
+      "mean_fitness": 0.6424,
+      "max_fitness": 0.9677,
+      "min_fitness": 0.1098,
+      "density": 0.0555,
+      "clustering": 0.1033,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "growth",
+      "cascade_size": 0,
+      "diversity": 0.8888
+    },
+    {
+      "tick": 37,
+      "species_count": 50,
+      "mean_fitness": 0.6463,
+      "max_fitness": 0.963,
+      "min_fitness": 0.2457,
+      "density": 0.0547,
+      "clustering": 0.1033,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "growth",
+      "cascade_size": 0,
+      "diversity": 0.8682
+    },
+    {
+      "tick": 38,
+      "species_count": 50,
+      "mean_fitness": 0.6651,
+      "max_fitness": 0.964,
+      "min_fitness": 0.2689,
+      "density": 0.0551,
+      "clustering": 0.1033,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "growth",
+      "cascade_size": 0,
+      "diversity": 0.856
+    },
+    {
+      "tick": 39,
+      "species_count": 50,
+      "mean_fitness": 0.6719,
+      "max_fitness": 0.9666,
+      "min_fitness": 0.2689,
+      "density": 0.0563,
+      "clustering": 0.1033,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "growth",
+      "cascade_size": 0,
+      "diversity": 0.8447
+    },
+    {
+      "tick": 40,
+      "species_count": 50,
+      "mean_fitness": 0.6664,
+      "max_fitness": 0.9585,
+      "min_fitness": 0.1539,
+      "density": 0.0571,
+      "clustering": 0.0889,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "growth",
+      "cascade_size": 0,
+      "diversity": 0.8672
+    },
+    {
+      "tick": 41,
+      "species_count": 50,
+      "mean_fitness": 0.6429,
+      "max_fitness": 0.9805,
+      "min_fitness": 0.0885,
+      "density": 0.0555,
+      "clustering": 0.0889,
+      "largest_component": 50,
+      "num_keystones": 4,
+      "phase": "growth",
+      "cascade_size": 5,
+      "diversity": 0.9015
+    },
+    {
+      "tick": 42,
+      "species_count": 50,
+      "mean_fitness": 0.6381,
+      "max_fitness": 0.9495,
+      "min_fitness": 0.001,
+      "density": 0.0539,
+      "clustering": 0.0889,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "growth",
+      "cascade_size": 0,
+      "diversity": 0.9015
+    },
+    {
+      "tick": 43,
+      "species_count": 50,
+      "mean_fitness": 0.6551,
+      "max_fitness": 0.9493,
+      "min_fitness": 0.1927,
+      "density": 0.0531,
+      "clustering": 0.0889,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "growth",
+      "cascade_size": 0,
+      "diversity": 0.8742
+    },
+    {
+      "tick": 44,
+      "species_count": 50,
+      "mean_fitness": 0.6795,
+      "max_fitness": 0.9532,
+      "min_fitness": 0.2284,
+      "density": 0.0559,
+      "clustering": 0.0889,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "growth",
+      "cascade_size": 0,
+      "diversity": 0.8522
+    },
+    {
+      "tick": 45,
+      "species_count": 50,
+      "mean_fitness": 0.6952,
+      "max_fitness": 0.9709,
+      "min_fitness": 0.2619,
+      "density": 0.058,
+      "clustering": 0.0889,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "growth",
+      "cascade_size": 1,
+      "diversity": 0.8422
+    },
+    {
+      "tick": 46,
+      "species_count": 50,
+      "mean_fitness": 0.6728,
+      "max_fitness": 0.9711,
+      "min_fitness": 0.1018,
+      "density": 0.0567,
+      "clustering": 0.0889,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "growth",
+      "cascade_size": 1,
+      "diversity": 0.887
+    },
+    {
+      "tick": 47,
+      "species_count": 50,
+      "mean_fitness": 0.6696,
+      "max_fitness": 0.9646,
+      "min_fitness": 0.2044,
+      "density": 0.0567,
+      "clustering": 0.0889,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "growth",
+      "cascade_size": 0,
+      "diversity": 0.8695
+    },
+    {
+      "tick": 48,
+      "species_count": 50,
+      "mean_fitness": 0.6829,
+      "max_fitness": 0.965,
+      "min_fitness": 0.2652,
+      "density": 0.0571,
+      "clustering": 0.0889,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "growth",
+      "cascade_size": 0,
+      "diversity": 0.863
+    },
+    {
+      "tick": 49,
+      "species_count": 50,
+      "mean_fitness": 0.6914,
+      "max_fitness": 0.9702,
+      "min_fitness": 0.1852,
+      "density": 0.0576,
+      "clustering": 0.0889,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "growth",
+      "cascade_size": 1,
+      "diversity": 0.8522
+    },
+    {
+      "tick": 50,
+      "species_count": 50,
+      "mean_fitness": 0.6851,
+      "max_fitness": 0.9862,
+      "min_fitness": 0.1059,
+      "density": 0.0539,
+      "clustering": 0.0595,
+      "largest_component": 50,
+      "num_keystones": 4,
+      "phase": "growth",
+      "cascade_size": 3,
+      "diversity": 0.839
+    },
+    {
+      "tick": 51,
+      "species_count": 50,
+      "mean_fitness": 0.695,
+      "max_fitness": 0.9864,
+      "min_fitness": 0.2689,
+      "density": 0.0547,
+      "clustering": 0.0595,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "growth",
+      "cascade_size": 0,
+      "diversity": 0.814
+    },
+    {
+      "tick": 52,
+      "species_count": 50,
+      "mean_fitness": 0.712,
+      "max_fitness": 0.9847,
+      "min_fitness": 0.2689,
+      "density": 0.0543,
+      "clustering": 0.0595,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "growth",
+      "cascade_size": 0,
+      "diversity": 0.8013
+    },
+    {
+      "tick": 53,
+      "species_count": 50,
+      "mean_fitness": 0.7068,
+      "max_fitness": 0.9853,
+      "min_fitness": 0.2689,
+      "density": 0.0543,
+      "clustering": 0.0595,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "growth",
+      "cascade_size": 0,
+      "diversity": 0.8039
+    },
+    {
+      "tick": 54,
+      "species_count": 50,
+      "mean_fitness": 0.6928,
+      "max_fitness": 0.9851,
+      "min_fitness": 0.1366,
+      "density": 0.0551,
+      "clustering": 0.0595,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "growth",
+      "cascade_size": 0,
+      "diversity": 0.8076
+    },
+    {
+      "tick": 55,
+      "species_count": 50,
+      "mean_fitness": 0.695,
+      "max_fitness": 0.9742,
+      "min_fitness": 0.3817,
+      "density": 0.0551,
+      "clustering": 0.0595,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "growth",
+      "cascade_size": 0,
+      "diversity": 0.7828
+    },
+    {
+      "tick": 56,
+      "species_count": 50,
+      "mean_fitness": 0.6755,
+      "max_fitness": 0.9739,
+      "min_fitness": 0.2103,
+      "density": 0.0555,
+      "clustering": 0.0595,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "growth",
+      "cascade_size": 1,
+      "diversity": 0.7993
+    },
+    {
+      "tick": 57,
+      "species_count": 50,
+      "mean_fitness": 0.6921,
+      "max_fitness": 0.9735,
+      "min_fitness": 0.3663,
+      "density": 0.0551,
+      "clustering": 0.0595,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "growth",
+      "cascade_size": 0,
+      "diversity": 0.7677
+    },
+    {
+      "tick": 58,
+      "species_count": 50,
+      "mean_fitness": 0.6906,
+      "max_fitness": 0.9729,
+      "min_fitness": 0.2689,
+      "density": 0.0551,
+      "clustering": 0.0595,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "growth",
+      "cascade_size": 1,
+      "diversity": 0.7552
+    },
+    {
+      "tick": 59,
+      "species_count": 50,
+      "mean_fitness": 0.7007,
+      "max_fitness": 0.9731,
+      "min_fitness": 0.2964,
+      "density": 0.0567,
+      "clustering": 0.0595,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "growth",
+      "cascade_size": 0,
+      "diversity": 0.74
+    },
+    {
+      "tick": 60,
+      "species_count": 50,
+      "mean_fitness": 0.6892,
+      "max_fitness": 0.9737,
+      "min_fitness": 0.216,
+      "density": 0.0576,
+      "clustering": 0.0727,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "growth",
+      "cascade_size": 2,
+      "diversity": 0.7833
+    },
+    {
+      "tick": 61,
+      "species_count": 50,
+      "mean_fitness": 0.6859,
+      "max_fitness": 0.9749,
+      "min_fitness": 0.2052,
+      "density": 0.0563,
+      "clustering": 0.0727,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "growth",
+      "cascade_size": 0,
+      "diversity": 0.8239
+    },
+    {
+      "tick": 62,
+      "species_count": 50,
+      "mean_fitness": 0.6869,
+      "max_fitness": 0.9749,
+      "min_fitness": 0.2523,
+      "density": 0.058,
+      "clustering": 0.0727,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "random",
+      "cascade_size": 0,
+      "diversity": 0.8157
+    },
+    {
+      "tick": 63,
+      "species_count": 50,
+      "mean_fitness": 0.7042,
+      "max_fitness": 0.9747,
+      "min_fitness": 0.3415,
+      "density": 0.0551,
+      "clustering": 0.0727,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "random",
+      "cascade_size": 0,
+      "diversity": 0.7833
+    },
+    {
+      "tick": 64,
+      "species_count": 50,
+      "mean_fitness": 0.6916,
+      "max_fitness": 0.9748,
+      "min_fitness": 0.3923,
+      "density": 0.0535,
+      "clustering": 0.0727,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "random",
+      "cascade_size": 0,
+      "diversity": 0.7899
+    },
+    {
+      "tick": 65,
+      "species_count": 50,
+      "mean_fitness": 0.6856,
+      "max_fitness": 0.9751,
+      "min_fitness": 0.0533,
+      "density": 0.0518,
+      "clustering": 0.0727,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "random",
+      "cascade_size": 0,
+      "diversity": 0.7874
+    },
+    {
+      "tick": 66,
+      "species_count": 50,
+      "mean_fitness": 0.6839,
+      "max_fitness": 0.975,
+      "min_fitness": 0.0554,
+      "density": 0.0527,
+      "clustering": 0.0727,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "random",
+      "cascade_size": 0,
+      "diversity": 0.7759
+    },
+    {
+      "tick": 67,
+      "species_count": 50,
+      "mean_fitness": 0.691,
+      "max_fitness": 0.9749,
+      "min_fitness": 0.2689,
+      "density": 0.0518,
+      "clustering": 0.0727,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "random",
+      "cascade_size": 0,
+      "diversity": 0.7866
+    },
+    {
+      "tick": 68,
+      "species_count": 50,
+      "mean_fitness": 0.6838,
+      "max_fitness": 0.9749,
+      "min_fitness": 0.0558,
+      "density": 0.0535,
+      "clustering": 0.0727,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "random",
+      "cascade_size": 0,
+      "diversity": 0.7939
+    },
+    {
+      "tick": 69,
+      "species_count": 50,
+      "mean_fitness": 0.688,
+      "max_fitness": 0.9749,
+      "min_fitness": 0.1536,
+      "density": 0.0527,
+      "clustering": 0.0727,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "random",
+      "cascade_size": 0,
+      "diversity": 0.7972
+    },
+    {
+      "tick": 70,
+      "species_count": 50,
+      "mean_fitness": 0.6869,
+      "max_fitness": 0.9755,
+      "min_fitness": 0.2745,
+      "density": 0.0547,
+      "clustering": 0.0699,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "random",
+      "cascade_size": 0,
+      "diversity": 0.8005
+    },
+    {
+      "tick": 71,
+      "species_count": 50,
+      "mean_fitness": 0.697,
+      "max_fitness": 0.9754,
+      "min_fitness": 0.0586,
+      "density": 0.0547,
+      "clustering": 0.0699,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "random",
+      "cascade_size": 1,
+      "diversity": 0.7777
+    },
+    {
+      "tick": 72,
+      "species_count": 50,
+      "mean_fitness": 0.7117,
+      "max_fitness": 0.9753,
+      "min_fitness": 0.4291,
+      "density": 0.0535,
+      "clustering": 0.0699,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "organized",
+      "cascade_size": 0,
+      "diversity": 0.7592
+    },
+    {
+      "tick": 73,
+      "species_count": 50,
+      "mean_fitness": 0.7087,
+      "max_fitness": 0.9762,
+      "min_fitness": 0.3427,
+      "density": 0.0527,
+      "clustering": 0.0699,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "random",
+      "cascade_size": 1,
+      "diversity": 0.7777
+    },
+    {
+      "tick": 74,
+      "species_count": 50,
+      "mean_fitness": 0.7002,
+      "max_fitness": 0.9761,
+      "min_fitness": 0.1174,
+      "density": 0.0522,
+      "clustering": 0.0699,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "random",
+      "cascade_size": 0,
+      "diversity": 0.7768
+    },
+    {
+      "tick": 75,
+      "species_count": 50,
+      "mean_fitness": 0.7115,
+      "max_fitness": 0.9752,
+      "min_fitness": 0.4548,
+      "density": 0.0522,
+      "clustering": 0.0699,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "organized",
+      "cascade_size": 0,
+      "diversity": 0.7477
+    },
+    {
+      "tick": 76,
+      "species_count": 50,
+      "mean_fitness": 0.7182,
+      "max_fitness": 0.9882,
+      "min_fitness": 0.462,
+      "density": 0.0527,
+      "clustering": 0.0699,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "organized",
+      "cascade_size": 1,
+      "diversity": 0.7265
+    },
+    {
+      "tick": 77,
+      "species_count": 50,
+      "mean_fitness": 0.7086,
+      "max_fitness": 0.9881,
+      "min_fitness": 0.1421,
+      "density": 0.0539,
+      "clustering": 0.0699,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "random",
+      "cascade_size": 0,
+      "diversity": 0.7336
+    },
+    {
+      "tick": 78,
+      "species_count": 50,
+      "mean_fitness": 0.7137,
+      "max_fitness": 0.988,
+      "min_fitness": 0.2689,
+      "density": 0.0522,
+      "clustering": 0.0699,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "organized",
+      "cascade_size": 0,
+      "diversity": 0.77
+    },
+    {
+      "tick": 79,
+      "species_count": 50,
+      "mean_fitness": 0.7049,
+      "max_fitness": 0.9907,
+      "min_fitness": 0.0184,
+      "density": 0.0522,
+      "clustering": 0.0699,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "growth",
+      "cascade_size": 0,
+      "diversity": 0.7765
+    },
+    {
+      "tick": 80,
+      "species_count": 50,
+      "mean_fitness": 0.7167,
+      "max_fitness": 0.9908,
+      "min_fitness": 0.3419,
+      "density": 0.0547,
+      "clustering": 0.1077,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "growth",
+      "cascade_size": 0,
+      "diversity": 0.7662
+    },
+    {
+      "tick": 81,
+      "species_count": 50,
+      "mean_fitness": 0.7095,
+      "max_fitness": 0.9906,
+      "min_fitness": 0.2689,
+      "density": 0.0527,
+      "clustering": 0.1077,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "growth",
+      "cascade_size": 0,
+      "diversity": 0.7753
+    },
+    {
+      "tick": 82,
+      "species_count": 50,
+      "mean_fitness": 0.7174,
+      "max_fitness": 0.9907,
+      "min_fitness": 0.2689,
+      "density": 0.0547,
+      "clustering": 0.1077,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "growth",
+      "cascade_size": 0,
+      "diversity": 0.7577
+    },
+    {
+      "tick": 83,
+      "species_count": 50,
+      "mean_fitness": 0.7134,
+      "max_fitness": 0.9903,
+      "min_fitness": 0.2689,
+      "density": 0.0535,
+      "clustering": 0.1077,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "growth",
+      "cascade_size": 0,
+      "diversity": 0.7684
+    },
+    {
+      "tick": 84,
+      "species_count": 50,
+      "mean_fitness": 0.7094,
+      "max_fitness": 0.9903,
+      "min_fitness": 0.0605,
+      "density": 0.0539,
+      "clustering": 0.1077,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "growth",
+      "cascade_size": 0,
+      "diversity": 0.7671
+    },
+    {
+      "tick": 85,
+      "species_count": 50,
+      "mean_fitness": 0.7085,
+      "max_fitness": 0.9903,
+      "min_fitness": 0.3047,
+      "density": 0.0567,
+      "clustering": 0.1077,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "growth",
+      "cascade_size": 0,
+      "diversity": 0.7654
+    },
+    {
+      "tick": 86,
+      "species_count": 50,
+      "mean_fitness": 0.702,
+      "max_fitness": 0.9902,
+      "min_fitness": 0.026,
+      "density": 0.0555,
+      "clustering": 0.1077,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "random",
+      "cascade_size": 0,
+      "diversity": 0.7768
+    },
+    {
+      "tick": 87,
+      "species_count": 50,
+      "mean_fitness": 0.7198,
+      "max_fitness": 0.9903,
+      "min_fitness": 0.3678,
+      "density": 0.0559,
+      "clustering": 0.1077,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "organized",
+      "cascade_size": 0,
+      "diversity": 0.7513
+    },
+    {
+      "tick": 88,
+      "species_count": 50,
+      "mean_fitness": 0.696,
+      "max_fitness": 0.9864,
+      "min_fitness": 0.2689,
+      "density": 0.0551,
+      "clustering": 0.1077,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "random",
+      "cascade_size": 1,
+      "diversity": 0.7735
+    },
+    {
+      "tick": 89,
+      "species_count": 50,
+      "mean_fitness": 0.7057,
+      "max_fitness": 0.9836,
+      "min_fitness": 0.385,
+      "density": 0.0535,
+      "clustering": 0.1077,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "organized",
+      "cascade_size": 2,
+      "diversity": 0.7413
+    },
+    {
+      "tick": 90,
+      "species_count": 50,
+      "mean_fitness": 0.6848,
+      "max_fitness": 0.9835,
+      "min_fitness": 0.0192,
+      "density": 0.0522,
+      "clustering": 0.09,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "random",
+      "cascade_size": 0,
+      "diversity": 0.8008
+    },
+    {
+      "tick": 91,
+      "species_count": 50,
+      "mean_fitness": 0.6869,
+      "max_fitness": 0.9747,
+      "min_fitness": 0.2689,
+      "density": 0.0518,
+      "clustering": 0.09,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "random",
+      "cascade_size": 0,
+      "diversity": 0.7972
+    },
+    {
+      "tick": 92,
+      "species_count": 50,
+      "mean_fitness": 0.6823,
+      "max_fitness": 0.9697,
+      "min_fitness": 0.2449,
+      "density": 0.0555,
+      "clustering": 0.09,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "random",
+      "cascade_size": 2,
+      "diversity": 0.7929
+    },
+    {
+      "tick": 93,
+      "species_count": 50,
+      "mean_fitness": 0.682,
+      "max_fitness": 0.9677,
+      "min_fitness": 0.334,
+      "density": 0.0567,
+      "clustering": 0.09,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "random",
+      "cascade_size": 0,
+      "diversity": 0.7605
+    },
+    {
+      "tick": 94,
+      "species_count": 50,
+      "mean_fitness": 0.6793,
+      "max_fitness": 0.9675,
+      "min_fitness": 0.1907,
+      "density": 0.0567,
+      "clustering": 0.09,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "random",
+      "cascade_size": 2,
+      "diversity": 0.7763
+    },
+    {
+      "tick": 95,
+      "species_count": 50,
+      "mean_fitness": 0.6584,
+      "max_fitness": 0.9691,
+      "min_fitness": 0.0655,
+      "density": 0.0539,
+      "clustering": 0.09,
+      "largest_component": 50,
+      "num_keystones": 4,
+      "phase": "random",
+      "cascade_size": 1,
+      "diversity": 0.7908
+    },
+    {
+      "tick": 96,
+      "species_count": 50,
+      "mean_fitness": 0.6538,
+      "max_fitness": 0.9716,
+      "min_fitness": 0.0579,
+      "density": 0.0547,
+      "clustering": 0.09,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "random",
+      "cascade_size": 1,
+      "diversity": 0.8458
+    },
+    {
+      "tick": 97,
+      "species_count": 50,
+      "mean_fitness": 0.6573,
+      "max_fitness": 0.9701,
+      "min_fitness": 0.1637,
+      "density": 0.0535,
+      "clustering": 0.09,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "random",
+      "cascade_size": 0,
+      "diversity": 0.8337
+    },
+    {
+      "tick": 98,
+      "species_count": 50,
+      "mean_fitness": 0.6613,
+      "max_fitness": 0.9701,
+      "min_fitness": 0.2231,
+      "density": 0.0527,
+      "clustering": 0.09,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "random",
+      "cascade_size": 0,
+      "diversity": 0.7848
+    },
+    {
+      "tick": 99,
+      "species_count": 50,
+      "mean_fitness": 0.6692,
+      "max_fitness": 0.97,
+      "min_fitness": 0.2689,
+      "density": 0.0539,
+      "clustering": 0.09,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "random",
+      "cascade_size": 0,
+      "diversity": 0.7824
+    },
+    {
+      "tick": 100,
+      "species_count": 50,
+      "mean_fitness": 0.6646,
+      "max_fitness": 0.9687,
+      "min_fitness": 0.2689,
+      "density": 0.0539,
+      "clustering": 0.1005,
+      "largest_component": 50,
+      "num_keystones": 5,
+      "phase": "random",
+      "cascade_size": 1,
+      "diversity": 0.769
+    }
+  ],
+  "cascades": [
+    {
+      "tick": 1,
+      "trigger_species": 49,
+      "size": 2,
+      "phase_before": "random",
+      "phase_after": "random"
+    },
+    {
+      "tick": 6,
+      "trigger_species": 33,
+      "size": 2,
+      "phase_before": "random",
+      "phase_after": "random"
+    },
+    {
+      "tick": 9,
+      "trigger_species": 18,
+      "size": 1,
+      "phase_before": "random",
+      "phase_after": "random"
+    },
+    {
+      "tick": 11,
+      "trigger_species": 18,
+      "size": 1,
+      "phase_before": "random",
+      "phase_after": "random"
+    },
+    {
+      "tick": 13,
+      "trigger_species": 13,
+      "size": 2,
+      "phase_before": "random",
+      "phase_after": "random"
+    },
+    {
+      "tick": 15,
+      "trigger_species": 1,
+      "size": 2,
+      "phase_before": "random",
+      "phase_after": "random"
+    },
+    {
+      "tick": 18,
+      "trigger_species": 14,
+      "size": 1,
+      "phase_before": "random",
+      "phase_after": "random"
+    },
+    {
+      "tick": 19,
+      "trigger_species": 37,
+      "size": 1,
+      "phase_before": "random",
+      "phase_after": "random"
+    },
+    {
+      "tick": 26,
+      "trigger_species": 15,
+      "size": 3,
+      "phase_before": "growth",
+      "phase_after": "growth"
+    },
+    {
+      "tick": 30,
+      "trigger_species": 6,
+      "size": 1,
+      "phase_before": "growth",
+      "phase_after": "growth"
+    },
+    {
+      "tick": 33,
+      "trigger_species": 35,
+      "size": 1,
+      "phase_before": "growth",
+      "phase_after": "growth"
+    },
+    {
+      "tick": 41,
+      "trigger_species": 26,
+      "size": 5,
+      "phase_before": "growth",
+      "phase_after": "growth"
+    },
+    {
+      "tick": 45,
+      "trigger_species": 33,
+      "size": 1,
+      "phase_before": "growth",
+      "phase_after": "growth"
+    },
+    {
+      "tick": 46,
+      "trigger_species": 31,
+      "size": 1,
+      "phase_before": "growth",
+      "phase_after": "growth"
+    },
+    {
+      "tick": 49,
+      "trigger_species": 11,
+      "size": 1,
+      "phase_before": "growth",
+      "phase_after": "growth"
+    },
+    {
+      "tick": 50,
+      "trigger_species": 18,
+      "size": 3,
+      "phase_before": "growth",
+      "phase_after": "growth"
+    },
+    {
+      "tick": 56,
+      "trigger_species": 13,
+      "size": 1,
+      "phase_before": "growth",
+      "phase_after": "growth"
+    },
+    {
+      "tick": 58,
+      "trigger_species": 0,
+      "size": 1,
+      "phase_before": "growth",
+      "phase_after": "growth"
+    },
+    {
+      "tick": 60,
+      "trigger_species": 15,
+      "size": 2,
+      "phase_before": "growth",
+      "phase_after": "growth"
+    },
+    {
+      "tick": 71,
+      "trigger_species": 43,
+      "size": 1,
+      "phase_before": "random",
+      "phase_after": "random"
+    },
+    {
+      "tick": 73,
+      "trigger_species": 44,
+      "size": 1,
+      "phase_before": "organized",
+      "phase_after": "random"
+    },
+    {
+      "tick": 76,
+      "trigger_species": 2,
+      "size": 1,
+      "phase_before": "organized",
+      "phase_after": "organized"
+    },
+    {
+      "tick": 88,
+      "trigger_species": 33,
+      "size": 1,
+      "phase_before": "organized",
+      "phase_after": "random"
+    },
+    {
+      "tick": 89,
+      "trigger_species": 39,
+      "size": 2,
+      "phase_before": "random",
+      "phase_after": "organized"
+    },
+    {
+      "tick": 92,
+      "trigger_species": 13,
+      "size": 2,
+      "phase_before": "random",
+      "phase_after": "random"
+    },
+    {
+      "tick": 94,
+      "trigger_species": 32,
+      "size": 2,
+      "phase_before": "random",
+      "phase_after": "random"
+    },
+    {
+      "tick": 95,
+      "trigger_species": 0,
+      "size": 1,
+      "phase_before": "random",
+      "phase_after": "random"
+    },
+    {
+      "tick": 96,
+      "trigger_species": 0,
+      "size": 1,
+      "phase_before": "random",
+      "phase_after": "random"
+    },
+    {
+      "tick": 100,
+      "trigger_species": 6,
+      "size": 1,
+      "phase_before": "random",
+      "phase_after": "random"
+    }
+  ],
+  "cascade_distribution": {
+    "1": 18,
+    "2": 8,
+    "3": 2,
+    "5": 1
+  }
+}

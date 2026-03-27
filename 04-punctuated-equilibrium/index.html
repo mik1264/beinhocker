@@ -1,0 +1,2005 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Punctuated Equilibrium Ecosystem</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  background: #08080e;
+  color: #c8c8d0;
+  overflow: hidden;
+}
+
+.container {
+  display: grid;
+  grid-template-columns: 300px 1fr 360px;
+  grid-template-rows: auto 1fr auto;
+  height: 100vh;
+}
+
+/* --- HEADER --- */
+header {
+  grid-column: 1 / -1;
+  padding: 12px 24px;
+  background: linear-gradient(180deg, #14141e 0%, #10101a 100%);
+  border-bottom: 1px solid #1e1e30;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+header h1 {
+  font-size: 17px;
+  font-weight: 600;
+  color: #e8e8f0;
+  white-space: nowrap;
+  letter-spacing: -0.3px;
+}
+header .stats {
+  display: flex;
+  gap: 18px;
+  font-size: 12px;
+  flex-wrap: wrap;
+  font-family: 'JetBrains Mono', monospace;
+}
+header .stat { color: #666680; }
+header .stat span { color: #aaaac0; font-weight: 500; }
+
+/* --- LEFT PANEL --- */
+.controls {
+  background: #0e0e16;
+  border-right: 1px solid #1e1e30;
+  padding: 16px;
+  overflow-y: auto;
+}
+.controls::-webkit-scrollbar { width: 4px; }
+.controls::-webkit-scrollbar-track { background: transparent; }
+.controls::-webkit-scrollbar-thumb { background: #2a2a40; border-radius: 2px; }
+
+.controls h2 {
+  font-size: 10px;
+  font-weight: 600;
+  color: #55556a;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #1a1a28;
+}
+.controls .group { margin-bottom: 18px; }
+.controls label {
+  display: block;
+  font-size: 11px;
+  color: #777790;
+  margin-bottom: 4px;
+  margin-top: 8px;
+}
+.controls input[type="range"],
+.controls input[type="number"] {
+  width: 100%;
+  background: #14141e;
+  border: 1px solid #252538;
+  color: #c8c8d0;
+  padding: 5px 8px;
+  font-size: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  border-radius: 4px;
+}
+.controls input[type="range"] {
+  padding: 0;
+  cursor: pointer;
+  accent-color: #5577cc;
+}
+.controls .val {
+  font-size: 10px;
+  color: #8888a0;
+  text-align: right;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.btn {
+  display: inline-block;
+  padding: 7px 14px;
+  margin: 3px 2px;
+  background: #16162a;
+  border: 1px solid #2a2a48;
+  color: #9999b8;
+  font-size: 12px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 5px;
+}
+.btn:hover { background: #1e1e3a; border-color: #4444aa; color: #bbbbdd; transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
+.btn.active { background: #1e2e55; border-color: #4466aa; color: #aaccff; box-shadow: 0 0 12px rgba(68,102,170,0.15); }
+.btn.danger { border-color: #5a2a2a; color: #cc8888; }
+.btn.danger:hover { background: #2a1218; border-color: #cc4444; color: #ff8888; box-shadow: 0 0 12px rgba(204,68,68,0.15); }
+
+/* --- MAIN VIEW --- */
+.main-view {
+  position: relative;
+  background: #0a0a12;
+  overflow: hidden;
+  grid-row: 2 / 4;
+}
+#network-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.phase-indicator {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  padding: 6px 16px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  font-family: 'JetBrains Mono', monospace;
+  backdrop-filter: blur(8px);
+}
+.phase-random { background: rgba(80,80,120,0.25); color: #8888bb; border: 1px solid rgba(85,85,119,0.4); }
+.phase-growth { background: rgba(50,130,70,0.25); color: #66cc77; border: 1px solid rgba(51,136,68,0.4); }
+.phase-organized { background: rgba(50,90,170,0.25); color: #6699ee; border: 1px solid rgba(51,102,170,0.4); }
+.phase-punctuation { background: rgba(170,50,50,0.25); color: #ee6666; border: 1px solid rgba(170,51,51,0.4); }
+
+/* --- RIGHT PANEL --- */
+.right-panel {
+  background: #0e0e16;
+  border-left: 1px solid #1e1e30;
+  padding: 16px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  grid-row: 2 / 4;
+}
+.right-panel::-webkit-scrollbar { width: 4px; }
+.right-panel::-webkit-scrollbar-track { background: transparent; }
+.right-panel::-webkit-scrollbar-thumb { background: #2a2a40; border-radius: 2px; }
+
+.chart-box {
+  background: #0a0a12;
+  border: 1px solid #1a1a2a;
+  padding: 12px;
+  border-radius: 6px;
+}
+.chart-box h3 {
+  font-size: 10px;
+  font-weight: 600;
+  color: #55556a;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+.chart-box .chart-explanation {
+  font-size: 11px;
+  color: #666680;
+  line-height: 1.45;
+  margin-bottom: 8px;
+  font-style: italic;
+}
+.chart-box canvas { width: 100%; height: 110px; display: block; }
+
+.legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 10px; margin-top: 6px; }
+.legend-item { display: flex; align-items: center; gap: 4px; color: #777790; }
+.legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+/* --- INTRO OVERLAY --- */
+.intro-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(6,6,12,0.92);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(6px);
+  animation: fadeIn 0.4s ease;
+}
+.intro-overlay.hidden { display: none; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.intro-card {
+  background: linear-gradient(135deg, #12121e 0%, #0e0e1a 100%);
+  border: 1px solid #2a2a48;
+  border-radius: 12px;
+  padding: 48px 52px;
+  max-width: 680px;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+  animation: slideUp 0.5s ease;
+}
+@keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+.intro-card h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #e0e0f0;
+  margin-bottom: 8px;
+  letter-spacing: -0.5px;
+}
+.intro-card .subtitle {
+  font-size: 13px;
+  color: #6666aa;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 24px;
+}
+.intro-card p {
+  font-size: 15px;
+  line-height: 1.7;
+  color: #9999b0;
+  margin-bottom: 16px;
+}
+.intro-card p strong { color: #bbbbdd; font-weight: 500; }
+.intro-card .launch-btn {
+  display: inline-block;
+  margin-top: 20px;
+  padding: 12px 36px;
+  background: linear-gradient(135deg, #2244aa 0%, #3355bb 100%);
+  border: 1px solid #4466cc;
+  color: #ddeeff;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.2s;
+  letter-spacing: 0.3px;
+}
+.intro-card .launch-btn:hover {
+  background: linear-gradient(135deg, #2a55bb 0%, #4466cc 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(34,68,170,0.3);
+}
+
+/* --- NARRATIVE PANEL --- */
+.narrative-box {
+  background: linear-gradient(135deg, #10101e 0%, #0c0c18 100%);
+  border: 1px solid #1e1e38;
+  padding: 14px 16px;
+  border-radius: 8px;
+  min-height: 70px;
+}
+.narrative-box h3 {
+  font-size: 10px;
+  font-weight: 600;
+  color: #6666aa;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  margin-bottom: 8px;
+}
+#narrative-text {
+  font-size: 12px;
+  line-height: 1.6;
+  color: #8888a8;
+}
+#narrative-text strong { color: #aaaacc; font-weight: 500; }
+
+/* --- KEY INSIGHT --- */
+.key-insight {
+  background: linear-gradient(135deg, rgba(34,68,136,0.12) 0%, rgba(20,40,80,0.08) 100%);
+  border: 1px solid rgba(68,102,187,0.2);
+  border-left: 3px solid #4466bb;
+  padding: 14px 16px;
+  border-radius: 0 8px 8px 0;
+}
+.key-insight h3 {
+  font-size: 10px;
+  font-weight: 600;
+  color: #5577bb;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  margin-bottom: 6px;
+}
+.key-insight p {
+  font-size: 11px;
+  line-height: 1.6;
+  color: #7788aa;
+}
+
+/* --- PARALLELS --- */
+.parallels-box {
+  background: linear-gradient(135deg, rgba(130,80,40,0.08) 0%, rgba(80,50,20,0.05) 100%);
+  border: 1px solid rgba(170,120,60,0.15);
+  padding: 14px 16px;
+  border-radius: 8px;
+}
+.parallels-box h3 {
+  font-size: 10px;
+  font-weight: 600;
+  color: #aa8844;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  margin-bottom: 6px;
+}
+#parallels-text {
+  font-size: 11px;
+  line-height: 1.6;
+  color: #998866;
+}
+
+/* --- GEOLOGICAL TIMELINE --- */
+.geo-timeline {
+  grid-column: 1 / -1;
+  background: #0c0c14;
+  border-top: 1px solid #1e1e30;
+  padding: 0;
+  height: 52px;
+  position: relative;
+  overflow: hidden;
+}
+.geo-timeline canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* --- NOTIFICATIONS --- */
+.notification-container {
+  position: fixed;
+  top: 60px;
+  right: 380px;
+  z-index: 500;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+.notification {
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  animation: notifIn 0.35s ease, notifOut 0.4s ease 3s forwards;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  max-width: 400px;
+}
+.notification.extinction {
+  background: linear-gradient(135deg, rgba(180,40,40,0.9) 0%, rgba(140,30,30,0.85) 100%);
+  border: 1px solid #cc4444;
+  color: #ffcccc;
+}
+.notification.emergence {
+  background: linear-gradient(135deg, rgba(40,130,70,0.9) 0%, rgba(30,100,50,0.85) 100%);
+  border: 1px solid #44aa66;
+  color: #ccffdd;
+}
+.notification.milestone {
+  background: linear-gradient(135deg, rgba(50,80,160,0.9) 0%, rgba(40,60,130,0.85) 100%);
+  border: 1px solid #4477cc;
+  color: #ccddff;
+}
+@keyframes notifIn { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes notifOut { from { opacity: 1; } to { opacity: 0; transform: translateY(-10px); } }
+
+/* --- SCREEN SHAKE --- */
+@keyframes shake {
+  0%, 100% { transform: translate(0,0); }
+  10% { transform: translate(-4px, 2px); }
+  20% { transform: translate(3px, -3px); }
+  30% { transform: translate(-2px, 4px); }
+  40% { transform: translate(4px, -1px); }
+  50% { transform: translate(-3px, 3px); }
+  60% { transform: translate(2px, -4px); }
+  70% { transform: translate(-4px, 1px); }
+  80% { transform: translate(3px, 2px); }
+  90% { transform: translate(-1px, -3px); }
+}
+.shaking { animation: shake 0.4s ease; }
+
+/* --- DANGER HEATMAP TOGGLE --- */
+.heatmap-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+}
+.heatmap-toggle input[type="checkbox"] {
+  accent-color: #cc4444;
+}
+</style>
+</head>
+<body>
+
+<!-- INTRO OVERLAY -->
+<div class="intro-overlay" id="intro-overlay">
+  <div class="intro-card">
+    <div class="subtitle">Beinhocker's Origin of Wealth</div>
+    <h1>Punctuated Equilibrium</h1>
+    <p>
+      <strong>Nature doesn't evolve smoothly -- it lurches.</strong> Long periods of calm are shattered by explosive bursts of innovation and extinction.
+    </p>
+    <p>
+      The same pattern shows up in <strong>technology</strong> (decades of incremental improvement, then the iPhone), in <strong>business</strong> (stable industries disrupted overnight), and in this simulation.
+    </p>
+    <p>
+      Watch an ecosystem of species (or technologies, or companies) evolve, and see how removing one "keystone" can trigger an avalanche.
+    </p>
+    <button class="launch-btn" onclick="dismissIntro()">Launch Simulation</button>
+  </div>
+</div>
+
+<!-- NOTIFICATION CONTAINER -->
+<div class="notification-container" id="notifications"></div>
+
+<div class="container" id="main-container">
+  <header>
+    <h1>Punctuated Equilibrium</h1>
+    <div class="stats">
+      <div class="stat">Tick <span id="stat-tick">0</span></div>
+      <div class="stat">Fitness <span id="stat-fitness">0</span></div>
+      <div class="stat">Density <span id="stat-density">0</span></div>
+      <div class="stat">Diversity <span id="stat-diversity">0</span></div>
+      <div class="stat">Keystones <span id="stat-keystones">0</span></div>
+      <div class="stat">Cascades <span id="stat-cascades">0</span></div>
+    </div>
+  </header>
+
+  <div class="controls">
+    <div class="group">
+      <h2>Simulation</h2>
+      <button class="btn active" id="btn-start" onclick="toggleRun()">Start</button>
+      <button class="btn" id="btn-step" onclick="stepOnce()">Step</button>
+      <button class="btn danger" id="btn-reset" onclick="resetSim()">Reset</button>
+    </div>
+
+    <div class="group">
+      <h2>Speed</h2>
+      <input type="range" id="speed" min="1" max="100" value="20">
+      <div class="val" id="speed-val">20 ms</div>
+    </div>
+
+    <div class="group">
+      <h2>Parameters</h2>
+      <label>Species count</label>
+      <input type="number" id="param-species" value="60" min="10" max="200">
+
+      <label>Connection probability</label>
+      <input type="range" id="param-conn" min="1" max="20" value="5">
+      <div class="val" id="conn-val">0.05</div>
+
+      <label>Weight range</label>
+      <input type="range" id="param-weight" min="5" max="20" value="10">
+      <div class="val" id="weight-val">1.0</div>
+    </div>
+
+    <div class="group">
+      <h2>Actions</h2>
+      <button class="btn danger" onclick="removeRandomSpecies()">Remove Random Species</button>
+      <button class="btn danger" onclick="removeKeystoneSpecies()">Remove Keystone</button>
+      <button class="btn" onclick="runCascadeTest()">Cascade Test</button>
+    </div>
+
+    <div class="group">
+      <h2>Display</h2>
+      <label><input type="checkbox" id="show-edges" checked> Show edges</label><br>
+      <label><input type="checkbox" id="show-labels"> Show names</label><br>
+      <label><input type="checkbox" id="show-negative" checked> Show negative edges</label>
+      <div class="heatmap-toggle">
+        <label><input type="checkbox" id="show-heatmap"> Extinction danger heatmap</label>
+      </div>
+    </div>
+
+    <div class="group">
+      <h2>Legend</h2>
+      <div class="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#55aaff"></div> New</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#55cc66"></div> Growing</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#aacc44"></div> Established</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#ffaa22"></div> Keystone</div>
+      </div>
+      <div class="legend" style="margin-top: 8px;">
+        <div class="legend-item"><div class="legend-dot" style="background:#44aa55; width:16px; height:2px; border-radius:0"></div> Mutualism</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#aa4444; width:16px; height:2px; border-radius:0"></div> Competition</div>
+      </div>
+    </div>
+
+    <div class="group">
+      <div class="key-insight">
+        <h3>Key Insight</h3>
+        <p>The network self-organizes through repeating phases: random &rarr; growth &rarr; organized &rarr; CRASH &rarr; random again. The innovations that trigger growth are impossible to predict, and the keystones that anchor the organized phase are both the system's greatest strength and its greatest vulnerability. This is why Schumpeter called capitalism "creative destruction."</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-view" id="main-view">
+    <canvas id="network-canvas"></canvas>
+    <div class="phase-indicator phase-random" id="phase-badge">Random</div>
+    <!-- Particle canvas for extinction effects -->
+    <canvas id="particle-canvas" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;"></canvas>
+  </div>
+
+  <div class="right-panel">
+    <div class="narrative-box">
+      <h3>What's Happening</h3>
+      <div id="narrative-text">The ecosystem is initializing. Press <strong>Start</strong> to begin evolution.</div>
+    </div>
+
+    <div class="chart-box">
+      <h3>Fitness Over Time</h3>
+      <div class="chart-explanation">See the long flat periods? That's "stasis." Then -- bang -- a punctuation event reshuffles everything. This is Gould and Eldredge's "punctuated equilibrium."</div>
+      <canvas id="chart-fitness" height="110"></canvas>
+    </div>
+
+    <div class="chart-box">
+      <h3>Ecosystem Diversity</h3>
+      <div class="chart-explanation">High diversity = many niches occupied. Watch it crash during extinction events, then slowly rebuild as new species fill the gaps.</div>
+      <canvas id="chart-diversity" height="110"></canvas>
+    </div>
+
+    <div class="chart-box">
+      <h3>Cascade Sizes</h3>
+      <div class="chart-explanation">Each bar is an extinction cascade. Most are tiny, but occasionally a big one reshapes the whole ecosystem.</div>
+      <canvas id="chart-cascades" height="110"></canvas>
+    </div>
+
+    <div class="chart-box">
+      <h3>Cascade Distribution (log-log)</h3>
+      <div class="chart-explanation">This log-log plot should form a straight line -- a power law. That means there's no "typical" extinction size. Most are tiny, but massive ones are always possible. Same pattern as earthquakes, stock market crashes, and forest fires.</div>
+      <canvas id="chart-distribution" height="110"></canvas>
+    </div>
+
+    <div class="parallels-box">
+      <h3>Real-World Parallel</h3>
+      <div id="parallels-text">Waiting for the simulation to generate patterns...</div>
+    </div>
+  </div>
+
+  <!-- GEOLOGICAL TIMELINE -->
+  <div class="geo-timeline">
+    <canvas id="geo-canvas"></canvas>
+  </div>
+</div>
+
+<script>
+// =====================================================
+// PROCEDURAL SPECIES NAMES
+// =====================================================
+const NAME_PREFIXES = [
+  'Mega','Nano','Proto','Neo','Paleo','Crypto','Pseudo','Ultra','Hyper','Micro',
+  'Macro','Astro','Xeno','Dino','Mono','Poly','Ecto','Endo','Meta','Archi',
+  'Pyro','Cryo','Aero','Hydro','Geo','Cosmo','Bio','Chrono','Litho','Techno'
+];
+const NAME_ROOTS = [
+  'fauna','flora','plankton','raptor','morph','saurus','therium','phyte','cyte','zoon',
+  'pod','derm','soma','blast','stoma','naut','chrome','spore','gene','tron',
+  'mancer','forge','nexus','pulse','wave','spark','drift','flux','core','vex'
+];
+const NAME_SUFFIXES = [
+  'Alpha','Beta','Gamma','Delta','Epsilon','Zeta','Eta','Theta','Iota','Kappa',
+  'Lambda','Mu','Nu','Xi','Omicron','Pi','Rho','Sigma','Tau','Upsilon',
+  'Prime','Rex','Nova','Apex','Minor','Major','Ultra','Vex','Flux','Zero'
+];
+
+function generateSpeciesName(id) {
+  const pi = (id * 7 + 3) % NAME_PREFIXES.length;
+  const ri = (id * 13 + 5) % NAME_ROOTS.length;
+  const si = (id * 11 + 7) % NAME_SUFFIXES.length;
+  return NAME_PREFIXES[pi] + NAME_ROOTS[ri] + ' ' + NAME_SUFFIXES[si];
+}
+
+// =====================================================
+// REAL-WORLD PARALLELS
+// =====================================================
+const PARALLELS = {
+  punctuation: [
+    "This is like when Marconi's radio disrupted telegraphy, which cascaded into the decline of telegraph operators, wire-service monopolies, and eventually spawned TV, radar, and mobile phones.",
+    "Think of how the asteroid that killed the dinosaurs cleared the way for mammals. The 'destruction' was also the greatest 'creation' event in mammalian history.",
+    "Remember when Netflix streaming destroyed Blockbuster? That single innovation cascaded through video rental, cable TV, movie theaters, and content production -- all within a decade.",
+    "The 2008 financial crisis: one failing bank (a 'keystone') triggered a cascade that reshaped the entire financial ecosystem. Bear Stearns, Lehman, AIG -- dominoes falling.",
+    "When the iPhone launched in 2007, it didn't just disrupt phones. It killed GPS devices, point-and-shoot cameras, MP3 players, and spawned an entirely new app economy."
+  ],
+  organized: [
+    "This stable phase is like the mainframe era (1960s-80s): IBM dominated, everyone's niche was well-defined, and the ecosystem was highly interconnected but rigid.",
+    "Think of the pre-internet media landscape: newspapers, TV networks, and radio stations in a stable, organized ecosystem. Everyone had their niche. Then came the web...",
+    "Like a mature rainforest: every niche is filled, energy flows efficiently through the food web, keystone species anchor the structure. Beautiful -- but fragile.",
+    "This resembles the 'Big Three' era of American automaking. GM, Ford, and Chrysler formed a stable oligopoly for decades. Then Japanese imports arrived..."
+  ],
+  growth: [
+    "This growth phase resembles the Cambrian Explosion -- new body plans appearing faster than ever before. Or the early internet (1995-2000), when new business models were born daily.",
+    "Like Silicon Valley in the early 2010s: mobile apps, social media, cloud computing all reinforcing each other in a burst of co-evolution.",
+    "This is the 'Roaring Twenties' of the ecosystem -- rapid innovation, new species filling every available niche, interconnections multiplying."
+  ],
+  random: [
+    "Early random phase -- like the primordial soup before life organized. Or a new market before dominant players emerge. Everything is possible, nothing is certain.",
+    "Think of the early days of any technology platform: many small players, no clear winners, weak connections. The structure hasn't emerged yet."
+  ]
+};
+
+function getParallel(phase) {
+  const list = PARALLELS[phase] || PARALLELS.random;
+  return list[Math.floor(Math.random() * list.length)];
+}
+
+
+// =====================================================
+// SIMULATION ENGINE
+// =====================================================
+
+class Species {
+  constructor(id) {
+    this.id = id;
+    this.name = generateSpeciesName(id);
+    this.fitness = 0;
+    this.age = 0;
+    this.isKeystone = false;
+    this.x = 0;
+    this.y = 0;
+    this.vx = 0;
+    this.vy = 0;
+    // Visual state
+    this.targetRadius = 4;
+    this.currentRadius = 0; // animate in from 0
+    this.opacity = 0;
+    this.deathAnim = 0; // 1 = just died, decays to 0
+    this.cascadeWave = 0; // visual wave from cascade propagation
+    this.dangerScore = 0; // cached: how big a cascade if removed
+  }
+  get category() {
+    if (this.age < 5) return 'new';
+    if (this.isKeystone) return 'keystone';
+    if (this.age > 50) return 'established';
+    return 'growing';
+  }
+}
+
+class Ecosystem {
+  constructor(nSpecies = 60, connProb = 0.05, weightRange = [-1, 1]) {
+    this.nSpecies = nSpecies;
+    this.connProb = connProb;
+    this.weightRange = weightRange;
+    this.tick = 0;
+    this.species = [];
+    this.weights = [];
+    this.history = [];
+    this.cascades = [];
+    this.cascadeDist = {};
+    this.phase = 'random';
+    this.prevPhase = 'random';
+    this.recentFitness = [];
+    this.geoEvents = []; // for geological timeline
+    this.peakFitness = 0;
+    this.totalExtinctions = 0;
+    this.largestCascade = 0;
+    this.phaseStartTick = 0;
+    this.init();
+  }
+
+  init() {
+    this.species = [];
+    this.weights = [];
+    for (let i = 0; i < this.nSpecies; i++) {
+      const s = new Species(i);
+      const angle = (2 * Math.PI * i) / this.nSpecies;
+      s.x = 400 + 200 * Math.cos(angle) + (Math.random() - 0.5) * 100;
+      s.y = 300 + 200 * Math.sin(angle) + (Math.random() - 0.5) * 100;
+      this.species.push(s);
+    }
+    for (let i = 0; i < this.nSpecies; i++) {
+      this.weights[i] = new Float32Array(this.nSpecies);
+      for (let j = 0; j < this.nSpecies; j++) {
+        if (i === j) continue;
+        if (Math.random() < this.connProb) {
+          this.weights[i][j] = this.weightRange[0] + Math.random() * (this.weightRange[1] - this.weightRange[0]);
+        }
+      }
+    }
+    this.computeAllFitness();
+    this.identifyKeystones();
+  }
+
+  computeFitness(idx) {
+    let raw = 0;
+    for (let j = 0; j < this.nSpecies; j++) {
+      if (this.weights[idx][j] !== 0 && j !== idx) {
+        const sf = Math.max(this.species[j].fitness, 0.01);
+        raw += this.weights[idx][j] * sf;
+      }
+    }
+    return 1 / (1 + Math.exp(-raw));
+  }
+
+  computeAllFitness() {
+    for (let i = 0; i < this.nSpecies; i++) {
+      this.species[i].fitness = this.computeFitness(i);
+    }
+  }
+
+  identifyKeystones() {
+    const scores = new Float32Array(this.nSpecies);
+    for (let i = 0; i < this.nSpecies; i++) {
+      let outPos = 0, deps = 0;
+      for (let j = 0; j < this.nSpecies; j++) {
+        if (this.weights[j][i] > 0) {
+          outPos += this.weights[j][i] * this.species[j].fitness;
+          deps++;
+        }
+      }
+      scores[i] = outPos * this.species[i].fitness * Math.sqrt(Math.max(deps, 1));
+    }
+    const sorted = Array.from(scores).sort((a, b) => a - b);
+    const threshold = sorted[Math.floor(this.nSpecies * 0.9)];
+    for (let i = 0; i < this.nSpecies; i++) {
+      this.species[i].isKeystone = scores[i] >= threshold && threshold > 0;
+    }
+  }
+
+  replaceSpecies(idx) {
+    const oldName = this.species[idx].name;
+    const oldX = this.species[idx].x;
+    const oldY = this.species[idx].y;
+
+    // Spawn death particles
+    spawnDeathParticles(oldX, oldY, this.species[idx].isKeystone);
+
+    this.species[idx] = new Species(idx);
+    this.species[idx].name = generateSpeciesName(idx + this.tick * 7); // unique name
+    this.species[idx].x = oldX + (Math.random() - 0.5) * 40;
+    this.species[idx].y = oldY + (Math.random() - 0.5) * 40;
+    this.species[idx].currentRadius = 0; // animate in
+    this.species[idx].opacity = 0;
+
+    for (let j = 0; j < this.nSpecies; j++) {
+      this.weights[idx][j] = 0;
+      this.weights[j][idx] = 0;
+    }
+    for (let j = 0; j < this.nSpecies; j++) {
+      if (j === idx) continue;
+      if (Math.random() < this.connProb) {
+        this.weights[idx][j] = this.weightRange[0] + Math.random() * (this.weightRange[1] - this.weightRange[0]);
+      }
+      if (Math.random() < this.connProb) {
+        this.weights[j][idx] = this.weightRange[0] + Math.random() * (this.weightRange[1] - this.weightRange[0]);
+      }
+    }
+    this.computeAllFitness();
+    return oldName;
+  }
+
+  propagateCascade() {
+    let total = 0;
+    const cascadeIndices = [];
+    for (let iter = 0; iter < 20; iter++) {
+      const toRemove = [];
+      for (let i = 0; i < this.nSpecies; i++) {
+        if (this.species[i].fitness < 0.15 && this.species[i].age > 0) {
+          let inPos = 0;
+          for (let j = 0; j < this.nSpecies; j++) {
+            if (this.weights[i][j] > 0) inPos += this.weights[i][j];
+          }
+          if (inPos < 0.1) toRemove.push(i);
+        }
+      }
+      if (toRemove.length === 0) break;
+      for (const idx of toRemove) {
+        this.species[idx].cascadeWave = 1;
+        cascadeIndices.push(idx);
+        this.replaceSpecies(idx);
+        total++;
+      }
+    }
+    this.totalExtinctions += total;
+    return total;
+  }
+
+  propagateCascadeSilent() {
+    // Same as propagateCascade but without visual effects (for cascade test)
+    let total = 0;
+    for (let iter = 0; iter < 20; iter++) {
+      const toRemove = [];
+      for (let i = 0; i < this.nSpecies; i++) {
+        if (this.species[i].fitness < 0.15 && this.species[i].age > 0) {
+          let inPos = 0;
+          for (let j = 0; j < this.nSpecies; j++) {
+            if (this.weights[i][j] > 0) inPos += this.weights[i][j];
+          }
+          if (inPos < 0.1) toRemove.push(i);
+        }
+      }
+      if (toRemove.length === 0) break;
+      for (const idx of toRemove) {
+        // Silent replace - no particles
+        this.species[idx] = new Species(idx);
+        this.species[idx].x = 400 + (Math.random() - 0.5) * 300;
+        this.species[idx].y = 300 + (Math.random() - 0.5) * 300;
+        for (let j = 0; j < this.nSpecies; j++) {
+          this.weights[idx][j] = 0;
+          this.weights[j][idx] = 0;
+        }
+        for (let j = 0; j < this.nSpecies; j++) {
+          if (j === idx) continue;
+          if (Math.random() < this.connProb) {
+            this.weights[idx][j] = this.weightRange[0] + Math.random() * (this.weightRange[1] - this.weightRange[0]);
+          }
+          if (Math.random() < this.connProb) {
+            this.weights[j][idx] = this.weightRange[0] + Math.random() * (this.weightRange[1] - this.weightRange[0]);
+          }
+        }
+        this.computeAllFitness();
+        total++;
+      }
+    }
+    return total;
+  }
+
+  detectPhase() {
+    const fitnesses = this.species.map(s => s.fitness);
+    const mean = fitnesses.reduce((a, b) => a + b, 0) / fitnesses.length;
+    const std = Math.sqrt(fitnesses.reduce((a, b) => a + (b - mean) ** 2, 0) / fitnesses.length);
+
+    this.recentFitness.push(mean);
+    if (this.recentFitness.length > 50) this.recentFitness = this.recentFitness.slice(-50);
+
+    if (this.recentFitness.length < 5) return 'random';
+
+    const last = this.recentFitness[this.recentFitness.length - 1];
+    const prev = this.recentFitness[this.recentFitness.length - 2];
+    if (last < prev * 0.85) return 'punctuation';
+    if (mean > 0.6 && std < 0.15) return 'organized';
+
+    const recent10 = this.recentFitness.slice(-10);
+    const recentMean = recent10.reduce((a, b) => a + b, 0) / recent10.length;
+    if (this.recentFitness.length >= 20) {
+      const older10 = this.recentFitness.slice(-20, -10);
+      const olderMean = older10.reduce((a, b) => a + b, 0) / older10.length;
+      if (recentMean > olderMean * 1.02) return 'growth';
+    }
+    return 'random';
+  }
+
+  computeDensity() {
+    let edges = 0;
+    for (let i = 0; i < this.nSpecies; i++)
+      for (let j = 0; j < this.nSpecies; j++)
+        if (this.weights[i][j] !== 0) edges++;
+    return edges / (this.nSpecies * (this.nSpecies - 1));
+  }
+
+  computeDiversity() {
+    const bins = new Array(10).fill(0);
+    for (const s of this.species) {
+      const idx = Math.min(Math.floor(s.fitness * 10), 9);
+      bins[idx]++;
+    }
+    const total = this.nSpecies;
+    let entropy = 0;
+    for (const c of bins) {
+      if (c > 0) {
+        const p = c / total;
+        entropy -= p * Math.log(p);
+      }
+    }
+    return entropy / Math.log(10);
+  }
+
+  computeDangerScores() {
+    // Quick estimate: count positive outgoing connections weighted by fitness
+    for (let i = 0; i < this.nSpecies; i++) {
+      let score = 0;
+      for (let j = 0; j < this.nSpecies; j++) {
+        if (this.weights[j][i] > 0) {
+          score += this.weights[j][i] * this.species[j].fitness;
+        }
+      }
+      this.species[i].dangerScore = score * this.species[i].fitness;
+    }
+  }
+
+  step() {
+    this.tick++;
+    for (const s of this.species) s.age++;
+    this.identifyKeystones();
+
+    // Find least fit
+    let minF = Infinity, minIdx = 0;
+    for (let i = 0; i < this.nSpecies; i++) {
+      if (this.species[i].fitness < minF) {
+        minF = this.species[i].fitness;
+        minIdx = i;
+      }
+    }
+
+    const wasKeystone = this.species[minIdx].isKeystone;
+    const removedName = this.replaceSpecies(minIdx);
+
+    let cascadeSize = this.propagateCascade();
+
+    this.prevPhase = this.phase;
+    this.phase = this.detectPhase();
+
+    if (this.phase !== this.prevPhase) {
+      this.phaseStartTick = this.tick;
+    }
+
+    // Record cascade
+    if (cascadeSize > 0) {
+      this.cascades.push({ tick: this.tick, size: cascadeSize });
+      this.cascadeDist[cascadeSize] = (this.cascadeDist[cascadeSize] || 0) + 1;
+      if (cascadeSize > this.largestCascade) this.largestCascade = cascadeSize;
+    }
+
+    // Record geo event
+    this.geoEvents.push({ tick: this.tick, phase: this.phase, cascade: cascadeSize });
+
+    // Compute danger scores periodically
+    if (this.tick % 10 === 0) {
+      this.computeDangerScores();
+    }
+
+    const fitnesses = this.species.map(s => s.fitness);
+    const mean = fitnesses.reduce((a, b) => a + b, 0) / fitnesses.length;
+    if (mean > this.peakFitness) this.peakFitness = mean;
+
+    this.history.push({
+      tick: this.tick,
+      meanFitness: mean,
+      diversity: this.computeDiversity(),
+      density: this.computeDensity(),
+      cascadeSize,
+      phase: this.phase,
+      keystones: this.species.filter(s => s.isKeystone).length,
+    });
+
+    // Trigger notifications
+    const pct = Math.round((cascadeSize / this.nSpecies) * 100);
+    if (cascadeSize >= this.nSpecies * 0.2) {
+      showNotification(`Mass Extinction! ${pct}% of species wiped out!`, 'extinction');
+      triggerScreenShake(0.6);
+      triggerFlash(0.5);
+    } else if (cascadeSize >= this.nSpecies * 0.1) {
+      showNotification(`Major cascade: ${cascadeSize} species replaced`, 'extinction');
+      triggerScreenShake(0.3);
+      triggerFlash(0.25);
+    }
+
+    if (this.phase !== this.prevPhase) {
+      if (this.phase === 'organized') {
+        showNotification('Ecosystem reached organized stability', 'milestone');
+      } else if (this.phase === 'growth') {
+        showNotification('Growth phase: rapid co-evolution underway', 'emergence');
+      } else if (this.phase === 'punctuation') {
+        showNotification('Punctuation event! Ecosystem destabilized', 'extinction');
+      }
+    }
+
+    // Dominant species notification (rare)
+    if (this.tick % 100 === 0) {
+      let maxF = 0, maxS = null;
+      for (const s of this.species) {
+        if (s.fitness > maxF) { maxF = s.fitness; maxS = s; }
+      }
+      if (maxS && maxF > 0.8) {
+        showNotification(`Dominant species: ${maxS.name} (fitness ${maxF.toFixed(2)})`, 'emergence');
+      }
+    }
+
+    return cascadeSize;
+  }
+
+  removeSpeciesManual(idx) {
+    this.replaceSpecies(idx);
+    return 1 + this.propagateCascade();
+  }
+}
+
+
+// =====================================================
+// PARTICLE SYSTEM
+// =====================================================
+
+const particles = [];
+const particleCanvas = document.getElementById('particle-canvas');
+const pctx = particleCanvas.getContext('2d');
+
+function resizeParticleCanvas() {
+  const rect = particleCanvas.parentElement.getBoundingClientRect();
+  particleCanvas.width = rect.width * devicePixelRatio;
+  particleCanvas.height = rect.height * devicePixelRatio;
+  particleCanvas.style.width = rect.width + 'px';
+  particleCanvas.style.height = rect.height + 'px';
+  pctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+}
+
+function spawnDeathParticles(x, y, isKeystone) {
+  const count = isKeystone ? 30 : 12;
+  const baseColor = isKeystone ? [255, 170, 34] : [200, 80, 80];
+  for (let i = 0; i < count; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const speed = 1 + Math.random() * (isKeystone ? 5 : 3);
+    particles.push({
+      x, y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      life: 1,
+      decay: 0.015 + Math.random() * 0.02,
+      size: 1.5 + Math.random() * (isKeystone ? 3 : 2),
+      color: baseColor,
+    });
+  }
+}
+
+function spawnBirthParticles(x, y) {
+  for (let i = 0; i < 6; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const speed = 0.5 + Math.random() * 1.5;
+    particles.push({
+      x, y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      life: 1,
+      decay: 0.03 + Math.random() * 0.02,
+      size: 1 + Math.random() * 1.5,
+      color: [85, 170, 255],
+    });
+  }
+}
+
+function updateParticles() {
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
+    p.x += p.vx;
+    p.y += p.vy;
+    p.vx *= 0.97;
+    p.vy *= 0.97;
+    p.life -= p.decay;
+    if (p.life <= 0) {
+      particles.splice(i, 1);
+    }
+  }
+}
+
+function renderParticles() {
+  const rect = particleCanvas.parentElement.getBoundingClientRect();
+  pctx.clearRect(0, 0, rect.width, rect.height);
+  for (const p of particles) {
+    const [r, g, b] = p.color;
+    pctx.globalAlpha = p.life;
+    pctx.fillStyle = `rgb(${r},${g},${b})`;
+    pctx.beginPath();
+    pctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
+    pctx.fill();
+
+    // Glow
+    pctx.beginPath();
+    pctx.arc(p.x, p.y, p.size * p.life * 2.5, 0, Math.PI * 2);
+    pctx.fillStyle = `rgba(${r},${g},${b},${p.life * 0.15})`;
+    pctx.fill();
+  }
+  pctx.globalAlpha = 1;
+}
+
+
+// =====================================================
+// SCREEN EFFECTS
+// =====================================================
+
+let flashAlpha = 0;
+let shakeIntensity = 0;
+
+function triggerFlash(intensity) {
+  flashAlpha = Math.max(flashAlpha, intensity);
+}
+
+function triggerScreenShake(intensity) {
+  shakeIntensity = Math.max(shakeIntensity, intensity);
+  const container = document.getElementById('main-view');
+  container.classList.add('shaking');
+  setTimeout(() => container.classList.remove('shaking'), 400);
+}
+
+
+// =====================================================
+// NOTIFICATIONS
+// =====================================================
+
+function showNotification(text, type) {
+  const container = document.getElementById('notifications');
+  const el = document.createElement('div');
+  el.className = 'notification ' + type;
+  el.textContent = text;
+  container.appendChild(el);
+  setTimeout(() => {
+    if (el.parentNode) el.parentNode.removeChild(el);
+  }, 3500);
+}
+
+
+// =====================================================
+// VISUALIZATION
+// =====================================================
+
+let eco = null;
+let running = false;
+let animId = null;
+let speed = 20;
+let keystoneGlowPhase = 0;
+let lastParallelPhase = '';
+let lastParallelTick = 0;
+
+const canvas = document.getElementById('network-canvas');
+const ctx = canvas.getContext('2d');
+
+function resizeCanvas() {
+  const rect = canvas.parentElement.getBoundingClientRect();
+  canvas.width = rect.width * devicePixelRatio;
+  canvas.height = rect.height * devicePixelRatio;
+  canvas.style.width = rect.width + 'px';
+  canvas.style.height = rect.height + 'px';
+  ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+  resizeParticleCanvas();
+}
+window.addEventListener('resize', resizeCanvas);
+
+function dismissIntro() {
+  document.getElementById('intro-overlay').classList.add('hidden');
+}
+
+function initSim() {
+  const n = parseInt(document.getElementById('param-species').value) || 60;
+  const cp = parseInt(document.getElementById('param-conn').value) / 100;
+  const wr = parseInt(document.getElementById('param-weight').value) / 10;
+  eco = new Ecosystem(n, cp, [-wr, wr]);
+  const rect = canvas.parentElement.getBoundingClientRect();
+  const cx = rect.width / 2, cy = rect.height / 2;
+  for (let i = 0; i < eco.nSpecies; i++) {
+    const angle = (2 * Math.PI * i) / eco.nSpecies;
+    const r = Math.min(cx, cy) * 0.6;
+    eco.species[i].x = cx + r * Math.cos(angle) + (Math.random() - 0.5) * 60;
+    eco.species[i].y = cy + r * Math.sin(angle) + (Math.random() - 0.5) * 60;
+    eco.species[i].currentRadius = 4;
+    eco.species[i].opacity = 1;
+  }
+  eco.computeDangerScores();
+}
+
+function resetSim() {
+  running = false;
+  if (animId) cancelAnimationFrame(animId);
+  animId = null;
+  document.getElementById('btn-start').textContent = 'Start';
+  document.getElementById('btn-start').classList.add('active');
+  particles.length = 0;
+  initSim();
+  render();
+  updateStats();
+  updateNarrative();
+}
+
+function toggleRun() {
+  running = !running;
+  const btn = document.getElementById('btn-start');
+  btn.textContent = running ? 'Pause' : 'Start';
+  btn.classList.toggle('active', !running);
+  if (running) tick();
+}
+
+function stepOnce() {
+  if (!eco) initSim();
+  eco.step();
+  applyForces();
+  render();
+  updateStats();
+  updateCharts();
+  updateNarrative();
+  updateGeoTimeline();
+}
+
+let lastStepTime = 0;
+function tick() {
+  if (!running) return;
+  const now = performance.now();
+  const delay = 101 - speed;
+  if (now - lastStepTime >= delay) {
+    eco.step();
+    applyForces();
+    updateStats();
+    if (eco.tick % 5 === 0) {
+      updateCharts();
+      updateGeoTimeline();
+    }
+    if (eco.tick % 3 === 0) updateNarrative();
+    lastStepTime = now;
+  }
+
+  // Always render (smooth animation)
+  updateParticles();
+  keystoneGlowPhase += 0.05;
+  // Animate species opacity/radius
+  for (const s of eco.species) {
+    s.opacity = Math.min(1, s.opacity + 0.05);
+    s.targetRadius = 3 + s.fitness * 8;
+    s.currentRadius += (s.targetRadius - s.currentRadius) * 0.15;
+  }
+  // Decay flash
+  if (flashAlpha > 0) flashAlpha *= 0.9;
+  if (flashAlpha < 0.01) flashAlpha = 0;
+
+  render();
+  renderParticles();
+
+  animId = requestAnimationFrame(tick);
+}
+
+function applyForces() {
+  if (!eco) return;
+  const rect = canvas.parentElement.getBoundingClientRect();
+  const w = rect.width, h = rect.height;
+  const n = eco.nSpecies;
+  const k = Math.sqrt((w * h) / n) * 0.8;
+
+  for (let i = 0; i < n; i++) {
+    eco.species[i].vx = 0;
+    eco.species[i].vy = 0;
+  }
+
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      let dx = eco.species[i].x - eco.species[j].x;
+      let dy = eco.species[i].y - eco.species[j].y;
+      let dist = Math.sqrt(dx * dx + dy * dy) || 1;
+      let force = (k * k) / dist * 0.3;
+      let fx = (dx / dist) * force;
+      let fy = (dy / dist) * force;
+      eco.species[i].vx += fx;
+      eco.species[i].vy += fy;
+      eco.species[j].vx -= fx;
+      eco.species[j].vy -= fy;
+    }
+  }
+
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < n; j++) {
+      if (eco.weights[i][j] !== 0) {
+        let dx = eco.species[j].x - eco.species[i].x;
+        let dy = eco.species[j].y - eco.species[i].y;
+        let dist = Math.sqrt(dx * dx + dy * dy) || 1;
+        let force = (dist / k) * Math.abs(eco.weights[i][j]) * 0.5;
+        let fx = (dx / dist) * force;
+        let fy = (dy / dist) * force;
+        eco.species[i].vx += fx;
+        eco.species[i].vy += fy;
+        eco.species[j].vx -= fx * 0.5;
+        eco.species[j].vy -= fy * 0.5;
+      }
+    }
+  }
+
+  const cx = w / 2, cy = h / 2;
+  for (let i = 0; i < n; i++) {
+    let dx = cx - eco.species[i].x;
+    let dy = cy - eco.species[i].y;
+    eco.species[i].vx += dx * 0.002;
+    eco.species[i].vy += dy * 0.002;
+  }
+
+  const damping = 0.3;
+  for (let i = 0; i < n; i++) {
+    eco.species[i].x += eco.species[i].vx * damping;
+    eco.species[i].y += eco.species[i].vy * damping;
+    eco.species[i].x = Math.max(20, Math.min(w - 20, eco.species[i].x));
+    eco.species[i].y = Math.max(20, Math.min(h - 20, eco.species[i].y));
+  }
+}
+
+const categoryColors = {
+  new: '#55aaff',
+  growing: '#55cc66',
+  established: '#aacc44',
+  keystone: '#ffaa22',
+};
+
+function render() {
+  if (!eco) return;
+  const rect = canvas.parentElement.getBoundingClientRect();
+  const w = rect.width, h = rect.height;
+  ctx.clearRect(0, 0, w, h);
+
+  const showEdges = document.getElementById('show-edges').checked;
+  const showLabels = document.getElementById('show-labels').checked;
+  const showNeg = document.getElementById('show-negative').checked;
+  const showHeatmap = document.getElementById('show-heatmap').checked;
+
+  // Draw edges
+  if (showEdges) {
+    for (let i = 0; i < eco.nSpecies; i++) {
+      for (let j = 0; j < eco.nSpecies; j++) {
+        const wt = eco.weights[i][j];
+        if (wt === 0) continue;
+        if (wt < 0 && !showNeg) continue;
+
+        const si = eco.species[j];
+        const ti = eco.species[i];
+
+        const alpha = Math.min(Math.abs(wt) * 0.35, 0.4) * si.opacity * ti.opacity;
+        ctx.strokeStyle = wt > 0
+          ? `rgba(68, 170, 85, ${alpha})`
+          : `rgba(170, 68, 68, ${alpha})`;
+        ctx.lineWidth = Math.abs(wt) * 1.5;
+        ctx.beginPath();
+        ctx.moveTo(si.x, si.y);
+        ctx.lineTo(ti.x, ti.y);
+        ctx.stroke();
+
+        // Arrow head
+        const angle = Math.atan2(ti.y - si.y, ti.x - si.x);
+        const nodeR = ti.currentRadius;
+        const ax = ti.x - Math.cos(angle) * (nodeR + 3);
+        const ay = ti.y - Math.sin(angle) * (nodeR + 3);
+        ctx.fillStyle = ctx.strokeStyle;
+        ctx.beginPath();
+        ctx.moveTo(ax, ay);
+        ctx.lineTo(ax - 5 * Math.cos(angle - 0.4), ay - 5 * Math.sin(angle - 0.4));
+        ctx.lineTo(ax - 5 * Math.cos(angle + 0.4), ay - 5 * Math.sin(angle + 0.4));
+        ctx.closePath();
+        ctx.fill();
+      }
+    }
+  }
+
+  // Danger heatmap overlay
+  if (showHeatmap) {
+    let maxDanger = 0;
+    for (const s of eco.species) {
+      if (s.dangerScore > maxDanger) maxDanger = s.dangerScore;
+    }
+    if (maxDanger > 0) {
+      for (const s of eco.species) {
+        const danger = s.dangerScore / maxDanger;
+        if (danger > 0.1) {
+          const radius = 20 + danger * 40;
+          const gradient = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, radius);
+          gradient.addColorStop(0, `rgba(255, 40, 40, ${danger * 0.25})`);
+          gradient.addColorStop(0.5, `rgba(255, 80, 20, ${danger * 0.1})`);
+          gradient.addColorStop(1, 'rgba(255, 80, 20, 0)');
+          ctx.fillStyle = gradient;
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, radius, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+    }
+  }
+
+  // Draw nodes
+  for (const s of eco.species) {
+    const r = s.currentRadius;
+    const color = categoryColors[s.category] || '#888';
+
+    ctx.globalAlpha = s.opacity;
+
+    // Keystone pulsing glow
+    if (s.isKeystone) {
+      const pulse = 0.5 + 0.5 * Math.sin(keystoneGlowPhase + s.id * 0.5);
+      const glowR = r + 8 + pulse * 6;
+
+      // Outer glow
+      const gradient = ctx.createRadialGradient(s.x, s.y, r, s.x, s.y, glowR);
+      gradient.addColorStop(0, `rgba(255, 170, 34, ${0.15 + pulse * 0.1})`);
+      gradient.addColorStop(1, 'rgba(255, 170, 34, 0)');
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, glowR, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Pulsing ring
+      ctx.strokeStyle = `rgba(255, 200, 80, ${0.2 + pulse * 0.15})`;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, r + 4 + pulse * 3, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+
+    // Node body
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+    ctx.lineWidth = 0.5;
+    ctx.stroke();
+
+    // Inner highlight
+    if (r > 3) {
+      const innerGrad = ctx.createRadialGradient(s.x - r * 0.3, s.y - r * 0.3, 0, s.x, s.y, r);
+      innerGrad.addColorStop(0, 'rgba(255,255,255,0.15)');
+      innerGrad.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.fillStyle = innerGrad;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Labels (species names)
+    if (showLabels) {
+      ctx.fillStyle = `rgba(160,160,180,${s.opacity * 0.8})`;
+      ctx.font = '9px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      const label = s.name.length > 16 ? s.name.substring(0, 14) + '..' : s.name;
+      ctx.fillText(label, s.x, s.y - r - 4);
+    }
+
+    ctx.globalAlpha = 1;
+  }
+
+  // Flash overlay
+  if (flashAlpha > 0.01) {
+    ctx.fillStyle = `rgba(255, 100, 80, ${flashAlpha * 0.3})`;
+    ctx.fillRect(0, 0, w, h);
+  }
+}
+
+
+// =====================================================
+// NARRATIVE
+// =====================================================
+
+function updateNarrative() {
+  if (!eco) return;
+  const el = document.getElementById('narrative-text');
+
+  const keystones = eco.species.filter(s => s.isKeystone);
+  const keystoneCount = keystones.length;
+  let maxFit = 0, maxSpecies = null;
+  let maxDanger = 0, dangerSpecies = null;
+  for (const s of eco.species) {
+    if (s.fitness > maxFit) { maxFit = s.fitness; maxSpecies = s; }
+    if (s.dangerScore > maxDanger) { maxDanger = s.dangerScore; dangerSpecies = s; }
+  }
+
+  // Count connections for danger species
+  let dangerConnections = 0;
+  if (dangerSpecies) {
+    for (let j = 0; j < eco.nSpecies; j++) {
+      if (eco.weights[j][dangerSpecies.id] > 0) dangerConnections++;
+    }
+  }
+  const dangerPct = dangerSpecies ? Math.round((dangerConnections / eco.nSpecies) * 100) : 0;
+
+  let text = '';
+
+  switch (eco.phase) {
+    case 'organized':
+      text = `The ecosystem is in a <strong>stable organized phase</strong>. ` +
+        `${keystoneCount} keystone species anchor the web. `;
+      if (dangerSpecies && dangerPct > 15) {
+        text += `If <strong>${dangerSpecies.name}</strong> goes extinct, watch out -- it's connected to ${dangerPct}% of the ecosystem. `;
+      }
+      if (maxSpecies) {
+        text += `<strong>${maxSpecies.name}</strong> dominates with fitness ${maxFit.toFixed(2)}.`;
+      }
+      break;
+
+    case 'growth':
+      text = `<strong>Rapid co-evolution</strong> is underway. New connections are forming, fitness is climbing. `;
+      if (maxSpecies) {
+        text += `<strong>${maxSpecies.name}</strong> leads the charge (fitness ${maxFit.toFixed(2)}). `;
+      }
+      text += `${keystoneCount} keystones are emerging.`;
+      break;
+
+    case 'punctuation':
+      text = `<strong>Punctuation event!</strong> The ecosystem is being reshuffled. `;
+      text += `${eco.totalExtinctions} total extinctions so far. `;
+      if (eco.largestCascade > 0) {
+        text += `Largest cascade: ${eco.largestCascade} species.`;
+      }
+      break;
+
+    default: // random
+      text = `The ecosystem is in a <strong>disordered phase</strong> -- no clear structure yet. `;
+      text += `Species are competing and cooperating randomly. `;
+      if (keystoneCount > 0) {
+        text += `${keystoneCount} proto-keystones are beginning to emerge.`;
+      } else {
+        text += `No keystones have formed yet.`;
+      }
+  }
+
+  el.innerHTML = text;
+
+  // Update parallels (not every tick)
+  if (eco.phase !== lastParallelPhase || eco.tick - lastParallelTick > 80) {
+    lastParallelPhase = eco.phase;
+    lastParallelTick = eco.tick;
+    document.getElementById('parallels-text').textContent = getParallel(eco.phase);
+  }
+}
+
+
+// =====================================================
+// STATS
+// =====================================================
+
+function updateStats() {
+  if (!eco) return;
+  const fitnesses = eco.species.map(s => s.fitness);
+  const mean = fitnesses.reduce((a, b) => a + b, 0) / fitnesses.length;
+  document.getElementById('stat-tick').textContent = eco.tick;
+  document.getElementById('stat-fitness').textContent = mean.toFixed(3);
+  document.getElementById('stat-density').textContent = eco.computeDensity().toFixed(3);
+  document.getElementById('stat-diversity').textContent = eco.computeDiversity().toFixed(3);
+  document.getElementById('stat-keystones').textContent = eco.species.filter(s => s.isKeystone).length;
+  document.getElementById('stat-cascades').textContent = eco.cascades.length;
+
+  const badge = document.getElementById('phase-badge');
+  badge.textContent = eco.phase;
+  badge.className = 'phase-indicator phase-' + eco.phase;
+}
+
+
+// =====================================================
+// CHARTS
+// =====================================================
+
+function drawLineChart(canvasId, data, color, yMin = 0, yMax = 1) {
+  const cv = document.getElementById(canvasId);
+  const cctx = cv.getContext('2d');
+  const rect = cv.parentElement.getBoundingClientRect();
+  cv.width = (rect.width - 24) * devicePixelRatio;
+  cv.height = 110 * devicePixelRatio;
+  cv.style.width = (rect.width - 24) + 'px';
+  cv.style.height = '110px';
+  cctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+
+  const w = rect.width - 24, h = 110;
+  cctx.clearRect(0, 0, w, h);
+
+  // Grid
+  cctx.strokeStyle = 'rgba(255,255,255,0.04)';
+  cctx.lineWidth = 0.5;
+  for (let y = 0; y < h; y += 28) {
+    cctx.beginPath(); cctx.moveTo(0, y); cctx.lineTo(w, y); cctx.stroke();
+  }
+
+  if (data.length < 2) return;
+
+  const d = data.length > 300 ? data.slice(-300) : data;
+  const xStep = w / (d.length - 1);
+
+  // Fill gradient under line
+  cctx.beginPath();
+  for (let i = 0; i < d.length; i++) {
+    const x = i * xStep;
+    const y = h - ((d[i] - yMin) / (yMax - yMin)) * h;
+    if (i === 0) cctx.moveTo(x, y);
+    else cctx.lineTo(x, y);
+  }
+  cctx.lineTo((d.length - 1) * xStep, h);
+  cctx.lineTo(0, h);
+  cctx.closePath();
+  const grad = cctx.createLinearGradient(0, 0, 0, h);
+  grad.addColorStop(0, color.replace(')', ',0.12)').replace('rgb', 'rgba'));
+  grad.addColorStop(1, 'rgba(0,0,0,0)');
+  cctx.fillStyle = grad;
+  cctx.fill();
+
+  // Line
+  cctx.strokeStyle = color;
+  cctx.lineWidth = 1.5;
+  cctx.beginPath();
+  for (let i = 0; i < d.length; i++) {
+    const x = i * xStep;
+    const y = h - ((d[i] - yMin) / (yMax - yMin)) * h;
+    if (i === 0) cctx.moveTo(x, y);
+    else cctx.lineTo(x, y);
+  }
+  cctx.stroke();
+}
+
+function drawBarChart(canvasId, data, color) {
+  const cv = document.getElementById(canvasId);
+  const cctx = cv.getContext('2d');
+  const rect = cv.parentElement.getBoundingClientRect();
+  cv.width = (rect.width - 24) * devicePixelRatio;
+  cv.height = 110 * devicePixelRatio;
+  cv.style.width = (rect.width - 24) + 'px';
+  cv.style.height = '110px';
+  cctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+
+  const w = rect.width - 24, h = 110;
+  cctx.clearRect(0, 0, w, h);
+
+  if (data.length === 0) return;
+
+  const d = data.length > 100 ? data.slice(-100) : data;
+  const maxVal = Math.max(...d.map(v => v.value), 1);
+  const barW = Math.max(w / d.length - 1, 1);
+
+  for (let i = 0; i < d.length; i++) {
+    const barH = (d[i].value / maxVal) * (h - 10);
+    const x = i * (w / d.length);
+    const y = h - barH;
+    const isBig = d[i].value > 3;
+    cctx.fillStyle = isBig ? '#cc4444' : color;
+    cctx.fillRect(x, y, barW, barH);
+    if (isBig) {
+      // Glow for large cascades
+      cctx.fillStyle = `rgba(204, 68, 68, 0.2)`;
+      cctx.fillRect(x - 1, y - 2, barW + 2, barH + 4);
+    }
+  }
+}
+
+function drawLogLogChart(canvasId, dist) {
+  const cv = document.getElementById(canvasId);
+  const cctx = cv.getContext('2d');
+  const rect = cv.parentElement.getBoundingClientRect();
+  cv.width = (rect.width - 24) * devicePixelRatio;
+  cv.height = 110 * devicePixelRatio;
+  cv.style.width = (rect.width - 24) + 'px';
+  cv.style.height = '110px';
+  cctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+
+  const w = rect.width - 24, h = 110;
+  cctx.clearRect(0, 0, w, h);
+
+  const entries = Object.entries(dist).map(([s, c]) => [parseInt(s), c]).filter(([s]) => s > 0);
+  if (entries.length < 2) return;
+
+  // Grid
+  cctx.strokeStyle = 'rgba(255,255,255,0.04)';
+  cctx.lineWidth = 0.5;
+  for (let y = 0; y < h; y += 28) {
+    cctx.beginPath(); cctx.moveTo(0, y); cctx.lineTo(w, y); cctx.stroke();
+  }
+
+  const logData = entries.map(([s, c]) => [Math.log10(s), Math.log10(c)]);
+  const xMin = Math.min(...logData.map(d => d[0]));
+  const xMax = Math.max(...logData.map(d => d[0]));
+  const yMin = Math.min(...logData.map(d => d[1]));
+  const yMax = Math.max(...logData.map(d => d[1]));
+  const xRange = xMax - xMin || 1;
+  const yRange = yMax - yMin || 1;
+
+  // Points
+  cctx.fillStyle = '#88aaff';
+  for (const [lx, ly] of logData) {
+    const x = ((lx - xMin) / xRange) * (w - 20) + 10;
+    const y = h - ((ly - yMin) / yRange) * (h - 20) - 10;
+    // Glow
+    cctx.beginPath();
+    cctx.arc(x, y, 6, 0, Math.PI * 2);
+    cctx.fillStyle = 'rgba(136, 170, 255, 0.1)';
+    cctx.fill();
+    // Point
+    cctx.beginPath();
+    cctx.arc(x, y, 3, 0, Math.PI * 2);
+    cctx.fillStyle = '#88aaff';
+    cctx.fill();
+  }
+
+  // Fit line
+  if (logData.length >= 3) {
+    const n = logData.length;
+    let sumX = 0, sumY = 0, sumXY = 0, sumXX = 0;
+    for (const [x, y] of logData) {
+      sumX += x; sumY += y; sumXY += x * y; sumXX += x * x;
+    }
+    const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
+    const intercept = (sumY - slope * sumX) / n;
+
+    cctx.strokeStyle = 'rgba(136, 170, 255, 0.35)';
+    cctx.lineWidth = 1;
+    cctx.setLineDash([4, 4]);
+    cctx.beginPath();
+    const lx1 = xMin, lx2 = xMax;
+    const ly1 = slope * lx1 + intercept;
+    const ly2 = slope * lx2 + intercept;
+    const x1 = ((lx1 - xMin) / xRange) * (w - 20) + 10;
+    const y1 = h - ((ly1 - yMin) / yRange) * (h - 20) - 10;
+    const x2 = ((lx2 - xMin) / xRange) * (w - 20) + 10;
+    const y2 = h - ((ly2 - yMin) / yRange) * (h - 20) - 10;
+    cctx.moveTo(x1, y1);
+    cctx.lineTo(x2, y2);
+    cctx.stroke();
+    cctx.setLineDash([]);
+
+    cctx.fillStyle = '#5577aa';
+    cctx.font = '10px JetBrains Mono, monospace';
+    cctx.fillText(`slope: ${slope.toFixed(2)}`, w - 90, 14);
+  }
+}
+
+function updateCharts() {
+  if (!eco || eco.history.length === 0) return;
+
+  drawLineChart('chart-fitness',
+    eco.history.map(h => h.meanFitness),
+    '#6699ee', 0.3, 0.7);
+
+  drawLineChart('chart-diversity',
+    eco.history.map(h => h.diversity),
+    '#55bb88', 0, 1);
+
+  drawBarChart('chart-cascades',
+    eco.history.map(h => ({ value: h.cascadeSize })),
+    '#aa6644');
+
+  drawLogLogChart('chart-distribution', eco.cascadeDist);
+}
+
+
+// =====================================================
+// GEOLOGICAL TIMELINE
+// =====================================================
+
+function updateGeoTimeline() {
+  if (!eco || eco.geoEvents.length === 0) return;
+
+  const cv = document.getElementById('geo-canvas');
+  const gctx = cv.getContext('2d');
+  const rect = cv.parentElement.getBoundingClientRect();
+  cv.width = rect.width * devicePixelRatio;
+  cv.height = 52 * devicePixelRatio;
+  cv.style.width = rect.width + 'px';
+  cv.style.height = '52px';
+  gctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+
+  const w = rect.width, h = 52;
+  gctx.clearRect(0, 0, w, h);
+
+  // Background
+  gctx.fillStyle = '#0a0a12';
+  gctx.fillRect(0, 0, w, h);
+
+  // Title
+  gctx.fillStyle = '#444460';
+  gctx.font = '9px JetBrains Mono, monospace';
+  gctx.fillText('GEOLOGICAL TIMELINE', 10, 12);
+
+  const events = eco.geoEvents;
+  const maxTick = eco.tick;
+  const startTick = Math.max(0, maxTick - 500);
+
+  const phaseColors = {
+    random: '#33334a',
+    growth: '#1a3a22',
+    organized: '#1a2a44',
+    punctuation: '#3a1a1a',
+  };
+
+  // Draw phase bands
+  const barY = 18;
+  const barH = 20;
+  let prevPhase = null;
+  let bandStart = 0;
+
+  for (let i = 0; i < events.length; i++) {
+    const e = events[i];
+    if (e.tick < startTick) continue;
+    const x = ((e.tick - startTick) / Math.max(maxTick - startTick, 1)) * w;
+
+    if (e.phase !== prevPhase && prevPhase !== null) {
+      gctx.fillStyle = phaseColors[prevPhase] || '#222';
+      gctx.fillRect(bandStart, barY, x - bandStart, barH);
+      bandStart = x;
+    }
+    if (prevPhase === null) bandStart = x;
+    prevPhase = e.phase;
+  }
+  // Final band
+  if (prevPhase) {
+    gctx.fillStyle = phaseColors[prevPhase] || '#222';
+    gctx.fillRect(bandStart, barY, w - bandStart, barH);
+  }
+
+  // Draw cascade spikes
+  let maxCascade = 1;
+  for (const e of events) {
+    if (e.cascade > maxCascade) maxCascade = e.cascade;
+  }
+
+  for (const e of events) {
+    if (e.tick < startTick || e.cascade === 0) continue;
+    const x = ((e.tick - startTick) / Math.max(maxTick - startTick, 1)) * w;
+    const spikeH = (e.cascade / maxCascade) * 12;
+    const alpha = Math.min(e.cascade / 3, 1);
+
+    gctx.fillStyle = `rgba(204, 68, 68, ${0.3 + alpha * 0.5})`;
+    gctx.fillRect(x - 0.5, barY + barH - spikeH, 2, spikeH);
+
+    // Glow for big cascades
+    if (e.cascade >= 3) {
+      gctx.fillStyle = `rgba(255, 80, 60, 0.15)`;
+      gctx.fillRect(x - 3, barY, 7, barH);
+    }
+  }
+
+  // Border
+  gctx.strokeStyle = '#1e1e30';
+  gctx.lineWidth = 1;
+  gctx.strokeRect(0, barY, w, barH);
+
+  // Tick markers
+  gctx.fillStyle = '#333350';
+  gctx.font = '8px JetBrains Mono, monospace';
+  const tickSpan = maxTick - startTick;
+  const tickInterval = tickSpan > 200 ? 100 : tickSpan > 50 ? 25 : 10;
+  for (let t = Math.ceil(startTick / tickInterval) * tickInterval; t <= maxTick; t += tickInterval) {
+    const x = ((t - startTick) / Math.max(tickSpan, 1)) * w;
+    gctx.fillText(t, x, h - 2);
+    gctx.fillStyle = 'rgba(50,50,80,0.3)';
+    gctx.fillRect(x, barY + barH, 1, 4);
+    gctx.fillStyle = '#333350';
+  }
+
+  // Phase legend
+  const legendX = w - 280;
+  const phases = [
+    { name: 'Calm', color: phaseColors.random },
+    { name: 'Growth', color: phaseColors.growth },
+    { name: 'Organized', color: phaseColors.organized },
+    { name: 'Extinction', color: phaseColors.punctuation },
+  ];
+  for (let i = 0; i < phases.length; i++) {
+    const px = legendX + i * 70;
+    gctx.fillStyle = phases[i].color;
+    gctx.fillRect(px, 4, 10, 8);
+    gctx.strokeStyle = '#444460';
+    gctx.lineWidth = 0.5;
+    gctx.strokeRect(px, 4, 10, 8);
+    gctx.fillStyle = '#555570';
+    gctx.font = '8px Inter, sans-serif';
+    gctx.fillText(phases[i].name, px + 13, 12);
+  }
+}
+
+
+// =====================================================
+// ACTIONS
+// =====================================================
+
+function removeRandomSpecies() {
+  if (!eco) return;
+  const idx = Math.floor(Math.random() * eco.nSpecies);
+  const name = eco.species[idx].name;
+  const cascade = eco.removeSpeciesManual(idx);
+  eco.phase = eco.detectPhase();
+  if (cascade > 0) {
+    eco.cascades.push({ tick: eco.tick, size: cascade });
+    eco.cascadeDist[cascade] = (eco.cascadeDist[cascade] || 0) + 1;
+    eco.geoEvents.push({ tick: eco.tick, phase: eco.phase, cascade });
+    const pct = Math.round((cascade / eco.nSpecies) * 100);
+    if (cascade >= eco.nSpecies * 0.15) {
+      showNotification(`${name} removed -- ${pct}% cascade!`, 'extinction');
+      triggerScreenShake(0.4);
+      triggerFlash(0.3);
+    } else {
+      showNotification(`${name} removed -- ${cascade} species affected`, cascade > 2 ? 'extinction' : 'milestone');
+    }
+  }
+  render();
+  updateStats();
+  updateCharts();
+  updateNarrative();
+  updateGeoTimeline();
+}
+
+function removeKeystoneSpecies() {
+  if (!eco) return;
+  const keystones = eco.species.filter(s => s.isKeystone);
+  if (keystones.length === 0) {
+    showNotification('No keystone species identified yet', 'milestone');
+    return;
+  }
+  const ks = keystones[Math.floor(Math.random() * keystones.length)];
+  const name = ks.name;
+  const cascade = eco.removeSpeciesManual(ks.id);
+  eco.phase = eco.detectPhase();
+  if (cascade > 0) {
+    eco.cascades.push({ tick: eco.tick, size: cascade });
+    eco.cascadeDist[cascade] = (eco.cascadeDist[cascade] || 0) + 1;
+    eco.geoEvents.push({ tick: eco.tick, phase: eco.phase, cascade });
+    const pct = Math.round((cascade / eco.nSpecies) * 100);
+    showNotification(`Keystone ${name} removed! ${pct}% cascade!`, 'extinction');
+    if (cascade >= eco.nSpecies * 0.1) {
+      triggerScreenShake(0.6);
+      triggerFlash(0.5);
+    }
+  }
+  render();
+  updateStats();
+  updateCharts();
+  updateNarrative();
+  updateGeoTimeline();
+}
+
+function runCascadeTest() {
+  if (!eco) return;
+  // Save state
+  const savedWeights = eco.weights.map(row => new Float32Array(row));
+  const savedSpecies = eco.species.map(s => {
+    const ns = new Species(s.id);
+    ns.name = s.name; ns.fitness = s.fitness; ns.age = s.age; ns.isKeystone = s.isKeystone;
+    ns.x = s.x; ns.y = s.y; ns.currentRadius = s.currentRadius; ns.opacity = s.opacity;
+    return ns;
+  });
+
+  const results = [];
+  for (let i = 0; i < eco.nSpecies; i++) {
+    // Silent replace for testing
+    const origSpecies = eco.species[i];
+    eco.species[i] = new Species(i);
+    eco.species[i].x = origSpecies.x;
+    eco.species[i].y = origSpecies.y;
+    for (let j = 0; j < eco.nSpecies; j++) {
+      eco.weights[i][j] = 0;
+      eco.weights[j][i] = 0;
+    }
+    for (let j = 0; j < eco.nSpecies; j++) {
+      if (j === i) continue;
+      if (Math.random() < eco.connProb) {
+        eco.weights[i][j] = eco.weightRange[0] + Math.random() * (eco.weightRange[1] - eco.weightRange[0]);
+      }
+      if (Math.random() < eco.connProb) {
+        eco.weights[j][i] = eco.weightRange[0] + Math.random() * (eco.weightRange[1] - eco.weightRange[0]);
+      }
+    }
+    eco.computeAllFitness();
+    const cascade = 1 + eco.propagateCascadeSilent();
+    results.push({ id: i, name: savedSpecies[i].name, cascade, keystone: savedSpecies[i].isKeystone });
+    // Restore
+    eco.weights = savedWeights.map(row => new Float32Array(row));
+    eco.species = savedSpecies.map(s => {
+      const ns = new Species(s.id);
+      ns.name = s.name; ns.fitness = s.fitness; ns.age = s.age; ns.isKeystone = s.isKeystone;
+      ns.x = s.x; ns.y = s.y; ns.currentRadius = s.currentRadius; ns.opacity = s.opacity;
+      return ns;
+    });
+  }
+
+  results.sort((a, b) => b.cascade - a.cascade);
+  let msg = 'Cascade Test Results (top 15):\n\n';
+  msg += 'Species                      | Cascade | Keystone\n';
+  msg += '-----------------------------|---------|--------\n';
+  for (const r of results.slice(0, 15)) {
+    const name = r.name.padEnd(28);
+    msg += `${name} |  ${r.cascade.toString().padStart(4)}   |  ${r.keystone ? 'YES' : 'no'}\n`;
+  }
+  alert(msg);
+}
+
+
+// =====================================================
+// UI BINDINGS
+// =====================================================
+
+document.getElementById('speed').addEventListener('input', e => {
+  speed = parseInt(e.target.value);
+  document.getElementById('speed-val').textContent = (101 - speed) + ' ms';
+});
+
+document.getElementById('param-conn').addEventListener('input', e => {
+  document.getElementById('conn-val').textContent = (parseInt(e.target.value) / 100).toFixed(2);
+});
+
+document.getElementById('param-weight').addEventListener('input', e => {
+  document.getElementById('weight-val').textContent = (parseInt(e.target.value) / 10).toFixed(1);
+});
+
+
+// =====================================================
+// INIT
+// =====================================================
+
+resizeCanvas();
+initSim();
+render();
+updateStats();
+updateNarrative();
+updateGeoTimeline();
+</script>
+</body>
+</html>

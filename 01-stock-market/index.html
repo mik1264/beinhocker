@@ -1,0 +1,1429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SFI Artificial Stock Market — Complexity Economics in Action</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', system-ui, sans-serif; background: #0a0e17; color: #c8cdd8; overflow-x: hidden; }
+
+/* ===== HERO INTRO ===== */
+.hero {
+  background: linear-gradient(135deg, #0d1220 0%, #111b2e 50%, #0d1a14 100%);
+  border-bottom: 1px solid #1e3a2a;
+  padding: 40px 32px 32px;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(0,255,100,0.03) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero-content { max-width: 900px; position: relative; z-index: 1; }
+.hero h1 {
+  font-size: 32px;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  background: linear-gradient(90deg, #00ff88, #00cc66, #44ffaa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 4px;
+}
+.hero .tagline {
+  font-size: 14px;
+  color: #5a7a6a;
+  font-weight: 500;
+  margin-bottom: 16px;
+  letter-spacing: 0.5px;
+}
+.hero p {
+  font-size: 16px;
+  line-height: 1.7;
+  color: #9ab0a8;
+  max-width: 780px;
+}
+.hero p strong { color: #c0ffe0; font-weight: 600; }
+
+/* Key insight callout */
+.key-insight {
+  margin: 24px 0 0;
+  padding: 20px 24px;
+  background: linear-gradient(135deg, rgba(0,255,100,0.06), rgba(0,180,80,0.03));
+  border: 1px solid #1a3a28;
+  border-left: 4px solid #00cc66;
+  border-radius: 0 8px 8px 0;
+  max-width: 780px;
+}
+.key-insight-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: #00cc66;
+  margin-bottom: 8px;
+}
+.key-insight p {
+  font-size: 14px;
+  line-height: 1.65;
+  color: #8aaa98;
+}
+.key-insight p strong { color: #b0ffd0; }
+
+/* ===== HEADER BAR ===== */
+.header {
+  background: #0f1520;
+  padding: 12px 24px;
+  border-bottom: 1px solid #1a2030;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.header-left { display: flex; align-items: center; gap: 16px; }
+.header-title { font-size: 15px; font-weight: 700; color: #e0e8f0; }
+.tick-display {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: #5a6a80;
+}
+.controls { display: flex; gap: 6px; align-items: center; }
+.controls button {
+  padding: 6px 16px;
+  border: 1px solid #1e2a3a;
+  background: #141c28;
+  color: #8090a8;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.15s;
+}
+.controls button:hover { background: #1a2840; border-color: #2a3a50; color: #b0c0d8; }
+.controls button.active { background: #00994d; border-color: #00cc66; color: #fff; }
+.controls button.danger { border-color: #3a1a1a; color: #cc4444; }
+.controls button.danger:hover { background: #2a1010; color: #ff5555; }
+.sound-toggle {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; color: #5a6a80; cursor: pointer;
+  margin-left: 8px;
+  padding: 4px 10px;
+  border: 1px solid #1e2a3a;
+  border-radius: 4px;
+  background: #141c28;
+  transition: all 0.15s;
+}
+.sound-toggle:hover { border-color: #2a3a50; color: #8090a8; }
+.sound-toggle.on { border-color: #00884d; color: #00cc66; }
+
+/* ===== MAIN LAYOUT ===== */
+.main { display: grid; grid-template-columns: 280px 1fr; min-height: calc(100vh - 160px); }
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+  background: #0c1018;
+  padding: 16px;
+  overflow-y: auto;
+  border-right: 1px solid #1a2030;
+}
+.sidebar h3 {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: #3a4a5a;
+  margin: 18px 0 8px;
+  font-weight: 700;
+}
+.sidebar h3:first-child { margin-top: 0; }
+.param-group { display: flex; flex-direction: column; gap: 5px; }
+.param { display: flex; justify-content: space-between; align-items: center; }
+.param label { font-size: 12px; color: #6a7a8a; }
+.param input, .param select {
+  width: 80px;
+  padding: 3px 6px;
+  background: #111820;
+  border: 1px solid #1a2535;
+  color: #b0c0d8;
+  border-radius: 3px;
+  font-size: 12px;
+  text-align: right;
+  font-family: 'JetBrains Mono', monospace;
+}
+.param select { text-align: left; }
+
+.speed-control { display: flex; align-items: center; gap: 6px; margin-top: 6px; }
+.speed-control label { font-size: 11px; color: #4a5a6a; }
+.speed-control input { flex: 1; accent-color: #00cc66; }
+
+/* Stats box */
+.stats-box {
+  background: #111820;
+  border: 1px solid #1a2535;
+  border-radius: 6px;
+  padding: 10px;
+  margin-top: 10px;
+}
+.stat-row { display: flex; justify-content: space-between; font-size: 11px; padding: 3px 0; }
+.stat-row .label { color: #4a5a6a; }
+.stat-row .value { color: #8898b0; font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+.stat-row .value.positive { color: #00ff88; }
+.stat-row .value.negative { color: #ff4444; }
+
+/* ===== MARKET MOOD GAUGE ===== */
+.mood-section { margin-top: 16px; }
+.mood-gauge {
+  background: #111820;
+  border: 1px solid #1a2535;
+  border-radius: 6px;
+  padding: 12px;
+  text-align: center;
+}
+.mood-label-top { font-size: 10px; color: #3a4a5a; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+.mood-emoji { font-size: 28px; margin-bottom: 4px; }
+.mood-text { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+.mood-bar-track {
+  height: 6px;
+  background: linear-gradient(90deg, #ff4444, #ff8844, #cccc44, #44cc44, #00ff88);
+  border-radius: 3px;
+  position: relative;
+  margin: 8px 0 4px;
+}
+.mood-bar-thumb {
+  position: absolute;
+  top: -4px;
+  width: 14px;
+  height: 14px;
+  background: #fff;
+  border-radius: 50%;
+  border: 2px solid #0a0e17;
+  transform: translateX(-50%);
+  transition: left 0.5s ease;
+}
+.mood-extremes {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+  color: #3a4a5a;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ===== LEADERBOARD ===== */
+.leaderboard {
+  background: #111820;
+  border: 1px solid #1a2535;
+  border-radius: 6px;
+  padding: 10px;
+  margin-top: 10px;
+}
+.leaderboard-title {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #3a4a5a;
+  margin-bottom: 6px;
+  font-weight: 700;
+}
+.lb-section-label {
+  font-size: 9px;
+  color: #2a3a4a;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 6px 0 3px;
+}
+.lb-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  padding: 2px 0;
+  font-family: 'JetBrains Mono', monospace;
+}
+.lb-row .lb-name { color: #5a6a7a; }
+.lb-row .lb-val.winner { color: #00ff88; }
+.lb-row .lb-val.loser { color: #ff4444; }
+
+/* ===== WHAT'S HAPPENING PANEL ===== */
+.narrative-panel {
+  background: linear-gradient(135deg, #111820, #0f1620);
+  border: 1px solid #1a2535;
+  border-radius: 6px;
+  padding: 14px;
+  margin-top: 12px;
+}
+.narrative-header {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #3a4a5a;
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+.narrative-text {
+  font-size: 13px;
+  line-height: 1.5;
+  color: #8898b0;
+  min-height: 40px;
+}
+.narrative-icon { font-size: 18px; margin-bottom: 4px; }
+
+/* ===== CHARTS AREA ===== */
+.charts-area { padding: 16px; overflow-y: auto; }
+
+/* Comparison header */
+.comparison-header {
+  display: none;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.comparison-header.visible { display: grid; }
+.comp-label {
+  text-align: center;
+  padding: 10px;
+  border-radius: 6px;
+  font-weight: 800;
+  font-size: 15px;
+  letter-spacing: 1px;
+}
+.comp-label.boring {
+  background: linear-gradient(135deg, #1a1510, #201a10);
+  border: 1px solid #3a3020;
+  color: #aa8844;
+}
+.comp-label.alive {
+  background: linear-gradient(135deg, #0d1a14, #102018);
+  border: 1px solid #1a3a28;
+  color: #00ff88;
+}
+.comp-sublabel {
+  font-size: 11px;
+  font-weight: 400;
+  opacity: 0.6;
+  margin-top: 2px;
+}
+
+/* Chart grid */
+.charts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.chart-container {
+  background: #111820;
+  border: 1px solid #1a2535;
+  border-radius: 8px;
+  padding: 14px;
+  position: relative;
+  height: 280px;
+}
+.chart-container.wide { grid-column: 1 / -1; height: 340px; }
+.chart-container h4 {
+  font-size: 12px;
+  color: #5a6a80;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+.chart-annotation {
+  font-size: 11px;
+  color: #3a4a5a;
+  line-height: 1.4;
+  margin-bottom: 8px;
+  font-style: italic;
+}
+.chart-container canvas { width: 100%; height: calc(100% - 50px); }
+
+/* Fun fact tooltips */
+.fun-fact {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 22px;
+  height: 22px;
+  background: #1a2535;
+  border: 1px solid #2a3a50;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: #5a6a80;
+  cursor: pointer;
+  transition: all 0.2s;
+  z-index: 5;
+}
+.fun-fact:hover { background: #2a3a50; color: #b0c0d8; }
+.fun-fact-tooltip {
+  display: none;
+  position: absolute;
+  top: 32px;
+  right: 0;
+  width: 260px;
+  background: #1a2535;
+  border: 1px solid #2a3a50;
+  border-radius: 6px;
+  padding: 12px;
+  font-size: 11px;
+  line-height: 1.5;
+  color: #8898b0;
+  z-index: 10;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+.fun-fact:hover .fun-fact-tooltip { display: block; }
+.fun-fact-tooltip strong { color: #b0c0d8; }
+
+/* Mode indicator in header */
+.mode-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.mode-badge.learning { background: #0d2a1a; color: #00ff88; border: 1px solid #1a3a28; }
+.mode-badge.rational { background: #2a1a0d; color: #ffaa44; border: 1px solid #3a2810; }
+.mode-badge.compare { background: #0d1a2a; color: #44aaff; border: 1px solid #102a3a; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #0a0e17; }
+::-webkit-scrollbar-thumb { background: #1a2535; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #2a3a50; }
+</style>
+</head>
+<body>
+
+<!-- ===== HERO SECTION ===== -->
+<div class="hero">
+  <div class="hero-content">
+    <h1>The Santa Fe Artificial Stock Market</h1>
+    <div class="tagline">Arthur, Holland, LeBaron, Palmer & Tayler (1997) &mdash; Complexity Economics in Action</div>
+    <p>
+      This is one of the most famous models in complexity economics. <strong>Agents with evolving strategies</strong> compete to buy and sell a single stock. Each trader uses a genetic algorithm to breed better prediction rules over time &mdash; learning from the market they collectively create. Watch what happens when agents stop being perfectly rational and start <strong>adapting</strong>: bubbles inflate, crashes cascade, and fat-tailed returns emerge &mdash; just like real markets.
+    </p>
+    <div class="key-insight">
+      <div class="key-insight-label">Beinhocker's Key Insight</div>
+      <p>
+        When all agents use the same rational strategy, the market is <strong>boring and efficient</strong>. Price hugs fundamental value, volatility is low, and nothing interesting happens. The moment agents start <strong>learning and adapting</strong>, the market comes alive with bubbles, crashes, and power laws &mdash; just like the real thing. <strong>The volatility isn't noise. It's the emergent result of evolving strategies competing for dominance.</strong>
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== CONTROLS HEADER ===== -->
+<div class="header">
+  <div class="header-left">
+    <span class="header-title">Simulation</span>
+    <span class="mode-badge learning" id="modeBadge">LEARNING</span>
+    <span class="tick-display" id="tickDisplay">Tick: 0</span>
+  </div>
+  <div style="display:flex; align-items:center; gap: 8px;">
+    <div class="controls">
+      <button id="btnStart" onclick="toggleRun()">Start</button>
+      <button id="btnStep" onclick="stepOnce()">Step</button>
+      <button class="danger" onclick="resetSim()">Reset</button>
+    </div>
+    <div class="sound-toggle" id="soundToggle" onclick="toggleSound()">
+      <span id="soundIcon">&#128264;</span>
+      <span>Sound</span>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MAIN ===== -->
+<div class="main">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <h3>Mode</h3>
+    <div class="param-group">
+      <div class="param">
+        <label>Mode</label>
+        <select id="paramMode" onchange="updateModeIndicator()">
+          <option value="learning">Learning</option>
+          <option value="rational">Rational</option>
+          <option value="compare">Compare</option>
+        </select>
+      </div>
+    </div>
+
+    <h3>Market</h3>
+    <div class="param-group">
+      <div class="param"><label>Agents</label><input type="number" id="paramAgents" value="25" min="2" max="500"></div>
+      <div class="param"><label>Interest Rate</label><input type="number" id="paramRate" value="0.10" step="0.01" min="0.01" max="0.5"></div>
+      <div class="param"><label>Risk Aversion</label><input type="number" id="paramRisk" value="0.5" step="0.1" min="0.1" max="5"></div>
+    </div>
+
+    <h3>Dividend</h3>
+    <div class="param-group">
+      <div class="param"><label>Mean Dividend</label><input type="number" id="paramDbar" value="10" step="0.5" min="1" max="50"></div>
+      <div class="param"><label>AR(1) rho</label><input type="number" id="paramRho" value="0.95" step="0.01" min="0" max="0.99"></div>
+    </div>
+
+    <h3>Evolution (Learning Mode)</h3>
+    <div class="param-group">
+      <div class="param"><label>Rules / Agent</label><input type="number" id="paramRules" value="100" min="1" max="500"></div>
+      <div class="param"><label>Mutation Rate</label><input type="number" id="paramMutation" value="0.03" step="0.005" min="0" max="0.5"></div>
+      <div class="param"><label>Crossover Prob</label><input type="number" id="paramCrossover" value="0.3" step="0.05" min="0" max="1"></div>
+      <div class="param"><label>GA Interval</label><input type="number" id="paramGA" value="250" min="10" max="5000"></div>
+    </div>
+
+    <h3>Speed</h3>
+    <div class="speed-control">
+      <label>Slow</label>
+      <input type="range" id="speedSlider" min="1" max="50" value="10">
+      <label>Fast</label>
+    </div>
+
+    <h3>Live Statistics</h3>
+    <div class="stats-box" id="statsBox">
+      <div class="stat-row"><span class="label">Price</span><span class="value" id="statPrice">--</span></div>
+      <div class="stat-row"><span class="label">Fund. Value</span><span class="value" id="statFV">--</span></div>
+      <div class="stat-row"><span class="label">Dividend</span><span class="value" id="statDiv">--</span></div>
+      <div class="stat-row"><span class="label">Volume</span><span class="value" id="statVol">--</span></div>
+      <div class="stat-row"><span class="label">Volatility</span><span class="value" id="statVolatility">--</span></div>
+      <div class="stat-row"><span class="label">Kurtosis</span><span class="value" id="statKurtosis">--</span></div>
+      <div class="stat-row"><span class="label">Gini</span><span class="value" id="statGini">--</span></div>
+    </div>
+
+    <!-- MARKET MOOD -->
+    <div class="mood-section">
+      <h3>Market Mood</h3>
+      <div class="mood-gauge">
+        <div class="mood-emoji" id="moodEmoji">😐</div>
+        <div class="mood-text" id="moodText" style="color: #cccc44">Neutral</div>
+        <div class="mood-bar-track">
+          <div class="mood-bar-thumb" id="moodThumb" style="left: 50%"></div>
+        </div>
+        <div class="mood-extremes">
+          <span>Extreme Fear</span>
+          <span>Extreme Greed</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- WHAT'S HAPPENING -->
+    <div class="narrative-panel">
+      <div class="narrative-header">What's Happening</div>
+      <div class="narrative-icon" id="narrativeIcon">📊</div>
+      <div class="narrative-text" id="narrativeText">Hit <strong>Start</strong> to begin the simulation. Agents will begin trading and evolving their strategies.</div>
+    </div>
+
+    <!-- LEADERBOARD -->
+    <h3>Agent Leaderboard</h3>
+    <div class="leaderboard" id="leaderboard">
+      <div class="lb-section-label">Top 5</div>
+      <div id="lbTop"></div>
+      <div class="lb-section-label" style="margin-top:8px">Bottom 5</div>
+      <div id="lbBottom"></div>
+    </div>
+  </div>
+
+  <!-- CHARTS -->
+  <div class="charts-area">
+    <!-- Comparison labels -->
+    <div class="comparison-header" id="comparisonHeader">
+      <div class="comp-label boring">
+        BORING: Perfect Rationality
+        <div class="comp-sublabel">All agents use the same equilibrium formula</div>
+      </div>
+      <div class="comp-label alive">
+        ALIVE: Learning Agents
+        <div class="comp-sublabel">Genetic algorithms evolve competing strategies</div>
+      </div>
+    </div>
+
+    <div class="charts">
+      <!-- Price chart -->
+      <div class="chart-container wide">
+        <h4>Price & Fundamental Value</h4>
+        <div class="chart-annotation">Watch how price deviates from fundamental value (dashed line). These aren't random &mdash; they're bubbles and crashes created by agents' competing strategies.</div>
+        <div class="fun-fact">?
+          <div class="fun-fact-tooltip"><strong>SFI Fun Fact:</strong> The original 1997 model ran on a Connection Machine supercomputer at the Santa Fe Institute. Brian Arthur convinced the team that markets aren't just information processors &mdash; they're ecologies of competing beliefs.</div>
+        </div>
+        <canvas id="chartPrice"></canvas>
+      </div>
+
+      <!-- Volume chart -->
+      <div class="chart-container">
+        <h4>Trading Volume</h4>
+        <div class="chart-annotation">Spikes in volume often signal disagreement among agents &mdash; a hallmark of real market behavior.</div>
+        <div class="fun-fact">?
+          <div class="fun-fact-tooltip"><strong>SFI Fun Fact:</strong> In the rational-expectations regime, volume essentially disappears. Everyone agrees on the "right" price, so there's no reason to trade. But real markets have enormous volume. Why? Learning agents disagree.</div>
+        </div>
+        <canvas id="chartVolume"></canvas>
+      </div>
+
+      <!-- Returns chart -->
+      <div class="chart-container">
+        <h4>Returns Distribution</h4>
+        <div class="chart-annotation">The tall peaks and fat tails show that extreme events happen far more often than a normal distribution would predict &mdash; just like real markets.</div>
+        <div class="fun-fact">?
+          <div class="fun-fact-tooltip"><strong>SFI Fun Fact:</strong> Mandelbrot observed fat tails in cotton prices in 1963. The SFI model was one of the first to show how agent-based learning generates this pattern endogenously &mdash; no external shocks needed.</div>
+        </div>
+        <canvas id="chartReturns"></canvas>
+      </div>
+
+      <!-- Wealth chart -->
+      <div class="chart-container">
+        <h4>Wealth Distribution</h4>
+        <div class="chart-annotation">Inequality emerges naturally as some strategies outperform others. Lucky early movers compound their advantage.</div>
+        <div class="fun-fact">?
+          <div class="fun-fact-tooltip"><strong>SFI Fun Fact:</strong> The SFI team found that wealth inequality in the artificial market follows power-law distributions similar to those observed by Pareto in real economies over 100 years ago.</div>
+        </div>
+        <canvas id="chartWealth"></canvas>
+      </div>
+
+      <!-- Gini chart -->
+      <div class="chart-container">
+        <h4>Gini Coefficient Over Time</h4>
+        <div class="chart-annotation">Rising Gini means growing inequality. In learning mode, strategy evolution drives wealth concentration then disruption.</div>
+        <div class="fun-fact">?
+          <div class="fun-fact-tooltip"><strong>SFI Fun Fact:</strong> The "punctuated equilibria" in Gini mirror patterns seen in biological evolution. Periods of stability are interrupted by bursts of change as new dominant strategies emerge.</div>
+        </div>
+        <canvas id="chartGini"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== SFI ASM Simulation Engine =====
+
+class ForecastRule {
+  constructor(condition, a, b) {
+    this.condition = condition;
+    this.a = a;
+    this.b = b;
+    this.variance = 4.0 + Math.random() * 4;
+    this.fitness = 0;
+    this.updateFitness();
+  }
+
+  get specificity() {
+    let s = 0;
+    for (let i = 0; i < this.condition.length; i++) {
+      if (this.condition[i] !== 2) s++;
+    }
+    return s;
+  }
+
+  matches(state) {
+    for (let i = 0; i < this.condition.length; i++) {
+      if (this.condition[i] === 2) continue;
+      if (this.condition[i] !== state[i]) return false;
+    }
+    return true;
+  }
+
+  forecast(pricePlusDividend) {
+    return this.a * pricePlusDividend + this.b;
+  }
+
+  updateFitness(penalty = 0.005) {
+    this.fitness = -this.variance - penalty * this.specificity;
+  }
+}
+
+class Stock {
+  constructor(dBar = 10, rho = 0.95, sigmaD = Math.sqrt(0.0743), r = 0.10) {
+    this.dBar = dBar;
+    this.rho = rho;
+    this.sigmaD = sigmaD;
+    this.r = r;
+    this.dividend = dBar;
+    this.fundamentalValue = dBar / r;
+    this.price = this.fundamentalValue;
+    this.priceHistory = [this.price];
+    this.dividendHistory = [this.dividend];
+    this.returnHistory = [];
+    this.volumeHistory = [];
+  }
+
+  nextDividend() {
+    const eps = gaussRandom() * this.sigmaD;
+    this.dividend = this.dBar + this.rho * (this.dividend - this.dBar) + eps;
+    this.dividend = Math.max(this.dividend, 0.001);
+    this.dividendHistory.push(this.dividend);
+    this.fundamentalValue = this.dividend / this.r;
+    return this.dividend;
+  }
+
+  recordPrice(price) {
+    const oldPrice = this.price;
+    this.price = price;
+    this.priceHistory.push(price);
+    if (oldPrice > 0) {
+      const ret = (price + this.dividend - oldPrice * (1 + this.r)) / oldPrice;
+      this.returnHistory.push(ret);
+    } else {
+      this.returnHistory.push(0);
+    }
+  }
+
+  recordVolume(vol) {
+    this.volumeHistory.push(vol);
+  }
+
+  movingAverage(window) {
+    const p = this.priceHistory;
+    const n = Math.min(window, p.length);
+    let sum = 0;
+    for (let i = p.length - n; i < p.length; i++) sum += p[i];
+    return sum / n;
+  }
+}
+
+function encodeMarketState(stock) {
+  const p = stock.price;
+  const fv = stock.fundamentalValue;
+  const ratio = fv > 0 ? p / fv : 1;
+  return [
+    ratio > 0.25 ? 1 : 0,
+    ratio > 0.50 ? 1 : 0,
+    ratio > 0.75 ? 1 : 0,
+    ratio > 0.875 ? 1 : 0,
+    ratio > 1.00 ? 1 : 0,
+    ratio > 1.125 ? 1 : 0,
+    p > stock.movingAverage(5) ? 1 : 0,
+    p > stock.movingAverage(10) ? 1 : 0,
+    p > stock.movingAverage(100) ? 1 : 0,
+    p > stock.movingAverage(500) ? 1 : 0,
+    1,
+    0
+  ];
+}
+
+class Agent {
+  constructor(id, cash, shares, numRules, riskAversion, r, learning) {
+    this.id = id;
+    this.cash = cash;
+    this.shares = shares;
+    this.riskAversion = riskAversion;
+    this.r = r;
+    this.learning = learning;
+    this.rules = [];
+    this.activeRule = null;
+    this.wealthHistory = [];
+    const nRules = learning ? numRules : 1;
+    for (let i = 0; i < nRules; i++) {
+      const cond = [];
+      for (let j = 0; j < 12; j++) {
+        const rnd = Math.random();
+        cond.push(rnd < 0.90 ? 2 : (rnd < 0.95 ? 0 : 1));
+      }
+      this.rules.push(new ForecastRule(cond, 0.7 + Math.random() * 0.5, -10 + Math.random() * 29));
+    }
+  }
+
+  get wealth() {
+    return this.cash + this.shares * (this._lastPrice || 0);
+  }
+
+  selectRule(state) {
+    let active = this.rules.filter(r => r.matches(state));
+    if (active.length === 0) {
+      active = this.rules.slice().sort((a, b) => a.specificity - b.specificity).slice(0, 1);
+    }
+    this.activeRule = active.reduce((best, r) => r.fitness > best.fitness ? r : best, active[0]);
+    return this.activeRule;
+  }
+
+  computeDemand(price, dividend) {
+    if (!this.activeRule) return 0;
+    const pd = price + dividend;
+    const expected = this.activeRule.forecast(pd);
+    const excessReturn = expected - price * (1 + this.r);
+    const v = Math.max(this.activeRule.variance, 0.5);
+    let demand = excessReturn / (this.riskAversion * v);
+    demand = Math.max(-5, Math.min(5, demand));
+    let desired = this.shares + demand;
+    desired = Math.max(-5, Math.min(10, desired));
+    return desired - this.shares;
+  }
+
+  updateRuleAccuracy(actualPD, theta = 0.1) {
+    if (this.activeRule) {
+      const predicted = this.activeRule.forecast(actualPD);
+      const error = actualPD - predicted;
+      this.activeRule.variance = (1 - theta) * this.activeRule.variance + theta * error * error;
+      this.activeRule.updateFitness();
+    }
+  }
+
+  evolveRules(mutationRate, crossoverProb) {
+    if (!this.learning || this.rules.length < 5) return;
+    this.rules.sort((a, b) => b.fitness - a.fitness);
+    const n = this.rules.length;
+    const nKeep = Math.floor(n * 0.8);
+    const nReplace = n - nKeep;
+    const survivors = this.rules.slice(0, nKeep);
+    const newRules = [];
+    for (let i = 0; i < nReplace; i++) {
+      let child;
+      if (Math.random() < crossoverProb && survivors.length >= 2) {
+        const [p1, p2] = pickTwo(survivors, nKeep);
+        child = crossover(p1, p2);
+      } else {
+        const parent = survivors[Math.floor(Math.random() * Math.max(Math.floor(nKeep / 2), 1))];
+        child = cloneRule(parent);
+      }
+      mutateRule(child, mutationRate);
+      child.updateFitness();
+      newRules.push(child);
+    }
+    this.rules = survivors.concat(newRules);
+  }
+
+  recordWealth(price) {
+    this._lastPrice = price;
+    this.wealthHistory.push(this.cash + this.shares * price);
+  }
+}
+
+function pickTwo(arr, maxIdx) {
+  const i = Math.floor(Math.random() * Math.min(maxIdx, arr.length));
+  let j = Math.floor(Math.random() * Math.min(maxIdx, arr.length));
+  while (j === i && arr.length > 1) j = Math.floor(Math.random() * Math.min(maxIdx, arr.length));
+  return [arr[i], arr[j]];
+}
+
+function crossover(p1, p2) {
+  const cond = p1.condition.map((c, i) => Math.random() < 0.5 ? c : p2.condition[i]);
+  const method = Math.floor(Math.random() * 3);
+  let a, b;
+  if (method === 0) { a = p1.a; b = p1.b; }
+  else if (method === 1) { a = p2.a; b = p2.b; }
+  else { a = (p1.a + p2.a) / 2; b = (p1.b + p2.b) / 2; }
+  return new ForecastRule(cond, a, b);
+}
+
+function cloneRule(parent) {
+  return new ForecastRule([...parent.condition], parent.a, parent.b);
+}
+
+function mutateRule(rule, rate) {
+  for (let i = 0; i < rule.condition.length; i++) {
+    if (Math.random() < rate) rule.condition[i] = Math.floor(Math.random() * 3);
+  }
+  if (Math.random() < rate) {
+    rule.a += gaussRandom() * 0.05;
+    rule.a = Math.max(0, Math.min(2, rule.a));
+  }
+  if (Math.random() < rate) {
+    rule.b += gaussRandom() * 2;
+    rule.b = Math.max(-30, Math.min(30, rule.b));
+  }
+}
+
+function clearMarket(agents, stock) {
+  const dividend = stock.dividend;
+  function excessDemand(price) {
+    let total = 0;
+    for (const agent of agents) total += agent.computeDemand(price, dividend);
+    return total;
+  }
+  let pLow = Math.max(stock.price * 0.5, 0.01);
+  let pHigh = stock.price * 1.5 + 10;
+  for (let i = 0; i < 10; i++) {
+    const edLow = excessDemand(pLow);
+    const edHigh = excessDemand(pHigh);
+    if (edLow > 0 && edHigh < 0) break;
+    if (edLow <= 0) pLow = Math.max(pLow * 0.5, 0.001);
+    if (edHigh >= 0) pHigh *= 2;
+  }
+  for (let i = 0; i < 100; i++) {
+    const pMid = (pLow + pHigh) / 2;
+    const ed = excessDemand(pMid);
+    if (Math.abs(ed) < 0.001) break;
+    if (ed > 0) pLow = pMid; else pHigh = pMid;
+  }
+  const clearingPrice = Math.max((pLow + pHigh) / 2, 0.01);
+  for (const agent of agents) {
+    agent.cash += agent.shares * dividend;
+  }
+  let volume = 0;
+  for (const agent of agents) {
+    const demand = agent.computeDemand(clearingPrice, dividend);
+    agent.shares += demand;
+    agent.cash -= demand * clearingPrice;
+    volume += Math.abs(demand);
+  }
+  return [clearingPrice, volume / 2];
+}
+
+function gaussRandom() {
+  let u = 0, v = 0;
+  while (u === 0) u = Math.random();
+  while (v === 0) v = Math.random();
+  return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+}
+
+// ===== Simulation wrapper =====
+
+class SimState {
+  constructor(params) {
+    this.learning = params.learning;
+    this.mutationRate = params.mutationRate;
+    this.crossoverProb = params.crossoverProb;
+    this.gaInterval = params.gaInterval;
+    this.stock = new Stock(params.dBar, params.rho, Math.sqrt(0.0743), params.r);
+    this.agents = [];
+    const initCash = this.stock.fundamentalValue * 2;
+    for (let i = 0; i < params.numAgents; i++) {
+      this.agents.push(new Agent(i, initCash, 1, params.numRules, params.riskAversion, params.r, this.learning));
+    }
+    this.tick = 0;
+    this.giniHistory = [];
+  }
+
+  step() {
+    this.stock.nextDividend();
+    const state = encodeMarketState(this.stock);
+    for (const a of this.agents) a.selectRule(state);
+    const [price, vol] = clearMarket(this.agents, this.stock);
+    this.stock.recordPrice(price);
+    this.stock.recordVolume(vol);
+    const actualPD = price + this.stock.dividend;
+    for (const a of this.agents) {
+      a.updateRuleAccuracy(actualPD);
+      a.recordWealth(price);
+    }
+    if (this.learning) {
+      const gaProb = 1 / this.gaInterval;
+      for (const a of this.agents) {
+        if (Math.random() < gaProb) a.evolveRules(this.mutationRate, this.crossoverProb);
+      }
+    }
+    this.giniHistory.push(this.computeGini());
+    this.tick++;
+  }
+
+  computeGini() {
+    let w = this.agents.map(a => a.wealth);
+    const n = w.length;
+    if (n === 0) return 0;
+    const minW = Math.min(...w);
+    if (minW < 0) w = w.map(v => v - minW + 1);
+    w.sort((a, b) => a - b);
+    const total = w.reduce((s, v) => s + v, 0);
+    if (total === 0) return 0;
+    let wSum = 0;
+    for (let i = 0; i < n; i++) wSum += (2 * (i + 1) - n - 1) * w[i];
+    return Math.max(0, Math.min(1, wSum / (n * total)));
+  }
+}
+
+// ===== Chart setup =====
+
+const chartOpts = (title) => ({
+  responsive: true,
+  maintainAspectRatio: false,
+  animation: false,
+  plugins: {
+    legend: { display: true, labels: { color: '#5a6a80', font: { size: 10, family: 'Inter' } } }
+  },
+  scales: {
+    x: { ticks: { color: '#3a4a5a', maxTicksLimit: 8, font: { size: 10, family: 'JetBrains Mono' } }, grid: { color: '#141c28' } },
+    y: { ticks: { color: '#3a4a5a', font: { size: 10, family: 'JetBrains Mono' } }, grid: { color: '#141c28' } }
+  }
+});
+
+let chartPrice, chartVolume, chartReturns, chartWealth, chartGini;
+
+function initCharts() {
+  chartPrice = new Chart(document.getElementById('chartPrice'), {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [
+        { label: 'Price', data: [], borderColor: '#00cc66', borderWidth: 1.5, pointRadius: 0, fill: false },
+        { label: 'Fundamental', data: [], borderColor: '#ff8844', borderWidth: 1, pointRadius: 0, borderDash: [4, 4], fill: false },
+        { label: 'Price (Compare)', data: [], borderColor: '#ffaa44', borderWidth: 1.5, pointRadius: 0, fill: false, hidden: true }
+      ]
+    },
+    options: chartOpts('Price')
+  });
+
+  chartVolume = new Chart(document.getElementById('chartVolume'), {
+    type: 'bar',
+    data: {
+      labels: [],
+      datasets: [
+        { label: 'Volume', data: [], backgroundColor: 'rgba(0,204,102,0.2)', borderColor: '#00cc66', borderWidth: 1 }
+      ]
+    },
+    options: { ...chartOpts('Volume'), plugins: { legend: { display: false } } }
+  });
+
+  chartReturns = new Chart(document.getElementById('chartReturns'), {
+    type: 'bar',
+    data: {
+      labels: [],
+      datasets: [
+        { label: 'Returns', data: [], backgroundColor: 'rgba(0,150,255,0.3)', borderColor: '#0096ff', borderWidth: 1 }
+      ]
+    },
+    options: { ...chartOpts('Returns'), plugins: { legend: { display: false } } }
+  });
+
+  chartWealth = new Chart(document.getElementById('chartWealth'), {
+    type: 'bar',
+    data: {
+      labels: [],
+      datasets: [
+        { label: 'Wealth', data: [], backgroundColor: [], borderColor: [], borderWidth: 1 }
+      ]
+    },
+    options: { ...chartOpts('Wealth'), plugins: { legend: { display: false } } }
+  });
+
+  chartGini = new Chart(document.getElementById('chartGini'), {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [
+        { label: 'Gini', data: [], borderColor: '#ff4488', borderWidth: 1.5, pointRadius: 0, fill: false }
+      ]
+    },
+    options: { ...chartOpts('Gini'), scales: { ...chartOpts('Gini').scales, y: { ...chartOpts('Gini').scales.y, min: 0, max: 1 } } }
+  });
+}
+
+// ===== Simulation control =====
+
+let sim1 = null;
+let sim2 = null;
+let running = false;
+let animFrame = null;
+let soundEnabled = false;
+let audioCtx = null;
+
+function getParams(learning) {
+  return {
+    numAgents: parseInt(document.getElementById('paramAgents').value),
+    learning: learning,
+    numRules: parseInt(document.getElementById('paramRules').value),
+    mutationRate: parseFloat(document.getElementById('paramMutation').value),
+    crossoverProb: parseFloat(document.getElementById('paramCrossover').value),
+    gaInterval: parseFloat(document.getElementById('paramGA').value),
+    riskAversion: parseFloat(document.getElementById('paramRisk').value),
+    r: parseFloat(document.getElementById('paramRate').value),
+    dBar: parseFloat(document.getElementById('paramDbar').value),
+    rho: parseFloat(document.getElementById('paramRho').value),
+  };
+}
+
+function toggleSound() {
+  soundEnabled = !soundEnabled;
+  const toggle = document.getElementById('soundToggle');
+  const icon = document.getElementById('soundIcon');
+  if (soundEnabled) {
+    toggle.classList.add('on');
+    icon.innerHTML = '&#128266;';
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  } else {
+    toggle.classList.remove('on');
+    icon.innerHTML = '&#128264;';
+  }
+}
+
+function playTick(freq, duration, vol) {
+  if (!soundEnabled || !audioCtx) return;
+  try {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = freq;
+    gain.gain.value = vol;
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + duration);
+  } catch(e) {}
+}
+
+function updateModeIndicator() {
+  const mode = document.getElementById('paramMode').value;
+  const badge = document.getElementById('modeBadge');
+  badge.className = 'mode-badge ' + (mode === 'compare' ? 'compare' : mode);
+  badge.textContent = mode === 'compare' ? 'COMPARE' : mode === 'learning' ? 'LEARNING' : 'RATIONAL';
+
+  const compHeader = document.getElementById('comparisonHeader');
+  compHeader.classList.toggle('visible', mode === 'compare');
+}
+
+function resetSim() {
+  running = false;
+  if (animFrame) cancelAnimationFrame(animFrame);
+  document.getElementById('btnStart').textContent = 'Start';
+  document.getElementById('btnStart').classList.remove('active');
+
+  const mode = document.getElementById('paramMode').value;
+  if (mode === 'compare') {
+    sim1 = new SimState(getParams(true));
+    sim2 = new SimState(getParams(false));
+  } else {
+    sim1 = new SimState(getParams(mode === 'learning'));
+    sim2 = null;
+  }
+
+  chartPrice.data.labels = [];
+  chartPrice.data.datasets.forEach(d => d.data = []);
+  chartPrice.data.datasets[2].hidden = mode !== 'compare';
+  chartVolume.data.labels = [];
+  chartVolume.data.datasets[0].data = [];
+  chartReturns.data.labels = [];
+  chartReturns.data.datasets[0].data = [];
+  chartWealth.data.labels = [];
+  chartWealth.data.datasets[0].data = [];
+  chartWealth.data.datasets[0].backgroundColor = [];
+  chartWealth.data.datasets[0].borderColor = [];
+  chartGini.data.labels = [];
+  chartGini.data.datasets[0].data = [];
+
+  [chartPrice, chartVolume, chartReturns, chartWealth, chartGini].forEach(c => c.update());
+  document.getElementById('tickDisplay').textContent = 'Tick: 0';
+  updateStatsDisplay(sim1);
+  updateModeIndicator();
+  updateNarrative(sim1);
+  updateMood(sim1);
+  updateLeaderboard(sim1);
+}
+
+function toggleRun() {
+  running = !running;
+  const btn = document.getElementById('btnStart');
+  if (running) {
+    btn.textContent = 'Pause';
+    btn.classList.add('active');
+    if (!sim1) resetSim();
+    runLoop();
+  } else {
+    btn.textContent = 'Start';
+    btn.classList.remove('active');
+    if (animFrame) cancelAnimationFrame(animFrame);
+  }
+}
+
+function stepOnce() {
+  if (!sim1) resetSim();
+  sim1.step();
+  if (sim2) sim2.step();
+  updateCharts();
+  updateStatsDisplay(sim1);
+  updateNarrative(sim1);
+  updateMood(sim1);
+  updateLeaderboard(sim1);
+}
+
+let frameCount = 0;
+
+function runLoop() {
+  if (!running) return;
+  const speed = parseInt(document.getElementById('speedSlider').value);
+  for (let i = 0; i < speed; i++) {
+    sim1.step();
+    if (sim2) sim2.step();
+  }
+  frameCount++;
+  updateCharts();
+  updateStatsDisplay(sim1);
+
+  // Update narrative/mood/leaderboard less frequently for performance
+  if (frameCount % 3 === 0) {
+    updateNarrative(sim1);
+    updateMood(sim1);
+    updateLeaderboard(sim1);
+  }
+
+  // Sound: play tick on significant price moves
+  if (soundEnabled && sim1.stock.returnHistory.length > 1) {
+    const lastRet = sim1.stock.returnHistory[sim1.stock.returnHistory.length - 1];
+    if (Math.abs(lastRet) > 0.02) {
+      const isUp = lastRet > 0;
+      playTick(isUp ? 880 : 220, 0.08, 0.05);
+    }
+    if (Math.abs(lastRet) > 0.08) {
+      // crash or boom alarm
+      playTick(lastRet > 0 ? 1200 : 150, 0.3, 0.12);
+    }
+  }
+
+  animFrame = requestAnimationFrame(runLoop);
+}
+
+function updateCharts() {
+  if (!sim1) return;
+  const s = sim1.stock;
+  const maxPoints = 1000;
+
+  const prices = downsample(s.priceHistory, maxPoints);
+  const fvs = downsample(s.dividendHistory.map(d => d / s.r), maxPoints);
+  const volumes = downsample(s.volumeHistory, maxPoints);
+  const ginis = downsample(sim1.giniHistory, maxPoints);
+  const labels = prices.map((_, i) => i);
+
+  // Price chart
+  chartPrice.data.labels = labels;
+  chartPrice.data.datasets[0].data = prices;
+  chartPrice.data.datasets[0].label = sim2 ? 'Price (Learning)' : 'Price';
+  chartPrice.data.datasets[1].data = fvs;
+  if (sim2) {
+    const prices2 = downsample(sim2.stock.priceHistory, maxPoints);
+    chartPrice.data.datasets[2].data = prices2;
+    chartPrice.data.datasets[2].hidden = false;
+    chartPrice.data.datasets[2].label = 'Price (Rational)';
+  } else {
+    chartPrice.data.datasets[2].hidden = true;
+  }
+
+  // Volume - color bars by direction
+  const volLabels = volumes.map((_, i) => i);
+  chartVolume.data.labels = volLabels;
+  chartVolume.data.datasets[0].data = volumes;
+
+  // Returns histogram
+  const returns = s.returnHistory;
+  if (returns.length > 10) {
+    const bins = buildHistogram(returns, 40);
+    chartReturns.data.labels = bins.labels;
+    chartReturns.data.datasets[0].data = bins.counts;
+    // Color by positive/negative
+    chartReturns.data.datasets[0].backgroundColor = bins.labels.map(l =>
+      parseFloat(l) >= 0 ? 'rgba(0,204,102,0.35)' : 'rgba(255,68,68,0.35)'
+    );
+    chartReturns.data.datasets[0].borderColor = bins.labels.map(l =>
+      parseFloat(l) >= 0 ? '#00cc66' : '#ff4444'
+    );
+  }
+
+  // Wealth distribution - gradient colors
+  const wealths = sim1.agents.map(a => a.wealth).sort((a, b) => a - b);
+  chartWealth.data.labels = wealths.map((_, i) => 'A' + i);
+  chartWealth.data.datasets[0].data = wealths;
+  const maxW = Math.max(...wealths, 1);
+  const minW = Math.min(...wealths);
+  chartWealth.data.datasets[0].backgroundColor = wealths.map(w => {
+    const t = maxW !== minW ? (w - minW) / (maxW - minW) : 0.5;
+    if (t > 0.7) return 'rgba(0,255,136,0.4)';
+    if (t > 0.3) return 'rgba(0,150,255,0.3)';
+    return 'rgba(255,68,68,0.3)';
+  });
+  chartWealth.data.datasets[0].borderColor = wealths.map(w => {
+    const t = maxW !== minW ? (w - minW) / (maxW - minW) : 0.5;
+    if (t > 0.7) return '#00ff88';
+    if (t > 0.3) return '#0096ff';
+    return '#ff4444';
+  });
+
+  // Gini
+  chartGini.data.labels = ginis.map((_, i) => i);
+  chartGini.data.datasets[0].data = ginis;
+
+  document.getElementById('tickDisplay').textContent = `Tick: ${sim1.tick}`;
+
+  [chartPrice, chartVolume, chartReturns, chartWealth, chartGini].forEach(c => c.update());
+}
+
+function updateStatsDisplay(sim) {
+  if (!sim) return;
+  const s = sim.stock;
+  const priceEl = document.getElementById('statPrice');
+  priceEl.textContent = s.price.toFixed(2);
+
+  // Color price by direction
+  if (s.priceHistory.length > 1) {
+    const prev = s.priceHistory[s.priceHistory.length - 2];
+    priceEl.className = 'value ' + (s.price >= prev ? 'positive' : 'negative');
+  }
+
+  document.getElementById('statFV').textContent = s.fundamentalValue.toFixed(2);
+  document.getElementById('statDiv').textContent = s.dividend.toFixed(3);
+  document.getElementById('statVol').textContent = s.volumeHistory.length > 0 ? s.volumeHistory[s.volumeHistory.length - 1].toFixed(1) : '--';
+
+  if (s.returnHistory.length > 20) {
+    const recent = s.returnHistory.slice(-100);
+    const stdR = std(recent);
+    document.getElementById('statVolatility').textContent = (stdR * Math.sqrt(252)).toFixed(4);
+    const k = kurtosis(s.returnHistory);
+    const el = document.getElementById('statKurtosis');
+    el.textContent = k.toFixed(2);
+    el.className = 'value' + (k > 1 ? ' positive' : '');
+  }
+  document.getElementById('statGini').textContent = sim.giniHistory.length > 0 ? sim.giniHistory[sim.giniHistory.length - 1].toFixed(4) : '--';
+}
+
+// ===== Market Mood =====
+
+function updateMood(sim) {
+  if (!sim || sim.stock.priceHistory.length < 5) return;
+  const s = sim.stock;
+  const fv = s.fundamentalValue;
+  const ratio = fv > 0 ? s.price / fv : 1;
+
+  // Compute momentum (recent price trend)
+  const recent = s.priceHistory.slice(-20);
+  let momentum = 0;
+  if (recent.length >= 2) {
+    momentum = (recent[recent.length - 1] - recent[0]) / (Math.abs(recent[0]) || 1);
+  }
+
+  // Mood score: 0 = extreme fear, 100 = extreme greed
+  let moodScore = 50;
+  moodScore += (ratio - 1) * 120; // price vs FV
+  moodScore += momentum * 200;     // momentum
+  moodScore = Math.max(0, Math.min(100, moodScore));
+
+  let emoji, text, color;
+  if (moodScore < 15) {
+    emoji = '😱'; text = 'Extreme Fear'; color = '#ff4444';
+  } else if (moodScore < 30) {
+    emoji = '😨'; text = 'Fear'; color = '#ff6644';
+  } else if (moodScore < 45) {
+    emoji = '😟'; text = 'Cautious'; color = '#cc8844';
+  } else if (moodScore < 55) {
+    emoji = '😐'; text = 'Neutral'; color = '#aaaaaa';
+  } else if (moodScore < 70) {
+    emoji = '🙂'; text = 'Optimistic'; color = '#88cc44';
+  } else if (moodScore < 85) {
+    emoji = '😀'; text = 'Greed'; color = '#44cc44';
+  } else {
+    emoji = '🤑'; text = 'Extreme Greed'; color = '#00ff88';
+  }
+
+  document.getElementById('moodEmoji').textContent = emoji;
+  document.getElementById('moodText').textContent = text;
+  document.getElementById('moodText').style.color = color;
+  document.getElementById('moodThumb').style.left = moodScore + '%';
+}
+
+// ===== What's Happening Narrative =====
+
+function updateNarrative(sim) {
+  if (!sim) return;
+  const s = sim.stock;
+  const iconEl = document.getElementById('narrativeIcon');
+  const textEl = document.getElementById('narrativeText');
+
+  if (s.priceHistory.length < 10) {
+    iconEl.textContent = '📊';
+    textEl.innerHTML = 'Market is warming up. Agents are calibrating their initial strategies...';
+    return;
+  }
+
+  const fv = s.fundamentalValue;
+  const price = s.price;
+  const ratio = fv > 0 ? price / fv : 1;
+  const recent = s.returnHistory.slice(-10);
+  const recentVol = recent.length > 2 ? std(recent) : 0;
+  const lastReturn = recent.length > 0 ? recent[recent.length - 1] : 0;
+
+  // Detect regime
+  if (ratio > 1.15 && lastReturn > 0.01) {
+    iconEl.textContent = '📈🔥';
+    textEl.innerHTML = '<strong>Bubble forming!</strong> Momentum traders are piling in, driving price ' + ((ratio - 1) * 100).toFixed(0) + '% above fundamental value. The herd is charging.';
+  } else if (ratio > 1.1) {
+    iconEl.textContent = '📈';
+    textEl.innerHTML = '<strong>Overvalued.</strong> Price is ' + ((ratio - 1) * 100).toFixed(0) + '% above fundamental value. Momentum strategies are winning, but value traders may stage a correction.';
+  } else if (ratio < 0.85 && lastReturn < -0.01) {
+    iconEl.textContent = '📉💥';
+    textEl.innerHTML = '<strong>Crash!</strong> Value traders overwhelmed the momentum players. Price plunged to ' + ((1 - ratio) * 100).toFixed(0) + '% below fundamental value.';
+  } else if (ratio < 0.9) {
+    iconEl.textContent = '📉';
+    textEl.innerHTML = '<strong>Undervalued.</strong> Price sits ' + ((1 - ratio) * 100).toFixed(0) + '% below fundamental value. A recovery may be brewing as value-oriented rules gain fitness.';
+  } else if (recentVol < 0.005) {
+    iconEl.textContent = '😴';
+    textEl.innerHTML = '<strong>Quiet period.</strong> Agents have converged on similar strategies. Low volatility, low volume. ' + (sim.learning ? 'But evolution never stops — a mutation could break the calm.' : 'Rational agents have found equilibrium.');
+  } else if (recentVol > 0.03) {
+    iconEl.textContent = '⚡';
+    textEl.innerHTML = '<strong>Turbulence!</strong> Volatility is spiking as competing strategies clash. This is complexity in action — order emerging from disagreement.';
+  } else {
+    iconEl.textContent = '📊';
+    textEl.innerHTML = 'Normal trading. Price is near fundamental value (ratio: ' + ratio.toFixed(2) + '). Agents are adapting, testing new strategies through genetic evolution.';
+  }
+}
+
+// ===== Leaderboard =====
+
+function updateLeaderboard(sim) {
+  if (!sim || sim.agents.length < 5) return;
+  const sorted = sim.agents.slice().sort((a, b) => b.wealth - a.wealth);
+  const top5 = sorted.slice(0, 5);
+  const bot5 = sorted.slice(-5).reverse();
+
+  const topEl = document.getElementById('lbTop');
+  const botEl = document.getElementById('lbBottom');
+
+  topEl.innerHTML = top5.map((a, i) =>
+    `<div class="lb-row"><span class="lb-name">${['🥇','🥈','🥉','4.','5.'][i]} Agent #${a.id}</span><span class="lb-val winner">${a.wealth.toFixed(0)}</span></div>`
+  ).join('');
+
+  botEl.innerHTML = bot5.map((a, i) =>
+    `<div class="lb-row"><span class="lb-name">${sim.agents.length - 4 + i}. Agent #${a.id}</span><span class="lb-val loser">${a.wealth.toFixed(0)}</span></div>`
+  ).join('');
+}
+
+// ===== Utility functions =====
+
+function downsample(arr, maxLen) {
+  if (arr.length <= maxLen) return arr.slice();
+  const step = arr.length / maxLen;
+  const result = [];
+  for (let i = 0; i < maxLen; i++) result.push(arr[Math.floor(i * step)]);
+  return result;
+}
+
+function buildHistogram(data, numBins) {
+  const min = Math.min(...data);
+  const max = Math.max(...data);
+  const range = max - min || 1;
+  const binWidth = range / numBins;
+  const counts = new Array(numBins).fill(0);
+  for (const v of data) {
+    const idx = Math.min(Math.floor((v - min) / binWidth), numBins - 1);
+    counts[idx]++;
+  }
+  const labels = counts.map((_, i) => (min + (i + 0.5) * binWidth).toFixed(4));
+  return { labels, counts };
+}
+
+function mean(arr) {
+  return arr.reduce((s, v) => s + v, 0) / arr.length;
+}
+
+function std(arr) {
+  const m = mean(arr);
+  return Math.sqrt(arr.reduce((s, v) => s + (v - m) ** 2, 0) / arr.length);
+}
+
+function kurtosis(arr) {
+  const m = mean(arr);
+  const s = std(arr);
+  if (s === 0) return 0;
+  const n = arr.length;
+  let sum4 = 0;
+  for (const v of arr) sum4 += ((v - m) / s) ** 4;
+  return sum4 / n - 3;
+}
+
+// ===== Init =====
+
+initCharts();
+resetSim();
+</script>
+</body>
+</html>
