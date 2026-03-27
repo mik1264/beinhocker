@@ -1,0 +1,1237 @@
+{
+  "config": {
+    "num_firms": 40,
+    "num_ticks": 10,
+    "supply_chain_length": 4,
+    "base_demand": 10.0,
+    "dependency_prob": 0.08,
+    "seed": 42
+  },
+  "history": [
+    {
+      "tick": 1,
+      "phase": "normal",
+      "gdp": 11.56,
+      "market_index": 97.35,
+      "gini": 0.0662,
+      "unemployment": 0.0,
+      "supply_chain_stress": 0.0,
+      "mean_health": 0.6584,
+      "mean_tech_fitness": 0.7027,
+      "mean_flex_fraction": 0.395,
+      "cascade_size": 0,
+      "num_alive": 40,
+      "consumer_demand": 10.0,
+      "market_sentiment": 0.0022,
+      "tech_generation": 0
+    },
+    {
+      "tick": 2,
+      "phase": "normal",
+      "gdp": 11.25,
+      "market_index": 93.41,
+      "gini": 0.0709,
+      "unemployment": 0.0,
+      "supply_chain_stress": 0.0,
+      "mean_health": 0.657,
+      "mean_tech_fitness": 0.7027,
+      "mean_flex_fraction": 0.39,
+      "cascade_size": 0,
+      "num_alive": 40,
+      "consumer_demand": 10.0,
+      "market_sentiment": 0.0072,
+      "tech_generation": 0
+    },
+    {
+      "tick": 3,
+      "phase": "normal",
+      "gdp": 11.2,
+      "market_index": 90.0,
+      "gini": 0.0756,
+      "unemployment": 0.0,
+      "supply_chain_stress": 0.0,
+      "mean_health": 0.6538,
+      "mean_tech_fitness": 0.7027,
+      "mean_flex_fraction": 0.385,
+      "cascade_size": 0,
+      "num_alive": 40,
+      "consumer_demand": 10.0,
+      "market_sentiment": -0.015,
+      "tech_generation": 0
+    },
+    {
+      "tick": 4,
+      "phase": "normal",
+      "gdp": 11.16,
+      "market_index": 86.97,
+      "gini": 0.084,
+      "unemployment": 0.0,
+      "supply_chain_stress": 0.0,
+      "mean_health": 0.651,
+      "mean_tech_fitness": 0.7027,
+      "mean_flex_fraction": 0.38,
+      "cascade_size": 0,
+      "num_alive": 40,
+      "consumer_demand": 10.0,
+      "market_sentiment": 0.0199,
+      "tech_generation": 0
+    },
+    {
+      "tick": 5,
+      "phase": "normal",
+      "gdp": 11.13,
+      "market_index": 84.02,
+      "gini": 0.0937,
+      "unemployment": 0.0,
+      "supply_chain_stress": 0.0,
+      "mean_health": 0.6483,
+      "mean_tech_fitness": 0.7027,
+      "mean_flex_fraction": 0.375,
+      "cascade_size": 0,
+      "num_alive": 40,
+      "consumer_demand": 10.0,
+      "market_sentiment": 0.0313,
+      "tech_generation": 0
+    },
+    {
+      "tick": 6,
+      "phase": "normal",
+      "gdp": 11.12,
+      "market_index": 80.98,
+      "gini": 0.0995,
+      "unemployment": 0.0,
+      "supply_chain_stress": 0.0,
+      "mean_health": 0.6454,
+      "mean_tech_fitness": 0.7027,
+      "mean_flex_fraction": 0.37,
+      "cascade_size": 0,
+      "num_alive": 40,
+      "consumer_demand": 10.0,
+      "market_sentiment": 0.0377,
+      "tech_generation": 0
+    },
+    {
+      "tick": 7,
+      "phase": "normal",
+      "gdp": 11.11,
+      "market_index": 78.05,
+      "gini": 0.1035,
+      "unemployment": 0.0,
+      "supply_chain_stress": 0.0,
+      "mean_health": 0.6423,
+      "mean_tech_fitness": 0.7027,
+      "mean_flex_fraction": 0.365,
+      "cascade_size": 0,
+      "num_alive": 40,
+      "consumer_demand": 10.0,
+      "market_sentiment": 0.0203,
+      "tech_generation": 0
+    },
+    {
+      "tick": 8,
+      "phase": "normal",
+      "gdp": 11.11,
+      "market_index": 75.53,
+      "gini": 0.1129,
+      "unemployment": 0.0,
+      "supply_chain_stress": 0.0,
+      "mean_health": 0.6392,
+      "mean_tech_fitness": 0.7027,
+      "mean_flex_fraction": 0.36,
+      "cascade_size": 0,
+      "num_alive": 40,
+      "consumer_demand": 10.0,
+      "market_sentiment": 0.0498,
+      "tech_generation": 0
+    },
+    {
+      "tick": 9,
+      "phase": "normal",
+      "gdp": 11.1,
+      "market_index": 73.24,
+      "gini": 0.1222,
+      "unemployment": 0.0,
+      "supply_chain_stress": 0.0,
+      "mean_health": 0.6366,
+      "mean_tech_fitness": 0.7027,
+      "mean_flex_fraction": 0.355,
+      "cascade_size": 0,
+      "num_alive": 40,
+      "consumer_demand": 10.0,
+      "market_sentiment": 0.0521,
+      "tech_generation": 0
+    },
+    {
+      "tick": 10,
+      "phase": "normal",
+      "gdp": 11.1,
+      "market_index": 70.65,
+      "gini": 0.1299,
+      "unemployment": 0.0,
+      "supply_chain_stress": 0.0,
+      "mean_health": 0.6342,
+      "mean_tech_fitness": 0.7027,
+      "mean_flex_fraction": 0.35,
+      "cascade_size": 0,
+      "num_alive": 40,
+      "consumer_demand": 10.0,
+      "market_sentiment": 0.0241,
+      "tech_generation": 0
+    }
+  ],
+  "events": [],
+  "phase_transitions": [],
+  "network": {
+    "nodes": [
+      {
+        "id": 0,
+        "alive": true,
+        "health": 0.6,
+        "stock_price": 87.89,
+        "tech_fitness": 0.61,
+        "flex_fraction": 0.35,
+        "supply_chain_pos": 0,
+        "output": 1.0,
+        "age": 10
+      },
+      {
+        "id": 1,
+        "alive": true,
+        "health": 0.63,
+        "stock_price": 55.23,
+        "tech_fitness": 0.771,
+        "flex_fraction": 0.35,
+        "supply_chain_pos": 1,
+        "output": 0.11,
+        "age": 10
+      },
+      {
+        "id": 2,
+        "alive": true,
+        "health": 0.612,
+        "stock_price": 62.04,
+        "tech_fitness": 0.669,
+        "flex_fraction": 0.35,
+        "supply_chain_pos": 2,
+        "output": 0.0,
+        "age": 10
+      },
+      {
+        "id": 3,
+        "alive": true,
+        "health": 0.619,
+        "stock_price": 55.86,
+        "tech_fitness": 0.702,
+        "flex_fraction": 0.35,
+        "supply_chain_pos": 3,
+        "output": 0.0,
+        "age": 10
+      },
+      {
+        "id": 4,
+        "alive": true,
+        "health": 0.64,
+        "stock_price": 79.38,
+        "tech_fitness": 0.76,
+        "flex_fraction": 0.35,
+        "supply_chain_pos": 0,
+        "output": 1.0,
+        "age": 10
+      },
+      {
+        "id": 5,
+        "alive": true,
+        "health": 0.594,
+        "stock_price": 61.43,
+        "tech_fitness": 0.736,
+        "flex_fraction": 0.35,
+        "supply_chain_pos": 1,
+        "output": 0.11,
+        "age": 10
+      },
+      {
+        "id": 6,
+        "alive": true,
+        "health": 0.652,
+        "stock_price": 61.0,
+        "tech_fitness": 0.822,
+        "flex_fraction": 0.35,
+        "supply_chain_pos": 2,
+        "output": 0.0,
+        "age": 10
+      },
+      {
+        "id": 7,
+        "alive": true,
+        "health": 0.597,
+        "stock_price": 64.13,
+        "tech_fitness": 0.562,
+        "flex_fraction": 0.35,
+        "supply_chain_pos": 3,
+        "output": 0.0,
+        "age": 10
+      },
+      {
+        "id": 8,
+        "alive": true,
+        "health": 0.618,
+        "stock_price": 110.22,
+        "tech_fitness": 0.537,
+        "flex_fraction": 0.35,
+        "supply_chain_pos": 0,
+        "output": 1.0,
+        "age": 10
+      },
+      {
+        "id": 9,
+        "alive": true,
+        "health": 0.638,
+        "stock_price": 65.22,
+        "tech_fitness": 0.741,
+        "flex_fraction": 0.35,
+        "supply_chain_pos": 1,
+        "output": 0.11,
+        "age": 10
+      },
+      {
+        "id": 10,
+        "alive": true,
+        "health": 0.666,
+        "stock_price": 60.98,
+        "tech_fitness": 0.714,
+        "flex_fraction": 0.35,
+        "supply_chain_pos": 2,
+        "output": 0.0,
+        "age": 10
+      },
+      {
+        "id": 11,
+        "alive": true,
+        "health": 0.651,
+        "stock_price": 67.52,
+        "tech_fitness": 0.721,
+        "flex_fraction": 0.35,
+        "supply_chain_pos": 3,
+        "output": 0.0,
+        "age": 10
+      },
+      {
+        "id": 12,
+        "alive": true,
+        "health": 0.726,
+        "stock_price": 106.7,
+        "tech_fitness": 0.845,
+        "flex_fraction": 0.35,
+        "supply_chain_pos": 0,
+        "output": 1.0,
+        "age": 10
+      },
+      {
+        "id": 13,
+        "alive": true,
+        "health": 0.563,
+        "stock_price": 63.03,
+        "tech_fitness": 0.518,
+        "flex_fraction": 0.35,
+        "supply_chain_pos": 1,
+        "output": 0.11,
+        "age": 10
+      },
+      {
+        "id": 14,
+        "alive": true,
+        "health": 0.582,
+        "stock_price": 60.68,
+        "tech_fitness": 0.532,
+        "flex_fraction": 0.35,
+        "supply_chain_pos": 2,
+        "output": 0.0,
+        "age": 10
+      },
+      {
+        "id": 15,
+        "alive": true,
+        "health": 0.586,
+        "stock_price": 57.26,
+        "tech_fitness": 0.611,
+        "flex_fraction": 0.35,
+        "supply_chain_pos": 3,
+        "output": 0.0,
+        "age": 10
+      },
+      {
+        "id": 16,
+        "alive": true,
+        "health": 0.635,
+        "stock_price": 92.85,
+        "tech_fitness": 0.648,
+        "flex_fraction": 0.35,
+        "supply_chain_pos": 0,
+        "output": 1.0,
+        "age": 10
+      },
+      {
+        "id": 17,
+        "alive": true,
+        "health": 0.639,
+        "stock_price": 61.34,
+        "tech_fitness": 0.875,
+        "flex_fraction": 0.35,
+        "supply_chain_pos": 1,
+        "output": 0.11,
+        "age": 10
+      },
+      {
+        "id": 18,
+        "alive": true,
+        "health": 0.61,
+        "stock_price": 60.33,
+        "tech_fitness": 0.568,
+        "flex_fraction": 0.35,
+        "supply_chain_pos": 2,
+        "output": 0.0,
+        "age": 10
+      },
+      {
+        "id": 19,
+        "alive": true,
+        "health": 0.61,
+        "stock_price": 65.27,
+        "tech_fitness": 0.652,
+        "flex_fraction": 0.35,
+        "supply_chain_pos": 3,
+        "output": 0.0,
+        "age": 10
+      },
+      {
+        "id": 20,
+        "alive": true,
+        "health": 0.708,
+        "stock_price": 114.97,
+        "tech_fitness": 0.723,
+        "flex_fraction": 0.35,
+        "supply_chain_pos": 0,
+        "output": 1.0,
+        "age": 10
+      },
+      {
+        "id": 21,
+        "alive": true,
+        "health": 0.658,
+        "stock_price": 62.62,
+        "tech_fitness": 0.81,
+        "flex_fraction": 0.35,
+        "supply_chain_pos": 1,
+        "output": 0.11,
+        "age": 10
+      },
+      {
+        "id": 22,
+        "alive": true,
+        "health": 0.579,
+        "stock_price": 51.83,
+        "tech_fitness": 0.626,
+        "flex_fraction": 0.35,
+        "supply_chain_pos": 2,
+        "output": 0.0,
+        "age": 10
+      },
+      {
+        "id": 23,
+        "alive": true,
+        "health": 0.673,
+        "stock_price": 57.72,
+        "tech_fitness": 0.877,
+        "flex_fraction": 0.35,
+        "supply_chain_pos": 3,
+        "output": 0.0,
+        "age": 10
+      },
+      {
+        "id": 24,
+        "alive": true,
+        "health": 0.687,
+        "stock_price": 105.26,
+        "tech_fitness": 0.762,
+        "flex_fraction": 0.35,
+        "supply_chain_pos": 0,
+        "output": 1.0,
+        "age": 10
+      },
+      {
+        "id": 25,
+        "alive": true,
+        "health": 0.624,
+        "stock_price": 64.61,
+        "tech_fitness": 0.684,
+        "flex_fraction": 0.35,
+        "supply_chain_pos": 1,
+        "output": 0.11,
+        "age": 10
+      },
+      {
+        "id": 26,
+        "alive": true,
+        "health": 0.628,
+        "stock_price": 53.77,
+        "tech_fitness": 0.725,
+        "flex_fraction": 0.35,
+        "supply_chain_pos": 2,
+        "output": 0.0,
+        "age": 10
+      },
+      {
+        "id": 27,
+        "alive": true,
+        "health": 0.693,
+        "stock_price": 58.66,
+        "tech_fitness": 0.859,
+        "flex_fraction": 0.35,
+        "supply_chain_pos": 3,
+        "output": 0.0,
+        "age": 10
+      },
+      {
+        "id": 28,
+        "alive": true,
+        "health": 0.703,
+        "stock_price": 94.08,
+        "tech_fitness": 0.899,
+        "flex_fraction": 0.35,
+        "supply_chain_pos": 0,
+        "output": 1.0,
+        "age": 10
+      },
+      {
+        "id": 29,
+        "alive": true,
+        "health": 0.526,
+        "stock_price": 62.95,
+        "tech_fitness": 0.519,
+        "flex_fraction": 0.35,
+        "supply_chain_pos": 1,
+        "output": 0.11,
+        "age": 10
+      },
+      {
+        "id": 30,
+        "alive": true,
+        "health": 0.681,
+        "stock_price": 58.63,
+        "tech_fitness": 0.817,
+        "flex_fraction": 0.35,
+        "supply_chain_pos": 2,
+        "output": 0.0,
+        "age": 10
+      },
+      {
+        "id": 31,
+        "alive": true,
+        "health": 0.597,
+        "stock_price": 53.92,
+        "tech_fitness": 0.653,
+        "flex_fraction": 0.35,
+        "supply_chain_pos": 3,
+        "output": 0.0,
+        "age": 10
+      },
+      {
+        "id": 32,
+        "alive": true,
+        "health": 0.731,
+        "stock_price": 101.59,
+        "tech_fitness": 0.888,
+        "flex_fraction": 0.35,
+        "supply_chain_pos": 0,
+        "output": 1.0,
+        "age": 10
+      },
+      {
+        "id": 33,
+        "alive": true,
+        "health": 0.622,
+        "stock_price": 77.01,
+        "tech_fitness": 0.788,
+        "flex_fraction": 0.35,
+        "supply_chain_pos": 1,
+        "output": 0.11,
+        "age": 10
+      },
+      {
+        "id": 34,
+        "alive": true,
+        "health": 0.607,
+        "stock_price": 54.26,
+        "tech_fitness": 0.607,
+        "flex_fraction": 0.35,
+        "supply_chain_pos": 2,
+        "output": 0.0,
+        "age": 10
+      },
+      {
+        "id": 35,
+        "alive": true,
+        "health": 0.614,
+        "stock_price": 64.2,
+        "tech_fitness": 0.674,
+        "flex_fraction": 0.35,
+        "supply_chain_pos": 3,
+        "output": 0.0,
+        "age": 10
+      },
+      {
+        "id": 36,
+        "alive": true,
+        "health": 0.745,
+        "stock_price": 104.36,
+        "tech_fitness": 0.85,
+        "flex_fraction": 0.35,
+        "supply_chain_pos": 0,
+        "output": 1.0,
+        "age": 10
+      },
+      {
+        "id": 37,
+        "alive": true,
+        "health": 0.554,
+        "stock_price": 56.42,
+        "tech_fitness": 0.571,
+        "flex_fraction": 0.35,
+        "supply_chain_pos": 1,
+        "output": 0.11,
+        "age": 10
+      },
+      {
+        "id": 38,
+        "alive": true,
+        "health": 0.654,
+        "stock_price": 65.73,
+        "tech_fitness": 0.619,
+        "flex_fraction": 0.35,
+        "supply_chain_pos": 2,
+        "output": 0.0,
+        "age": 10
+      },
+      {
+        "id": 39,
+        "alive": true,
+        "health": 0.614,
+        "stock_price": 65.14,
+        "tech_fitness": 0.561,
+        "flex_fraction": 0.35,
+        "supply_chain_pos": 3,
+        "output": 0.0,
+        "age": 10
+      }
+    ],
+    "edges": [
+      {
+        "source": 0,
+        "target": 5,
+        "active": true
+      },
+      {
+        "source": 0,
+        "target": 7,
+        "active": true
+      },
+      {
+        "source": 0,
+        "target": 12,
+        "active": true
+      },
+      {
+        "source": 0,
+        "target": 17,
+        "active": true
+      },
+      {
+        "source": 1,
+        "target": 2,
+        "active": true
+      },
+      {
+        "source": 1,
+        "target": 7,
+        "active": true
+      },
+      {
+        "source": 1,
+        "target": 39,
+        "active": true
+      },
+      {
+        "source": 2,
+        "target": 10,
+        "active": true
+      },
+      {
+        "source": 2,
+        "target": 27,
+        "active": true
+      },
+      {
+        "source": 3,
+        "target": 16,
+        "active": true
+      },
+      {
+        "source": 3,
+        "target": 20,
+        "active": true
+      },
+      {
+        "source": 3,
+        "target": 33,
+        "active": true
+      },
+      {
+        "source": 4,
+        "target": 15,
+        "active": true
+      },
+      {
+        "source": 4,
+        "target": 22,
+        "active": true
+      },
+      {
+        "source": 4,
+        "target": 23,
+        "active": true
+      },
+      {
+        "source": 5,
+        "target": 10,
+        "active": true
+      },
+      {
+        "source": 5,
+        "target": 28,
+        "active": true
+      },
+      {
+        "source": 6,
+        "target": 15,
+        "active": true
+      },
+      {
+        "source": 6,
+        "target": 22,
+        "active": true
+      },
+      {
+        "source": 7,
+        "target": 1,
+        "active": true
+      },
+      {
+        "source": 7,
+        "target": 23,
+        "active": true
+      },
+      {
+        "source": 7,
+        "target": 27,
+        "active": true
+      },
+      {
+        "source": 7,
+        "target": 35,
+        "active": true
+      },
+      {
+        "source": 8,
+        "target": 3,
+        "active": true
+      },
+      {
+        "source": 8,
+        "target": 29,
+        "active": true
+      },
+      {
+        "source": 8,
+        "target": 38,
+        "active": true
+      },
+      {
+        "source": 9,
+        "target": 11,
+        "active": true
+      },
+      {
+        "source": 9,
+        "target": 23,
+        "active": true
+      },
+      {
+        "source": 9,
+        "target": 31,
+        "active": true
+      },
+      {
+        "source": 9,
+        "target": 34,
+        "active": true
+      },
+      {
+        "source": 9,
+        "target": 38,
+        "active": true
+      },
+      {
+        "source": 10,
+        "target": 8,
+        "active": true
+      },
+      {
+        "source": 10,
+        "target": 19,
+        "active": true
+      },
+      {
+        "source": 10,
+        "target": 34,
+        "active": true
+      },
+      {
+        "source": 11,
+        "target": 0,
+        "active": true
+      },
+      {
+        "source": 12,
+        "target": 1,
+        "active": true
+      },
+      {
+        "source": 12,
+        "target": 10,
+        "active": true
+      },
+      {
+        "source": 13,
+        "target": 10,
+        "active": true
+      },
+      {
+        "source": 13,
+        "target": 25,
+        "active": true
+      },
+      {
+        "source": 13,
+        "target": 30,
+        "active": true
+      },
+      {
+        "source": 13,
+        "target": 32,
+        "active": true
+      },
+      {
+        "source": 14,
+        "target": 18,
+        "active": true
+      },
+      {
+        "source": 14,
+        "target": 19,
+        "active": true
+      },
+      {
+        "source": 14,
+        "target": 38,
+        "active": true
+      },
+      {
+        "source": 15,
+        "target": 11,
+        "active": true
+      },
+      {
+        "source": 15,
+        "target": 24,
+        "active": true
+      },
+      {
+        "source": 17,
+        "target": 35,
+        "active": true
+      },
+      {
+        "source": 18,
+        "target": 4,
+        "active": true
+      },
+      {
+        "source": 18,
+        "target": 30,
+        "active": true
+      },
+      {
+        "source": 18,
+        "target": 31,
+        "active": true
+      },
+      {
+        "source": 19,
+        "target": 3,
+        "active": true
+      },
+      {
+        "source": 19,
+        "target": 12,
+        "active": true
+      },
+      {
+        "source": 19,
+        "target": 22,
+        "active": true
+      },
+      {
+        "source": 20,
+        "target": 8,
+        "active": true
+      },
+      {
+        "source": 21,
+        "target": 17,
+        "active": true
+      },
+      {
+        "source": 21,
+        "target": 28,
+        "active": true
+      },
+      {
+        "source": 21,
+        "target": 33,
+        "active": true
+      },
+      {
+        "source": 22,
+        "target": 17,
+        "active": true
+      },
+      {
+        "source": 22,
+        "target": 36,
+        "active": true
+      },
+      {
+        "source": 23,
+        "target": 1,
+        "active": true
+      },
+      {
+        "source": 23,
+        "target": 9,
+        "active": true
+      },
+      {
+        "source": 23,
+        "target": 16,
+        "active": true
+      },
+      {
+        "source": 23,
+        "target": 17,
+        "active": true
+      },
+      {
+        "source": 23,
+        "target": 22,
+        "active": true
+      },
+      {
+        "source": 23,
+        "target": 33,
+        "active": true
+      },
+      {
+        "source": 23,
+        "target": 39,
+        "active": true
+      },
+      {
+        "source": 24,
+        "target": 5,
+        "active": true
+      },
+      {
+        "source": 24,
+        "target": 8,
+        "active": true
+      },
+      {
+        "source": 24,
+        "target": 36,
+        "active": true
+      },
+      {
+        "source": 25,
+        "target": 31,
+        "active": true
+      },
+      {
+        "source": 25,
+        "target": 39,
+        "active": true
+      },
+      {
+        "source": 26,
+        "target": 5,
+        "active": true
+      },
+      {
+        "source": 26,
+        "target": 15,
+        "active": true
+      },
+      {
+        "source": 26,
+        "target": 32,
+        "active": true
+      },
+      {
+        "source": 26,
+        "target": 35,
+        "active": true
+      },
+      {
+        "source": 27,
+        "target": 1,
+        "active": true
+      },
+      {
+        "source": 27,
+        "target": 9,
+        "active": true
+      },
+      {
+        "source": 27,
+        "target": 11,
+        "active": true
+      },
+      {
+        "source": 27,
+        "target": 12,
+        "active": true
+      },
+      {
+        "source": 27,
+        "target": 20,
+        "active": true
+      },
+      {
+        "source": 28,
+        "target": 24,
+        "active": true
+      },
+      {
+        "source": 28,
+        "target": 29,
+        "active": true
+      },
+      {
+        "source": 28,
+        "target": 33,
+        "active": true
+      },
+      {
+        "source": 28,
+        "target": 35,
+        "active": true
+      },
+      {
+        "source": 29,
+        "target": 10,
+        "active": true
+      },
+      {
+        "source": 29,
+        "target": 30,
+        "active": true
+      },
+      {
+        "source": 30,
+        "target": 26,
+        "active": true
+      },
+      {
+        "source": 30,
+        "target": 33,
+        "active": true
+      },
+      {
+        "source": 32,
+        "target": 5,
+        "active": true
+      },
+      {
+        "source": 32,
+        "target": 6,
+        "active": true
+      },
+      {
+        "source": 32,
+        "target": 11,
+        "active": true
+      },
+      {
+        "source": 32,
+        "target": 23,
+        "active": true
+      },
+      {
+        "source": 32,
+        "target": 24,
+        "active": true
+      },
+      {
+        "source": 32,
+        "target": 34,
+        "active": true
+      },
+      {
+        "source": 33,
+        "target": 1,
+        "active": true
+      },
+      {
+        "source": 33,
+        "target": 12,
+        "active": true
+      },
+      {
+        "source": 33,
+        "target": 22,
+        "active": true
+      },
+      {
+        "source": 33,
+        "target": 30,
+        "active": true
+      },
+      {
+        "source": 34,
+        "target": 0,
+        "active": true
+      },
+      {
+        "source": 34,
+        "target": 4,
+        "active": true
+      },
+      {
+        "source": 34,
+        "target": 6,
+        "active": true
+      },
+      {
+        "source": 34,
+        "target": 31,
+        "active": true
+      },
+      {
+        "source": 35,
+        "target": 4,
+        "active": true
+      },
+      {
+        "source": 35,
+        "target": 11,
+        "active": true
+      },
+      {
+        "source": 35,
+        "target": 20,
+        "active": true
+      },
+      {
+        "source": 35,
+        "target": 21,
+        "active": true
+      },
+      {
+        "source": 36,
+        "target": 19,
+        "active": true
+      },
+      {
+        "source": 36,
+        "target": 32,
+        "active": true
+      },
+      {
+        "source": 37,
+        "target": 6,
+        "active": true
+      },
+      {
+        "source": 37,
+        "target": 19,
+        "active": true
+      },
+      {
+        "source": 38,
+        "target": 6,
+        "active": true
+      },
+      {
+        "source": 38,
+        "target": 7,
+        "active": true
+      },
+      {
+        "source": 38,
+        "target": 22,
+        "active": true
+      },
+      {
+        "source": 38,
+        "target": 23,
+        "active": true
+      },
+      {
+        "source": 39,
+        "target": 16,
+        "active": true
+      },
+      {
+        "source": 39,
+        "target": 22,
+        "active": true
+      },
+      {
+        "source": 39,
+        "target": 38,
+        "active": true
+      }
+    ]
+  },
+  "statistics": {
+    "num_ticks": 10,
+    "num_firms": 40,
+    "mean_gdp": 11.185236634208001,
+    "std_gdp": 0.13330294409724544,
+    "final_gdp": 11.102709780479998,
+    "peak_gdp": 11.560431012799999,
+    "trough_gdp": 11.102709780479998,
+    "mean_market_index": 83.02113392464655,
+    "final_market_index": 70.65253666995213,
+    "mean_gini": 0.09585635170743165,
+    "final_gini": 0.12993211460628534,
+    "mean_unemployment": 0.0,
+    "max_unemployment": 0.0,
+    "total_cascades": 0,
+    "mean_cascade_size": 0.0,
+    "max_cascade_size": 0,
+    "tech_disruptions": 0,
+    "phase_transitions": 0,
+    "final_phase": "normal",
+    "firms_alive_at_end": 40
+  }
+}

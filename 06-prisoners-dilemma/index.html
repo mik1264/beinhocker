@@ -1,0 +1,1426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prisoner's Dilemma &mdash; Evolution of Cooperation</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', system-ui, sans-serif; background: #0a0e17; color: #c8cdd8; overflow-x: hidden; }
+
+/* ===== HERO ===== */
+.hero {
+  background: linear-gradient(135deg, #0d1220 0%, #111b2e 50%, #0d1a14 100%);
+  border-bottom: 1px solid #1e3a2a;
+  padding: 40px 32px 32px;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(0,100,255,0.03) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero-content { max-width: 900px; position: relative; z-index: 1; }
+.hero h1 {
+  font-size: 32px;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  background: linear-gradient(90deg, #4488ff, #44ccff, #00ff88);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 4px;
+}
+.hero .tagline {
+  font-size: 14px;
+  color: #5a7a8a;
+  font-weight: 500;
+  margin-bottom: 16px;
+  letter-spacing: 0.5px;
+}
+.hero p {
+  font-size: 16px;
+  line-height: 1.7;
+  color: #9ab0a8;
+  max-width: 780px;
+}
+.hero p strong { color: #c0e0ff; font-weight: 600; }
+
+.key-insight {
+  margin: 24px 0 0;
+  padding: 20px 24px;
+  background: linear-gradient(135deg, rgba(68,136,255,0.06), rgba(0,180,255,0.03));
+  border: 1px solid #1a2a3a;
+  border-left: 4px solid #4488ff;
+  border-radius: 0 8px 8px 0;
+  max-width: 780px;
+}
+.key-insight-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: #4488ff;
+  margin-bottom: 8px;
+}
+.key-insight p {
+  font-size: 14px;
+  line-height: 1.65;
+  color: #8a98aa;
+}
+.key-insight p strong { color: #b0d0ff; }
+
+/* ===== HEADER BAR ===== */
+.header {
+  background: #0f1520;
+  padding: 12px 24px;
+  border-bottom: 1px solid #1a2030;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.header-left { display: flex; align-items: center; gap: 16px; }
+.header-title { font-size: 15px; font-weight: 700; color: #e0e8f0; }
+.tick-display {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: #5a6a80;
+}
+.controls { display: flex; gap: 6px; align-items: center; }
+.controls button {
+  padding: 6px 16px;
+  border: 1px solid #1e2a3a;
+  background: #141c28;
+  color: #8090a8;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.15s;
+}
+.controls button:hover { background: #1a2840; border-color: #2a3a50; color: #b0c0d8; }
+.controls button.active { background: #003399; border-color: #4488ff; color: #fff; }
+.controls button.danger { border-color: #3a1a1a; color: #cc4444; }
+.controls button.danger:hover { background: #2a1010; color: #ff5555; }
+
+.mode-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  background: #0d1a2a;
+  color: #4488ff;
+  border: 1px solid #1a2a3a;
+}
+
+/* ===== MAIN LAYOUT ===== */
+.main { display: grid; grid-template-columns: 300px 1fr; min-height: calc(100vh - 160px); }
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+  background: #0c1018;
+  padding: 16px;
+  overflow-y: auto;
+  border-right: 1px solid #1a2030;
+}
+.sidebar h3 {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: #3a4a5a;
+  margin: 18px 0 8px;
+  font-weight: 700;
+}
+.sidebar h3:first-child { margin-top: 0; }
+.param-group { display: flex; flex-direction: column; gap: 5px; }
+.param { display: flex; justify-content: space-between; align-items: center; }
+.param label { font-size: 12px; color: #6a7a8a; }
+.param input, .param select {
+  width: 80px;
+  padding: 3px 6px;
+  background: #111820;
+  border: 1px solid #1a2535;
+  color: #b0c0d8;
+  border-radius: 3px;
+  font-size: 12px;
+  text-align: right;
+  font-family: 'JetBrains Mono', monospace;
+}
+.param select { text-align: left; width: 100px; }
+.param input.wide { width: 60px; }
+
+.speed-control { display: flex; align-items: center; gap: 6px; margin-top: 6px; }
+.speed-control label { font-size: 11px; color: #4a5a6a; }
+.speed-control input { flex: 1; accent-color: #4488ff; }
+
+/* Strategy mix */
+.strategy-mix { margin-top: 6px; }
+.strat-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 0;
+}
+.strat-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.strat-name {
+  font-size: 11px;
+  color: #6a7a8a;
+  flex: 1;
+}
+.strat-row input {
+  width: 50px;
+  padding: 2px 4px;
+  background: #111820;
+  border: 1px solid #1a2535;
+  color: #b0c0d8;
+  border-radius: 3px;
+  font-size: 11px;
+  text-align: right;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Stats box */
+.stats-box {
+  background: #111820;
+  border: 1px solid #1a2535;
+  border-radius: 6px;
+  padding: 10px;
+  margin-top: 10px;
+}
+.stat-row { display: flex; justify-content: space-between; font-size: 11px; padding: 3px 0; }
+.stat-row .label { color: #4a5a6a; }
+.stat-row .value { color: #8898b0; font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+.stat-row .value.positive { color: #00ff88; }
+.stat-row .value.negative { color: #ff4444; }
+
+/* Payoff matrix display */
+.payoff-grid {
+  display: grid;
+  grid-template-columns: auto 1fr 1fr;
+  gap: 1px;
+  background: #1a2535;
+  border: 1px solid #1a2535;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 6px;
+  font-size: 10px;
+}
+.payoff-cell {
+  background: #111820;
+  padding: 4px 6px;
+  text-align: center;
+  font-family: 'JetBrains Mono', monospace;
+}
+.payoff-header {
+  background: #0f1520;
+  color: #5a6a80;
+  font-weight: 600;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Narrative */
+.narrative-panel {
+  background: linear-gradient(135deg, #111820, #0f1620);
+  border: 1px solid #1a2535;
+  border-radius: 6px;
+  padding: 14px;
+  margin-top: 12px;
+}
+.narrative-header {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #3a4a5a;
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+.narrative-text {
+  font-size: 13px;
+  line-height: 1.5;
+  color: #8898b0;
+  min-height: 40px;
+}
+
+/* ===== CHARTS AREA ===== */
+.charts-area { padding: 16px; overflow-y: auto; }
+.charts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* Grid visualization */
+.grid-section {
+  margin-bottom: 12px;
+}
+.grid-container {
+  background: #111820;
+  border: 1px solid #1a2535;
+  border-radius: 8px;
+  padding: 14px;
+  position: relative;
+}
+.grid-container h4 {
+  font-size: 12px;
+  color: #5a6a80;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+.grid-annotation {
+  font-size: 11px;
+  color: #3a4a5a;
+  line-height: 1.4;
+  margin-bottom: 8px;
+  font-style: italic;
+}
+.grid-canvas-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 0;
+  overflow: hidden;
+}
+.grid-canvas-wrap canvas {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+/* Strategy legend */
+.strategy-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+  justify-content: center;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  color: #6a7a8a;
+}
+.legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* Chart containers */
+.chart-container {
+  background: #111820;
+  border: 1px solid #1a2535;
+  border-radius: 8px;
+  padding: 14px;
+  position: relative;
+  height: 280px;
+  min-height: 0;
+  overflow: hidden;
+}
+.chart-container.wide { grid-column: 1 / -1; height: 340px; }
+.chart-container h4 {
+  font-size: 12px;
+  color: #5a6a80;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+.chart-annotation {
+  font-size: 11px;
+  color: #3a4a5a;
+  line-height: 1.4;
+  margin-bottom: 8px;
+  font-style: italic;
+}
+.chart-container canvas { width: 100%; height: calc(100% - 50px); }
+
+/* Fun fact tooltips */
+.fun-fact {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 22px;
+  height: 22px;
+  background: #1a2535;
+  border: 1px solid #2a3a50;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: #5a6a80;
+  cursor: pointer;
+  transition: all 0.2s;
+  z-index: 5;
+}
+.fun-fact:hover { background: #2a3a50; color: #b0c0d8; }
+.fun-fact-tooltip {
+  display: none;
+  position: absolute;
+  top: 32px;
+  right: 0;
+  width: 280px;
+  background: #1a2535;
+  border: 1px solid #2a3a50;
+  border-radius: 6px;
+  padding: 12px;
+  font-size: 11px;
+  line-height: 1.5;
+  color: #8898b0;
+  z-index: 10;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+.fun-fact:hover .fun-fact-tooltip { display: block; }
+.fun-fact-tooltip strong { color: #b0c0d8; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #0a0e17; }
+::-webkit-scrollbar-thumb { background: #1a2535; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #2a3a50; }
+</style>
+</head>
+<body>
+
+<!-- ===== HERO ===== -->
+<div class="hero">
+  <div class="hero-content">
+    <h1>The Evolution of Cooperation</h1>
+    <div class="tagline">Axelrod's Tournament &amp; Spatial Prisoner's Dilemma &mdash; from Beinhocker's "The Origin of Wealth"</div>
+    <p>
+      In the 1980s, Robert Axelrod invited game theorists to submit strategies for an iterated Prisoner's Dilemma tournament.
+      The winner was <strong>Tit-for-Tat</strong> &mdash; the simplest strategy imaginable: cooperate first, then copy what
+      your opponent did last round. Watch as strategies compete, evolve, and form spatial patterns on the grid below.
+      <strong>Cooperation isn't naive &mdash; it's an emergent, evolutionarily stable strategy.</strong>
+    </p>
+    <div class="key-insight">
+      <div class="key-insight-label">Beinhocker's Key Insight</div>
+      <p>
+        Beinhocker uses Axelrod's tournaments to show that <strong>cooperation is not a mystery requiring altruism</strong> &mdash;
+        it emerges naturally from repeated interactions and evolutionary selection. In a world of pure one-shot encounters,
+        defection dominates. But add <strong>memory, repetition, and spatial structure</strong>, and cooperative strategies
+        like Tit-for-Tat form clusters that resist invasion by defectors. <strong>The shadow of the future makes
+        cooperation rational.</strong>
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== CONTROLS ===== -->
+<div class="header">
+  <div class="header-left">
+    <span class="header-title">Simulation</span>
+    <span class="mode-badge" id="modeBadge">SPATIAL</span>
+    <span class="tick-display" id="genDisplay">Generation: 0</span>
+  </div>
+  <div style="display:flex; align-items:center; gap: 8px;">
+    <div class="controls">
+      <button id="btnStart" onclick="toggleRun()">Start</button>
+      <button id="btnStep" onclick="stepOnce()">Step</button>
+      <button class="danger" onclick="resetSim()">Reset</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MAIN ===== -->
+<div class="main">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <h3>Simulation Mode</h3>
+    <div class="param-group">
+      <div class="param">
+        <label>Mode</label>
+        <select id="paramMode" onchange="updateMode()">
+          <option value="spatial">Spatial (Grid)</option>
+          <option value="tournament">Tournament</option>
+        </select>
+      </div>
+    </div>
+
+    <h3>Grid / Population</h3>
+    <div class="param-group">
+      <div class="param" id="gridSizeParam"><label>Grid Size</label><input type="number" id="paramGridSize" value="50" min="10" max="150"></div>
+      <div class="param" id="popParam" style="display:none"><label>Population</label><input type="number" id="paramPopulation" value="100" min="10" max="500"></div>
+      <div class="param"><label>Rounds / Match</label><input type="number" id="paramRounds" value="5" min="1" max="50"></div>
+      <div class="param" id="neighborhoodParam">
+        <label>Neighborhood</label>
+        <select id="paramNeighborhood">
+          <option value="moore">Moore (8)</option>
+          <option value="von_neumann">Von Neumann (4)</option>
+        </select>
+      </div>
+    </div>
+
+    <h3>Dynamics</h3>
+    <div class="param-group">
+      <div class="param"><label>Noise</label><input type="number" id="paramNoise" value="0.00" step="0.01" min="0" max="0.5"></div>
+      <div class="param"><label>Mutation Rate</label><input type="number" id="paramMutation" value="0.001" step="0.001" min="0" max="0.1"></div>
+    </div>
+
+    <h3>Payoff Matrix</h3>
+    <div class="param-group">
+      <div class="param"><label>T (Temptation)</label><input type="number" id="paramT" value="5" step="0.5" min="0" max="20" class="wide"></div>
+      <div class="param"><label>R (Reward)</label><input type="number" id="paramR" value="3" step="0.5" min="0" max="20" class="wide"></div>
+      <div class="param"><label>P (Punishment)</label><input type="number" id="paramP" value="1" step="0.5" min="0" max="20" class="wide"></div>
+      <div class="param"><label>S (Sucker)</label><input type="number" id="paramS" value="0" step="0.5" min="-10" max="20" class="wide"></div>
+    </div>
+    <div class="payoff-grid" id="payoffDisplay">
+      <div class="payoff-cell payoff-header"></div>
+      <div class="payoff-cell payoff-header">Opp: C</div>
+      <div class="payoff-cell payoff-header">Opp: D</div>
+      <div class="payoff-cell payoff-header">You: C</div>
+      <div class="payoff-cell" id="payoffRC">R=3</div>
+      <div class="payoff-cell" id="payoffSC">S=0</div>
+      <div class="payoff-cell payoff-header">You: D</div>
+      <div class="payoff-cell" id="payoffTD">T=5</div>
+      <div class="payoff-cell" id="payoffPD">P=1</div>
+    </div>
+
+    <h3>Strategy Mix (Initial %)</h3>
+    <div class="strategy-mix" id="strategyMixInputs"></div>
+
+    <h3>Speed</h3>
+    <div class="speed-control">
+      <label>Slow</label>
+      <input type="range" id="speedSlider" min="1" max="30" value="8">
+      <label>Fast</label>
+    </div>
+
+    <h3>Live Statistics</h3>
+    <div class="stats-box">
+      <div class="stat-row"><span class="label">Generation</span><span class="value" id="statGen">0</span></div>
+      <div class="stat-row"><span class="label">Cooperation Rate</span><span class="value" id="statCoop">--</span></div>
+      <div class="stat-row"><span class="label">Avg Payoff</span><span class="value" id="statPayoff">--</span></div>
+      <div class="stat-row"><span class="label">Dominant Strategy</span><span class="value" id="statDominant">--</span></div>
+      <div class="stat-row"><span class="label">Strategies Alive</span><span class="value" id="statAlive">--</span></div>
+    </div>
+
+    <!-- WHAT'S HAPPENING -->
+    <div class="narrative-panel">
+      <div class="narrative-header">What's Happening</div>
+      <div class="narrative-text" id="narrativeText">Press <strong>Start</strong> to begin. Agents on the grid will play their neighbors in the Prisoner's Dilemma and adopt the strategies of their most successful neighbors.</div>
+    </div>
+  </div>
+
+  <!-- CHARTS AREA -->
+  <div class="charts-area">
+    <!-- Grid visualization -->
+    <div class="grid-section" id="gridSection">
+      <div class="grid-container">
+        <h4>Spatial Strategy Map</h4>
+        <div class="grid-annotation">Each cell is an agent colored by strategy. Watch cooperative clusters form and defectors try to invade their borders.</div>
+        <div class="fun-fact">?
+          <div class="fun-fact-tooltip"><strong>Axelrod Fun Fact:</strong> In Axelrod's first tournament (1980), 14 strategies competed. Tit-for-Tat, submitted by Anatol Rapoport, won despite never "beating" any individual opponent. It won by eliciting cooperation from others.</div>
+        </div>
+        <div class="grid-canvas-wrap">
+          <canvas id="gridCanvas" width="500" height="500"></canvas>
+        </div>
+        <div class="strategy-legend" id="strategyLegend"></div>
+      </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="charts">
+      <!-- Cooperation rate -->
+      <div class="chart-container wide">
+        <h4>Cooperation Rate Over Time</h4>
+        <div class="chart-annotation">The fraction of all actions that were cooperative. Rising cooperation = strategies learning to work together.</div>
+        <div class="fun-fact">?
+          <div class="fun-fact-tooltip"><strong>Axelrod Fun Fact:</strong> The key properties of successful strategies in Axelrod's tournament were: <strong>nice</strong> (cooperate first), <strong>retaliatory</strong> (punish defection), <strong>forgiving</strong> (return to cooperation), and <strong>clear</strong> (easy for opponents to model).</div>
+        </div>
+        <canvas id="chartCoop"></canvas>
+      </div>
+
+      <!-- Strategy population -->
+      <div class="chart-container wide">
+        <h4>Strategy Population Over Time</h4>
+        <div class="chart-annotation">How each strategy's share of the population changes. Watch for competitive exclusion and coexistence.</div>
+        <div class="fun-fact">?
+          <div class="fun-fact-tooltip"><strong>Evolution Fun Fact:</strong> Nowak & May (1992) showed that spatial structure alone can sustain cooperation. Cooperators survive by forming clusters where they interact mostly with each other, earning mutual cooperation payoffs that defectors at the edges cannot match.</div>
+        </div>
+        <canvas id="chartPop"></canvas>
+      </div>
+
+      <!-- Average payoff -->
+      <div class="chart-container">
+        <h4>Average Payoff</h4>
+        <div class="chart-annotation">Higher payoff means the population is collectively doing better. Maximum = R (mutual cooperation).</div>
+        <div class="fun-fact">?
+          <div class="fun-fact-tooltip"><strong>Game Theory Fun Fact:</strong> The Prisoner's Dilemma payoff matrix satisfies T > R > P > S. If both cooperate, each gets R=3. But the temptation T=5 makes defection individually rational &mdash; even though mutual cooperation (R=3) beats mutual defection (P=1).</div>
+        </div>
+        <canvas id="chartPayoff"></canvas>
+      </div>
+
+      <!-- Strategy diversity -->
+      <div class="chart-container">
+        <h4>Strategy Diversity (Shannon Entropy)</h4>
+        <div class="chart-annotation">Higher entropy means more diverse strategies coexist. Low entropy means one strategy dominates.</div>
+        <div class="fun-fact">?
+          <div class="fun-fact-tooltip"><strong>Beinhocker Fun Fact:</strong> Beinhocker argues that economies, like ecologies, exist in a state of "perpetual novelty" &mdash; never reaching equilibrium but constantly creating new strategies and niches. Diversity is the engine of innovation.</div>
+        </div>
+        <canvas id="chartEntropy"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===================================================================
+// PRISONER'S DILEMMA SIMULATION ENGINE (JavaScript)
+// ===================================================================
+
+const COOPERATE = 0;
+const DEFECT = 1;
+
+const STRATEGY_TYPES = [
+  'always_cooperate', 'always_defect', 'tit_for_tat',
+  'generous_tft', 'pavlov', 'random', 'grudger'
+];
+const STRATEGY_NAMES = {
+  always_cooperate: 'AllC', always_defect: 'AllD',
+  tit_for_tat: 'TFT', generous_tft: 'GTFT',
+  pavlov: 'Pavlov', random: 'Random', grudger: 'Grudger'
+};
+const STRATEGY_COLORS = {
+  always_cooperate: '#00cc66', always_defect: '#ff4444',
+  tit_for_tat: '#4488ff', generous_tft: '#44ccff',
+  pavlov: '#ffaa00', random: '#888888', grudger: '#cc44ff'
+};
+
+// --- Strategy decision logic ---
+function strategyDecide(type, oppHistory, myHistory, noise) {
+  let action = strategyDecideImpl(type, oppHistory, myHistory);
+  if (noise > 0 && Math.random() < noise) action = 1 - action;
+  return action;
+}
+
+function strategyDecideImpl(type, oppHistory, myHistory) {
+  switch (type) {
+    case 'always_cooperate': return COOPERATE;
+    case 'always_defect': return DEFECT;
+    case 'tit_for_tat':
+      return oppHistory.length === 0 ? COOPERATE : oppHistory[oppHistory.length - 1];
+    case 'generous_tft':
+      if (oppHistory.length === 0) return COOPERATE;
+      if (oppHistory[oppHistory.length - 1] === DEFECT) {
+        return Math.random() < 0.33 ? COOPERATE : DEFECT;
+      }
+      return COOPERATE;
+    case 'pavlov': {
+      if (oppHistory.length === 0) return COOPERATE;
+      const lastMy = myHistory.length > 0 ? myHistory[myHistory.length - 1] : COOPERATE;
+      const lastOpp = oppHistory[oppHistory.length - 1];
+      if (lastMy === lastOpp) {
+        return lastMy === COOPERATE ? COOPERATE : COOPERATE; // R->stay, P->shift
+      } else {
+        return lastMy === COOPERATE ? DEFECT : DEFECT; // S->shift, T->stay
+      }
+    }
+    case 'random': return Math.random() < 0.5 ? COOPERATE : DEFECT;
+    case 'grudger':
+      return oppHistory.includes(DEFECT) ? DEFECT : COOPERATE;
+    default: return COOPERATE;
+  }
+}
+
+// --- Play a match between two strategy types ---
+function playMatch(type1, type2, rounds, noise) {
+  let opp1 = [], my1 = [], opp2 = [], my2 = [];
+  let score1 = 0, score2 = 0, coops1 = 0, coops2 = 0;
+  const T = simPayoff.T, R = simPayoff.R, P = simPayoff.P, S = simPayoff.S;
+
+  for (let r = 0; r < rounds; r++) {
+    const a1 = strategyDecide(type1, opp1, my1, noise);
+    const a2 = strategyDecide(type2, opp2, my2, noise);
+
+    let p1, p2;
+    if (a1 === COOPERATE && a2 === COOPERATE) { p1 = R; p2 = R; }
+    else if (a1 === COOPERATE && a2 === DEFECT) { p1 = S; p2 = T; }
+    else if (a1 === DEFECT && a2 === COOPERATE) { p1 = T; p2 = S; }
+    else { p1 = P; p2 = P; }
+
+    score1 += p1; score2 += p2;
+    if (a1 === COOPERATE) coops1++;
+    if (a2 === COOPERATE) coops2++;
+
+    my1.push(a1); opp1.push(a2);
+    my2.push(a2); opp2.push(a1);
+  }
+  return { score1, score2, coops1, coops2, rounds };
+}
+
+// ===================================================================
+// SPATIAL SIMULATION
+// ===================================================================
+
+class SpatialSim {
+  constructor(params) {
+    this.gridSize = params.gridSize;
+    this.rounds = params.rounds;
+    this.noise = params.noise;
+    this.mutation = params.mutation;
+    this.neighborhood = params.neighborhood;
+    this.grid = [];
+    this.generation = 0;
+
+    // Initialize grid
+    const types = STRATEGY_TYPES;
+    const weights = types.map(t => params.mix[t] || 0);
+    const total = weights.reduce((a, b) => a + b, 0);
+    const probs = weights.map(w => w / (total || 1));
+
+    for (let r = 0; r < this.gridSize; r++) {
+      const row = [];
+      for (let c = 0; c < this.gridSize; c++) {
+        row.push(weightedChoice(types, probs));
+      }
+      this.grid.push(row);
+    }
+  }
+
+  getNeighbors(r, c) {
+    const offsets = this.neighborhood === 'moore'
+      ? [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]]
+      : [[-1,0],[0,-1],[0,1],[1,0]];
+    const n = this.gridSize;
+    return offsets.map(([dr, dc]) => [(r + dr + n) % n, (c + dc + n) % n]);
+  }
+
+  step() {
+    const gs = this.gridSize;
+    const fitness = Array.from({length: gs}, () => new Float64Array(gs));
+    const games = Array.from({length: gs}, () => new Int32Array(gs));
+    const coops = Array.from({length: gs}, () => new Int32Array(gs));
+    const actions = Array.from({length: gs}, () => new Int32Array(gs));
+
+    // Play matches
+    const played = new Set();
+    for (let r = 0; r < gs; r++) {
+      for (let c = 0; c < gs; c++) {
+        const neighbors = this.getNeighbors(r, c);
+        for (const [nr, nc] of neighbors) {
+          const key = r < nr || (r === nr && c < nc)
+            ? `${r},${c}-${nr},${nc}` : `${nr},${nc}-${r},${c}`;
+          if (played.has(key)) continue;
+          played.add(key);
+
+          const result = playMatch(this.grid[r][c], this.grid[nr][nc], this.rounds, this.noise);
+          fitness[r][c] += result.score1;
+          fitness[nr][nc] += result.score2;
+          games[r][c] += this.rounds;
+          games[nr][nc] += this.rounds;
+          coops[r][c] += result.coops1;
+          coops[nr][nc] += result.coops2;
+          actions[r][c] += this.rounds;
+          actions[nr][nc] += this.rounds;
+        }
+      }
+    }
+
+    // Compute average fitness
+    const avgFitness = Array.from({length: gs}, () => new Float64Array(gs));
+    for (let r = 0; r < gs; r++) {
+      for (let c = 0; c < gs; c++) {
+        avgFitness[r][c] = games[r][c] > 0 ? fitness[r][c] / games[r][c] : 0;
+      }
+    }
+
+    // Collect metrics
+    let totalCoop = 0, totalActions = 0, totalFitness = 0, totalGames = 0;
+    const stratCount = {};
+    STRATEGY_TYPES.forEach(s => stratCount[s] = 0);
+    for (let r = 0; r < gs; r++) {
+      for (let c = 0; c < gs; c++) {
+        totalCoop += coops[r][c];
+        totalActions += actions[r][c];
+        totalFitness += fitness[r][c];
+        totalGames += games[r][c];
+        stratCount[this.grid[r][c]]++;
+      }
+    }
+
+    const totalAgents = gs * gs;
+    const coopRate = totalActions > 0 ? totalCoop / totalActions : 0;
+    const avgPayoff = totalGames > 0 ? totalFitness / totalGames : 0;
+    const stratFracs = {};
+    STRATEGY_TYPES.forEach(s => stratFracs[s] = stratCount[s] / totalAgents);
+
+    // Reproduction: adopt best neighbor's strategy
+    const newGrid = Array.from({length: gs}, () => new Array(gs));
+    for (let r = 0; r < gs; r++) {
+      for (let c = 0; c < gs; c++) {
+        let bestFit = avgFitness[r][c];
+        let bestType = this.grid[r][c];
+        const neighbors = this.getNeighbors(r, c);
+        for (const [nr, nc] of neighbors) {
+          if (avgFitness[nr][nc] > bestFit) {
+            bestFit = avgFitness[nr][nc];
+            bestType = this.grid[nr][nc];
+          }
+        }
+        // Mutation
+        if (this.mutation > 0 && Math.random() < this.mutation) {
+          bestType = STRATEGY_TYPES[Math.floor(Math.random() * STRATEGY_TYPES.length)];
+        }
+        newGrid[r][c] = bestType;
+      }
+    }
+    this.grid = newGrid;
+    this.generation++;
+
+    return { coopRate, avgPayoff, stratFracs, stratCount };
+  }
+}
+
+// ===================================================================
+// TOURNAMENT SIMULATION
+// ===================================================================
+
+class TournamentSim {
+  constructor(params) {
+    this.popSize = params.popSize;
+    this.rounds = params.rounds;
+    this.noise = params.noise;
+    this.mutation = params.mutation;
+    this.generation = 0;
+
+    const types = STRATEGY_TYPES;
+    const weights = types.map(t => params.mix[t] || 0);
+    const total = weights.reduce((a, b) => a + b, 0);
+    const probs = weights.map(w => w / (total || 1));
+
+    this.population = [];
+    for (let i = 0; i < this.popSize; i++) {
+      this.population.push(weightedChoice(types, probs));
+    }
+  }
+
+  step() {
+    const n = this.population.length;
+    const fitness = new Float64Array(n);
+    const games = new Int32Array(n);
+    const coopsArr = new Int32Array(n);
+    const actionsArr = new Int32Array(n);
+
+    // Round-robin or sampled
+    if (n <= 50) {
+      for (let i = 0; i < n; i++) {
+        for (let j = i + 1; j < n; j++) {
+          const result = playMatch(this.population[i], this.population[j], this.rounds, this.noise);
+          fitness[i] += result.score1;
+          fitness[j] += result.score2;
+          games[i] += this.rounds;
+          games[j] += this.rounds;
+          coopsArr[i] += result.coops1;
+          coopsArr[j] += result.coops2;
+          actionsArr[i] += this.rounds;
+          actionsArr[j] += this.rounds;
+        }
+      }
+    } else {
+      const oppsPerAgent = Math.min(20, n - 1);
+      for (let i = 0; i < n; i++) {
+        for (let k = 0; k < oppsPerAgent; k++) {
+          let j = Math.floor(Math.random() * n);
+          while (j === i) j = Math.floor(Math.random() * n);
+          const result = playMatch(this.population[i], this.population[j], this.rounds, this.noise);
+          fitness[i] += result.score1;
+          games[i] += this.rounds;
+          coopsArr[i] += result.coops1;
+          actionsArr[i] += this.rounds;
+        }
+      }
+    }
+
+    // Metrics
+    let totalCoop = 0, totalActions = 0, totalFitness = 0, totalGames = 0;
+    const stratCount = {};
+    STRATEGY_TYPES.forEach(s => stratCount[s] = 0);
+    const avgFit = new Float64Array(n);
+    for (let i = 0; i < n; i++) {
+      totalCoop += coopsArr[i];
+      totalActions += actionsArr[i];
+      totalFitness += fitness[i];
+      totalGames += games[i];
+      stratCount[this.population[i]]++;
+      avgFit[i] = games[i] > 0 ? fitness[i] / games[i] : 0;
+    }
+
+    const coopRate = totalActions > 0 ? totalCoop / totalActions : 0;
+    const avgPayoff = totalGames > 0 ? totalFitness / totalGames : 0;
+    const stratFracs = {};
+    STRATEGY_TYPES.forEach(s => stratFracs[s] = stratCount[s] / n);
+
+    // Replication
+    let minFit = Infinity;
+    for (let i = 0; i < n; i++) if (avgFit[i] < minFit) minFit = avgFit[i];
+    const shifted = new Float64Array(n);
+    let sumFit = 0;
+    for (let i = 0; i < n; i++) {
+      shifted[i] = avgFit[i] - minFit + 0.01;
+      sumFit += shifted[i];
+    }
+    const probs = new Float64Array(n);
+    for (let i = 0; i < n; i++) probs[i] = shifted[i] / sumFit;
+
+    const newPop = [];
+    for (let i = 0; i < n; i++) {
+      let idx = weightedIndexChoice(probs);
+      let type = this.population[idx];
+      if (this.mutation > 0 && Math.random() < this.mutation) {
+        type = STRATEGY_TYPES[Math.floor(Math.random() * STRATEGY_TYPES.length)];
+      }
+      newPop.push(type);
+    }
+    this.population = newPop;
+    this.generation++;
+
+    return { coopRate, avgPayoff, stratFracs, stratCount };
+  }
+}
+
+// --- Utility functions ---
+function weightedChoice(items, probs) {
+  const r = Math.random();
+  let cum = 0;
+  for (let i = 0; i < items.length; i++) {
+    cum += probs[i];
+    if (r < cum) return items[i];
+  }
+  return items[items.length - 1];
+}
+
+function weightedIndexChoice(probs) {
+  const r = Math.random();
+  let cum = 0;
+  for (let i = 0; i < probs.length; i++) {
+    cum += probs[i];
+    if (r < cum) return i;
+  }
+  return probs.length - 1;
+}
+
+// ===================================================================
+// APPLICATION STATE
+// ===================================================================
+
+let sim = null;
+let running = false;
+let animId = null;
+let simPayoff = { T: 5, R: 3, P: 1, S: 0 };
+
+// History for charts
+let histCoop = [];
+let histPayoff = [];
+let histStratFracs = {};
+let histEntropy = [];
+
+// Charts
+let chartCoop, chartPop, chartPayoff, chartEntropy;
+
+// ===================================================================
+// INITIALIZATION
+// ===================================================================
+
+function init() {
+  buildStrategyMixInputs();
+  buildLegend();
+  initCharts();
+  updatePayoffDisplay();
+  resetSim();
+}
+
+function buildStrategyMixInputs() {
+  const container = document.getElementById('strategyMixInputs');
+  container.innerHTML = '';
+  const defaults = {
+    always_cooperate: 15, always_defect: 15, tit_for_tat: 20,
+    generous_tft: 10, pavlov: 15, random: 10, grudger: 15
+  };
+  STRATEGY_TYPES.forEach(st => {
+    const row = document.createElement('div');
+    row.className = 'strat-row';
+    row.innerHTML = `
+      <span class="strat-dot" style="background:${STRATEGY_COLORS[st]}"></span>
+      <span class="strat-name">${STRATEGY_NAMES[st]}</span>
+      <input type="number" id="mix_${st}" value="${defaults[st]}" min="0" max="100" step="5">
+      <span style="font-size:10px;color:#4a5a6a">%</span>
+    `;
+    container.appendChild(row);
+  });
+}
+
+function buildLegend() {
+  const legend = document.getElementById('strategyLegend');
+  legend.innerHTML = '';
+  STRATEGY_TYPES.forEach(st => {
+    const item = document.createElement('div');
+    item.className = 'legend-item';
+    item.innerHTML = `<span class="legend-dot" style="background:${STRATEGY_COLORS[st]}"></span>${STRATEGY_NAMES[st]}`;
+    legend.appendChild(item);
+  });
+}
+
+function getStrategyMix() {
+  const mix = {};
+  STRATEGY_TYPES.forEach(st => {
+    mix[st] = parseFloat(document.getElementById(`mix_${st}`).value) || 0;
+  });
+  // Normalize
+  const total = Object.values(mix).reduce((a, b) => a + b, 0);
+  if (total > 0) {
+    STRATEGY_TYPES.forEach(st => mix[st] /= total);
+  } else {
+    STRATEGY_TYPES.forEach(st => mix[st] = 1 / STRATEGY_TYPES.length);
+  }
+  return mix;
+}
+
+function getParams() {
+  const mode = document.getElementById('paramMode').value;
+  simPayoff = {
+    T: parseFloat(document.getElementById('paramT').value) || 5,
+    R: parseFloat(document.getElementById('paramR').value) || 3,
+    P: parseFloat(document.getElementById('paramP').value) || 1,
+    S: parseFloat(document.getElementById('paramS').value) || 0
+  };
+  return {
+    mode,
+    gridSize: parseInt(document.getElementById('paramGridSize').value) || 50,
+    popSize: parseInt(document.getElementById('paramPopulation').value) || 100,
+    rounds: parseInt(document.getElementById('paramRounds').value) || 5,
+    noise: parseFloat(document.getElementById('paramNoise').value) || 0,
+    mutation: parseFloat(document.getElementById('paramMutation').value) || 0.001,
+    neighborhood: document.getElementById('paramNeighborhood').value,
+    mix: getStrategyMix(),
+  };
+}
+
+function updateMode() {
+  const mode = document.getElementById('paramMode').value;
+  document.getElementById('gridSizeParam').style.display = mode === 'spatial' ? 'flex' : 'none';
+  document.getElementById('popParam').style.display = mode === 'tournament' ? 'flex' : 'none';
+  document.getElementById('neighborhoodParam').style.display = mode === 'spatial' ? 'flex' : 'none';
+  document.getElementById('gridSection').style.display = mode === 'spatial' ? 'block' : 'none';
+  document.getElementById('modeBadge').textContent = mode === 'spatial' ? 'SPATIAL' : 'TOURNAMENT';
+}
+
+function updatePayoffDisplay() {
+  const T = parseFloat(document.getElementById('paramT').value) || 5;
+  const R = parseFloat(document.getElementById('paramR').value) || 3;
+  const P = parseFloat(document.getElementById('paramP').value) || 1;
+  const S = parseFloat(document.getElementById('paramS').value) || 0;
+  document.getElementById('payoffRC').textContent = `R=${R}`;
+  document.getElementById('payoffSC').textContent = `S=${S}`;
+  document.getElementById('payoffTD').textContent = `T=${T}`;
+  document.getElementById('payoffPD').textContent = `P=${P}`;
+}
+
+// Update payoff display when inputs change
+['paramT', 'paramR', 'paramP', 'paramS'].forEach(id => {
+  document.getElementById(id).addEventListener('input', updatePayoffDisplay);
+});
+
+// ===================================================================
+// SIMULATION CONTROL
+// ===================================================================
+
+function resetSim() {
+  if (running) toggleRun();
+  const params = getParams();
+
+  if (params.mode === 'spatial') {
+    sim = new SpatialSim(params);
+  } else {
+    sim = new TournamentSim(params);
+  }
+
+  histCoop = [];
+  histPayoff = [];
+  histEntropy = [];
+  histStratFracs = {};
+  STRATEGY_TYPES.forEach(s => histStratFracs[s] = []);
+
+  updateGenDisplay(0);
+  drawGrid();
+  resetCharts();
+  updateStats(null);
+  document.getElementById('narrativeText').innerHTML =
+    'Press <strong>Start</strong> to begin. Agents will play the Prisoner\'s Dilemma and evolve their strategies.';
+}
+
+function toggleRun() {
+  running = !running;
+  document.getElementById('btnStart').textContent = running ? 'Pause' : 'Start';
+  document.getElementById('btnStart').classList.toggle('active', running);
+  if (running) runLoop();
+  else if (animId) { cancelAnimationFrame(animId); animId = null; }
+}
+
+function stepOnce() {
+  if (running) return;
+  doStep();
+}
+
+function runLoop() {
+  if (!running) return;
+  const speed = parseInt(document.getElementById('speedSlider').value);
+  for (let i = 0; i < speed; i++) {
+    doStep();
+  }
+  animId = requestAnimationFrame(runLoop);
+}
+
+function doStep() {
+  if (!sim) return;
+  const result = sim.step();
+
+  // Record history
+  histCoop.push(result.coopRate);
+  histPayoff.push(result.avgPayoff);
+  STRATEGY_TYPES.forEach(s => {
+    histStratFracs[s].push(result.stratFracs[s] || 0);
+  });
+
+  // Shannon entropy
+  let entropy = 0;
+  STRATEGY_TYPES.forEach(s => {
+    const f = result.stratFracs[s] || 0;
+    if (f > 0) entropy -= f * Math.log2(f);
+  });
+  histEntropy.push(entropy);
+
+  updateGenDisplay(sim.generation);
+  updateStats(result);
+  updateNarrative(result);
+
+  // Update visuals every few steps for performance
+  if (sim.generation % 1 === 0) {
+    drawGrid();
+    updateCharts();
+  }
+}
+
+function updateGenDisplay(gen) {
+  document.getElementById('genDisplay').textContent = `Generation: ${gen}`;
+  document.getElementById('statGen').textContent = gen;
+}
+
+// ===================================================================
+// GRID RENDERING
+// ===================================================================
+
+function drawGrid() {
+  if (!sim || !(sim instanceof SpatialSim)) return;
+  const canvas = document.getElementById('gridCanvas');
+  const ctx = canvas.getContext('2d');
+  const gs = sim.gridSize;
+
+  // Scale canvas to fit
+  const maxPx = 500;
+  const cellSize = Math.max(1, Math.floor(maxPx / gs));
+  const canvasSize = cellSize * gs;
+  canvas.width = canvasSize;
+  canvas.height = canvasSize;
+  canvas.style.width = Math.min(canvasSize, maxPx) + 'px';
+  canvas.style.height = Math.min(canvasSize, maxPx) + 'px';
+
+  for (let r = 0; r < gs; r++) {
+    for (let c = 0; c < gs; c++) {
+      ctx.fillStyle = STRATEGY_COLORS[sim.grid[r][c]] || '#333';
+      ctx.fillRect(c * cellSize, r * cellSize, cellSize, cellSize);
+    }
+  }
+}
+
+// ===================================================================
+// CHARTS
+// ===================================================================
+
+const chartDefaults = {
+  responsive: true,
+  maintainAspectRatio: false,
+  animation: { duration: 0 },
+  plugins: {
+    legend: { display: false },
+    tooltip: { enabled: true }
+  },
+  scales: {
+    x: {
+      grid: { color: '#1a2535' },
+      ticks: { color: '#3a4a5a', font: { size: 10 } }
+    },
+    y: {
+      grid: { color: '#1a2535' },
+      ticks: { color: '#3a4a5a', font: { size: 10 } }
+    }
+  }
+};
+
+function initCharts() {
+  // Cooperation rate
+  chartCoop = new Chart(document.getElementById('chartCoop'), {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [{
+        label: 'Cooperation Rate',
+        data: [],
+        borderColor: '#00cc66',
+        backgroundColor: 'rgba(0,204,102,0.1)',
+        borderWidth: 1.5,
+        pointRadius: 0,
+        fill: true,
+        tension: 0.3,
+      }]
+    },
+    options: {
+      ...chartDefaults,
+      scales: {
+        ...chartDefaults.scales,
+        y: { ...chartDefaults.scales.y, min: 0, max: 1 }
+      }
+    }
+  });
+
+  // Strategy population
+  const popDatasets = STRATEGY_TYPES.map(st => ({
+    label: STRATEGY_NAMES[st],
+    data: [],
+    borderColor: STRATEGY_COLORS[st],
+    backgroundColor: STRATEGY_COLORS[st] + '30',
+    borderWidth: 1.5,
+    pointRadius: 0,
+    fill: true,
+    tension: 0.3,
+  }));
+
+  chartPop = new Chart(document.getElementById('chartPop'), {
+    type: 'line',
+    data: { labels: [], datasets: popDatasets },
+    options: {
+      ...chartDefaults,
+      plugins: {
+        legend: {
+          display: true,
+          labels: { color: '#5a6a80', font: { size: 10 }, boxWidth: 12, padding: 8 },
+          position: 'top'
+        }
+      },
+      scales: {
+        ...chartDefaults.scales,
+        y: {
+          ...chartDefaults.scales.y,
+          stacked: true,
+          min: 0,
+          max: 1,
+        }
+      }
+    }
+  });
+
+  // Average payoff
+  chartPayoff = new Chart(document.getElementById('chartPayoff'), {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [{
+        label: 'Avg Payoff',
+        data: [],
+        borderColor: '#ffaa00',
+        backgroundColor: 'rgba(255,170,0,0.1)',
+        borderWidth: 1.5,
+        pointRadius: 0,
+        fill: true,
+        tension: 0.3,
+      }]
+    },
+    options: chartDefaults
+  });
+
+  // Entropy
+  chartEntropy = new Chart(document.getElementById('chartEntropy'), {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [{
+        label: 'Shannon Entropy',
+        data: [],
+        borderColor: '#cc44ff',
+        backgroundColor: 'rgba(204,68,255,0.1)',
+        borderWidth: 1.5,
+        pointRadius: 0,
+        fill: true,
+        tension: 0.3,
+      }]
+    },
+    options: {
+      ...chartDefaults,
+      scales: {
+        ...chartDefaults.scales,
+        y: { ...chartDefaults.scales.y, min: 0 }
+      }
+    }
+  });
+}
+
+function resetCharts() {
+  [chartCoop, chartPop, chartPayoff, chartEntropy].forEach(chart => {
+    if (!chart) return;
+    chart.data.labels = [];
+    chart.data.datasets.forEach(ds => ds.data = []);
+    chart.update('none');
+  });
+}
+
+function updateCharts() {
+  const maxPoints = 500;
+  const len = histCoop.length;
+  const step = len > maxPoints ? Math.ceil(len / maxPoints) : 1;
+
+  const labels = [];
+  const coopData = [];
+  const payoffData = [];
+  const entropyData = [];
+  const popData = STRATEGY_TYPES.map(() => []);
+
+  for (let i = 0; i < len; i += step) {
+    labels.push(i);
+    coopData.push(histCoop[i]);
+    payoffData.push(histPayoff[i]);
+    entropyData.push(histEntropy[i]);
+    STRATEGY_TYPES.forEach((s, si) => {
+      popData[si].push(histStratFracs[s][i]);
+    });
+  }
+
+  chartCoop.data.labels = labels;
+  chartCoop.data.datasets[0].data = coopData;
+  chartCoop.update('none');
+
+  chartPop.data.labels = labels;
+  STRATEGY_TYPES.forEach((s, si) => {
+    chartPop.data.datasets[si].data = popData[si];
+  });
+  chartPop.update('none');
+
+  chartPayoff.data.labels = labels;
+  chartPayoff.data.datasets[0].data = payoffData;
+  chartPayoff.update('none');
+
+  chartEntropy.data.labels = labels;
+  chartEntropy.data.datasets[0].data = entropyData;
+  chartEntropy.update('none');
+}
+
+// ===================================================================
+// STATS & NARRATIVE
+// ===================================================================
+
+function updateStats(result) {
+  if (!result) {
+    document.getElementById('statCoop').textContent = '--';
+    document.getElementById('statPayoff').textContent = '--';
+    document.getElementById('statDominant').textContent = '--';
+    document.getElementById('statAlive').textContent = '--';
+    return;
+  }
+
+  const coopEl = document.getElementById('statCoop');
+  coopEl.textContent = (result.coopRate * 100).toFixed(1) + '%';
+  coopEl.className = 'value ' + (result.coopRate > 0.5 ? 'positive' : result.coopRate < 0.3 ? 'negative' : '');
+
+  document.getElementById('statPayoff').textContent = result.avgPayoff.toFixed(2);
+
+  // Find dominant
+  let maxFrac = 0, dominant = '';
+  STRATEGY_TYPES.forEach(s => {
+    if ((result.stratFracs[s] || 0) > maxFrac) {
+      maxFrac = result.stratFracs[s];
+      dominant = STRATEGY_NAMES[s];
+    }
+  });
+  document.getElementById('statDominant').textContent = dominant + ' (' + (maxFrac * 100).toFixed(0) + '%)';
+
+  // Count alive
+  let alive = 0;
+  STRATEGY_TYPES.forEach(s => { if ((result.stratFracs[s] || 0) > 0.005) alive++; });
+  document.getElementById('statAlive').textContent = alive + ' / ' + STRATEGY_TYPES.length;
+}
+
+function updateNarrative(result) {
+  const el = document.getElementById('narrativeText');
+  const gen = sim.generation;
+  const coop = result.coopRate;
+
+  // Find dominant strategy
+  let maxFrac = 0, dominant = '';
+  STRATEGY_TYPES.forEach(s => {
+    if ((result.stratFracs[s] || 0) > maxFrac) {
+      maxFrac = result.stratFracs[s];
+      dominant = s;
+    }
+  });
+
+  const allD = result.stratFracs.always_defect || 0;
+  const allC = result.stratFracs.always_cooperate || 0;
+  const tft = result.stratFracs.tit_for_tat || 0;
+  const pavlov = result.stratFracs.pavlov || 0;
+
+  let text = '';
+
+  if (gen <= 3) {
+    text = 'The simulation has just begun. Strategies are interacting with their neighbors for the first time. Watch how the initial random mix evolves.';
+  } else if (gen < 15) {
+    if (allD > 0.3) {
+      text = '<strong>Defectors are spreading!</strong> Always Defect agents exploit cooperators at the borders. But watch closely &mdash; cooperative clusters may still form and fight back.';
+    } else if (coop > 0.6) {
+      text = 'Cooperation is holding strong in the early generations. <strong>Cooperative clusters</strong> are forming, protecting their members from defector invasion.';
+    } else {
+      text = 'The population is in flux. Strategies are competing for territory. The spatial structure creates <strong>natural selection pressure</strong> as neighbors compare payoffs.';
+    }
+  } else if (coop > 0.8) {
+    text = '<strong>Cooperation dominates!</strong> Reciprocal strategies like ' + STRATEGY_NAMES[dominant] + ' have established themselves. The "shadow of the future" makes cooperation the rational choice &mdash; exactly as Axelrod predicted.';
+  } else if (coop < 0.2) {
+    text = '<strong>Defection has taken over.</strong> Without enough cooperative clusters to resist invasion, defectors spread everywhere. The population earns only the low Punishment payoff. Try adding noise or changing the payoff matrix.';
+  } else if (tft > 0.3 || pavlov > 0.3) {
+    text = '<strong>Reciprocal strategies are thriving.</strong> ' + (tft > pavlov ? 'Tit-for-Tat' : 'Pavlov') + ' agents form clusters that earn high mutual cooperation payoffs while punishing defectors at their borders.';
+  } else if (allD > 0.4 && allC < 0.1) {
+    text = 'Defectors have overwhelmed the naive cooperators, but <strong>conditional cooperators</strong> (TFT, Grudger, Pavlov) may still be holding on in pockets. This is the "ecology of strategies" Beinhocker describes.';
+  } else {
+    text = 'The population is in a <strong>dynamic equilibrium</strong> with ' + (coop * 100).toFixed(0) + '% cooperation. Multiple strategies coexist, each occupying different niches in the spatial landscape &mdash; a hallmark of evolutionary complexity.';
+  }
+
+  el.innerHTML = text;
+}
+
+// ===================================================================
+// BOOT
+// ===================================================================
+
+window.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>

@@ -1,0 +1,1587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Integrated Economy — When Models Collide</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', system-ui, sans-serif; background: #0a0e17; color: #c8cdd8; overflow-x: hidden; }
+
+/* ===== HERO INTRO ===== */
+.hero {
+  background: linear-gradient(135deg, #0d1220 0%, #151020 40%, #0d1a14 100%);
+  border-bottom: 1px solid #1e2a3a;
+  padding: 40px 32px 32px;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(100,100,255,0.03) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero-content { max-width: 960px; position: relative; z-index: 1; }
+.hero h1 {
+  font-size: 32px;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  background: linear-gradient(90deg, #6688ff, #44ccff, #44ffaa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 4px;
+}
+.hero .tagline {
+  font-size: 14px;
+  color: #5a6a8a;
+  font-weight: 500;
+  margin-bottom: 16px;
+  letter-spacing: 0.5px;
+}
+.hero p {
+  font-size: 15px;
+  line-height: 1.7;
+  color: #8a9ab0;
+  max-width: 820px;
+}
+.hero p strong { color: #b0d0ff; font-weight: 600; }
+
+.model-tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+.model-tag {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+.model-tag.market { background: #1a2a1a; color: #44dd88; border: 1px solid #2a3a2a; }
+.model-tag.supply { background: #2a1a0a; color: #ddaa44; border: 1px solid #3a2a1a; }
+.model-tag.ecosystem { background: #1a1a2a; color: #8888ff; border: 1px solid #2a2a3a; }
+.model-tag.org { background: #2a1a2a; color: #dd66aa; border: 1px solid #3a2a3a; }
+
+.key-insight {
+  margin: 20px 0 0;
+  padding: 18px 22px;
+  background: linear-gradient(135deg, rgba(100,100,255,0.05), rgba(60,180,120,0.03));
+  border: 1px solid #1a2a3a;
+  border-left: 4px solid #6688ff;
+  border-radius: 0 8px 8px 0;
+  max-width: 820px;
+}
+.key-insight-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: #6688ff;
+  margin-bottom: 8px;
+}
+.key-insight p {
+  font-size: 13px;
+  line-height: 1.65;
+  color: #7a8a9a;
+}
+.key-insight p strong { color: #a0c0ff; }
+
+/* ===== HEADER BAR ===== */
+.header {
+  background: #0f1520;
+  padding: 12px 24px;
+  border-bottom: 1px solid #1a2030;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.header-left { display: flex; align-items: center; gap: 16px; }
+.header-title { font-size: 15px; font-weight: 700; color: #e0e8f0; }
+.tick-display {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: #5a6a80;
+}
+.phase-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.phase-badge.normal { background: #0d2a1a; color: #44dd88; border: 1px solid #1a3a28; }
+.phase-badge.supply_shock { background: #2a1a0a; color: #ddaa44; border: 1px solid #3a2a1a; }
+.phase-badge.tech_disruption { background: #1a1a2a; color: #8888ff; border: 1px solid #2a2a3a; }
+.phase-badge.market_crash { background: #2a0a0a; color: #ff4444; border: 1px solid #3a1a1a; }
+.phase-badge.recovery { background: #1a2a1a; color: #88ccaa; border: 1px solid #2a3a2a; }
+
+.controls { display: flex; gap: 6px; align-items: center; }
+.controls button {
+  padding: 6px 16px;
+  border: 1px solid #1e2a3a;
+  background: #141c28;
+  color: #8090a8;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.15s;
+}
+.controls button:hover { background: #1a2840; border-color: #2a3a50; color: #b0c0d8; }
+.controls button.active { background: #00994d; border-color: #00cc66; color: #fff; }
+.controls button.danger { border-color: #3a1a1a; color: #cc4444; }
+.controls button.danger:hover { background: #2a1010; color: #ff5555; }
+
+/* ===== MAIN LAYOUT ===== */
+.main { display: grid; grid-template-columns: 280px 1fr; min-height: calc(100vh - 200px); }
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+  background: #0c1018;
+  padding: 16px;
+  overflow-y: auto;
+  border-right: 1px solid #1a2030;
+}
+.sidebar h3 {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: #3a4a5a;
+  margin: 18px 0 8px;
+  font-weight: 700;
+}
+.sidebar h3:first-child { margin-top: 0; }
+
+.param-group { display: flex; flex-direction: column; gap: 5px; }
+.param { display: flex; justify-content: space-between; align-items: center; }
+.param label { font-size: 12px; color: #6a7a8a; }
+.param select, .param input {
+  width: 100px;
+  padding: 3px 6px;
+  background: #111820;
+  border: 1px solid #1a2535;
+  color: #b0c0d8;
+  border-radius: 3px;
+  font-size: 12px;
+  text-align: right;
+  font-family: 'JetBrains Mono', monospace;
+}
+.param select { text-align: left; }
+
+.speed-control { display: flex; align-items: center; gap: 6px; margin-top: 6px; }
+.speed-control label { font-size: 11px; color: #4a5a6a; }
+.speed-control input { flex: 1; accent-color: #6688ff; }
+
+/* Stats box */
+.stats-box {
+  background: #111820;
+  border: 1px solid #1a2535;
+  border-radius: 6px;
+  padding: 10px;
+  margin-top: 10px;
+}
+.stat-row { display: flex; justify-content: space-between; font-size: 11px; padding: 3px 0; }
+.stat-row .label { color: #4a5a6a; }
+.stat-row .value { color: #8898b0; font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+.stat-row .value.positive { color: #44dd88; }
+.stat-row .value.negative { color: #ff4444; }
+
+/* Scenario buttons */
+.scenario-buttons { display: flex; flex-direction: column; gap: 4px; margin-top: 8px; }
+.scenario-btn {
+  padding: 8px 10px;
+  background: #111820;
+  border: 1px solid #1a2535;
+  border-radius: 5px;
+  color: #7a8a9a;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: left;
+}
+.scenario-btn:hover { background: #1a2535; border-color: #2a3a50; color: #b0c0d8; }
+.scenario-btn.active { background: #1a2040; border-color: #4466aa; color: #88aaff; }
+.scenario-btn .scenario-name { font-weight: 600; display: block; margin-bottom: 2px; }
+.scenario-btn .scenario-desc { font-size: 10px; color: #4a5a6a; }
+
+/* Dashboard indicators */
+.dashboard-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-top: 8px;
+}
+.indicator {
+  background: #111820;
+  border: 1px solid #1a2535;
+  border-radius: 6px;
+  padding: 10px;
+  text-align: center;
+}
+.indicator .ind-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #3a4a5a;
+  margin-bottom: 4px;
+}
+.indicator .ind-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 16px;
+  font-weight: 700;
+}
+.indicator .ind-sub {
+  font-size: 9px;
+  color: #3a4a5a;
+  margin-top: 2px;
+}
+
+/* Health bar */
+.health-bar-track {
+  height: 6px;
+  background: #1a2030;
+  border-radius: 3px;
+  margin-top: 6px;
+  overflow: hidden;
+}
+.health-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s, background 0.3s;
+}
+
+/* Narrative panel */
+.narrative-panel {
+  background: linear-gradient(135deg, #111820, #0f1620);
+  border: 1px solid #1a2535;
+  border-radius: 6px;
+  padding: 14px;
+  margin-top: 12px;
+}
+.narrative-header {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #3a4a5a;
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+.narrative-text {
+  font-size: 12px;
+  line-height: 1.5;
+  color: #7a8a9a;
+  min-height: 40px;
+}
+
+/* ===== CHARTS AREA ===== */
+.charts-area { padding: 16px; overflow-y: auto; }
+
+/* Network canvas */
+.network-section {
+  background: #111820;
+  border: 1px solid #1a2535;
+  border-radius: 8px;
+  padding: 14px;
+  margin-bottom: 12px;
+  height: 340px;
+  position: relative;
+  min-height: 0;
+  overflow: hidden;
+}
+.network-section h4 {
+  font-size: 12px;
+  color: #5a6a80;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+.network-section .chart-annotation {
+  font-size: 11px;
+  color: #3a4a5a;
+  line-height: 1.4;
+  margin-bottom: 8px;
+  font-style: italic;
+}
+#networkCanvas {
+  width: 100%;
+  height: calc(100% - 44px);
+  display: block;
+}
+
+/* Chart grid */
+.charts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.chart-container {
+  background: #111820;
+  border: 1px solid #1a2535;
+  border-radius: 8px;
+  padding: 14px;
+  position: relative;
+  height: 280px;
+  min-height: 0;
+  overflow: hidden;
+}
+.chart-container.wide { grid-column: 1 / -1; height: 340px; }
+.chart-container h4 {
+  font-size: 12px;
+  color: #5a6a80;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+.chart-annotation {
+  font-size: 11px;
+  color: #3a4a5a;
+  line-height: 1.4;
+  margin-bottom: 8px;
+  font-style: italic;
+}
+.chart-container canvas { width: 100%; height: calc(100% - 50px); }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #0a0e17; }
+::-webkit-scrollbar-thumb { background: #1a2535; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #2a3a50; }
+</style>
+</head>
+<body>
+
+<!-- ===== HERO SECTION ===== -->
+<div class="hero">
+  <div class="hero-content">
+    <h1>The Integrated Economy</h1>
+    <div class="tagline">When Models Collide &mdash; Cross-Model Complexity Economics Simulation</div>
+    <p>
+      Real economies are not just stock markets, not just supply chains, not just ecosystems of competing firms.
+      They are <strong>all of these at once</strong>, woven together into a fabric where a supply chain disruption
+      can trigger a market crash, which cascades through a dependency network, and where
+      <strong>organizational rigidity</strong> determines which firms adapt and which ones die.
+      This simulation links four foundational models from complexity economics into a single coherent system.
+    </p>
+    <div class="model-tags">
+      <span class="model-tag market">SFI Stock Market</span>
+      <span class="model-tag supply">Beer Game Supply Chain</span>
+      <span class="model-tag ecosystem">Punctuated Equilibrium</span>
+      <span class="model-tag org">Rigids vs Flexibles</span>
+    </div>
+    <div class="key-insight">
+      <div class="key-insight-label">Integration Insight</div>
+      <p>
+        In isolation, each model produces its own emergent phenomena. <strong>When linked together</strong>,
+        new dynamics appear that none of the individual models can generate alone: supply chain shocks amplify
+        through financial contagion, technology disruptions trigger cascading firm failures, and
+        <strong>organizational flexibility becomes the key determinant of systemic resilience</strong>.
+        The economy's response to crisis is path-dependent and non-linear, just like real macroeconomic dynamics.
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== CONTROLS HEADER ===== -->
+<div class="header">
+  <div class="header-left">
+    <span class="header-title">Simulation</span>
+    <span class="phase-badge normal" id="phaseBadge">NORMAL</span>
+    <span class="tick-display" id="tickDisplay">Tick: 0 / 500</span>
+  </div>
+  <div style="display:flex; align-items:center; gap: 8px;">
+    <div class="controls">
+      <button id="btnStart" onclick="toggleRun()">Start</button>
+      <button id="btnStep" onclick="stepOnce()">Step</button>
+      <button class="danger" onclick="resetSim()">Reset</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MAIN ===== -->
+<div class="main">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <h3>Scenario</h3>
+    <div class="scenario-buttons" id="scenarioButtons">
+      <button class="scenario-btn active" data-scenario="normal" onclick="selectScenario('normal', this)">
+        <span class="scenario-name">Normal Operations</span>
+        <span class="scenario-desc">No scheduled shocks. Organic evolution.</span>
+      </button>
+      <button class="scenario-btn" data-scenario="supply_shock" onclick="selectScenario('supply_shock', this)">
+        <span class="scenario-name">Supply Shock</span>
+        <span class="scenario-desc">Demand spike at t=100, bullwhip amplification.</span>
+      </button>
+      <button class="scenario-btn" data-scenario="tech_disruption" onclick="selectScenario('tech_disruption', this)">
+        <span class="scenario-name">Tech Disruption</span>
+        <span class="scenario-desc">New technology at t=150 obsoletes incumbents.</span>
+      </button>
+      <button class="scenario-btn" data-scenario="market_crash" onclick="selectScenario('market_crash', this)">
+        <span class="scenario-name">Market Crash</span>
+        <span class="scenario-desc">Supply shock + panic + tech disruption cascade.</span>
+      </button>
+      <button class="scenario-btn" data-scenario="stress_test" onclick="selectScenario('stress_test', this)">
+        <span class="scenario-name">Stress Test</span>
+        <span class="scenario-desc">Repeated shocks testing long-run resilience.</span>
+      </button>
+    </div>
+
+    <h3>Parameters</h3>
+    <div class="param-group">
+      <div class="param">
+        <label>Firms</label>
+        <input type="number" id="paramFirms" value="40" min="10" max="100" step="5">
+      </div>
+      <div class="param">
+        <label>Ticks</label>
+        <input type="number" id="paramTicks" value="500" min="100" max="2000" step="50">
+      </div>
+      <div class="param">
+        <label>Seed</label>
+        <input type="number" id="paramSeed" value="42" min="0" max="99999">
+      </div>
+      <div class="param">
+        <label>Dep. Prob</label>
+        <input type="number" id="paramDepProb" value="0.08" min="0.01" max="0.3" step="0.01">
+      </div>
+    </div>
+
+    <div class="speed-control">
+      <label>Speed</label>
+      <input type="range" id="speedSlider" min="1" max="50" value="10">
+    </div>
+
+    <h3>Economy Dashboard</h3>
+    <div class="dashboard-row">
+      <div class="indicator">
+        <div class="ind-label">GDP</div>
+        <div class="ind-value" id="indGDP" style="color: #44dd88;">--</div>
+      </div>
+      <div class="indicator">
+        <div class="ind-label">Market Index</div>
+        <div class="ind-value" id="indIndex" style="color: #44ccff;">--</div>
+      </div>
+    </div>
+    <div class="dashboard-row">
+      <div class="indicator">
+        <div class="ind-label">Unemployment</div>
+        <div class="ind-value" id="indUnemployment" style="color: #ffaa44;">--</div>
+      </div>
+      <div class="indicator">
+        <div class="ind-label">Gini</div>
+        <div class="ind-value" id="indGini" style="color: #dd66aa;">--</div>
+      </div>
+    </div>
+
+    <h3>Supply Chain Stress</h3>
+    <div class="health-bar-track">
+      <div class="health-bar-fill" id="stressBar" style="width: 0%; background: #44dd88;"></div>
+    </div>
+    <div style="display: flex; justify-content: space-between; font-size: 9px; color: #3a4a5a; margin-top: 3px;">
+      <span>Low</span><span>High</span>
+    </div>
+
+    <h3>Ecosystem Health</h3>
+    <div class="health-bar-track">
+      <div class="health-bar-fill" id="healthBar" style="width: 70%; background: #44dd88;"></div>
+    </div>
+    <div style="display: flex; justify-content: space-between; font-size: 9px; color: #3a4a5a; margin-top: 3px;">
+      <span>Critical</span><span>Thriving</span>
+    </div>
+
+    <h3>Organization Mix</h3>
+    <div class="stats-box">
+      <div class="stat-row">
+        <span class="label">Flexible %</span>
+        <span class="value" id="statFlex">--</span>
+      </div>
+      <div class="stat-row">
+        <span class="label">Rigid %</span>
+        <span class="value" id="statRigid">--</span>
+      </div>
+      <div class="stat-row">
+        <span class="label">Tech Gen</span>
+        <span class="value" id="statTechGen">0</span>
+      </div>
+      <div class="stat-row">
+        <span class="label">Firms Alive</span>
+        <span class="value" id="statAlive">--</span>
+      </div>
+      <div class="stat-row">
+        <span class="label">Cascades</span>
+        <span class="value" id="statCascades">0</span>
+      </div>
+    </div>
+
+    <div class="narrative-panel">
+      <div class="narrative-header">What's Happening</div>
+      <div class="narrative-text" id="narrativeText">
+        Press Start to begin the simulation. Select a scenario to see how the integrated economy responds to different types of shocks.
+      </div>
+    </div>
+  </div>
+
+  <!-- CHARTS -->
+  <div class="charts-area">
+    <!-- Network Visualization -->
+    <div class="network-section">
+      <h4>Firm Network</h4>
+      <div class="chart-annotation">Nodes = firms (color = health), edges = dependency links. Failed firms shown in red.</div>
+      <canvas id="networkCanvas"></canvas>
+    </div>
+
+    <!-- Charts Grid -->
+    <div class="charts">
+      <!-- GDP + Market Index (wide) -->
+      <div class="chart-container wide">
+        <h4>GDP & Market Index</h4>
+        <div class="chart-annotation">Total economic output and average stock price over time</div>
+        <canvas id="chartGDP"></canvas>
+      </div>
+
+      <!-- Supply Chain Stress -->
+      <div class="chart-container">
+        <h4>Supply Chain Stress</h4>
+        <div class="chart-annotation">Fraction of firms with backlogs (bullwhip indicator)</div>
+        <canvas id="chartStress"></canvas>
+      </div>
+
+      <!-- Gini Coefficient -->
+      <div class="chart-container">
+        <h4>Inequality (Gini Coefficient)</h4>
+        <div class="chart-annotation">Wealth distribution across firms</div>
+        <canvas id="chartGini"></canvas>
+      </div>
+
+      <!-- Organization Composition -->
+      <div class="chart-container">
+        <h4>Organizational Composition</h4>
+        <div class="chart-annotation">Average flexible vs rigid leadership fraction</div>
+        <canvas id="chartOrg"></canvas>
+      </div>
+
+      <!-- Cascade Sizes -->
+      <div class="chart-container">
+        <h4>Cascade Events</h4>
+        <div class="chart-annotation">Firm failures per tick (cascade size)</div>
+        <canvas id="chartCascades"></canvas>
+      </div>
+
+      <!-- Technology & Health (wide) -->
+      <div class="chart-container wide">
+        <h4>Technology Fitness & Ecosystem Health</h4>
+        <div class="chart-annotation">Mean technology fitness and overall firm health</div>
+        <canvas id="chartTechHealth"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// =========================================================================
+// Integrated Economy Simulation (JavaScript port of core mechanics)
+// =========================================================================
+
+class IntegratedEconomy {
+  constructor(opts = {}) {
+    this.numFirms = opts.numFirms || 40;
+    this.maxTicks = opts.maxTicks || 500;
+    this.seed = opts.seed || 42;
+    this.depProb = opts.depProb || 0.08;
+
+    this.rng = this._makePRNG(this.seed);
+    this.tick = 0;
+    this.phase = 'normal';
+    this.firms = [];
+    this.edges = [];
+    this.history = [];
+    this.events = [];
+    this.scheduledEvents = [];
+    this.totalCascades = 0;
+
+    // Config constants
+    this.baseDemand = 10;
+    this.chainLength = 4;
+    this.bullwhipAlpha = 0.4;
+    this.bullwhipBeta = 0.2;
+    this.demandSmoothing = 0.3;
+    this.initialPrice = 100;
+    this.priceNoise = 0.02;
+    this.meanReversionSpeed = 0.05;
+    this.sentimentMomentum = 0.7;
+    this.cascadeThreshold = 0.4;
+    this.failureContagion = 0.2;
+    this.techDisruptionProb = 0.005;
+    this.techDisruptionSeverity = 0.6;
+
+    this.marketSentiment = 0;
+    this.currentDemand = this.baseDemand;
+    this.techGeneration = 0;
+
+    this._init();
+  }
+
+  _makePRNG(seed) {
+    // Simple seeded PRNG (Mulberry32)
+    let s = seed | 0;
+    return () => {
+      s |= 0; s = s + 0x6D2B79F5 | 0;
+      let t = Math.imul(s ^ s >>> 15, 1 | s);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+
+  _gauss() {
+    const u1 = this.rng();
+    const u2 = this.rng();
+    return Math.sqrt(-2 * Math.log(u1 + 1e-10)) * Math.cos(2 * Math.PI * u2);
+  }
+
+  _init() {
+    // Create firms
+    this.firmsPerEchelon = Math.max(this.numFirms / this.chainLength, 1);
+    this.perFirmDemand = this.baseDemand / this.firmsPerEchelon;
+    this.firms = [];
+    for (let i = 0; i < this.numFirms; i++) {
+      this.firms.push({
+        id: i,
+        alive: true,
+        supplyChainPos: i % this.chainLength,
+        inventory: this.perFirmDemand * 3,
+        backlog: 0,
+        expectedDemand: this.perFirmDemand,
+        lastOrder: this.perFirmDemand,
+        supplyLine: this.perFirmDemand * 2,
+        stockPrice: this.initialPrice * (0.8 + this.rng() * 0.4),
+        fundamentalValue: this.initialPrice,
+        sentiment: 0,
+        flexFraction: 0.35 + this.rng() * 0.15,
+        orgFitness: 0.5 + this.rng() * 0.3,
+        techFitness: 0.5 + this.rng() * 0.4,
+        techGeneration: 0,
+        health: 0.7,
+        output: this.perFirmDemand,
+        age: 0,
+        // For network layout
+        x: 0, y: 0,
+        vx: 0, vy: 0,
+      });
+    }
+
+    // Build dependency network
+    this.edges = [];
+    this.adjList = {};
+    this.revList = {};
+    for (let i = 0; i < this.numFirms; i++) {
+      this.adjList[i] = [];
+      this.revList[i] = [];
+    }
+    for (let i = 0; i < this.numFirms; i++) {
+      for (let j = 0; j < this.numFirms; j++) {
+        if (i !== j && this.rng() < this.depProb) {
+          this.edges.push({ source: i, target: j });
+          this.adjList[i].push(j);
+          this.revList[j].push(i);
+        }
+      }
+    }
+
+    // Position nodes in a circle by supply chain position
+    for (let i = 0; i < this.numFirms; i++) {
+      const angle = (i / this.numFirms) * Math.PI * 2 - Math.PI / 2;
+      const radius = 0.35 + (this.firms[i].supplyChainPos / this.chainLength) * 0.1;
+      this.firms[i].x = 0.5 + radius * Math.cos(angle);
+      this.firms[i].y = 0.5 + radius * Math.sin(angle);
+    }
+
+    this.history = [];
+    this.tick = 0;
+    this.phase = 'normal';
+    this.marketSentiment = 0;
+    this.currentDemand = this.baseDemand;
+    this.techGeneration = 0;
+    this.totalCascades = 0;
+    this.events = [];
+    this.scheduledEvents = [];
+  }
+
+  scheduleEvent(tick, type, params = {}) {
+    this.scheduledEvents.push({ tick, type, params });
+    this.scheduledEvents.sort((a, b) => a.tick - b.tick);
+  }
+
+  _processScheduled() {
+    while (this.scheduledEvents.length && this.scheduledEvents[0].tick <= this.tick) {
+      const ev = this.scheduledEvents.shift();
+      this._triggerEvent(ev.type, ev.params);
+    }
+  }
+
+  _triggerEvent(type, params) {
+    if (type === 'supply_shock') {
+      this.currentDemand = this.baseDemand * (params.multiplier || 2.5);
+      this.phase = 'supply_shock';
+      this.events.push({ tick: this.tick, type: 'supply_shock' });
+    } else if (type === 'demand_normalize') {
+      this.currentDemand = this.baseDemand;
+      if (this.phase === 'supply_shock') this.phase = 'recovery';
+    } else if (type === 'tech_disruption') {
+      this.techGeneration++;
+      for (const f of this.firms) {
+        if (!f.alive) continue;
+        const gap = this.techGeneration - f.techGeneration;
+        if (gap > 0) {
+          const penalty = this.techDisruptionSeverity * (1 - Math.pow(0.5, gap));
+          f.techFitness *= (1 - penalty);
+          f.techFitness = Math.max(0.05, f.techFitness);
+          f.sentiment -= 0.3;
+        }
+      }
+      this.phase = 'tech_disruption';
+      this.events.push({ tick: this.tick, type: 'tech_disruption' });
+    } else if (type === 'market_panic') {
+      this.marketSentiment = -0.95;
+      for (const f of this.firms) {
+        if (!f.alive) continue;
+        f.sentiment = -0.6 - this.rng() * 0.4;
+        f.stockPrice *= 0.4 + this.rng() * 0.3;
+        f.orgFitness *= 0.7;
+        f.health *= 0.8;
+      }
+      this.phase = 'market_crash';
+      this.events.push({ tick: this.tick, type: 'market_panic' });
+    }
+  }
+
+  step() {
+    this.tick++;
+    this._processScheduled();
+
+    const alive = this.firms.filter(f => f.alive);
+    const nAlive = alive.length;
+    if (nAlive === 0) {
+      this._record(0);
+      return;
+    }
+
+    const avgHealth = alive.reduce((s, f) => s + f.health, 0) / nAlive;
+    const isCrisis = avgHealth < 0.45 || ['market_crash', 'tech_disruption', 'supply_shock'].includes(this.phase);
+
+    // 1. Supply chain
+    this._stepSupplyChain();
+
+    // 2. Technology
+    this._stepTechnology();
+
+    // 3. Organization
+    this._stepOrganization(isCrisis);
+
+    // 4. Update health
+    for (const f of this.firms) {
+      if (f.alive) {
+        f.health = this._computeHealth(f);
+        f.age++;
+      }
+    }
+
+    // 5. Cascades
+    const cascadeSize = this._stepCascades();
+
+    // 6. Market
+    const cascadeStress = cascadeSize / Math.max(nAlive, 1);
+    const supplyStress = this.history.length > 0 ? this.history[this.history.length - 1].supplyChainStress : 0;
+    this._stepMarket(Math.min(1, cascadeStress + supplyStress * 0.5));
+
+    // 7. Respawn
+    for (const f of this.firms) {
+      if (!f.alive && this.rng() < 0.02) {
+        this._respawn(f);
+      }
+    }
+
+    // 8. Phase detection
+    this._detectPhase();
+
+    // 9. Record
+    this._record(cascadeSize);
+  }
+
+  _stepSupplyChain() {
+    const byPos = {};
+    for (const f of this.firms) {
+      if (!f.alive) continue;
+      if (!byPos[f.supplyChainPos]) byPos[f.supplyChainPos] = [];
+      byPos[f.supplyChainPos].push(f);
+    }
+
+    let incomingDemand = this.currentDemand;
+    for (let pos = 0; pos < this.chainLength; pos++) {
+      const group = byPos[pos] || [];
+      for (const f of group) {
+        const received = Math.min(f.supplyLine * 0.5, f.lastOrder);
+        f.inventory += received;
+        f.supplyLine = Math.max(0, f.supplyLine - received);
+
+        const demand = incomingDemand / Math.max(group.length, 1);
+        f.expectedDemand += this.demandSmoothing * (demand - f.expectedDemand);
+
+        const totalDemand = f.backlog + demand;
+        const shipped = Math.min(f.inventory, totalDemand);
+        f.inventory -= shipped;
+        f.backlog = totalDemand - shipped;
+        f.output = shipped;
+
+        const desiredInv = f.expectedDemand * 3;
+        const desiredSL = f.expectedDemand * 2;
+        const invAdj = this.bullwhipAlpha * (desiredInv - (f.inventory - f.backlog));
+        const slAdj = this.bullwhipBeta * (desiredSL - f.supplyLine);
+        let order = Math.max(0, f.expectedDemand + invAdj + slAdj);
+
+        if (f.flexFraction > 0.5) {
+          const sm = 0.3 * f.flexFraction;
+          order = (1 - sm) * order + sm * f.expectedDemand;
+        }
+        f.lastOrder = order;
+        f.supplyLine += order;
+      }
+      if (group.length > 0) {
+        const avgOrder = group.reduce((s, f) => s + f.lastOrder, 0) / group.length;
+        incomingDemand = avgOrder * 1.1;
+      }
+    }
+  }
+
+  _stepTechnology() {
+    if (this.rng() < this.techDisruptionProb) {
+      this._triggerEvent('tech_disruption', {});
+    }
+    for (const f of this.firms) {
+      if (!f.alive) continue;
+      const gap = this.techGeneration - f.techGeneration;
+      if (gap > 0) {
+        const speed = f.flexFraction * 0.15 + (1 - f.flexFraction) * 0.03;
+        f.techFitness += speed * (1 - f.techFitness);
+        f.techFitness = Math.min(1, f.techFitness);
+        if (f.techFitness > 0.8) f.techGeneration = this.techGeneration;
+      }
+    }
+  }
+
+  _stepOrganization(isCrisis) {
+    for (const f of this.firms) {
+      if (!f.alive) continue;
+      if (isCrisis) {
+        if (f.flexFraction < 0.8) f.flexFraction += 0.02 * (1 - f.health);
+        f.orgFitness += 0.3 * f.flexFraction * (1 - f.orgFitness);
+        f.orgFitness -= 0.1 * (1 - f.flexFraction) * (1 - f.health);
+      } else {
+        if (f.flexFraction > 0.2) f.flexFraction -= 0.005;
+        f.orgFitness += 0.02 * (1 - f.orgFitness) + 0.15 * (1 - f.flexFraction) * 0.01;
+      }
+      f.orgFitness = Math.max(0, Math.min(1, f.orgFitness));
+      f.flexFraction = Math.max(0, Math.min(1, f.flexFraction));
+    }
+  }
+
+  _computeHealth(f) {
+    const idealInv = this.perFirmDemand * 3;
+    const invRatio = Math.min(f.inventory / Math.max(idealInv, 0.1), 2) / 2;
+    const backlogPenalty = Math.min(f.backlog / Math.max(this.perFirmDemand, 0.1), 1);
+    const supplyHealth = Math.max(0, invRatio - 0.3 * backlogPenalty);
+    const priceHealth = Math.min(f.stockPrice / Math.max(this.initialPrice, 1), 1.5) / 1.5;
+    return Math.max(0, Math.min(1, 0.25 * supplyHealth + 0.25 * f.orgFitness + 0.30 * f.techFitness + 0.20 * priceHealth));
+  }
+
+  _stepCascades() {
+    const failed = new Set();
+    for (const f of this.firms) {
+      if (!f.alive) continue;
+      if (f.health < this.cascadeThreshold) {
+        const failProb = (this.cascadeThreshold - f.health) / this.cascadeThreshold;
+        if (this.rng() < failProb) failed.add(f.id);
+      }
+    }
+
+    let frontier = [...failed];
+    for (let round = 0; round < 10 && frontier.length > 0; round++) {
+      const nextFrontier = [];
+      for (const fid of frontier) {
+        for (const depId of (this.adjList[fid] || [])) {
+          const dep = this.firms[depId];
+          if (!dep.alive || failed.has(depId)) continue;
+          dep.health -= this.failureContagion;
+          dep.sentiment -= 0.2;
+          dep.stockPrice *= 0.95;
+          if (dep.health < this.cascadeThreshold * 0.8) {
+            nextFrontier.push(depId);
+            failed.add(depId);
+          }
+        }
+      }
+      frontier = nextFrontier;
+    }
+
+    for (const fid of failed) {
+      this.firms[fid].alive = false;
+      this.firms[fid].stockPrice = 0;
+      this.firms[fid].output = 0;
+    }
+
+    this.totalCascades += failed.size;
+    return failed.size;
+  }
+
+  _stepMarket(totalStress) {
+    const sentInnovation = this._gauss() * 0.1;
+    const fear = -totalStress * 0.5;
+    this.marketSentiment = this.sentimentMomentum * this.marketSentiment +
+      (1 - this.sentimentMomentum) * (sentInnovation + fear);
+    this.marketSentiment = Math.max(-1, Math.min(1, this.marketSentiment));
+
+    for (const f of this.firms) {
+      if (!f.alive) { f.stockPrice = 0; continue; }
+      const outputRatio = Math.min(f.output / Math.max(this.perFirmDemand, 0.01), 2.0);
+      const quality = Math.sqrt(f.techFitness * (0.5 + 0.5 * f.orgFitness));
+      f.fundamentalValue = this.initialPrice * outputRatio * quality;
+      const ret = this.meanReversionSpeed * (f.fundamentalValue - f.stockPrice) / Math.max(f.stockPrice, 1) +
+        this._gauss() * this.priceNoise + 0.03 * this.marketSentiment + 0.02 * f.sentiment;
+      f.stockPrice *= (1 + ret);
+      f.stockPrice = Math.max(0.01, f.stockPrice);
+    }
+  }
+
+  _respawn(f) {
+    f.alive = true;
+    f.stockPrice = this.initialPrice * 0.5;
+    f.health = 0.4;
+    f.inventory = this.perFirmDemand * 2;
+    f.backlog = 0;
+    f.expectedDemand = this.perFirmDemand;
+    f.supplyLine = this.perFirmDemand;
+    f.lastOrder = this.perFirmDemand;
+    f.techFitness = 0.6;
+    f.techGeneration = this.techGeneration;
+    f.orgFitness = 0.5;
+    f.flexFraction = 0.5 + this.rng() * 0.3;
+    f.sentiment = 0;
+    f.age = 0;
+    f.output = this.perFirmDemand * 0.5;
+  }
+
+  _detectPhase() {
+    const alive = this.firms.filter(f => f.alive);
+    if (alive.length === 0) { this.phase = 'market_crash'; return; }
+    const avgHealth = alive.reduce((s, f) => s + f.health, 0) / alive.length;
+    const unemployment = 1 - alive.length / this.numFirms;
+
+    const stressRec = this.history.length > 0 ? this.history[this.history.length - 1].supplyChainStress : 0;
+
+    // Don't override phase within 20 ticks of a triggered event
+    if (this.events.length > 0) {
+      const lastEventTick = Math.max(...this.events.map(e => e.tick));
+      if (this.tick - lastEventTick < 20) {
+        if (unemployment > 0.3) this.phase = 'market_crash';
+        return;
+      }
+    }
+
+    if (['market_crash', 'tech_disruption', 'supply_shock'].includes(this.phase)) {
+      if (avgHealth > 0.55 && unemployment < 0.15 && stressRec < 0.2) this.phase = 'recovery';
+    } else if (this.phase === 'recovery') {
+      if (avgHealth > 0.65 && unemployment < 0.08) this.phase = 'normal';
+    }
+    if (unemployment > 0.3) this.phase = 'market_crash';
+    else if (stressRec > 0.5 && this.phase === 'normal') this.phase = 'supply_shock';
+  }
+
+  _record(cascadeSize) {
+    const alive = this.firms.filter(f => f.alive);
+    const n = alive.length;
+    const gdp = alive.reduce((s, f) => s + f.output, 0);
+    const avgPrice = n > 0 ? alive.reduce((s, f) => s + f.stockPrice, 0) / n : 0;
+    const unemployment = 1 - n / this.numFirms;
+    const avgHealth = n > 0 ? alive.reduce((s, f) => s + f.health, 0) / n : 0;
+    const avgTech = n > 0 ? alive.reduce((s, f) => s + f.techFitness, 0) / n : 0;
+    const avgFlex = n > 0 ? alive.reduce((s, f) => s + f.flexFraction, 0) / n : 0;
+
+    // Stress: fraction of alive firms with backlog
+    let stressed = 0;
+    for (const f of alive) {
+      if (f.backlog > f.expectedDemand * 0.5) stressed++;
+    }
+    const stress = n > 0 ? stressed / n : 0;
+
+    // Gini
+    const prices = alive.map(f => Math.max(f.stockPrice, 0)).sort((a, b) => a - b);
+    let gini = 0;
+    if (prices.length > 1) {
+      const total = prices.reduce((s, v) => s + v, 0);
+      if (total > 0) {
+        let wsum = 0;
+        for (let i = 0; i < prices.length; i++) {
+          wsum += (2 * (i + 1) - prices.length - 1) * prices[i];
+        }
+        gini = Math.max(0, Math.min(1, wsum / (prices.length * total)));
+      }
+    }
+
+    this.history.push({
+      tick: this.tick,
+      phase: this.phase,
+      gdp, marketIndex: avgPrice, gini, unemployment,
+      supplyChainStress: stress, meanHealth: avgHealth,
+      meanTechFitness: avgTech, meanFlexFraction: avgFlex,
+      cascadeSize, numAlive: n,
+      marketSentiment: this.marketSentiment,
+      techGeneration: this.techGeneration,
+    });
+  }
+}
+
+// =========================================================================
+// Visualization State
+// =========================================================================
+
+let sim = null;
+let running = false;
+let animFrame = null;
+let currentScenario = 'normal';
+let charts = {};
+const MAX_POINTS = 600;
+
+// =========================================================================
+// Chart Setup
+// =========================================================================
+
+const chartDefaults = {
+  responsive: true,
+  maintainAspectRatio: false,
+  animation: { duration: 0 },
+  plugins: {
+    legend: { display: true, position: 'top', labels: { color: '#5a6a80', font: { size: 10 }, boxWidth: 12, padding: 8 } },
+  },
+  scales: {
+    x: { grid: { color: '#141c28' }, ticks: { color: '#3a4a5a', font: { size: 9 }, maxTicksLimit: 8 } },
+    y: { grid: { color: '#141c28' }, ticks: { color: '#3a4a5a', font: { size: 9 } } },
+  },
+};
+
+function makeChart(canvasId, label, color, opts = {}) {
+  const ctx = document.getElementById(canvasId).getContext('2d');
+  const datasets = opts.datasets || [{
+    label,
+    data: [],
+    borderColor: color,
+    backgroundColor: color + '18',
+    borderWidth: 1.5,
+    pointRadius: 0,
+    fill: opts.fill !== false,
+    tension: 0.3,
+  }];
+
+  return new Chart(ctx, {
+    type: opts.type || 'line',
+    data: { labels: [], datasets },
+    options: {
+      ...chartDefaults,
+      ...opts.options,
+      plugins: {
+        ...chartDefaults.plugins,
+        ...(opts.options?.plugins || {}),
+      },
+      scales: {
+        ...chartDefaults.scales,
+        ...(opts.options?.scales || {}),
+      },
+    },
+  });
+}
+
+function initCharts() {
+  charts.gdp = makeChart('chartGDP', 'GDP', '#44dd88', {
+    datasets: [
+      { label: 'GDP', data: [], borderColor: '#44dd88', backgroundColor: '#44dd8818', borderWidth: 1.5, pointRadius: 0, fill: true, tension: 0.3, yAxisID: 'y' },
+      { label: 'Market Index', data: [], borderColor: '#44ccff', backgroundColor: '#44ccff18', borderWidth: 1.5, pointRadius: 0, fill: false, tension: 0.3, yAxisID: 'y1' },
+    ],
+    options: {
+      scales: {
+        x: { grid: { color: '#141c28' }, ticks: { color: '#3a4a5a', font: { size: 9 }, maxTicksLimit: 10 } },
+        y: { position: 'left', grid: { color: '#141c28' }, ticks: { color: '#44dd88', font: { size: 9 } }, title: { display: true, text: 'GDP', color: '#44dd88', font: { size: 10 } } },
+        y1: { position: 'right', grid: { drawOnChartArea: false }, ticks: { color: '#44ccff', font: { size: 9 } }, title: { display: true, text: 'Index', color: '#44ccff', font: { size: 10 } } },
+      },
+    },
+  });
+
+  charts.stress = makeChart('chartStress', 'Supply Chain Stress', '#ddaa44', {
+    fill: true,
+    options: {
+      scales: {
+        x: { grid: { color: '#141c28' }, ticks: { color: '#3a4a5a', font: { size: 9 }, maxTicksLimit: 6 } },
+        y: { min: 0, max: 1, grid: { color: '#141c28' }, ticks: { color: '#3a4a5a', font: { size: 9 } } },
+      },
+    },
+  });
+
+  charts.gini = makeChart('chartGini', 'Gini', '#dd66aa', {
+    fill: true,
+    options: {
+      scales: {
+        x: { grid: { color: '#141c28' }, ticks: { color: '#3a4a5a', font: { size: 9 }, maxTicksLimit: 6 } },
+        y: { min: 0, max: 0.6, grid: { color: '#141c28' }, ticks: { color: '#3a4a5a', font: { size: 9 } } },
+      },
+    },
+  });
+
+  charts.org = makeChart('chartOrg', 'Flexible', '#88aaff', {
+    datasets: [
+      { label: 'Flexible %', data: [], borderColor: '#88aaff', backgroundColor: '#88aaff18', borderWidth: 1.5, pointRadius: 0, fill: true, tension: 0.3 },
+      { label: 'Org Fitness', data: [], borderColor: '#ffaa88', backgroundColor: '#ffaa8818', borderWidth: 1.5, pointRadius: 0, fill: false, tension: 0.3 },
+    ],
+    options: {
+      scales: {
+        x: { grid: { color: '#141c28' }, ticks: { color: '#3a4a5a', font: { size: 9 }, maxTicksLimit: 6 } },
+        y: { min: 0, max: 1, grid: { color: '#141c28' }, ticks: { color: '#3a4a5a', font: { size: 9 } } },
+      },
+    },
+  });
+
+  charts.cascades = makeChart('chartCascades', 'Cascade Size', '#ff5555', {
+    type: 'bar',
+    fill: false,
+    options: {
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { color: '#141c28' }, ticks: { color: '#3a4a5a', font: { size: 9 }, maxTicksLimit: 8 } },
+        y: { min: 0, grid: { color: '#141c28' }, ticks: { color: '#3a4a5a', font: { size: 9 }, stepSize: 1 } },
+      },
+    },
+  });
+
+  charts.techHealth = makeChart('chartTechHealth', 'Tech Fitness', '#8888ff', {
+    datasets: [
+      { label: 'Tech Fitness', data: [], borderColor: '#8888ff', backgroundColor: '#8888ff18', borderWidth: 1.5, pointRadius: 0, fill: true, tension: 0.3 },
+      { label: 'Ecosystem Health', data: [], borderColor: '#44dd88', backgroundColor: '#44dd8818', borderWidth: 1.5, pointRadius: 0, fill: false, tension: 0.3 },
+    ],
+    options: {
+      scales: {
+        x: { grid: { color: '#141c28' }, ticks: { color: '#3a4a5a', font: { size: 9 }, maxTicksLimit: 10 } },
+        y: { min: 0, max: 1, grid: { color: '#141c28' }, ticks: { color: '#3a4a5a', font: { size: 9 } } },
+      },
+    },
+  });
+}
+
+// =========================================================================
+// Update Charts
+// =========================================================================
+
+function updateCharts() {
+  const h = sim.history;
+  if (h.length === 0) return;
+
+  const ticks = h.map(r => r.tick);
+
+  // GDP & Index
+  charts.gdp.data.labels = ticks;
+  charts.gdp.data.datasets[0].data = h.map(r => r.gdp);
+  charts.gdp.data.datasets[1].data = h.map(r => r.marketIndex);
+  charts.gdp.update('none');
+
+  // Supply Chain Stress
+  charts.stress.data.labels = ticks;
+  charts.stress.data.datasets[0].data = h.map(r => r.supplyChainStress);
+  charts.stress.update('none');
+
+  // Gini
+  charts.gini.data.labels = ticks;
+  charts.gini.data.datasets[0].data = h.map(r => r.gini);
+  charts.gini.update('none');
+
+  // Org composition
+  charts.org.data.labels = ticks;
+  charts.org.data.datasets[0].data = h.map(r => r.meanFlexFraction);
+  // Compute avg org fitness from alive firms
+  const orgFitnessData = h.map(r => {
+    const alive = sim.firms.filter(f => f.alive);
+    return alive.length > 0 ? alive.reduce((s, f) => s + f.orgFitness, 0) / alive.length : 0;
+  });
+  // We only have current org fitness, approximate with health * 1.2
+  charts.org.data.datasets[1].data = h.map(r => Math.min(1, r.meanHealth * 1.2));
+  charts.org.update('none');
+
+  // Cascades
+  charts.cascades.data.labels = ticks;
+  charts.cascades.data.datasets[0].data = h.map(r => r.cascadeSize);
+  charts.cascades.data.datasets[0].backgroundColor = h.map(r => r.cascadeSize > 2 ? '#ff5555' : r.cascadeSize > 0 ? '#ffaa44' : '#1a2535');
+  charts.cascades.update('none');
+
+  // Tech & Health
+  charts.techHealth.data.labels = ticks;
+  charts.techHealth.data.datasets[0].data = h.map(r => r.meanTechFitness);
+  charts.techHealth.data.datasets[1].data = h.map(r => r.meanHealth);
+  charts.techHealth.update('none');
+}
+
+// =========================================================================
+// Network Visualization
+// =========================================================================
+
+function drawNetwork() {
+  const canvas = document.getElementById('networkCanvas');
+  const ctx = canvas.getContext('2d');
+  const rect = canvas.parentElement.getBoundingClientRect();
+  const w = rect.width - 28;  // padding
+  const h = rect.height - 72;  // header + annotation
+  canvas.width = w * window.devicePixelRatio;
+  canvas.height = h * window.devicePixelRatio;
+  canvas.style.width = w + 'px';
+  canvas.style.height = h + 'px';
+  ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+
+  ctx.clearRect(0, 0, w, h);
+
+  if (!sim) return;
+
+  // Draw edges
+  ctx.globalAlpha = 0.08;
+  ctx.strokeStyle = '#4466aa';
+  ctx.lineWidth = 0.5;
+  for (const edge of sim.edges) {
+    const s = sim.firms[edge.source];
+    const t = sim.firms[edge.target];
+    if (!s.alive && !t.alive) continue;
+    ctx.beginPath();
+    ctx.moveTo(s.x * w, s.y * h);
+    ctx.lineTo(t.x * w, t.y * h);
+    ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+
+  // Draw active edges more visible
+  ctx.globalAlpha = 0.2;
+  ctx.strokeStyle = '#6688cc';
+  ctx.lineWidth = 0.8;
+  for (const edge of sim.edges) {
+    const s = sim.firms[edge.source];
+    const t = sim.firms[edge.target];
+    if (s.alive && t.alive) {
+      ctx.beginPath();
+      ctx.moveTo(s.x * w, s.y * h);
+      ctx.lineTo(t.x * w, t.y * h);
+      ctx.stroke();
+    }
+  }
+  ctx.globalAlpha = 1;
+
+  // Draw nodes
+  for (const f of sim.firms) {
+    const x = f.x * w;
+    const y = f.y * h;
+    const r = f.alive ? 4 + f.output * 0.3 : 3;
+
+    let color;
+    if (!f.alive) {
+      color = '#332222';
+    } else if (f.health > 0.7) {
+      color = '#44dd88';
+    } else if (f.health > 0.5) {
+      color = '#aacc44';
+    } else if (f.health > 0.35) {
+      color = '#ddaa44';
+    } else {
+      color = '#ff5555';
+    }
+
+    // Glow for alive firms
+    if (f.alive && f.health > 0.5) {
+      ctx.beginPath();
+      ctx.arc(x, y, r + 3, 0, Math.PI * 2);
+      ctx.fillStyle = color + '22';
+      ctx.fill();
+    }
+
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fillStyle = color;
+    ctx.fill();
+
+    // Border
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.strokeStyle = f.alive ? '#ffffff18' : '#ffffff08';
+    ctx.lineWidth = 0.5;
+    ctx.stroke();
+  }
+
+  // Legend
+  ctx.font = '9px Inter, sans-serif';
+  ctx.fillStyle = '#3a4a5a';
+  const legendItems = [
+    { color: '#44dd88', label: 'Healthy' },
+    { color: '#ddaa44', label: 'Stressed' },
+    { color: '#ff5555', label: 'Critical' },
+    { color: '#332222', label: 'Failed' },
+  ];
+  let lx = 8;
+  for (const item of legendItems) {
+    ctx.beginPath();
+    ctx.arc(lx + 4, h - 10, 3, 0, Math.PI * 2);
+    ctx.fillStyle = item.color;
+    ctx.fill();
+    ctx.fillStyle = '#3a4a5a';
+    ctx.fillText(item.label, lx + 10, h - 7);
+    lx += ctx.measureText(item.label).width + 22;
+  }
+}
+
+// =========================================================================
+// Dashboard Updates
+// =========================================================================
+
+function updateDashboard() {
+  if (!sim || sim.history.length === 0) return;
+  const r = sim.history[sim.history.length - 1];
+
+  document.getElementById('tickDisplay').textContent = `Tick: ${r.tick} / ${sim.maxTicks}`;
+
+  // Phase badge
+  const badge = document.getElementById('phaseBadge');
+  const phaseLabels = {
+    normal: 'NORMAL', supply_shock: 'SUPPLY SHOCK',
+    tech_disruption: 'TECH DISRUPTION', market_crash: 'MARKET CRASH',
+    recovery: 'RECOVERY'
+  };
+  badge.textContent = phaseLabels[r.phase] || r.phase.toUpperCase();
+  badge.className = 'phase-badge ' + r.phase;
+
+  // Indicators
+  document.getElementById('indGDP').textContent = r.gdp.toFixed(1);
+  document.getElementById('indGDP').style.color = r.gdp > sim.baseDemand * sim.numFirms * 0.3 ? '#44dd88' : '#ff5555';
+  document.getElementById('indIndex').textContent = r.marketIndex.toFixed(1);
+  document.getElementById('indIndex').style.color = r.marketIndex > sim.initialPrice * 0.5 ? '#44ccff' : '#ff5555';
+  document.getElementById('indUnemployment').textContent = (r.unemployment * 100).toFixed(1) + '%';
+  document.getElementById('indUnemployment').style.color = r.unemployment < 0.1 ? '#44dd88' : r.unemployment < 0.25 ? '#ddaa44' : '#ff5555';
+  document.getElementById('indGini').textContent = r.gini.toFixed(3);
+  document.getElementById('indGini').style.color = r.gini < 0.3 ? '#44dd88' : r.gini < 0.5 ? '#ddaa44' : '#ff5555';
+
+  // Bars
+  const stressBar = document.getElementById('stressBar');
+  const stressPct = r.supplyChainStress * 100;
+  stressBar.style.width = stressPct + '%';
+  stressBar.style.background = stressPct < 20 ? '#44dd88' : stressPct < 50 ? '#ddaa44' : '#ff5555';
+
+  const healthBar = document.getElementById('healthBar');
+  const healthPct = r.meanHealth * 100;
+  healthBar.style.width = healthPct + '%';
+  healthBar.style.background = healthPct > 60 ? '#44dd88' : healthPct > 40 ? '#ddaa44' : '#ff5555';
+
+  // Stats
+  document.getElementById('statFlex').textContent = (r.meanFlexFraction * 100).toFixed(1) + '%';
+  document.getElementById('statRigid').textContent = ((1 - r.meanFlexFraction) * 100).toFixed(1) + '%';
+  document.getElementById('statTechGen').textContent = r.techGeneration;
+  document.getElementById('statAlive').textContent = r.numAlive + ' / ' + sim.numFirms;
+  document.getElementById('statCascades').textContent = sim.totalCascades;
+
+  // Narrative
+  updateNarrative(r);
+}
+
+function updateNarrative(r) {
+  const el = document.getElementById('narrativeText');
+  let text = '';
+
+  if (r.phase === 'normal') {
+    if (r.unemployment < 0.05 && r.meanHealth > 0.65) {
+      text = 'The economy is in a stable equilibrium. Firms are healthy, supply chains flowing smoothly, ' +
+        'and the market is calm. During stability, rigid leadership styles gradually accumulate — ' +
+        'efficient but fragile. Watch what happens when the next shock hits.';
+    } else {
+      text = 'The economy is operating normally, though some firms show signs of stress. ' +
+        'The dependency network connects firms in ways that can amplify small disruptions into large cascades.';
+    }
+  } else if (r.phase === 'supply_shock') {
+    text = 'A demand shock is propagating through the supply chain. The bullwhip effect amplifies ' +
+      'the disruption at each echelon — downstream firms face shortages while upstream firms over-order. ' +
+      'Firms with more flexible leadership are smoothing their orders, reducing amplification.';
+  } else if (r.phase === 'tech_disruption') {
+    text = 'A new technology generation has emerged, making existing capabilities partially obsolete. ' +
+      'Firms with flexible organizations are adopting the new technology faster. Rigid firms are stuck ' +
+      'on the old paradigm — their efficiency advantage has become a liability.';
+  } else if (r.phase === 'market_crash') {
+    text = 'The economy is in crisis. Firm failures are cascading through the dependency network — ' +
+      'when a key supplier fails, its dependents suffer contagion damage. Market sentiment has collapsed. ' +
+      'This is the "too connected to fail" problem in action.';
+  } else if (r.phase === 'recovery') {
+    text = 'The economy is recovering. New entrant firms are more flexible by nature, gradually replacing ' +
+      'the rigid incumbents that failed. Technology adoption continues. The recovery speed depends on ' +
+      'how much of the dependency network survived intact.';
+  }
+
+  if (r.cascadeSize > 3) {
+    text += ' A significant cascade just occurred — ' + r.cascadeSize + ' firms failed simultaneously.';
+  }
+
+  el.textContent = text;
+}
+
+// =========================================================================
+// Scenario Management
+// =========================================================================
+
+function applyScenarioEvents(sim, scenario) {
+  sim.scheduledEvents = [];
+  if (scenario === 'supply_shock') {
+    sim.scheduleEvent(100, 'supply_shock', { multiplier: 2.5 });
+    sim.scheduleEvent(150, 'demand_normalize');
+  } else if (scenario === 'tech_disruption') {
+    sim.scheduleEvent(150, 'tech_disruption');
+  } else if (scenario === 'market_crash') {
+    sim.scheduleEvent(80, 'supply_shock', { multiplier: 2.0 });
+    sim.scheduleEvent(120, 'market_panic');
+    sim.scheduleEvent(160, 'tech_disruption');
+    sim.scheduleEvent(200, 'demand_normalize');
+  } else if (scenario === 'stress_test') {
+    sim.scheduleEvent(50, 'supply_shock', { multiplier: 1.8 });
+    sim.scheduleEvent(100, 'demand_normalize');
+    sim.scheduleEvent(150, 'tech_disruption');
+    sim.scheduleEvent(250, 'market_panic');
+    sim.scheduleEvent(300, 'supply_shock', { multiplier: 2.2 });
+    sim.scheduleEvent(350, 'demand_normalize');
+    sim.scheduleEvent(400, 'tech_disruption');
+  }
+}
+
+function selectScenario(scenario, btn) {
+  currentScenario = scenario;
+  document.querySelectorAll('.scenario-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  resetSim();
+}
+
+// =========================================================================
+// Simulation Control
+// =========================================================================
+
+function createSim() {
+  const numFirms = parseInt(document.getElementById('paramFirms').value) || 40;
+  const maxTicks = parseInt(document.getElementById('paramTicks').value) || 500;
+  const seed = parseInt(document.getElementById('paramSeed').value) || 42;
+  const depProb = parseFloat(document.getElementById('paramDepProb').value) || 0.08;
+
+  sim = new IntegratedEconomy({ numFirms, maxTicks, seed, depProb });
+  applyScenarioEvents(sim, currentScenario);
+}
+
+function resetSim() {
+  running = false;
+  if (animFrame) cancelAnimationFrame(animFrame);
+  animFrame = null;
+  document.getElementById('btnStart').textContent = 'Start';
+  document.getElementById('btnStart').classList.remove('active');
+
+  createSim();
+
+  // Clear charts
+  for (const key in charts) {
+    charts[key].data.labels = [];
+    for (const ds of charts[key].data.datasets) {
+      ds.data = [];
+    }
+    charts[key].update('none');
+  }
+
+  document.getElementById('tickDisplay').textContent = `Tick: 0 / ${sim.maxTicks}`;
+  document.getElementById('phaseBadge').textContent = 'NORMAL';
+  document.getElementById('phaseBadge').className = 'phase-badge normal';
+  document.getElementById('indGDP').textContent = '--';
+  document.getElementById('indIndex').textContent = '--';
+  document.getElementById('indUnemployment').textContent = '--';
+  document.getElementById('indGini').textContent = '--';
+  document.getElementById('statCascades').textContent = '0';
+  document.getElementById('narrativeText').textContent = 'Press Start to begin the simulation.';
+
+  drawNetwork();
+}
+
+function toggleRun() {
+  running = !running;
+  const btn = document.getElementById('btnStart');
+  if (running) {
+    btn.textContent = 'Pause';
+    btn.classList.add('active');
+    runLoop();
+  } else {
+    btn.textContent = 'Start';
+    btn.classList.remove('active');
+    if (animFrame) cancelAnimationFrame(animFrame);
+    animFrame = null;
+  }
+}
+
+function stepOnce() {
+  if (!sim) createSim();
+  if (sim.tick < sim.maxTicks) {
+    sim.step();
+    updateCharts();
+    drawNetwork();
+    updateDashboard();
+  }
+}
+
+function runLoop() {
+  if (!running || !sim) return;
+
+  const speed = parseInt(document.getElementById('speedSlider').value) || 10;
+  const stepsPerFrame = Math.max(1, Math.floor(speed / 3));
+
+  for (let i = 0; i < stepsPerFrame; i++) {
+    if (sim.tick >= sim.maxTicks) {
+      running = false;
+      document.getElementById('btnStart').textContent = 'Done';
+      document.getElementById('btnStart').classList.remove('active');
+      break;
+    }
+    sim.step();
+  }
+
+  // Update visuals every frame
+  updateCharts();
+  drawNetwork();
+  updateDashboard();
+
+  if (running) {
+    const delay = Math.max(16, 100 - speed * 2);
+    animFrame = setTimeout(() => requestAnimationFrame(runLoop), delay);
+  }
+}
+
+// =========================================================================
+// Init
+// =========================================================================
+
+window.addEventListener('load', () => {
+  initCharts();
+  createSim();
+  drawNetwork();
+});
+
+window.addEventListener('resize', () => {
+  if (sim) drawNetwork();
+});
+</script>
+</body>
+</html>

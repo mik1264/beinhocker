@@ -28,9 +28,9 @@ Examples:
     )
 
     # Mode
-    mode = parser.add_mutually_exclusive_group(required=True)
-    mode.add_argument('--learning', action='store_true',
-                      help='Full model with 100 rules per agent and GA evolution')
+    mode = parser.add_mutually_exclusive_group(required=False)
+    mode.add_argument('--learning', action='store_true', default=True,
+                      help='Full model with 100 rules per agent and GA evolution (default)')
     mode.add_argument('--rational', action='store_true',
                       help='Single rule per agent, no evolution (rational expectations)')
 
@@ -82,7 +82,7 @@ def format_stat(label, value, fmt='.4f'):
 def main():
     args = parse_args()
 
-    learning = args.learning
+    learning = not args.rational
     num_rules = args.rules_per_agent if learning else 1
 
     if not args.quiet:

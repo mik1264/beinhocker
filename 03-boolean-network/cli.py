@@ -114,7 +114,7 @@ Examples:
         help="Number of trials for attractor search or cascade analysis (default: 50)",
     )
     parser.add_argument(
-        "--steps",
+        "--steps", "--ticks",
         type=int,
         default=50,
         help="Number of steps per cascade (default: 50)",

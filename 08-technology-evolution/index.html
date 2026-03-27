@@ -1,0 +1,1620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Technology Evolution on NK Landscapes</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  background: #08080e;
+  color: #c8c8d0;
+  overflow: hidden;
+}
+
+.container {
+  display: grid;
+  grid-template-columns: 300px 1fr 380px;
+  grid-template-rows: auto 1fr;
+  height: 100vh;
+}
+
+/* --- HEADER --- */
+header {
+  grid-column: 1 / -1;
+  padding: 12px 24px;
+  background: linear-gradient(180deg, #14141e 0%, #10101a 100%);
+  border-bottom: 1px solid #1e1e30;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+header h1 {
+  font-size: 17px;
+  font-weight: 600;
+  color: #e8e8f0;
+  white-space: nowrap;
+  letter-spacing: -0.3px;
+}
+header .stats {
+  display: flex;
+  gap: 18px;
+  font-size: 12px;
+  flex-wrap: wrap;
+  font-family: 'JetBrains Mono', monospace;
+}
+header .stat { color: #666680; }
+header .stat span { color: #aaaac0; font-weight: 500; }
+
+/* --- LEFT PANEL --- */
+.controls {
+  background: #0e0e16;
+  border-right: 1px solid #1e1e30;
+  padding: 16px;
+  overflow-y: auto;
+}
+.controls::-webkit-scrollbar { width: 4px; }
+.controls::-webkit-scrollbar-track { background: transparent; }
+.controls::-webkit-scrollbar-thumb { background: #2a2a40; border-radius: 2px; }
+
+.controls h2 {
+  font-size: 10px;
+  font-weight: 600;
+  color: #55556a;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #1a1a28;
+}
+.controls .group { margin-bottom: 18px; }
+.controls label {
+  display: block;
+  font-size: 11px;
+  color: #777790;
+  margin-bottom: 4px;
+  margin-top: 8px;
+}
+.controls input[type="range"],
+.controls input[type="number"],
+.controls select {
+  width: 100%;
+  background: #14141e;
+  border: 1px solid #252538;
+  color: #c8c8d0;
+  padding: 5px 8px;
+  font-size: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  border-radius: 4px;
+}
+.controls select {
+  cursor: pointer;
+}
+.controls input[type="range"] {
+  padding: 0;
+  cursor: pointer;
+  accent-color: #5577cc;
+}
+.controls .val {
+  font-size: 10px;
+  color: #8888a0;
+  text-align: right;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.btn {
+  display: inline-block;
+  padding: 7px 14px;
+  margin: 3px 2px;
+  background: #16162a;
+  border: 1px solid #2a2a48;
+  color: #9999b8;
+  font-size: 12px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 5px;
+}
+.btn:hover { background: #1e1e3a; border-color: #4444aa; color: #bbbbdd; transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
+.btn.active { background: #1e2e55; border-color: #4466aa; color: #aaccff; box-shadow: 0 0 12px rgba(68,102,170,0.15); }
+.btn.danger { border-color: #5a2a2a; color: #cc8888; }
+.btn.danger:hover { background: #2a1218; border-color: #cc4444; color: #ff8888; }
+
+/* --- MAIN VIEW --- */
+.main-view {
+  position: relative;
+  background: #0a0a12;
+  overflow: hidden;
+  min-height: 0;
+}
+#landscape-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.phase-indicator {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  padding: 6px 16px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  font-family: 'JetBrains Mono', monospace;
+  backdrop-filter: blur(8px);
+}
+.phase-exploring { background: rgba(80,80,120,0.25); color: #8888bb; border: 1px solid rgba(85,85,119,0.4); }
+.phase-converging { background: rgba(50,130,70,0.25); color: #66cc77; border: 1px solid rgba(51,136,68,0.4); }
+.phase-disrupting { background: rgba(170,50,50,0.25); color: #ee6666; border: 1px solid rgba(170,51,51,0.4); }
+.phase-innovating { background: rgba(50,90,170,0.25); color: #6699ee; border: 1px solid rgba(51,102,170,0.4); }
+
+/* --- RIGHT PANEL --- */
+.right-panel {
+  background: #0e0e16;
+  border-left: 1px solid #1e1e30;
+  padding: 16px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.right-panel::-webkit-scrollbar { width: 4px; }
+.right-panel::-webkit-scrollbar-track { background: transparent; }
+.right-panel::-webkit-scrollbar-thumb { background: #2a2a40; border-radius: 2px; }
+
+.chart-box {
+  background: #0a0a12;
+  border: 1px solid #1a1a2a;
+  padding: 12px;
+  border-radius: 6px;
+  min-height: 0;
+  overflow: hidden;
+}
+.chart-box h3 {
+  font-size: 10px;
+  font-weight: 600;
+  color: #55556a;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+.chart-box .chart-explanation {
+  font-size: 11px;
+  color: #666680;
+  line-height: 1.45;
+  margin-bottom: 8px;
+  font-style: italic;
+}
+.chart-container {
+  height: 280px;
+  position: relative;
+  min-height: 0;
+  overflow: hidden;
+}
+.chart-container.wide {
+  height: 340px;
+}
+.chart-container canvas {
+  display: block;
+}
+
+.legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 10px; margin-top: 6px; }
+.legend-item { display: flex; align-items: center; gap: 4px; color: #777790; }
+.legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+/* --- INTRO OVERLAY --- */
+.intro-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(6,6,12,0.92);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(6px);
+  animation: fadeIn 0.4s ease;
+}
+.intro-overlay.hidden { display: none; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.intro-card {
+  background: linear-gradient(135deg, #12121e 0%, #0e0e1a 100%);
+  border: 1px solid #2a2a48;
+  border-radius: 12px;
+  padding: 48px 52px;
+  max-width: 700px;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+  animation: slideUp 0.5s ease;
+}
+@keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+.intro-card h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #e0e0f0;
+  margin-bottom: 8px;
+  letter-spacing: -0.5px;
+}
+.intro-card .subtitle {
+  font-size: 13px;
+  color: #6666aa;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 24px;
+}
+.intro-card p {
+  font-size: 15px;
+  line-height: 1.7;
+  color: #9999b0;
+  margin-bottom: 16px;
+}
+.intro-card p strong { color: #bbbbdd; font-weight: 500; }
+.intro-card .launch-btn {
+  display: inline-block;
+  margin-top: 20px;
+  padding: 12px 36px;
+  background: linear-gradient(135deg, #2244aa 0%, #3355bb 100%);
+  border: 1px solid #4466cc;
+  color: #ddeeff;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.2s;
+  letter-spacing: 0.3px;
+}
+.intro-card .launch-btn:hover {
+  background: linear-gradient(135deg, #2a55bb 0%, #4466cc 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(34,68,170,0.3);
+}
+
+/* --- NARRATIVE PANEL --- */
+.narrative-box {
+  background: linear-gradient(135deg, #10101e 0%, #0c0c18 100%);
+  border: 1px solid #1e1e38;
+  padding: 14px 16px;
+  border-radius: 8px;
+  min-height: 70px;
+}
+.narrative-box h3 {
+  font-size: 10px;
+  font-weight: 600;
+  color: #6666aa;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  margin-bottom: 8px;
+}
+#narrative-text {
+  font-size: 12px;
+  line-height: 1.6;
+  color: #8888a8;
+}
+#narrative-text strong { color: #aaaacc; font-weight: 500; }
+
+/* --- KEY INSIGHT --- */
+.key-insight {
+  background: linear-gradient(135deg, rgba(34,68,136,0.12) 0%, rgba(20,40,80,0.08) 100%);
+  border: 1px solid rgba(68,102,187,0.2);
+  border-left: 3px solid #4466bb;
+  padding: 14px 16px;
+  border-radius: 0 8px 8px 0;
+}
+.key-insight h3 {
+  font-size: 10px;
+  font-weight: 600;
+  color: #5577bb;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  margin-bottom: 6px;
+}
+.key-insight p {
+  font-size: 11px;
+  line-height: 1.6;
+  color: #7788aa;
+}
+
+/* --- FUN FACTS --- */
+.fun-facts {
+  background: linear-gradient(135deg, rgba(130,80,40,0.08) 0%, rgba(80,50,20,0.05) 100%);
+  border: 1px solid rgba(170,120,60,0.15);
+  padding: 14px 16px;
+  border-radius: 8px;
+}
+.fun-facts h3 {
+  font-size: 10px;
+  font-weight: 600;
+  color: #aa8844;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  margin-bottom: 6px;
+}
+#fun-fact-text {
+  font-size: 11px;
+  line-height: 1.6;
+  color: #998866;
+}
+
+/* --- NOTIFICATIONS --- */
+.notification-container {
+  position: fixed;
+  top: 60px;
+  right: 400px;
+  z-index: 500;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+.notification {
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  animation: notifIn 0.35s ease, notifOut 0.4s ease 3s forwards;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  max-width: 400px;
+}
+.notification.destruction {
+  background: linear-gradient(135deg, rgba(180,40,40,0.9) 0%, rgba(140,30,30,0.85) 100%);
+  border: 1px solid #cc4444;
+  color: #ffcccc;
+}
+.notification.innovation {
+  background: linear-gradient(135deg, rgba(40,130,70,0.9) 0%, rgba(30,100,50,0.85) 100%);
+  border: 1px solid #44aa66;
+  color: #ccffdd;
+}
+.notification.milestone {
+  background: linear-gradient(135deg, rgba(50,80,160,0.9) 0%, rgba(40,60,130,0.85) 100%);
+  border: 1px solid #4477cc;
+  color: #ccddff;
+}
+@keyframes notifIn { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes notifOut { from { opacity: 1; } to { opacity: 0; transform: translateY(-10px); } }
+</style>
+</head>
+<body>
+
+<!-- INTRO OVERLAY -->
+<div class="intro-overlay" id="intro-overlay">
+  <div class="intro-card">
+    <div class="subtitle">Beinhocker's Origin of Wealth</div>
+    <h1>Technology Evolution</h1>
+    <p>
+      <strong>Innovation isn't magic -- it's combinatorial search on a rugged landscape.</strong>
+      Every technology is a recipe: a combination of components, processes, and ideas.
+      A small change can make it slightly better, or completely useless.
+    </p>
+    <p>
+      This is Kauffman's <strong>NK fitness landscape</strong>. N dimensions define the technology;
+      K interdependencies make the landscape rugged with peaks and valleys. Firms search this landscape
+      using different strategies: cautious <strong>hill-climbing</strong>, bold <strong>long jumps</strong>,
+      or <strong>recombination</strong> of existing ideas.
+    </p>
+    <p>
+      Beinhocker's key insight: <strong>economic evolution is a search algorithm</strong>. Markets are
+      massively parallel experiments in technology space, and creative destruction is the mechanism
+      that prunes failures and amplifies successes.
+    </p>
+    <button class="launch-btn" onclick="dismissIntro()">Launch Simulation</button>
+  </div>
+</div>
+
+<!-- NOTIFICATION CONTAINER -->
+<div class="notification-container" id="notifications"></div>
+
+<div class="container" id="main-container">
+  <header>
+    <h1>Technology Evolution</h1>
+    <div class="stats">
+      <div class="stat">Tick <span id="stat-tick">0</span></div>
+      <div class="stat">Best <span id="stat-best">0</span></div>
+      <div class="stat">Mean <span id="stat-mean">0</span></div>
+      <div class="stat">Firms <span id="stat-firms">0</span></div>
+      <div class="stat">Diversity <span id="stat-diversity">0</span></div>
+      <div class="stat">Innovations <span id="stat-innovations">0</span></div>
+    </div>
+  </header>
+
+  <div class="controls">
+    <div class="group">
+      <h2>Simulation</h2>
+      <button class="btn active" id="btn-start" onclick="toggleRun()">Start</button>
+      <button class="btn" id="btn-step" onclick="stepOnce()">Step</button>
+      <button class="btn danger" id="btn-reset" onclick="resetSim()">Reset</button>
+    </div>
+
+    <div class="group">
+      <h2>Speed</h2>
+      <input type="range" id="speed" min="1" max="100" value="30">
+      <div class="val" id="speed-val">30 ms</div>
+    </div>
+
+    <div class="group">
+      <h2>NK Landscape</h2>
+      <label>N (dimensions)</label>
+      <input type="number" id="param-n" value="12" min="4" max="24">
+
+      <label>K (interdependencies)</label>
+      <input type="range" id="param-k" min="0" max="11" value="4">
+      <div class="val" id="k-val">4</div>
+    </div>
+
+    <div class="group">
+      <h2>Firms</h2>
+      <label>Number of firms</label>
+      <input type="number" id="param-firms" value="30" min="5" max="100">
+
+      <label>Mutation rate</label>
+      <input type="range" id="param-mutation" min="0" max="20" value="5">
+      <div class="val" id="mutation-val">0.05</div>
+
+      <label>R&D budget</label>
+      <input type="range" id="param-rd" min="5" max="80" value="30">
+      <div class="val" id="rd-val">0.30</div>
+    </div>
+
+    <div class="group">
+      <h2>Strategy Mix</h2>
+      <label>Random search %</label>
+      <input type="range" id="strat-random" min="0" max="100" value="15">
+      <div class="val" id="strat-random-val">15%</div>
+
+      <label>Local hill-climbing %</label>
+      <input type="range" id="strat-local" min="0" max="100" value="40">
+      <div class="val" id="strat-local-val">40%</div>
+
+      <label>Long-jump %</label>
+      <input type="range" id="strat-longjump" min="0" max="100" value="25">
+      <div class="val" id="strat-longjump-val">25%</div>
+
+      <label>Recombination %</label>
+      <input type="range" id="strat-recomb" min="0" max="100" value="20">
+      <div class="val" id="strat-recomb-val">20%</div>
+    </div>
+
+    <div class="group">
+      <h2>Legend</h2>
+      <div class="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#cc6666"></div> Random</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#66bb77"></div> Local</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#6688dd"></div> Long-jump</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#cc9944"></div> Recombination</div>
+      </div>
+      <div class="legend" style="margin-top: 8px;">
+        <div class="legend-item"><div class="legend-dot" style="background:#333; border: 2px solid #888; width:10px; height:10px;"></div> Emerging</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#555; border: 2px solid #aaa; width:12px; height:12px;"></div> Mature</div>
+      </div>
+    </div>
+
+    <div class="group">
+      <div class="key-insight">
+        <h3>Beinhocker's Insight</h3>
+        <p>The economy is not an equilibrium system but an evolutionary one. Technologies are "designs" -- recipes
+        that compete for survival. The number of possible designs is astronomically large (2^N for N binary choices),
+        making exhaustive search impossible. Markets solve this through massively parallel, decentralized search
+        using diverse strategies. This is why diversity of approaches matters more than any single "optimal" strategy.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-view" id="main-view">
+    <canvas id="landscape-canvas"></canvas>
+    <div class="phase-indicator phase-exploring" id="phase-badge">Exploring</div>
+  </div>
+
+  <div class="right-panel">
+    <div class="narrative-box">
+      <h3>What's Happening</h3>
+      <div id="narrative-text">The technology landscape is ready. Press <strong>Start</strong> to watch firms search for innovations.</div>
+    </div>
+
+    <div class="chart-box">
+      <h3>Fitness Over Time</h3>
+      <div class="chart-explanation">The best fitness climbs in bursts -- an S-curve pattern. Long plateaus where hill-climbers get stuck on local peaks, then a long-jump or recombination finds a higher peak.</div>
+      <div class="chart-container" style="height: 280px;">
+        <canvas id="chart-fitness"></canvas>
+      </div>
+    </div>
+
+    <div class="chart-box">
+      <h3>Technology Diversity</h3>
+      <div class="chart-explanation">Average Hamming distance between firm technologies. High = many different approaches being tried. Low = convergence (everyone copied the winner).</div>
+      <div class="chart-container" style="height: 280px;">
+        <canvas id="chart-diversity"></canvas>
+      </div>
+    </div>
+
+    <div class="chart-box">
+      <h3>Firm Population by Strategy</h3>
+      <div class="chart-explanation">Which search strategies survive? On smooth landscapes, hill-climbers dominate. On rugged landscapes, long-jumpers and recombiners thrive.</div>
+      <div class="chart-container" style="height: 280px;">
+        <canvas id="chart-strategies"></canvas>
+      </div>
+    </div>
+
+    <div class="chart-box">
+      <h3>S-Curve Transitions</h3>
+      <div class="chart-explanation">Technologies move through phases: emerging, growing, maturing, then declining as better innovations arrive. Each bump represents a wave of creative destruction.</div>
+      <div class="chart-container" style="height: 280px;">
+        <canvas id="chart-scurve"></canvas>
+      </div>
+    </div>
+
+    <div class="fun-facts">
+      <h3>Innovation Fun Fact</h3>
+      <div id="fun-fact-text">The number of possible technologies with just 20 binary dimensions is over 1 million. With 50 dimensions, it exceeds the number of atoms in the universe.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// =====================================================
+// SIMULATION ENGINE (Pure JS, mirrors Python simulation)
+// =====================================================
+
+class NKLandscape {
+  constructor(n, k, rng) {
+    this.n = n;
+    this.k = Math.min(k, n - 1);
+    this.rng = rng;
+    this.interactions = [];
+    this.fitnessTables = [];
+
+    for (let i = 0; i < n; i++) {
+      const others = [];
+      for (let j = 0; j < n; j++) { if (j !== i) others.push(j); }
+      this._shuffle(others);
+      this.interactions.push(others.slice(0, this.k));
+    }
+
+    for (let i = 0; i < n; i++) {
+      const table = {};
+      const numCombos = 1 << (this.k + 1);
+      for (let c = 0; c < numCombos; c++) {
+        const bits = [];
+        for (let b = 0; b <= this.k; b++) bits.push((c >> b) & 1);
+        table[bits.join(',')] = this.rng();
+      }
+      this.fitnessTables.push(table);
+    }
+  }
+
+  _shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(this.rng() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+  }
+
+  fitness(genome) {
+    let total = 0;
+    for (let i = 0; i < this.n; i++) {
+      const bits = [genome[i]];
+      for (const p of this.interactions[i]) bits.push(genome[p]);
+      total += this.fitnessTables[i][bits.join(',')];
+    }
+    return total / this.n;
+  }
+
+  neighbors(genome) {
+    const result = [];
+    for (let i = 0; i < this.n; i++) {
+      const nb = genome.slice();
+      nb[i] = 1 - nb[i];
+      result.push(nb);
+    }
+    return result;
+  }
+
+  getHeatmap(resolution) {
+    resolution = resolution || 32;
+    const nRemaining = this.n - 2;
+    let configs = [];
+    if (nRemaining <= 6) {
+      const count = 1 << nRemaining;
+      for (let c = 0; c < count; c++) {
+        const bits = [];
+        for (let b = 0; b < nRemaining; b++) bits.push((c >> b) & 1);
+        configs.push(bits);
+      }
+    } else {
+      for (let i = 0; i < 32; i++) {
+        const bits = [];
+        for (let b = 0; b < nRemaining; b++) bits.push(this.rng() < 0.5 ? 1 : 0);
+        configs.push(bits);
+      }
+    }
+
+    const heatmap = [];
+    for (let row = 0; row < resolution; row++) {
+      const rowData = [];
+      const bit0 = row >= resolution / 2 ? 1 : 0;
+      for (let col = 0; col < resolution; col++) {
+        const bit1 = col >= resolution / 2 ? 1 : 0;
+        let totalF = 0;
+        for (const remaining of configs) {
+          const genome = [bit0, bit1, ...remaining];
+          totalF += this.fitness(genome);
+        }
+        rowData.push(totalF / configs.length);
+      }
+      heatmap.push(rowData);
+    }
+    return heatmap;
+  }
+}
+
+// Seeded RNG (mulberry32)
+function makeRng(seed) {
+  let s = seed | 0;
+  return function() {
+    s = (s + 0x6D2B79F5) | 0;
+    let t = Math.imul(s ^ (s >>> 15), 1 | s);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+const STRATEGIES = ['random', 'local', 'long_jump', 'recombination'];
+const STRATEGY_COLORS = {
+  random: '#cc6666',
+  local: '#66bb77',
+  long_jump: '#6688dd',
+  recombination: '#cc9944',
+};
+const PHASES = ['emerging', 'growth', 'mature', 'declining'];
+
+class Firm {
+  constructor(id, strategy, genome, fitness, rng) {
+    this.id = id;
+    this.strategy = strategy;
+    this.genome = genome;
+    this.fitness = fitness;
+    this.age = 0;
+    this.techAge = 0;
+    this.peakFitness = fitness;
+    this.innovations = 0;
+    this.phase = 'emerging';
+    this.alive = true;
+  }
+}
+
+class TechSimulation {
+  constructor(config) {
+    this.config = Object.assign({
+      n: 12, k: 4, numFirms: 30,
+      mutationRate: 0.05, rdBudget: 0.3,
+      entryRate: 0.02, exitThreshold: 0.15,
+      longJumpDist: 3,
+      strategyMix: { random: 0.15, local: 0.40, long_jump: 0.25, recombination: 0.20 },
+      seed: Date.now(),
+    }, config);
+
+    this.rng = makeRng(this.config.seed);
+    this.landscape = new NKLandscape(this.config.n, this.config.k, this.rng);
+    this.firms = [];
+    this.deadFirms = [];
+    this.tick = 0;
+    this.nextId = 0;
+    this.globalBestFitness = 0;
+    this.globalBestGenome = [];
+    this.totalInnovations = 0;
+    this.totalDestructions = 0;
+    this.totalEntries = 0;
+    this.totalExits = 0;
+    this.history = [];
+
+    this._initFirms();
+    this.heatmap = this.landscape.getHeatmap(32);
+  }
+
+  _initFirms() {
+    const strategies = [];
+    for (const [strat, frac] of Object.entries(this.config.strategyMix)) {
+      const count = Math.max(1, Math.round(this.config.numFirms * frac));
+      for (let i = 0; i < count; i++) strategies.push(strat);
+    }
+    while (strategies.length < this.config.numFirms) {
+      strategies.push(STRATEGIES[Math.floor(this.rng() * STRATEGIES.length)]);
+    }
+    // Shuffle
+    for (let i = strategies.length - 1; i > 0; i--) {
+      const j = Math.floor(this.rng() * (i + 1));
+      [strategies[i], strategies[j]] = [strategies[j], strategies[i]];
+    }
+
+    for (let i = 0; i < this.config.numFirms; i++) {
+      const genome = this._randomGenome();
+      const fitness = this.landscape.fitness(genome);
+      const firm = new Firm(this.nextId++, strategies[i], genome, fitness, this.rng);
+      this.firms.push(firm);
+      if (fitness > this.globalBestFitness) {
+        this.globalBestFitness = fitness;
+        this.globalBestGenome = genome.slice();
+      }
+    }
+  }
+
+  _randomGenome() {
+    const g = [];
+    for (let i = 0; i < this.config.n; i++) g.push(this.rng() < 0.5 ? 1 : 0);
+    return g;
+  }
+
+  _hammingDist(a, b) {
+    let d = 0;
+    for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) d++;
+    return d;
+  }
+
+  _techDiversity() {
+    if (this.firms.length < 2) return 0;
+    const subset = this.firms.slice(0, 40);
+    let total = 0, count = 0;
+    for (let i = 0; i < subset.length; i++) {
+      for (let j = i + 1; j < subset.length; j++) {
+        total += this._hammingDist(subset[i].genome, subset[j].genome);
+        count++;
+      }
+    }
+    return count > 0 ? (total / count) / this.config.n : 0;
+  }
+
+  _classifyPhase(firm) {
+    const relFit = firm.fitness / Math.max(this.globalBestFitness, 0.001);
+    if (firm.techAge < 10) return relFit < 0.5 ? 'emerging' : 'growth';
+    if (firm.fitness < firm.peakFitness * 0.8 && firm.techAge > 20) return 'declining';
+    if (relFit > 0.85 && firm.techAge > 15) return 'mature';
+    if (firm.fitness > firm.peakFitness * 0.9) return 'growth';
+    return 'emerging';
+  }
+
+  _mutate(genome) {
+    const m = genome.slice();
+    for (let i = 0; i < m.length; i++) {
+      if (this.rng() < this.config.mutationRate) m[i] = 1 - m[i];
+    }
+    return m;
+  }
+
+  _searchRandom() { return this._randomGenome(); }
+
+  _searchLocal(firm) {
+    const nbs = this.landscape.neighbors(firm.genome);
+    let bestG = null, bestF = firm.fitness;
+    for (const nb of nbs) {
+      const f = this.landscape.fitness(nb);
+      if (f > bestF) { bestF = f; bestG = nb; }
+    }
+    return bestG;
+  }
+
+  _searchLongJump(firm) {
+    const g = firm.genome.slice();
+    const positions = [];
+    const indices = [];
+    for (let i = 0; i < this.config.n; i++) indices.push(i);
+    for (let i = indices.length - 1; i > 0; i--) {
+      const j = Math.floor(this.rng() * (i + 1));
+      [indices[i], indices[j]] = [indices[j], indices[i]];
+    }
+    const dist = Math.min(this.config.longJumpDist, this.config.n);
+    for (let i = 0; i < dist; i++) g[indices[i]] = 1 - g[indices[i]];
+    return g;
+  }
+
+  _searchRecombination(firm) {
+    if (this.firms.length < 2) return null;
+    let other = this.firms[Math.floor(this.rng() * this.firms.length)];
+    let attempts = 0;
+    while (other.id === firm.id && attempts < 10) {
+      other = this.firms[Math.floor(this.rng() * this.firms.length)];
+      attempts++;
+    }
+    const child = [];
+    for (let i = 0; i < this.config.n; i++) {
+      child.push(this.rng() < 0.5 ? firm.genome[i] : other.genome[i]);
+    }
+    return child;
+  }
+
+  _firmSearch(firm) {
+    let candidate = null;
+    if (firm.strategy === 'random') candidate = this._searchRandom();
+    else if (firm.strategy === 'local') candidate = this._searchLocal(firm);
+    else if (firm.strategy === 'long_jump') candidate = this._searchLongJump(firm);
+    else if (firm.strategy === 'recombination') candidate = this._searchRecombination(firm);
+
+    if (!candidate) return false;
+    candidate = this._mutate(candidate);
+    const newF = this.landscape.fitness(candidate);
+
+    let accept = false;
+    if (firm.strategy === 'local') {
+      accept = newF > firm.fitness;
+    } else if (firm.strategy === 'random') {
+      accept = newF > firm.fitness || this.rng() < 0.05;
+    } else {
+      accept = newF > firm.fitness;
+    }
+
+    if (accept) {
+      firm.genome = candidate;
+      firm.fitness = newF;
+      firm.techAge = 0;
+      if (newF > firm.peakFitness) firm.peakFitness = newF;
+      firm.innovations++;
+      if (newF > this.globalBestFitness) {
+        this.globalBestFitness = newF;
+        this.globalBestGenome = candidate.slice();
+      }
+      return true;
+    }
+    return false;
+  }
+
+  _creativeDestruction() {
+    if (!this.firms.length) return [0, 0];
+    let exited = 0;
+    const meanF = this.firms.reduce((s, f) => s + f.fitness, 0) / this.firms.length;
+    const bestF = Math.max(...this.firms.map(f => f.fitness));
+    const threshold = Math.max(meanF * this.config.exitThreshold / 0.15, bestF * this.config.exitThreshold);
+
+    const toRemove = [];
+    for (const firm of this.firms) {
+      if (firm.fitness < threshold && firm.age > 5) {
+        const gap = (threshold - firm.fitness) / Math.max(threshold, 0.001);
+        if (this.rng() < gap * 0.5) toRemove.push(firm);
+      }
+    }
+    for (const firm of toRemove) {
+      firm.alive = false;
+      this.deadFirms.push(firm);
+      this.firms = this.firms.filter(f => f.id !== firm.id);
+      exited++;
+    }
+    this.totalExits += exited;
+    this.totalDestructions += exited;
+
+    let entered = 0;
+    if (this.rng() < this.config.entryRate || this.firms.length < this.config.numFirms * 0.5) {
+      const strategy = STRATEGIES[Math.floor(this.rng() * STRATEGIES.length)];
+      let genome;
+      if (this.firms.length >= 2 && this.rng() < 0.6) {
+        const p1 = this.firms[Math.floor(this.rng() * this.firms.length)];
+        const p2 = this.firms[Math.floor(this.rng() * this.firms.length)];
+        genome = [];
+        for (let i = 0; i < this.config.n; i++) {
+          genome.push(this.rng() < 0.5 ? p1.genome[i] : p2.genome[i]);
+        }
+        genome = this._mutate(genome);
+      } else {
+        genome = this._randomGenome();
+      }
+      const fitness = this.landscape.fitness(genome);
+      const firm = new Firm(this.nextId++, strategy, genome, fitness, this.rng);
+      this.firms.push(firm);
+      entered++;
+      this.totalEntries++;
+    }
+    return [entered, exited];
+  }
+
+  step() {
+    this.tick++;
+    let innovationsThisTick = 0;
+    let scurveTransitions = 0;
+
+    for (const firm of this.firms) { firm.age++; firm.techAge++; }
+    for (const firm of this.firms) {
+      if (this._firmSearch(firm)) {
+        innovationsThisTick++;
+        this.totalInnovations++;
+      }
+    }
+    for (const firm of this.firms) {
+      const oldPhase = firm.phase;
+      firm.phase = this._classifyPhase(firm);
+      if (firm.phase !== oldPhase) scurveTransitions++;
+    }
+
+    const [entered, exited] = this._creativeDestruction();
+
+    const stratCounts = {};
+    for (const s of STRATEGIES) stratCounts[s] = 0;
+    for (const f of this.firms) stratCounts[f.strategy]++;
+
+    const phaseCounts = {};
+    for (const p of PHASES) phaseCounts[p] = 0;
+    for (const f of this.firms) phaseCounts[f.phase]++;
+
+    const fitnesses = this.firms.map(f => f.fitness);
+    const bestF = fitnesses.length ? Math.max(...fitnesses) : 0;
+    const meanF = fitnesses.length ? fitnesses.reduce((a, b) => a + b, 0) / fitnesses.length : 0;
+
+    const record = {
+      tick: this.tick,
+      numFirms: this.firms.length,
+      bestFitness: bestF,
+      meanFitness: meanF,
+      diversity: this.tick % 5 === 0 ? this._techDiversity() : (this.history.length ? this.history[this.history.length - 1].diversity : 0),
+      stratCounts,
+      phaseCounts,
+      entered,
+      exited,
+      innovations: innovationsThisTick,
+      scurveTransitions,
+    };
+    this.history.push(record);
+    return record;
+  }
+
+  getFirmPositions() {
+    // Map genome to 2D position for visualization
+    const half = Math.floor(this.config.n / 2);
+    return this.firms.map(f => {
+      const xBits = f.genome.slice(0, half);
+      const yBits = f.genome.slice(half);
+      const maxX = (1 << half) - 1 || 1;
+      const maxY = (1 << (this.config.n - half)) - 1 || 1;
+      let x = 0, y = 0;
+      for (let i = 0; i < xBits.length; i++) x += xBits[i] * (1 << i);
+      for (let i = 0; i < yBits.length; i++) y += yBits[i] * (1 << i);
+      return {
+        id: f.id,
+        x: x / maxX,
+        y: y / maxY,
+        fitness: f.fitness,
+        strategy: f.strategy,
+        phase: f.phase,
+        age: f.age,
+        innovations: f.innovations,
+      };
+    });
+  }
+}
+
+// =====================================================
+// VISUALIZATION STATE
+// =====================================================
+
+let sim = null;
+let running = false;
+let animFrame = null;
+let speed = 30;
+let charts = {};
+let heatmapImageData = null;
+
+const MAX_HISTORY = 500;
+
+// =====================================================
+// CHART INITIALIZATION
+// =====================================================
+
+const chartDefaults = {
+  responsive: true,
+  maintainAspectRatio: false,
+  animation: { duration: 0 },
+  plugins: {
+    legend: { display: false },
+  },
+  scales: {
+    x: {
+      grid: { color: 'rgba(40,40,70,0.3)' },
+      ticks: { color: '#555570', font: { size: 9, family: 'JetBrains Mono' }, maxTicksLimit: 6 },
+    },
+    y: {
+      grid: { color: 'rgba(40,40,70,0.3)' },
+      ticks: { color: '#555570', font: { size: 9, family: 'JetBrains Mono' }, maxTicksLimit: 5 },
+    },
+  },
+};
+
+function initCharts() {
+  // Fitness chart
+  const ctxF = document.getElementById('chart-fitness').getContext('2d');
+  charts.fitness = new Chart(ctxF, {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [
+        { label: 'Best', data: [], borderColor: '#66ccff', borderWidth: 1.5, pointRadius: 0, tension: 0.3 },
+        { label: 'Mean', data: [], borderColor: '#88aa44', borderWidth: 1.5, pointRadius: 0, tension: 0.3 },
+      ],
+    },
+    options: {
+      ...chartDefaults,
+      plugins: {
+        ...chartDefaults.plugins,
+        legend: {
+          display: true,
+          labels: { color: '#777790', font: { size: 9 }, boxWidth: 12 },
+          position: 'top',
+        },
+      },
+      scales: {
+        ...chartDefaults.scales,
+        y: { ...chartDefaults.scales.y, min: 0, max: 1 },
+      },
+    },
+  });
+
+  // Diversity chart
+  const ctxD = document.getElementById('chart-diversity').getContext('2d');
+  charts.diversity = new Chart(ctxD, {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [
+        { label: 'Diversity', data: [], borderColor: '#cc88dd', borderWidth: 1.5, pointRadius: 0, fill: true, backgroundColor: 'rgba(200,120,220,0.08)', tension: 0.3 },
+      ],
+    },
+    options: {
+      ...chartDefaults,
+      scales: {
+        ...chartDefaults.scales,
+        y: { ...chartDefaults.scales.y, min: 0, max: 1 },
+      },
+    },
+  });
+
+  // Strategy chart
+  const ctxS = document.getElementById('chart-strategies').getContext('2d');
+  charts.strategies = new Chart(ctxS, {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [
+        { label: 'Random', data: [], borderColor: '#cc6666', borderWidth: 1.5, pointRadius: 0, fill: true, backgroundColor: 'rgba(200,100,100,0.08)' },
+        { label: 'Local', data: [], borderColor: '#66bb77', borderWidth: 1.5, pointRadius: 0, fill: true, backgroundColor: 'rgba(100,180,120,0.08)' },
+        { label: 'Long-jump', data: [], borderColor: '#6688dd', borderWidth: 1.5, pointRadius: 0, fill: true, backgroundColor: 'rgba(100,130,220,0.08)' },
+        { label: 'Recombination', data: [], borderColor: '#cc9944', borderWidth: 1.5, pointRadius: 0, fill: true, backgroundColor: 'rgba(200,150,70,0.08)' },
+      ],
+    },
+    options: {
+      ...chartDefaults,
+      plugins: {
+        ...chartDefaults.plugins,
+        legend: {
+          display: true,
+          labels: { color: '#777790', font: { size: 9 }, boxWidth: 12 },
+          position: 'top',
+        },
+      },
+      scales: {
+        ...chartDefaults.scales,
+        y: { ...chartDefaults.scales.y, min: 0 },
+      },
+    },
+  });
+
+  // S-curve chart (stacked area of phases)
+  const ctxSC = document.getElementById('chart-scurve').getContext('2d');
+  charts.scurve = new Chart(ctxSC, {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [
+        { label: 'Emerging', data: [], borderColor: '#8888bb', borderWidth: 1, pointRadius: 0, fill: true, backgroundColor: 'rgba(130,130,190,0.15)' },
+        { label: 'Growth', data: [], borderColor: '#66cc77', borderWidth: 1, pointRadius: 0, fill: true, backgroundColor: 'rgba(100,200,120,0.15)' },
+        { label: 'Mature', data: [], borderColor: '#6699ee', borderWidth: 1, pointRadius: 0, fill: true, backgroundColor: 'rgba(100,150,230,0.15)' },
+        { label: 'Declining', data: [], borderColor: '#cc5555', borderWidth: 1, pointRadius: 0, fill: true, backgroundColor: 'rgba(200,85,85,0.15)' },
+      ],
+    },
+    options: {
+      ...chartDefaults,
+      plugins: {
+        ...chartDefaults.plugins,
+        legend: {
+          display: true,
+          labels: { color: '#777790', font: { size: 9 }, boxWidth: 12 },
+          position: 'top',
+        },
+      },
+      scales: {
+        ...chartDefaults.scales,
+        y: { ...chartDefaults.scales.y, min: 0, stacked: true },
+        x: { ...chartDefaults.scales.x, stacked: true },
+      },
+    },
+  });
+}
+
+// =====================================================
+// LANDSCAPE + FIRM RENDERING (Canvas)
+// =====================================================
+
+function renderLandscape() {
+  const canvas = document.getElementById('landscape-canvas');
+  const ctx = canvas.getContext('2d');
+  const rect = canvas.parentElement.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  canvas.style.width = rect.width + 'px';
+  canvas.style.height = rect.height + 'px';
+  ctx.scale(dpr, dpr);
+
+  const w = rect.width;
+  const h = rect.height;
+
+  // Draw heatmap
+  if (sim && sim.heatmap) {
+    const hm = sim.heatmap;
+    const rows = hm.length;
+    const cols = hm[0].length;
+    const cellW = w / cols;
+    const cellH = h / rows;
+
+    // Find min/max for color mapping
+    let minF = Infinity, maxF = -Infinity;
+    for (const row of hm) {
+      for (const v of row) {
+        if (v < minF) minF = v;
+        if (v > maxF) maxF = v;
+      }
+    }
+    const range = maxF - minF || 1;
+
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const val = (hm[r][c] - minF) / range;
+        // Color: dark blue (low) -> teal -> green -> yellow (high)
+        const hue = val * 120; // 0=red-ish -> 120=green
+        const sat = 40 + val * 30;
+        const light = 8 + val * 25;
+        ctx.fillStyle = `hsl(${200 - hue}, ${sat}%, ${light}%)`;
+        ctx.fillRect(c * cellW, r * cellH, cellW + 1, cellH + 1);
+      }
+    }
+
+    // Draw contour lines (approximate)
+    ctx.strokeStyle = 'rgba(100,100,150,0.15)';
+    ctx.lineWidth = 0.5;
+    const levels = 8;
+    for (let level = 1; level < levels; level++) {
+      const threshold = minF + (range * level) / levels;
+      for (let r = 0; r < rows - 1; r++) {
+        for (let c = 0; c < cols - 1; c++) {
+          const v00 = hm[r][c];
+          const v10 = hm[r][c + 1];
+          const v01 = hm[r + 1][c];
+          if ((v00 < threshold) !== (v10 < threshold) || (v00 < threshold) !== (v01 < threshold)) {
+            ctx.beginPath();
+            ctx.moveTo(c * cellW + cellW / 2, r * cellH + cellH / 2);
+            if ((v00 < threshold) !== (v10 < threshold)) {
+              ctx.lineTo((c + 1) * cellW + cellW / 2, r * cellH + cellH / 2);
+            }
+            if ((v00 < threshold) !== (v01 < threshold)) {
+              ctx.lineTo(c * cellW + cellW / 2, (r + 1) * cellH + cellH / 2);
+            }
+            ctx.stroke();
+          }
+        }
+      }
+    }
+  }
+
+  // Draw firms
+  if (sim) {
+    const positions = sim.getFirmPositions();
+    const padding = 30;
+    const plotW = w - padding * 2;
+    const plotH = h - padding * 2;
+
+    for (const pos of positions) {
+      const x = padding + pos.x * plotW;
+      const y = padding + pos.y * plotH;
+      const color = STRATEGY_COLORS[pos.strategy] || '#888';
+
+      // Size based on fitness
+      const baseR = 4;
+      const r = baseR + pos.fitness * 8;
+
+      // Glow for high-fitness firms
+      if (pos.fitness > 0.7) {
+        ctx.beginPath();
+        const glow = ctx.createRadialGradient(x, y, r, x, y, r * 3);
+        glow.addColorStop(0, color + '40');
+        glow.addColorStop(1, 'transparent');
+        ctx.fillStyle = glow;
+        ctx.arc(x, y, r * 3, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Outer ring for mature/growth firms
+      if (pos.phase === 'mature' || pos.phase === 'growth') {
+        ctx.beginPath();
+        ctx.arc(x, y, r + 3, 0, Math.PI * 2);
+        ctx.strokeStyle = pos.phase === 'mature' ? 'rgba(100,150,230,0.6)' : 'rgba(100,200,120,0.4)';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+      }
+
+      // Declining: dashed ring
+      if (pos.phase === 'declining') {
+        ctx.beginPath();
+        ctx.setLineDash([3, 3]);
+        ctx.arc(x, y, r + 3, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(200,85,85,0.5)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+
+      // Main dot
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.fillStyle = color;
+      ctx.globalAlpha = 0.6 + pos.fitness * 0.4;
+      ctx.fill();
+      ctx.globalAlpha = 1;
+
+      // Innovation sparkle
+      if (pos.innovations > 0 && pos.innovations % 3 === 0) {
+        ctx.beginPath();
+        ctx.arc(x, y - r - 4, 2, 0, Math.PI * 2);
+        ctx.fillStyle = '#ffee88';
+        ctx.fill();
+      }
+    }
+
+    // Draw title on landscape
+    ctx.fillStyle = 'rgba(200,200,220,0.4)';
+    ctx.font = '11px JetBrains Mono';
+    ctx.fillText(`NK Landscape  N=${sim.config.n}  K=${sim.config.k}`, 14, h - 14);
+  }
+}
+
+// =====================================================
+// CHART UPDATES
+// =====================================================
+
+function updateCharts(record) {
+  const tick = record.tick;
+
+  // Trim history for chart performance
+  const trim = (chart) => {
+    if (chart.data.labels.length > MAX_HISTORY) {
+      chart.data.labels.shift();
+      for (const ds of chart.data.datasets) ds.data.shift();
+    }
+  };
+
+  // Fitness
+  charts.fitness.data.labels.push(tick);
+  charts.fitness.data.datasets[0].data.push(record.bestFitness.toFixed(4));
+  charts.fitness.data.datasets[1].data.push(record.meanFitness.toFixed(4));
+  trim(charts.fitness);
+  charts.fitness.update('none');
+
+  // Diversity
+  charts.diversity.data.labels.push(tick);
+  charts.diversity.data.datasets[0].data.push(record.diversity.toFixed(4));
+  trim(charts.diversity);
+  charts.diversity.update('none');
+
+  // Strategies
+  charts.strategies.data.labels.push(tick);
+  charts.strategies.data.datasets[0].data.push(record.stratCounts.random || 0);
+  charts.strategies.data.datasets[1].data.push(record.stratCounts.local || 0);
+  charts.strategies.data.datasets[2].data.push(record.stratCounts.long_jump || 0);
+  charts.strategies.data.datasets[3].data.push(record.stratCounts.recombination || 0);
+  trim(charts.strategies);
+  charts.strategies.update('none');
+
+  // S-curve phases
+  charts.scurve.data.labels.push(tick);
+  charts.scurve.data.datasets[0].data.push(record.phaseCounts.emerging || 0);
+  charts.scurve.data.datasets[1].data.push(record.phaseCounts.growth || 0);
+  charts.scurve.data.datasets[2].data.push(record.phaseCounts.mature || 0);
+  charts.scurve.data.datasets[3].data.push(record.phaseCounts.declining || 0);
+  trim(charts.scurve);
+  charts.scurve.update('none');
+}
+
+// =====================================================
+// NARRATIVE ENGINE
+// =====================================================
+
+function updateNarrative(record) {
+  const el = document.getElementById('narrative-text');
+  const parts = [];
+
+  if (record.tick <= 3) {
+    parts.push(`<strong>${record.numFirms} firms</strong> begin searching the NK landscape.`);
+    parts.push(`The technology space has <strong>2^${sim.config.n} = ${(1 << sim.config.n).toLocaleString()}</strong> possible designs.`);
+  } else {
+    if (record.innovations > 3) {
+      parts.push(`<strong>Innovation burst!</strong> ${record.innovations} firms found better technologies this tick.`);
+    } else if (record.innovations === 0) {
+      parts.push('No innovations this tick -- firms may be stuck on <strong>local peaks</strong>.');
+    } else {
+      parts.push(`${record.innovations} innovation${record.innovations > 1 ? 's' : ''} found.`);
+    }
+
+    if (record.exited > 0) {
+      parts.push(` <strong>Creative destruction:</strong> ${record.exited} firm${record.exited > 1 ? 's' : ''} destroyed by superior technology.`);
+    }
+    if (record.entered > 0) {
+      parts.push(` A new entrant joins the market.`);
+    }
+
+    // Phase commentary
+    const dominant = record.stratCounts;
+    const maxStrat = Object.entries(dominant).sort((a, b) => b[1] - a[1])[0];
+    if (maxStrat && record.tick % 20 === 0) {
+      const stratNames = {
+        random: 'Random searchers', local: 'Hill-climbers',
+        long_jump: 'Long-jumpers', recombination: 'Recombiners'
+      };
+      parts.push(` <strong>${stratNames[maxStrat[0]]}</strong> currently dominate (${maxStrat[1]} firms).`);
+    }
+  }
+
+  el.innerHTML = parts.join(' ');
+}
+
+// =====================================================
+// PHASE DETECTION FOR BADGE
+// =====================================================
+
+function updatePhaseBadge(record) {
+  const badge = document.getElementById('phase-badge');
+  let phase, className;
+
+  if (record.exited > 2) {
+    phase = 'Disrupting';
+    className = 'phase-disrupting';
+  } else if (record.innovations > record.numFirms * 0.2) {
+    phase = 'Innovating';
+    className = 'phase-innovating';
+  } else if (record.diversity < 0.3) {
+    phase = 'Converging';
+    className = 'phase-converging';
+  } else {
+    phase = 'Exploring';
+    className = 'phase-exploring';
+  }
+
+  badge.textContent = phase;
+  badge.className = 'phase-indicator ' + className;
+}
+
+// =====================================================
+// FUN FACTS
+// =====================================================
+
+const FUN_FACTS = [
+  "The number of possible technologies with just 20 binary dimensions is over 1 million. With 50 dimensions, it exceeds the number of atoms in the universe.",
+  "Kauffman showed that when K is about 2-4, NK landscapes have a 'complexity catastrophe' -- too many interdependencies make finding good solutions nearly impossible.",
+  "Edison tested over 3,000 materials for lightbulb filaments. That's local search on a technology landscape -- and it worked because the filament dimension was relatively independent of others.",
+  "The Wright Brothers' key insight was combining a warping wing (from bicycle mechanics) with a wind tunnel (from physics). Classic recombination innovation.",
+  "Schumpeter called entrepreneurs 'agents of creative destruction.' In this model, they're the long-jumpers and recombiners -- willing to abandon working technology for untested combinations.",
+  "The QWERTY keyboard persists because of path dependence on the NK landscape. It sits on a local peak -- not the global optimum, but good enough that no one wants to walk through the valley to reach Dvorak.",
+  "Intel's Andy Grove: 'Only the paranoid survive.' In NK landscape terms: the fitness of your current position can drop if the landscape shifts (new dimensions become relevant).",
+  "The printing press combined existing technologies: the wine press (screw mechanism), movable type (metallurgy), and oil-based ink (chemistry). None was new; the combination was revolutionary.",
+  "Brian Arthur showed that technology evolution follows increasing returns: the more a technology is adopted, the more it improves, creating lock-in on local peaks.",
+  "Beinhocker estimates the modern economy contains roughly 10 billion distinct 'stock-keeping units' -- each one a technology sitting on its own local peak.",
+  "When K=0 (no interdependencies), the landscape has a single peak and hill-climbing always finds it. Real technology landscapes have K >> 0, which is why innovation is hard.",
+  "Netflix destroyed Blockbuster not by being better at the same game, but by searching a completely different region of the technology landscape (streaming vs. physical stores).",
+  "The smartphone combined phone, camera, GPS, computer, and music player. Each existed independently; Steve Jobs' genius was recognizing the combinatorial opportunity.",
+  "On a maximally rugged landscape (K=N-1), random search is actually the optimal strategy. This is why disruption often comes from outsiders who don't know 'the right way' to do things.",
+  "Japan's manufacturing revolution combined Western mass production with local innovations (kanban, kaizen). Cross-cultural recombination on the technology landscape.",
+];
+
+let currentFactIdx = 0;
+function rotateFunFact() {
+  currentFactIdx = (currentFactIdx + 1) % FUN_FACTS.length;
+  document.getElementById('fun-fact-text').textContent = FUN_FACTS[currentFactIdx];
+}
+
+// =====================================================
+// NOTIFICATIONS
+// =====================================================
+
+function showNotification(text, type) {
+  const container = document.getElementById('notifications');
+  const el = document.createElement('div');
+  el.className = 'notification ' + type;
+  el.textContent = text;
+  container.appendChild(el);
+  setTimeout(() => el.remove(), 3500);
+}
+
+let lastMilestone = 0;
+function checkMilestones(record) {
+  if (record.bestFitness > 0.9 && lastMilestone < 0.9) {
+    showNotification('Best fitness exceeded 0.90 -- approaching global peak!', 'milestone');
+    lastMilestone = 0.9;
+  } else if (record.bestFitness > 0.8 && lastMilestone < 0.8) {
+    showNotification('Best fitness exceeded 0.80!', 'milestone');
+    lastMilestone = 0.8;
+  } else if (record.bestFitness > 0.7 && lastMilestone < 0.7) {
+    showNotification('Best fitness exceeded 0.70 -- strong technologies emerging.', 'innovation');
+    lastMilestone = 0.7;
+  }
+
+  if (record.exited >= 3) {
+    showNotification(`Creative destruction wave: ${record.exited} firms eliminated!`, 'destruction');
+  }
+}
+
+// =====================================================
+// HEADER STATS
+// =====================================================
+
+function updateStats(record) {
+  document.getElementById('stat-tick').textContent = record.tick;
+  document.getElementById('stat-best').textContent = record.bestFitness.toFixed(3);
+  document.getElementById('stat-mean').textContent = record.meanFitness.toFixed(3);
+  document.getElementById('stat-firms').textContent = record.numFirms;
+  document.getElementById('stat-diversity').textContent = record.diversity.toFixed(3);
+  document.getElementById('stat-innovations').textContent = sim.totalInnovations;
+}
+
+// =====================================================
+// SIMULATION LOOP
+// =====================================================
+
+function simulationTick() {
+  if (!sim) return;
+  const record = sim.step();
+
+  updateStats(record);
+  updateCharts(record);
+  renderLandscape();
+  updateNarrative(record);
+  updatePhaseBadge(record);
+  checkMilestones(record);
+
+  if (record.tick % 50 === 0) rotateFunFact();
+
+  if (running) {
+    animFrame = setTimeout(simulationTick, speed);
+  }
+}
+
+function toggleRun() {
+  running = !running;
+  const btn = document.getElementById('btn-start');
+  btn.textContent = running ? 'Pause' : 'Start';
+  btn.classList.toggle('active', running);
+  if (running) simulationTick();
+  else if (animFrame) { clearTimeout(animFrame); animFrame = null; }
+}
+
+function stepOnce() {
+  if (running) { toggleRun(); }
+  if (!sim) return;
+  const record = sim.step();
+  updateStats(record);
+  updateCharts(record);
+  renderLandscape();
+  updateNarrative(record);
+  updatePhaseBadge(record);
+  checkMilestones(record);
+}
+
+function resetSim() {
+  if (running) toggleRun();
+  if (animFrame) { clearTimeout(animFrame); animFrame = null; }
+  lastMilestone = 0;
+
+  const n = parseInt(document.getElementById('param-n').value) || 12;
+  const k = parseInt(document.getElementById('param-k').value) || 4;
+  const numFirms = parseInt(document.getElementById('param-firms').value) || 30;
+  const mutRate = parseInt(document.getElementById('param-mutation').value) / 100;
+  const rdBudget = parseInt(document.getElementById('param-rd').value) / 100;
+
+  const rFrac = parseInt(document.getElementById('strat-random').value);
+  const lFrac = parseInt(document.getElementById('strat-local').value);
+  const ljFrac = parseInt(document.getElementById('strat-longjump').value);
+  const rcFrac = parseInt(document.getElementById('strat-recomb').value);
+  const totalFrac = rFrac + lFrac + ljFrac + rcFrac || 1;
+
+  sim = new TechSimulation({
+    n, k: Math.min(k, n - 1), numFirms,
+    mutationRate: mutRate,
+    rdBudget,
+    strategyMix: {
+      random: rFrac / totalFrac,
+      local: lFrac / totalFrac,
+      long_jump: ljFrac / totalFrac,
+      recombination: rcFrac / totalFrac,
+    },
+    seed: Date.now(),
+  });
+
+  // Clear charts
+  for (const chart of Object.values(charts)) {
+    chart.data.labels = [];
+    for (const ds of chart.data.datasets) ds.data = [];
+    chart.update('none');
+  }
+
+  renderLandscape();
+  document.getElementById('narrative-text').innerHTML = 'Simulation reset. Press <strong>Start</strong> to begin.';
+  document.getElementById('stat-tick').textContent = '0';
+  document.getElementById('stat-best').textContent = '0';
+  document.getElementById('stat-mean').textContent = '0';
+  document.getElementById('stat-firms').textContent = numFirms;
+  document.getElementById('stat-diversity').textContent = '0';
+  document.getElementById('stat-innovations').textContent = '0';
+}
+
+function dismissIntro() {
+  document.getElementById('intro-overlay').classList.add('hidden');
+}
+
+// =====================================================
+// UI BINDINGS
+// =====================================================
+
+function initUI() {
+  document.getElementById('speed').addEventListener('input', function() {
+    speed = parseInt(this.value);
+    document.getElementById('speed-val').textContent = speed + ' ms';
+  });
+
+  document.getElementById('param-k').addEventListener('input', function() {
+    const maxK = parseInt(document.getElementById('param-n').value) - 1;
+    const v = Math.min(parseInt(this.value), maxK);
+    document.getElementById('k-val').textContent = v;
+  });
+
+  document.getElementById('param-n').addEventListener('change', function() {
+    const n = parseInt(this.value);
+    const kSlider = document.getElementById('param-k');
+    kSlider.max = n - 1;
+    if (parseInt(kSlider.value) >= n) kSlider.value = Math.floor(n / 3);
+    document.getElementById('k-val').textContent = kSlider.value;
+  });
+
+  document.getElementById('param-mutation').addEventListener('input', function() {
+    document.getElementById('mutation-val').textContent = (parseInt(this.value) / 100).toFixed(2);
+  });
+
+  document.getElementById('param-rd').addEventListener('input', function() {
+    document.getElementById('rd-val').textContent = (parseInt(this.value) / 100).toFixed(2);
+  });
+
+  for (const strat of ['random', 'local', 'longjump', 'recomb']) {
+    const el = document.getElementById('strat-' + strat);
+    const valEl = document.getElementById('strat-' + strat + '-val');
+    el.addEventListener('input', function() {
+      valEl.textContent = this.value + '%';
+    });
+  }
+
+  // Resize handler
+  window.addEventListener('resize', () => { if (sim) renderLandscape(); });
+}
+
+// =====================================================
+// BOOT
+// =====================================================
+
+document.addEventListener('DOMContentLoaded', () => {
+  initUI();
+  initCharts();
+  resetSim();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Origin of Wealth — Interactive Simulations</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background: #0a0e14;
+  color: #c8cdd8;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* ===== HERO ===== */
+.hero {
+  background: linear-gradient(135deg, #0d1220 0%, #111b2e 40%, #0f1a24 100%);
+  border-bottom: 1px solid #1a2540;
+  padding: 72px 32px 56px;
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -40%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 900px;
+  height: 900px;
+  background: radial-gradient(circle, rgba(100,160,255,0.04) 0%, transparent 60%);
+  pointer-events: none;
+}
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: -60%;
+  right: -10%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(255,140,50,0.03) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero-content {
+  max-width: 800px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+.hero h1 {
+  font-size: 40px;
+  font-weight: 900;
+  letter-spacing: -1px;
+  line-height: 1.15;
+  background: linear-gradient(135deg, #7eb8ff 0%, #a08cff 50%, #ff8c6a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 12px;
+}
+.hero .subtitle {
+  font-size: 16px;
+  font-weight: 500;
+  color: #6a7a94;
+  letter-spacing: 0.3px;
+  margin-bottom: 28px;
+}
+.hero .intro {
+  font-size: 15px;
+  line-height: 1.75;
+  color: #8a96aa;
+  max-width: 680px;
+  margin: 0 auto;
+}
+.hero .intro strong {
+  color: #b0c0dd;
+  font-weight: 600;
+}
+
+/* ===== GRID ===== */
+.grid-section {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 48px 24px 32px;
+}
+.grid-section h2 {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #4a5a74;
+  margin-bottom: 32px;
+  text-align: center;
+}
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 20px;
+}
+
+/* ===== CARDS ===== */
+.card {
+  background: linear-gradient(135deg, #111822 0%, #0e1420 100%);
+  border: 1px solid #1a2235;
+  border-radius: 14px;
+  padding: 28px 28px 24px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.25s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  text-decoration: none;
+  display: block;
+  cursor: pointer;
+}
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  border-radius: 14px 14px 0 0;
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+}
+.card:hover {
+  transform: translateY(-4px);
+  border-color: #2a3555;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+}
+.card:hover::before {
+  opacity: 1;
+}
+
+/* Card accent colors */
+.card[data-sim="01"]::before { background: linear-gradient(90deg, #00cc66, #00ff88); }
+.card[data-sim="01"]:hover { border-color: #1a3a28; box-shadow: 0 12px 40px rgba(0,204,102,0.08); }
+
+.card[data-sim="02"]::before { background: linear-gradient(90deg, #ff8c42, #ffaa66); }
+.card[data-sim="02"]:hover { border-color: #3a2a1a; box-shadow: 0 12px 40px rgba(255,140,66,0.08); }
+
+.card[data-sim="03"]::before { background: linear-gradient(90deg, #4a8aff, #7eb8ff); }
+.card[data-sim="03"]:hover { border-color: #1a2a4a; box-shadow: 0 12px 40px rgba(74,138,255,0.08); }
+
+.card[data-sim="04"]::before { background: linear-gradient(90deg, #ff5566, #ff8888); }
+.card[data-sim="04"]:hover { border-color: #3a1a22; box-shadow: 0 12px 40px rgba(255,85,102,0.08); }
+
+.card[data-sim="05"]::before { background: linear-gradient(90deg, #aa66ff, #cc99ff); }
+.card[data-sim="05"]:hover { border-color: #2a1a3a; box-shadow: 0 12px 40px rgba(170,102,255,0.08); }
+
+.card[data-sim="06"]::before { background: linear-gradient(90deg, #ffcc33, #ffdd66); }
+.card[data-sim="06"]:hover { border-color: #3a3018; box-shadow: 0 12px 40px rgba(255,204,51,0.08); }
+
+.card[data-sim="07"]::before { background: linear-gradient(90deg, #33cccc, #66eedd); }
+.card[data-sim="07"]:hover { border-color: #183a3a; box-shadow: 0 12px 40px rgba(51,204,204,0.08); }
+
+.card[data-sim="08"]::before { background: linear-gradient(90deg, #ff66aa, #ff99cc); }
+.card[data-sim="08"]:hover { border-color: #3a1a2a; box-shadow: 0 12px 40px rgba(255,102,170,0.08); }
+
+.card[data-sim="09"]::before { background: linear-gradient(90deg, #88ddff, #aaeeff); }
+.card[data-sim="09"]:hover { border-color: #1a2a3a; box-shadow: 0 12px 40px rgba(136,221,255,0.08); }
+
+.card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+.card-number {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 800;
+  color: #fff;
+  opacity: 0.9;
+}
+.card[data-sim="01"] .card-number { background: linear-gradient(135deg, #0a3020, #1a4a30); color: #00ff88; }
+.card[data-sim="02"] .card-number { background: linear-gradient(135deg, #2a1a0a, #3a2a14); color: #ff8c42; }
+.card[data-sim="03"] .card-number { background: linear-gradient(135deg, #0a1a3a, #142a4a); color: #7eb8ff; }
+.card[data-sim="04"] .card-number { background: linear-gradient(135deg, #2a0a10, #3a1420); color: #ff5566; }
+.card[data-sim="05"] .card-number { background: linear-gradient(135deg, #1a0a2a, #2a143a); color: #cc99ff; }
+.card[data-sim="06"] .card-number { background: linear-gradient(135deg, #2a2408, #3a3014); color: #ffcc33; }
+.card[data-sim="07"] .card-number { background: linear-gradient(135deg, #0a2a2a, #143a38); color: #66eedd; }
+.card[data-sim="08"] .card-number { background: linear-gradient(135deg, #2a0a1a, #3a1428); color: #ff66aa; }
+.card[data-sim="09"] .card-number { background: linear-gradient(135deg, #0a1a2a, #142838); color: #88ddff; }
+
+.card-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: #e0e6f0;
+  line-height: 1.3;
+  margin-bottom: 2px;
+}
+.card-desc {
+  font-size: 14px;
+  line-height: 1.65;
+  color: #7a8698;
+  margin-bottom: 14px;
+}
+.card-tag {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 5px 12px;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.card[data-sim="01"] .card-tag { color: #00cc66; border-color: rgba(0,204,102,0.15); background: rgba(0,204,102,0.06); }
+.card[data-sim="02"] .card-tag { color: #ff8c42; border-color: rgba(255,140,66,0.15); background: rgba(255,140,66,0.06); }
+.card[data-sim="03"] .card-tag { color: #7eb8ff; border-color: rgba(126,184,255,0.15); background: rgba(126,184,255,0.06); }
+.card[data-sim="04"] .card-tag { color: #ff5566; border-color: rgba(255,85,102,0.15); background: rgba(255,85,102,0.06); }
+.card[data-sim="05"] .card-tag { color: #cc99ff; border-color: rgba(204,153,255,0.15); background: rgba(204,153,255,0.06); }
+.card[data-sim="06"] .card-tag { color: #ffcc33; border-color: rgba(255,204,51,0.15); background: rgba(255,204,51,0.06); }
+.card[data-sim="07"] .card-tag { color: #66eedd; border-color: rgba(102,238,221,0.15); background: rgba(102,238,221,0.06); }
+.card[data-sim="08"] .card-tag { color: #ff66aa; border-color: rgba(255,102,170,0.15); background: rgba(255,102,170,0.06); }
+.card[data-sim="09"] .card-tag { color: #88ddff; border-color: rgba(136,221,255,0.15); background: rgba(136,221,255,0.06); }
+
+.card-status {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  margin-left: 8px;
+  background: rgba(255,170,50,0.1);
+  color: #cc8833;
+  border: 1px solid rgba(255,170,50,0.15);
+}
+.card-arrow {
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+  font-size: 18px;
+  color: #2a3555;
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+.card:hover .card-arrow {
+  color: #5a7aaa;
+  transform: translateX(4px);
+}
+
+/* ===== PRINCIPLES ===== */
+.principles-section {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 48px 24px 40px;
+}
+.principles-section h2 {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #4a5a74;
+  margin-bottom: 28px;
+  text-align: center;
+}
+.principles-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+.principle {
+  padding: 20px 22px;
+  background: linear-gradient(135deg, #0e1420 0%, #0c1018 100%);
+  border: 1px solid #151e2e;
+  border-radius: 10px;
+  transition: border-color 0.3s ease;
+}
+.principle:hover {
+  border-color: #2a3555;
+}
+.principle-num {
+  font-size: 11px;
+  font-weight: 700;
+  color: #3a5080;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+.principle-text {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #8a96aa;
+  font-weight: 500;
+}
+
+/* ===== FOOTER ===== */
+.footer {
+  text-align: center;
+  padding: 40px 24px 48px;
+  border-top: 1px solid #131a28;
+}
+.footer-credit {
+  font-size: 14px;
+  color: #4a5a6e;
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+.footer-credit em {
+  font-style: italic;
+  color: #5a6a80;
+}
+.footer-sub {
+  font-size: 12px;
+  color: #2e3a4a;
+  margin-top: 8px;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .hero {
+    padding: 48px 20px 40px;
+  }
+  .hero h1 {
+    font-size: 28px;
+  }
+  .hero .subtitle {
+    font-size: 14px;
+  }
+  .hero .intro {
+    font-size: 14px;
+  }
+  .card-grid {
+    grid-template-columns: 1fr;
+  }
+  .principles-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 1100px) {
+  .card-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+  <div class="hero-content">
+    <h1>The Origin of Wealth</h1>
+    <div class="subtitle">Interactive Simulations of Complexity Economics</div>
+    <p class="intro">
+      In 2006, Eric Beinhocker argued that <strong>the economy is not a machine in equilibrium</strong> but a
+      <strong>complex adaptive system</strong> — an evolving ecology of interacting agents whose collective
+      behavior produces emergent phenomena no individual intended. These eight simulations bring that
+      thesis to life: from fat-tailed stock returns and bullwhip cascades to the spontaneous emergence
+      of cooperation and inequality from nothing more than simple rules and local interaction.
+    </p>
+  </div>
+</section>
+
+<!-- ===== SIMULATION GRID ===== -->
+<section class="grid-section">
+  <h2>Simulations</h2>
+  <div class="card-grid">
+
+    <!-- 01 -->
+    <a href="01-stock-market/index.html" class="card" data-sim="01">
+      <div class="card-header">
+        <div class="card-number">01</div>
+        <div>
+          <div class="card-title">SFI Artificial Stock Market</div>
+        </div>
+      </div>
+      <div class="card-desc">
+        Emergent bubbles and crashes from heterogeneous learning agents. Watch as technical and fundamental
+        strategies co-evolve, producing fat tails and volatility clustering that mirror real markets.
+      </div>
+      <span class="card-tag">Fat tails &middot; Volatility clustering</span>
+      <span class="card-arrow">&rarr;</span>
+    </a>
+
+    <!-- 02 -->
+    <a href="02-beer-game/index.html" class="card" data-sim="02">
+      <div class="card-header">
+        <div class="card-number">02</div>
+        <div>
+          <div class="card-title">The Beer Game</div>
+        </div>
+      </div>
+      <div class="card-desc">
+        The bullwhip effect in supply chains: small demand shocks amplify into wild oscillations upstream.
+        Delays and local rationality conspire to create endogenous business cycles from nothing.
+      </div>
+      <span class="card-tag">Endogenous cycles &middot; Delay amplification</span>
+      <span class="card-arrow">&rarr;</span>
+    </a>
+
+    <!-- 03 -->
+    <a href="03-boolean-network/index.html" class="card" data-sim="03">
+      <div class="card-header">
+        <div class="card-number">03</div>
+        <div>
+          <div class="card-title">Boolean Networks</div>
+        </div>
+      </div>
+      <div class="card-desc">
+        Kauffman's NK model reveals a phase transition: too little connectivity and the system is frozen;
+        too much and it melts into chaos. Life — and innovation — thrives at the edge.
+      </div>
+      <span class="card-tag">Phase transitions &middot; Edge of chaos</span>
+      <span class="card-arrow">&rarr;</span>
+    </a>
+
+    <!-- 04 -->
+    <a href="04-punctuated-equilibrium/index.html" class="card" data-sim="04">
+      <div class="card-header">
+        <div class="card-number">04</div>
+        <div>
+          <div class="card-title">Punctuated Equilibrium</div>
+        </div>
+      </div>
+      <div class="card-desc">
+        Self-organized criticality in interconnected ecosystems. Long periods of stasis are interrupted by
+        sudden power-law cascades of extinction and renewal — creative destruction made visible.
+      </div>
+      <span class="card-tag">Power-law cascades &middot; Creative destruction</span>
+      <span class="card-arrow">&rarr;</span>
+    </a>
+
+    <!-- 05 -->
+    <a href="05-rigids-flexibles/index.html" class="card" data-sim="05">
+      <div class="card-header">
+        <div class="card-number">05</div>
+        <div>
+          <div class="card-title">Rigids vs Flexibles</div>
+        </div>
+      </div>
+      <div class="card-desc">
+        Two organizational strategies compete: rigid efficiency versus flexible adaptation. When the
+        environment shifts, the diversity-efficiency tradeoff determines who survives and who collapses.
+      </div>
+      <span class="card-tag">Diversity &middot; Efficiency tradeoff</span>
+      <span class="card-arrow">&rarr;</span>
+    </a>
+
+    <!-- 06 -->
+    <a href="06-prisoners-dilemma/index.html" class="card" data-sim="06">
+      <div class="card-header">
+        <div class="card-number">06</div>
+        <div>
+          <div class="card-title">Prisoner's Dilemma</div>
+        </div>
+      </div>
+      <div class="card-desc">
+        Axelrod's tournament brought to life: strategies evolve through spatial interaction and selection.
+        Cooperation emerges spontaneously — no central authority required, just repeated local encounters.
+      </div>
+      <span class="card-tag">Emergent cooperation</span>
+      <span class="card-arrow">&rarr;</span>
+    </a>
+
+    <!-- 07 -->
+    <a href="07-sugarscape/index.html" class="card" data-sim="07">
+      <div class="card-header">
+        <div class="card-number">07</div>
+        <div>
+          <div class="card-title">Sugarscape</div>
+        </div>
+      </div>
+      <div class="card-desc">
+        Epstein and Axtell's classic: agents forage on a landscape and emergent inequality, trade, and
+        migration arise from nothing but simple behavioral rules. Wealth distributions mirror reality.
+      </div>
+      <span class="card-tag">Wealth distribution &middot; Emergent markets</span>
+      <span class="card-arrow">&rarr;</span>
+    </a>
+
+    <!-- 08 -->
+    <a href="08-technology-evolution/index.html" class="card" data-sim="08">
+      <div class="card-header">
+        <div class="card-number">08</div>
+        <div>
+          <div class="card-title">Technology Evolution</div>
+        </div>
+      </div>
+      <div class="card-desc">
+        Innovation as combinatorial search on fitness landscapes. Technologies recombine and mutate,
+        producing bursts of creative destruction as old paradigms collapse and new ones take hold.
+      </div>
+      <span class="card-tag">Combinatorial search &middot; Creative destruction</span>
+      <span class="card-arrow">&rarr;</span>
+    </a>
+
+    <a href="09-integrated-economy/index.html" class="card" data-sim="09">
+      <div class="card-header">
+        <div class="card-number">09</div>
+        <div>
+          <div class="card-title">The Integrated Economy</div>
+        </div>
+      </div>
+      <div class="card-desc">
+        When models collide. Firms operate supply chains, trade on stock markets, face ecosystem-level
+        creative destruction, and adapt their organizational structure &mdash; all at once.
+      </div>
+      <span class="card-tag">Cross-model integration &middot; Emergent macro</span>
+      <span class="card-arrow">&rarr;</span>
+    </a>
+
+  </div>
+</section>
+
+<!-- ===== BEINHOCKER'S PRINCIPLES ===== -->
+<section class="principles-section">
+  <h2>Five Principles of Complexity Economics</h2>
+  <div class="principles-grid">
+    <div class="principle">
+      <div class="principle-num">Principle I</div>
+      <div class="principle-text">Markets are not in equilibrium. They are dynamic, evolving systems far from any resting state — perpetually adapting, never arriving.</div>
+    </div>
+    <div class="principle">
+      <div class="principle-num">Principle II</div>
+      <div class="principle-text">Complexity emerges from interaction. Macro-level patterns — prices, norms, institutions — arise from micro-level rules without top-down design.</div>
+    </div>
+    <div class="principle">
+      <div class="principle-num">Principle III</div>
+      <div class="principle-text">Delay amplifies instability. Information lags and feedback loops turn small perturbations into large oscillations throughout the system.</div>
+    </div>
+    <div class="principle">
+      <div class="principle-num">Principle IV</div>
+      <div class="principle-text">Diversity enables adaptation. Heterogeneous strategies provide the raw material for evolutionary selection — monocultures are fragile.</div>
+    </div>
+    <div class="principle">
+      <div class="principle-num">Principle V</div>
+      <div class="principle-text">Power laws are inevitable. In interconnected systems, outcomes follow heavy-tailed distributions: many small events, rare enormous ones.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer">
+  <div class="footer-credit">Based on Eric D. Beinhocker, <em>The Origin of Wealth</em> (2006)</div>
+  <div class="footer-sub">Interactive simulations built to explore the ideas of complexity economics</div>
+</footer>
+
+</body>
+</html>

@@ -171,9 +171,9 @@ Examples:
     )
 
     # Mode
-    mode = parser.add_mutually_exclusive_group(required=True)
-    mode.add_argument("--evolve", action="store_true",
-                      help="Run evolution simulation")
+    mode = parser.add_mutually_exclusive_group(required=False)
+    mode.add_argument("--evolve", action="store_true", default=True,
+                      help="Run evolution simulation (default)")
     mode.add_argument("--cascade-test", action="store_true",
                       help="Systematically remove species and measure cascades")
 

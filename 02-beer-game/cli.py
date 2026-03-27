@@ -105,6 +105,12 @@ Examples:
         help="Run both behavioral and rational, show comparison",
     )
 
+    # Seed
+    parser.add_argument(
+        "--seed", type=int, default=None,
+        help="Random seed for reproducibility",
+    )
+
     # Output
     parser.add_argument(
         "--output", "-o", type=str, default=None,
