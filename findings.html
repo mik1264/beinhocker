@@ -280,6 +280,32 @@
     color: var(--text-primary);
   }
 
+  /* ── BOOK QUOTE ─────────────── */
+  .book-quote {
+    margin: 1.5rem 0 2rem;
+    padding: 1.2rem 1.5rem;
+    border-left: 3px solid var(--accent-teal);
+    background: var(--accent-teal-light);
+    border-radius: 0 var(--radius) var(--radius) 0;
+  }
+  .book-quote p {
+    font-family: var(--font-serif);
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: var(--text-secondary);
+    font-style: italic;
+    margin: 0;
+  }
+  .book-quote cite {
+    display: block;
+    margin-top: 0.6rem;
+    font-family: var(--font-sans);
+    font-size: 0.78rem;
+    font-style: normal;
+    color: var(--text-tertiary);
+    letter-spacing: 0.02em;
+  }
+
   /* ── METRIC CARDS GRID ────────── */
   .metric-cards {
     display: grid;
@@ -606,6 +632,10 @@
       <div class="key-finding-label">Key Finding</div>
       <p>Learning agents produce fat-tailed returns with a Hill tail index of 2.55 &mdash; strikingly close to the empirical cubic power law (~3) found in real equity markets &mdash; while the rational baseline produces near-Gaussian tails. Fat tails, volatility clustering, and excess volume are the natural signature of adaptive agents co-evolving in a market.</p>
     </div>
+    <div class="book-quote">
+      <p>As soon as heterogeneity and learning are introduced, things get much richer and more complex. &hellip; All this price movement is driven by the dynamic interactions of various rules in the population and has little or nothing to do with changes in the underlying economic value of the stock. Nor are the complex patterns due merely to random noise. Instead, there is a complex battle of beliefs going on within the heads of agents and among the agents, which leads to volatility and complex patterns in the market.</p>
+      <cite>&mdash; Eric D. Beinhocker, <em>The Origin of Wealth</em>, Chapter 6, p. 138</cite>
+    </div>
 
     <div class="metric-cards">
       <div class="mc"><div class="mc-value">2.55</div><div class="mc-label">Hill Tail Index (empirical ~3)</div></div>
@@ -663,6 +693,10 @@
     <div class="key-finding">
       <div class="key-finding-label">Key Finding</div>
       <p>Shipping delay dominates all other factors with super-exponential cost scaling: delay 2 costs $3,236; delay 4 costs $35,908 (11x); delay 5 costs $142,427 (44x). A single, tiny, one-time demand perturbation generates 30&ndash;50 ticks of wild endogenous oscillation &mdash; the business cycle is purely structural, not driven by external shocks.</p>
+    </div>
+    <div class="book-quote">
+      <p>The Beer Game is not a mere wiggling-jelly propagation mechanism. The game receives a single exogenous shock &mdash; the increase in orders from four to eight. But unlike a jelly given a single tap, once the oscillations start in the Beer Game, the system never returns to equilibrium. The ultimate source of the oscillations in the Beer Game is not the exogenous shock itself (it just gets things started), but the behavior of the participants and the feedback structure of the system. The system is not propagating exogenous dynamics; it is endogenously creating them.</p>
+      <cite>&mdash; Eric D. Beinhocker, <em>The Origin of Wealth</em>, Chapter 8, pp. 171&ndash;172</cite>
     </div>
 
     <div class="metric-cards">
@@ -722,6 +756,10 @@
       <div class="key-finding-label">Key Finding</div>
       <p>At K=2, the network sits at the edge of chaos with measured Derrida parameter 1.010 (theoretical: 1.000). This is the sweet spot where perturbations propagate far enough to enable adaptation but not so far as to destroy coherence. At K=5, cascades engulf 93.4% of the network and no stable states can be found &mdash; the complexity catastrophe.</p>
     </div>
+    <div class="book-quote">
+      <p>This kind of interdependency in a network creates what Kauffman calls a complexity catastrophe. The effect occurs because as the network grows, and the number of interdependencies grows, the probability that a positive change in one part of the network will lead to a cascade resulting in a negative change somewhere else grows exponentially with the number of nodes. This in turn means that densely connected networks become less adaptable as they grow.</p>
+      <cite>&mdash; Eric D. Beinhocker, <em>The Origin of Wealth</em>, Chapter 7, p. 152</cite>
+    </div>
 
     <div class="metric-cards">
       <div class="mc"><div class="mc-value">1.010</div><div class="mc-label">Derrida parameter (K=2)</div></div>
@@ -778,6 +816,10 @@
       <div class="key-finding-label">Key Finding</div>
       <p>Cascade sizes follow a power law with exponent ~2.0, consistent with empirical extinction data. The system drives itself to criticality without tuning. Tripling connection density transforms the ecosystem from occasional small cascades (mean 2.5) to perpetual catastrophe (mean 56.9) &mdash; the connectivity-fragility paradox.</p>
     </div>
+    <div class="book-quote">
+      <p>Jain and Krishna noted three distinct phases to the punctuated equilibrium pattern. First, in a random phase, the network percolates along without much structure, and random changes occur without much effect. Then, an innovation sends the network suddenly into a growth phase. &hellip; The network continues to bubble along for a while in the organized phase, but then an innovation or a random change hits a keystone species. Changes influencing the keystone species radiate into the structure, and the network crashes in a wave of extinction. The process then begins again with a new random phase.</p>
+      <cite>&mdash; Eric D. Beinhocker, <em>The Origin of Wealth</em>, Chapter 8, p. 174</cite>
+    </div>
 
     <div class="metric-cards">
       <div class="mc"><div class="mc-value">~2.0</div><div class="mc-label">Power-law exponent</div></div>
@@ -833,6 +875,10 @@
     <div class="key-finding">
       <div class="key-finding-label">Key Finding</div>
       <p>The promotion tournament is a rigidity ratchet: it ruthlessly selects rigids upward during stable periods, then delivers catastrophic performance collapse (+0.87 drop) when the environment shifts. At stability=500 (the "Thatcher trap"), the organization is 97.5% rigid with peak performance of 1.44 and zero resilience. At stability=20, the hierarchy inverts: the top is 100% flexible, and transition costs vanish.</p>
+    </div>
+    <div class="book-quote">
+      <p>Evolutionary systems work best when their sensitivity to change is in a medium, in-between range. If an evolutionary system is too insensitive to change, then the system will not be able to keep up with the pace of change in its environment. However, if a system is overly sensitive to change, then small changes can have large consequences. This oversensitivity is a problem because if a system has been successful in the past, then few major changes are likely to improve it. Rather, the odds are that the vast majority of possible major changes will harm it.</p>
+      <cite>&mdash; Eric D. Beinhocker, <em>The Origin of Wealth</em>, Chapter 7, pp. 157&ndash;158</cite>
     </div>
 
     <div class="metric-cards">
@@ -892,6 +938,10 @@
       <div class="key-finding-label">Key Finding</div>
       <p>The same strategies, payoff matrix, and initial conditions produce diametrically opposite outcomes depending on population structure: spatial yields 100% cooperation (Grudger dominant at 46%), while the well-mixed tournament yields 0% cooperation (AllD dominance at 100%). Population structure is the foundation of cooperation.</p>
     </div>
+    <div class="book-quote">
+      <p>That we are conditional cooperators and altruistic punishers should not be surprising. Our hominid ancestors spent about 2 million years of their existence living in small bands for which cooperative behavior and survival were highly correlated. Today, people still inhabit networks of social interactions in which reciprocity &mdash; I'll scratch your back if you scratch mine &mdash; is important. We are all better off if we help each other out, but this creates the potential for abuse by those who take benefits without giving back.</p>
+      <cite>&mdash; Eric D. Beinhocker, <em>The Origin of Wealth</em>, Chapter 6, p. 121</cite>
+    </div>
 
     <div class="metric-cards">
       <div class="mc"><div class="mc-value">100%</div><div class="mc-label">Spatial cooperation</div></div>
@@ -947,6 +997,10 @@
     <div class="key-finding">
       <div class="key-finding-label">Key Finding</div>
       <p>Moderate inequality (Gini 0.26&ndash;0.40) emerges from identical behavioral rules and random initial conditions. Metabolism matters more than vision for survival (r = -0.55 to -0.83 vs r = 0.22 to 0.39). With reproduction enabled, traits evolve cumulatively toward near-optimal values: 97.3% of agents converge to metabolism=1 after 300 ticks.</p>
+    </div>
+    <div class="book-quote">
+      <p>The answer is, in essence, &ldquo;everything.&rdquo; The skewed distribution is an emergent property of the system. It is a macro behavior that emerges out of the collective micro behavior of the population of agents. The combination of the shape of the physical landscape, the genetic endowments of the agents, where they were born, the rules that they follow, the dynamics of their interactions with each other and with their environment, and, above all, luck all conspire to give the emergent result of a skewed wealth distribution.</p>
+      <cite>&mdash; Eric D. Beinhocker, <em>The Origin of Wealth</em>, Chapter 4, p. 86</cite>
     </div>
 
     <div class="metric-cards">
@@ -1006,6 +1060,10 @@
       <div class="key-finding-label">Key Finding</div>
       <p>Landscape ruggedness (K) drives market turbulence: K=8 produces 40 firm destructions and 0.483 technology diversity, while K=1 produces only 17 destructions and 0.222 diversity. The mixed-strategy portfolio (local + long-jump + recombination) outperforms any single search strategy, confirming that diversity of approaches is the source of economic fitness.</p>
     </div>
+    <div class="book-quote">
+      <p>For landscapes that are in between, are rough-correlated, and have complex features such as plateaus, holes, and portals, evolution is hard to beat. And when the landscape is constantly changing, when the search problem is a dynamic one, when one must balance the tension between exploring and exploiting &mdash; evolution truly is the grand champion.</p>
+      <cite>&mdash; Eric D. Beinhocker, <em>The Origin of Wealth</em>, Chapter 9, p. 213</cite>
+    </div>
 
     <div class="metric-cards">
       <div class="mc"><div class="mc-value">0.800</div><div class="mc-label">Global best fitness</div></div>
@@ -1062,6 +1120,10 @@
     <div class="key-finding">
       <div class="key-finding-label">Key Finding</div>
       <p>Scale creates fragility, not just bigger failures: at 40 firms, the market crash kills 28 (70%); at 100 firms, the same supply shock triggers total wipeout (100%) before the panic even arrives. The cascade arrives 47 ticks earlier in the larger economy &mdash; a phase transition in network behavior. Shock sequencing matters more than magnitude: a 2.5x supply shock alone causes zero failures, but combined with a panic, it is lethal.</p>
+    </div>
+    <div class="book-quote">
+      <p>Oscillations that do not settle down, punctuated equilibrium, and power laws &mdash; these are all signature behaviors of a complex adaptive economy at work. The real-world economy is a far more interesting place than the equilibrium world imagined by Traditional Economics. Complexity Economics does not have all the answers to the puzzle of economic patterns, but it provides us with new tools to begin to understand how these various factors combine to result in the behaviors we observe.</p>
+      <cite>&mdash; Eric D. Beinhocker, <em>The Origin of Wealth</em>, Chapter 8, p. 185</cite>
     </div>
 
     <div class="metric-cards">
