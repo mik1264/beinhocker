@@ -197,47 +197,29 @@
   }
 
   /* ── TABS ─────────────────────── */
-  .tabs-container {
+  .sims-container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 2rem 4rem;
   }
-  .tabs-header {
-    position: sticky;
-    top: 56px;
-    z-index: 90;
-    background: rgba(250,249,245,0.95);
-    backdrop-filter: blur(8px);
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 2rem;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+  .sim-section {
+    padding-top: 3rem;
+    margin-bottom: 3rem;
+    border-top: 1px solid var(--border);
   }
-  .tabs-nav {
-    display: flex;
-    gap: 0;
-    min-width: max-content;
+  .sim-section:first-child {
+    border-top: none;
+    padding-top: 0;
   }
-  .tab-btn {
-    padding: 0.9rem 1.1rem;
-    font-size: 0.8rem;
-    font-weight: 500;
-    color: var(--text-tertiary);
-    background: none;
-    border: none;
-    border-bottom: 2px solid transparent;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: color 0.2s, border-color 0.2s;
-    font-family: var(--font-sans);
-  }
-  .tab-btn:hover { color: var(--text-primary); }
-  .tab-btn.active {
+  .sim-number {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 600;
     color: var(--accent-teal);
-    border-bottom-color: var(--accent-teal);
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
   }
-  .tab-panel { display: none; }
-  .tab-panel.active { display: block; }
 
   /* ── MODEL CARD ──────────────── */
   .model-header {
@@ -535,8 +517,7 @@
     .metrics-row { grid-template-columns: repeat(2, 1fr); }
     .metrics-row .metric-item:last-child { grid-column: 1 / -1; }
     .metric-value { font-size: 1.4rem; }
-    .tabs-header { margin-left: -1.2rem; margin-right: -1.2rem; padding: 0 1.2rem; }
-    .section, .tabs-container, .metrics-bar { padding-left: 1.2rem; padding-right: 1.2rem; }
+    .section, .sims-container, .metrics-bar { padding-left: 1.2rem; padding-right: 1.2rem; }
     .pillars-grid { grid-template-columns: 1fr; }
     .model-header { flex-direction: column; }
     .metric-cards { grid-template-columns: repeat(2, 1fr); }
@@ -546,9 +527,8 @@
 
   /* ── PRINT ───────────────────── */
   @media print {
-    .nav, .tabs-header, .hero-cta, .model-link { display: none !important; }
-    .tab-panel { display: block !important; }
-    .tab-panel { page-break-inside: avoid; margin-bottom: 2rem; }
+    .nav, .hero-cta, .model-link { display: none !important; }
+    .sim-section { page-break-inside: avoid; margin-bottom: 2rem; }
     body { background: #fff; }
   }
 </style>
@@ -606,27 +586,14 @@
   </div>
 </div>
 
-<!-- ────── TABBED SIMULATION EXPLORER ────── -->
-<div class="tabs-container" id="simulations">
-  <h2 class="section-title">Simulation Explorer</h2>
-  <p class="section-subtitle">Select a model to explore its experiments, key findings, and emergent behaviors.</p>
-
-  <div class="tabs-header">
-    <div class="tabs-nav" role="tablist">
-      <button class="tab-btn active" data-tab="stock" role="tab">01 Stock Market</button>
-      <button class="tab-btn" data-tab="beer" role="tab">02 Beer Game</button>
-      <button class="tab-btn" data-tab="boolean" role="tab">03 Boolean Network</button>
-      <button class="tab-btn" data-tab="punctuated" role="tab">04 Punctuated Eq.</button>
-      <button class="tab-btn" data-tab="rigids" role="tab">05 Rigids vs Flexibles</button>
-      <button class="tab-btn" data-tab="prisoners" role="tab">06 Prisoner's Dilemma</button>
-      <button class="tab-btn" data-tab="sugarscape" role="tab">07 Sugarscape</button>
-      <button class="tab-btn" data-tab="techevo" role="tab">08 Technology Evolution</button>
-      <button class="tab-btn" data-tab="integrated" role="tab">09 Integrated Economy</button>
-    </div>
-  </div>
+<!-- ────── SIMULATION FINDINGS ────── -->
+<div class="sims-container" id="simulations">
+  <h2 class="section-title">Simulation Findings</h2>
+  <p class="section-subtitle">Nine models, fifty-four experiments. Each section presents key findings, metrics, and emergent behaviors.</p>
 
   <!-- ═══════ 01 STOCK MARKET ═══════ -->
-  <div class="tab-panel active" id="panel-stock" role="tabpanel">
+  <div class="sim-section" id="panel-stock">
+    <div class="sim-number">01 &mdash; STOCK MARKET</div>
     <div class="model-header">
       <div class="model-info">
         <h3>SFI Artificial Stock Market</h3>
@@ -683,7 +650,8 @@
   </div>
 
   <!-- ═══════ 02 BEER GAME ═══════ -->
-  <div class="tab-panel" id="panel-beer" role="tabpanel">
+  <div class="sim-section" id="panel-beer">
+    <div class="sim-number">02 &mdash; BEER GAME</div>
     <div class="model-header">
       <div class="model-info">
         <h3>Beer Distribution Game</h3>
@@ -740,7 +708,8 @@
   </div>
 
   <!-- ═══════ 03 BOOLEAN NETWORK ═══════ -->
-  <div class="tab-panel" id="panel-boolean" role="tabpanel">
+  <div class="sim-section" id="panel-boolean">
+    <div class="sim-number">03 &mdash; BOOLEAN NETWORK</div>
     <div class="model-header">
       <div class="model-info">
         <h3>Boolean Network / Complexity Catastrophe</h3>
@@ -795,7 +764,8 @@
   </div>
 
   <!-- ═══════ 04 PUNCTUATED EQUILIBRIUM ═══════ -->
-  <div class="tab-panel" id="panel-punctuated" role="tabpanel">
+  <div class="sim-section" id="panel-punctuated">
+    <div class="sim-number">04 &mdash; PUNCTUATED EQUILIBRIUM</div>
     <div class="model-header">
       <div class="model-info">
         <h3>Punctuated Equilibrium Ecosystem</h3>
@@ -850,7 +820,8 @@
   </div>
 
   <!-- ═══════ 05 RIGIDS VS FLEXIBLES ═══════ -->
-  <div class="tab-panel" id="panel-rigids" role="tabpanel">
+  <div class="sim-section" id="panel-rigids">
+    <div class="sim-number">05 &mdash; RIGIDS VS FLEXIBLES</div>
     <div class="model-header">
       <div class="model-info">
         <h3>Rigids vs. Flexibles</h3>
@@ -907,7 +878,8 @@
   </div>
 
   <!-- ═══════ 06 PRISONER'S DILEMMA ═══════ -->
-  <div class="tab-panel" id="panel-prisoners" role="tabpanel">
+  <div class="sim-section" id="panel-prisoners">
+    <div class="sim-number">06 &mdash; PRISONER'S DILEMMA</div>
     <div class="model-header">
       <div class="model-info">
         <h3>Prisoner's Dilemma / Evolution of Cooperation</h3>
@@ -962,7 +934,8 @@
   </div>
 
   <!-- ═══════ 07 SUGARSCAPE ═══════ -->
-  <div class="tab-panel" id="panel-sugarscape" role="tabpanel">
+  <div class="sim-section" id="panel-sugarscape">
+    <div class="sim-number">07 &mdash; SUGARSCAPE</div>
     <div class="model-header">
       <div class="model-info">
         <h3>Sugarscape</h3>
@@ -1019,7 +992,8 @@
   </div>
 
   <!-- ═══════ 08 TECHNOLOGY EVOLUTION ═══════ -->
-  <div class="tab-panel" id="panel-techevo" role="tabpanel">
+  <div class="sim-section" id="panel-techevo">
+    <div class="sim-number">08 &mdash; TECHNOLOGY EVOLUTION</div>
     <div class="model-header">
       <div class="model-info">
         <h3>Technology Evolution on NK Landscapes</h3>
@@ -1075,7 +1049,8 @@
   </div>
 
   <!-- ═══════ 09 INTEGRATED ECONOMY ═══════ -->
-  <div class="tab-panel" id="panel-integrated" role="tabpanel">
+  <div class="sim-section" id="panel-integrated">
+    <div class="sim-number">09 &mdash; INTEGRATED ECONOMY</div>
     <div class="model-header">
       <div class="model-info">
         <h3>Integrated Economy</h3>
@@ -1132,7 +1107,7 @@
     </div>
   </div>
 
-</div><!-- tabs-container -->
+</div><!-- sims-container -->
 
 
 <!-- ────── FIVE PILLARS ────── -->
@@ -1353,21 +1328,7 @@
 <!-- ────── JAVASCRIPT ────── -->
 <script>
 (function() {
-  // Tab switching
-  const btns = document.querySelectorAll('.tab-btn');
-  const panels = document.querySelectorAll('.tab-panel');
-
-  btns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const target = btn.dataset.tab;
-
-      btns.forEach(b => b.classList.remove('active'));
-      panels.forEach(p => p.classList.remove('active'));
-
-      btn.classList.add('active');
-      document.getElementById('panel-' + target).classList.add('active');
-    });
-  });
+  // No tab switching needed — all sections visible
 
   // Smooth scroll for nav links
   document.querySelectorAll('a[href^="#"]').forEach(a => {
