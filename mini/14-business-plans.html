@@ -1,0 +1,344 @@
+<div class="mini-sim" id="mini-business-plans">
+<style>
+  #mini-business-plans {
+    max-width: 680px;
+    margin: 2rem auto;
+    background: var(--bg-card, #ffffff);
+    border: 1px solid var(--border, #e2e0da);
+    border-radius: var(--radius-lg, 12px);
+    box-shadow: 0 2px 8px rgba(26,26,46,0.06);
+    padding: 1.5rem;
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    color: var(--text-primary, #1a1a2e);
+  }
+  #mini-business-plans .sim-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent-teal, #2a7f7f);
+    margin-bottom: 1rem;
+  }
+  #mini-business-plans .canvas-wrap {
+    width: 100%;
+    height: 200px;
+    margin-bottom: 0.75rem;
+  }
+  #mini-business-plans .canvas-wrap canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    border-radius: 6px;
+  }
+  #mini-business-plans .metrics {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+  #mini-business-plans .metric {
+    display: flex;
+    flex-direction: column;
+  }
+  #mini-business-plans .metric-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-tertiary, #7a7a8a);
+    margin-bottom: 2px;
+  }
+  #mini-business-plans .metric-value {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary, #1a1a2e);
+  }
+  #mini-business-plans .controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  #mini-business-plans .controls button {
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.4rem 1rem;
+    border: 1px solid var(--border, #e2e0da);
+    border-radius: 6px;
+    background: var(--bg, #faf9f5);
+    color: var(--text-primary, #1a1a2e);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  #mini-business-plans .controls button:hover {
+    background: var(--bg-hover, #f5f3ee);
+  }
+  #mini-business-plans .legend {
+    display: flex;
+    gap: 0.75rem;
+    margin-left: auto;
+  }
+  #mini-business-plans .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.6rem;
+    color: var(--text-tertiary, #7a7a8a);
+  }
+  #mini-business-plans .legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  #mini-business-plans .tick-badge {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 0.65rem;
+    color: var(--text-light, #9a9aaa);
+    margin-left: auto;
+  }
+</style>
+
+<div class="sim-title">Interactive: Business Plan Evolution</div>
+
+<div class="canvas-wrap">
+  <canvas id="bp-canvas"></canvas>
+</div>
+
+<div class="metrics">
+  <div class="metric">
+    <span class="metric-label">Total Wealth</span>
+    <span class="metric-value" id="bp-wealth">--</span>
+  </div>
+  <div class="metric">
+    <span class="metric-label">Diversity</span>
+    <span class="metric-value" id="bp-diversity">--</span>
+  </div>
+  <div class="metric">
+    <span class="metric-label">Avg Fitness</span>
+    <span class="metric-value" id="bp-fitness">--</span>
+  </div>
+</div>
+
+<div class="controls">
+  <button id="bp-toggle-btn">Start</button>
+  <div class="legend">
+    <span class="legend-item"><span class="legend-dot" style="background:#3a5a8c"></span>PT</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#4a8a5a"></span>ST</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#b08a3a"></span>Strategy</span>
+  </div>
+  <span class="tick-badge" id="bp-tick">Gen 0</span>
+</div>
+
+<script>
+(function() {
+  const POP = 20;
+  const BITS = 6; // per component
+
+  // Simple NK-ish fitness: random lookup for each component
+  function makeLookup() {
+    const table = {};
+    const combos = 1 << BITS;
+    for (let i = 0; i < combos; i++) table[i] = Math.random();
+    return table;
+  }
+  const ptTable = makeLookup();
+  const stTable = makeLookup();
+  const stratTable = makeLookup();
+
+  // Market preferences (shift over time)
+  let prefShift = 0;
+
+  function toInt(bits) {
+    let v = 0;
+    for (let i = 0; i < bits.length; i++) v |= (bits[i] << i);
+    return v;
+  }
+
+  function componentFitness(bits, table) {
+    return table[toInt(bits)] || 0;
+  }
+
+  function totalFitness(bp) {
+    const ptF = componentFitness(bp.pt, ptTable);
+    const stF = componentFitness(bp.st, stTable);
+    // Strategy fitness is shifted by market preferences
+    const shifted = bp.strat.map((b, i) => i < prefShift % BITS ? (1 - b) : b);
+    const stratF = componentFitness(shifted, stratTable);
+    bp.ptFit = ptF;
+    bp.stFit = stF;
+    bp.stratFit = stratF;
+    bp.fitness = ptF * stF * stratF;
+    bp.dominant = ptF >= stF && ptF >= stratF ? 'pt' : (stF >= stratF ? 'st' : 'strat');
+    return bp.fitness;
+  }
+
+  function randomBits() {
+    const b = [];
+    for (let i = 0; i < BITS; i++) b.push(Math.random() < 0.5 ? 1 : 0);
+    return b;
+  }
+
+  function mutateBits(bits, rate) {
+    return bits.map(b => Math.random() < rate ? (1 - b) : b);
+  }
+
+  // Initialize population
+  const plans = [];
+  for (let i = 0; i < POP; i++) {
+    const bp = { id: i, pt: randomBits(), st: randomBits(), strat: randomBits(),
+                 fitness: 0, ptFit: 0, stFit: 0, stratFit: 0, dominant: 'pt', wealth: 1.0 };
+    totalFitness(bp);
+    plans.push(bp);
+  }
+
+  let gen = 0;
+
+  function step() {
+    // Shift market preferences occasionally
+    if (Math.random() < 0.03) prefShift++;
+
+    // Evaluate
+    for (const bp of plans) totalFitness(bp);
+
+    // Accumulate wealth
+    for (const bp of plans) bp.wealth += bp.fitness * 2;
+
+    // Sort by fitness
+    plans.sort((a, b) => b.fitness - a.fitness);
+
+    // Replace bottom 20% with offspring of top 20%
+    const cutoff = Math.floor(POP * 0.2);
+    for (let i = 0; i < cutoff; i++) {
+      const parent = plans[i]; // top
+      const child = plans[POP - 1 - i]; // bottom
+      child.pt = mutateBits([...parent.pt], 0.08);
+      child.st = mutateBits([...parent.st], 0.08);
+      child.strat = mutateBits([...parent.strat], 0.08);
+      child.wealth = 1.0;
+      totalFitness(child);
+    }
+
+    // Crossover between random pairs
+    if (Math.random() < 0.3) {
+      const i = Math.floor(Math.random() * POP);
+      const j = Math.floor(Math.random() * POP);
+      if (i !== j) {
+        const crossPt = Math.floor(Math.random() * BITS);
+        for (let b = crossPt; b < BITS; b++) {
+          [plans[i].strat[b], plans[j].strat[b]] = [plans[j].strat[b], plans[i].strat[b]];
+        }
+        totalFitness(plans[i]);
+        totalFitness(plans[j]);
+      }
+    }
+
+    gen++;
+    render();
+  }
+
+  // --- Rendering ---
+  const canvas = document.getElementById('bp-canvas');
+  const wealthEl = document.getElementById('bp-wealth');
+  const divEl = document.getElementById('bp-diversity');
+  const fitEl = document.getElementById('bp-fitness');
+  const tickEl = document.getElementById('bp-tick');
+  const toggleBtn = document.getElementById('bp-toggle-btn');
+
+  const COMPONENT_COLORS = { pt: '#3a5a8c', st: '#4a8a5a', strat: '#b08a3a' };
+
+  function render() {
+    const ctx = canvas.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
+    const W = rect.width, H = rect.height;
+    ctx.clearRect(0, 0, W, H);
+
+    // Sort by fitness and draw top 10 as horizontal bars
+    const sorted = [...plans].sort((a, b) => b.fitness - a.fitness).slice(0, 10);
+    const maxFit = Math.max(...sorted.map(b => b.fitness), 0.01);
+    const barH = (H - 20) / 10;
+    const padding = 2;
+    const labelW = 32;
+
+    for (let i = 0; i < sorted.length; i++) {
+      const bp = sorted[i];
+      const y = i * barH + padding;
+      const barW = (W - labelW - 10) * (bp.fitness / maxFit);
+
+      ctx.fillStyle = COMPONENT_COLORS[bp.dominant];
+      const r = 3;
+      ctx.beginPath();
+      ctx.moveTo(labelW + r, y);
+      ctx.lineTo(labelW + barW - r, y);
+      ctx.quadraticCurveTo(labelW + barW, y, labelW + barW, y + r);
+      ctx.lineTo(labelW + barW, y + barH - padding - r);
+      ctx.quadraticCurveTo(labelW + barW, y + barH - padding, labelW + barW - r, y + barH - padding);
+      ctx.lineTo(labelW + r, y + barH - padding);
+      ctx.quadraticCurveTo(labelW, y + barH - padding, labelW, y + barH - padding - r);
+      ctx.lineTo(labelW, y + r);
+      ctx.quadraticCurveTo(labelW, y, labelW + r, y);
+      ctx.closePath();
+      ctx.fill();
+
+      // Rank label
+      ctx.fillStyle = '#7a7a8a';
+      ctx.font = '10px JetBrains Mono, monospace';
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('#' + (i + 1), labelW - 5, y + (barH - padding) / 2);
+
+      // Fitness label on bar
+      if (barW > 45) {
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '10px JetBrains Mono, monospace';
+        ctx.textAlign = 'left';
+        ctx.fillText(bp.fitness.toFixed(3), labelW + 6, y + (barH - padding) / 2);
+      }
+    }
+
+    // Metrics
+    const totalWealth = plans.reduce((s, b) => s + b.wealth, 0);
+    const avgFit = plans.reduce((s, b) => s + b.fitness, 0) / POP;
+
+    // Diversity: count unique genomes (Hamming spread)
+    let divScore = 0;
+    for (let i = 0; i < POP; i++) {
+      for (let j = i + 1; j < POP; j++) {
+        let diff = 0;
+        for (let b = 0; b < BITS; b++) {
+          if (plans[i].pt[b] !== plans[j].pt[b]) diff++;
+          if (plans[i].st[b] !== plans[j].st[b]) diff++;
+          if (plans[i].strat[b] !== plans[j].strat[b]) diff++;
+        }
+        divScore += diff;
+      }
+    }
+    const maxDiv = POP * (POP - 1) / 2 * BITS * 3;
+
+    wealthEl.textContent = totalWealth.toFixed(0);
+    divEl.textContent = (divScore / maxDiv * 100).toFixed(0) + '%';
+    fitEl.textContent = avgFit.toFixed(3);
+    tickEl.textContent = 'Gen ' + gen;
+  }
+
+  // --- Controls ---
+  let timer = null;
+  toggleBtn.addEventListener('click', function() {
+    if (timer) {
+      clearInterval(timer);
+      timer = null;
+      toggleBtn.textContent = 'Start';
+    } else {
+      timer = setInterval(step, 300);
+      toggleBtn.textContent = 'Pause';
+    }
+  });
+
+  render();
+})();
+</script>
+</div>

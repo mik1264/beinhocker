@@ -1,0 +1,395 @@
+<div class="mini-sim" id="mini-public-policy">
+<style>
+  #mini-public-policy {
+    max-width: 680px;
+    margin: 2rem auto;
+    background: var(--bg-card, #ffffff);
+    border: 1px solid var(--border, #e2e0da);
+    border-radius: var(--radius-lg, 12px);
+    box-shadow: 0 2px 8px rgba(26,26,46,0.06);
+    padding: 1.5rem;
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    color: var(--text-primary, #1a1a2e);
+  }
+  #mini-public-policy .sim-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent-teal, #2a7f7f);
+    margin-bottom: 1rem;
+  }
+  #mini-public-policy .canvas-wrap {
+    width: 100%;
+    height: 220px;
+    margin-bottom: 0.75rem;
+  }
+  #mini-public-policy .canvas-wrap canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    border-radius: 6px;
+  }
+  #mini-public-policy .metrics {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+  #mini-public-policy .metric {
+    display: flex;
+    flex-direction: column;
+  }
+  #mini-public-policy .metric-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-tertiary, #7a7a8a);
+    margin-bottom: 2px;
+  }
+  #mini-public-policy .metric-value {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary, #1a1a2e);
+  }
+  #mini-public-policy .regime-selector {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  #mini-public-policy .regime-selector label {
+    font-size: 0.7rem;
+    color: var(--text-secondary, #4a4a5a);
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    cursor: pointer;
+    user-select: none;
+    padding: 0.25rem 0.5rem;
+    border: 1px solid var(--border, #e2e0da);
+    border-radius: 6px;
+    transition: background 0.15s;
+  }
+  #mini-public-policy .regime-selector label:hover {
+    background: var(--bg-hover, #f5f3ee);
+  }
+  #mini-public-policy .regime-selector input[type="radio"] {
+    accent-color: var(--accent-teal, #2a7f7f);
+  }
+  #mini-public-policy .controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  #mini-public-policy .controls button {
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.4rem 1rem;
+    border: 1px solid var(--border, #e2e0da);
+    border-radius: 6px;
+    background: var(--bg, #faf9f5);
+    color: var(--text-primary, #1a1a2e);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  #mini-public-policy .controls button:hover {
+    background: var(--bg-hover, #f5f3ee);
+  }
+  #mini-public-policy .tick-badge {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 0.65rem;
+    color: var(--text-light, #9a9aaa);
+    margin-left: auto;
+  }
+</style>
+
+<div class="sim-title">Interactive: Public Policy</div>
+
+<div class="regime-selector">
+  <label><input type="radio" name="pp-regime" value="laissez-faire" checked> Laissez-faire</label>
+  <label><input type="radio" name="pp-regime" value="innovation"> Pro-innovation</label>
+  <label><input type="radio" name="pp-regime" value="regulated"> Regulated</label>
+  <label><input type="radio" name="pp-regime" value="redistributive"> Redistributive</label>
+  <label><input type="radio" name="pp-regime" value="balanced"> Balanced</label>
+</div>
+
+<div class="canvas-wrap">
+  <canvas id="pp-canvas"></canvas>
+</div>
+
+<div class="metrics">
+  <div class="metric">
+    <span class="metric-label">GDP</span>
+    <span class="metric-value" id="pp-gdp">--</span>
+  </div>
+  <div class="metric">
+    <span class="metric-label">Unemployment</span>
+    <span class="metric-value" id="pp-unemp">--</span>
+  </div>
+  <div class="metric">
+    <span class="metric-label">Innovation Rate</span>
+    <span class="metric-value" id="pp-innov">--</span>
+  </div>
+</div>
+
+<div class="controls">
+  <button id="pp-toggle-btn">Start</button>
+  <span class="tick-badge" id="pp-tick">Tick 0</span>
+</div>
+
+<script>
+(function() {
+  const NUM_FIRMS = 25;
+  const GENOME_LEN = 8;
+  const HISTORY_LEN = 80;
+
+  // Policy regimes: { regulation, taxRate, innovationSubsidy, competitionLimit, safetyNet }
+  const REGIMES = {
+    'laissez-faire':   { regulation: 0.1, taxRate: 0.05, innovationSubsidy: 0.0, competitionLimit: 1.0, safetyNet: 0.1 },
+    'innovation':      { regulation: 0.15, taxRate: 0.15, innovationSubsidy: 0.4, competitionLimit: 0.8, safetyNet: 0.2 },
+    'regulated':       { regulation: 0.6, taxRate: 0.3, innovationSubsidy: 0.05, competitionLimit: 0.3, safetyNet: 0.4 },
+    'redistributive':  { regulation: 0.3, taxRate: 0.5, innovationSubsidy: 0.1, competitionLimit: 0.4, safetyNet: 0.8 },
+    'balanced':        { regulation: 0.3, taxRate: 0.2, innovationSubsidy: 0.2, competitionLimit: 0.6, safetyNet: 0.4 }
+  };
+
+  // NK landscape
+  const interactions = [];
+  const tables = [];
+  const K = 2;
+  for (let i = 0; i < GENOME_LEN; i++) {
+    const others = [];
+    for (let j = 0; j < GENOME_LEN; j++) if (j !== i) others.push(j);
+    for (let s = others.length - 1; s > 0; s--) {
+      const r = Math.floor(Math.random() * (s + 1));
+      [others[s], others[r]] = [others[r], others[s]];
+    }
+    interactions.push(others.slice(0, K));
+    const table = {};
+    for (let c = 0; c < (1 << (K + 1)); c++) table[c] = Math.random();
+    tables.push(table);
+  }
+
+  function fitness(genome) {
+    let total = 0;
+    for (let i = 0; i < GENOME_LEN; i++) {
+      let key = genome[i];
+      for (let j = 0; j < K; j++) key |= (genome[interactions[i][j]] << (j + 1));
+      total += tables[i][key] || 0;
+    }
+    return total / GENOME_LEN;
+  }
+
+  // Firms
+  const firms = [];
+  for (let i = 0; i < NUM_FIRMS; i++) {
+    const genome = [];
+    for (let b = 0; b < GENOME_LEN; b++) genome.push(Math.random() < 0.5 ? 1 : 0);
+    firms.push({ genome, fitness: fitness(genome), output: 0, alive: true, marketShare: 1 / NUM_FIRMS });
+  }
+
+  let tick = 0;
+  let innovations = 0;
+  const gdpHistory = [];
+  let currentRegime = 'laissez-faire';
+
+  function getRegime() {
+    const radios = document.querySelectorAll('input[name="pp-regime"]');
+    for (const r of radios) if (r.checked) return r.value;
+    return 'laissez-faire';
+  }
+
+  function step() {
+    currentRegime = getRegime();
+    const policy = REGIMES[currentRegime];
+    const mutRate = 0.05 + policy.innovationSubsidy * 0.15;
+    const entryCost = 0.3 + policy.regulation * 0.4;
+    const operatingCost = 0.05 + policy.regulation * 0.08;
+
+    const aliveFirms = firms.filter(f => f.alive);
+
+    for (const f of aliveFirms) {
+      // Mutation (innovation)
+      const newGenome = f.genome.map(b => Math.random() < mutRate ? (1 - b) : b);
+      const newFit = fitness(newGenome);
+      if (newFit > f.fitness) {
+        f.genome = newGenome;
+        f.fitness = newFit;
+        innovations++;
+      }
+
+      // Output
+      f.output = f.fitness * 10 * (1 - policy.taxRate) - operatingCost;
+      f.output = Math.max(0, f.output);
+    }
+
+    // Market share with competition limit
+    const totalFit = aliveFirms.reduce((s, f) => s + f.fitness, 0) || 1;
+    for (const f of aliveFirms) {
+      f.marketShare = Math.min(policy.competitionLimit, f.fitness / totalFit);
+    }
+    // Renormalize
+    const totalShare = aliveFirms.reduce((s, f) => s + f.marketShare, 0) || 1;
+    for (const f of aliveFirms) f.marketShare /= totalShare;
+
+    // Firm failure: low output firms die
+    for (const f of aliveFirms) {
+      if (f.output < operatingCost * 2 && Math.random() < 0.1) {
+        f.alive = false;
+      }
+    }
+
+    // New entrants (easier when regulation is low)
+    for (const f of firms) {
+      if (!f.alive && Math.random() < (0.05 * (1 - entryCost * 0.5) + policy.safetyNet * 0.03)) {
+        const genome = [];
+        for (let b = 0; b < GENOME_LEN; b++) genome.push(Math.random() < 0.5 ? 1 : 0);
+        f.genome = genome;
+        f.fitness = fitness(genome);
+        f.alive = true;
+        f.output = 0;
+        f.marketShare = 0;
+      }
+    }
+
+    // GDP
+    const gdp = firms.filter(f => f.alive).reduce((s, f) => s + f.output, 0);
+    gdpHistory.push(gdp);
+    if (gdpHistory.length > HISTORY_LEN) gdpHistory.shift();
+
+    tick++;
+    render();
+  }
+
+  // --- Rendering ---
+  const canvas = document.getElementById('pp-canvas');
+  const gdpEl = document.getElementById('pp-gdp');
+  const unempEl = document.getElementById('pp-unemp');
+  const innovEl = document.getElementById('pp-innov');
+  const tickEl = document.getElementById('pp-tick');
+  const toggleBtn = document.getElementById('pp-toggle-btn');
+
+  // Regime colors
+  const REGIME_COLORS = {
+    'laissez-faire': '#b08a3a',
+    'innovation': '#3a5a8c',
+    'regulated': '#c96b5a',
+    'redistributive': '#8a5a8c',
+    'balanced': '#2a7f7f'
+  };
+
+  function render() {
+    const ctx = canvas.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
+    const W = rect.width, H = rect.height;
+    ctx.clearRect(0, 0, W, H);
+
+    // GDP line chart
+    if (gdpHistory.length < 2) {
+      ctx.fillStyle = '#7a7a8a';
+      ctx.font = '11px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('Press Start to begin simulation', W / 2, H / 2);
+      return;
+    }
+
+    const maxGdp = Math.max(...gdpHistory, 1);
+    const minGdp = Math.min(...gdpHistory, 0);
+    const range = maxGdp - minGdp || 1;
+    const stepW = W / (HISTORY_LEN - 1);
+    const pad = 20;
+
+    // Grid lines
+    ctx.strokeStyle = 'rgba(26,26,46,0.08)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([3, 3]);
+    for (let i = 0; i <= 4; i++) {
+      const y = pad + (H - 2 * pad) * (i / 4);
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(W, y);
+      ctx.stroke();
+    }
+    ctx.setLineDash([]);
+
+    // Y-axis labels
+    ctx.fillStyle = '#7a7a8a';
+    ctx.font = '9px JetBrains Mono, monospace';
+    ctx.textAlign = 'left';
+    ctx.fillText(maxGdp.toFixed(0), 2, pad - 3);
+    ctx.fillText(minGdp.toFixed(0), 2, H - pad + 12);
+
+    // GDP line
+    const lineColor = REGIME_COLORS[currentRegime] || '#2a7f7f';
+    ctx.strokeStyle = lineColor;
+    ctx.lineWidth = 2;
+    ctx.lineJoin = 'round';
+    ctx.beginPath();
+    for (let i = 0; i < gdpHistory.length; i++) {
+      const x = (HISTORY_LEN - gdpHistory.length + i) * stepW;
+      const y = pad + (H - 2 * pad) * (1 - (gdpHistory[i] - minGdp) / range);
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+
+    // Fill under line
+    const lastX = (HISTORY_LEN - 1) * stepW;
+    const firstX = (HISTORY_LEN - gdpHistory.length) * stepW;
+    ctx.lineTo(lastX, H - pad);
+    ctx.lineTo(firstX, H - pad);
+    ctx.closePath();
+    ctx.fillStyle = lineColor;
+    ctx.globalAlpha = 0.08;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+
+    // Current value dot
+    const lastY = pad + (H - 2 * pad) * (1 - (gdpHistory[gdpHistory.length - 1] - minGdp) / range);
+    ctx.fillStyle = lineColor;
+    ctx.beginPath();
+    ctx.arc(lastX, lastY, 4, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Regime label
+    ctx.fillStyle = lineColor;
+    ctx.font = '10px Inter, sans-serif';
+    ctx.textAlign = 'right';
+    ctx.fillText(currentRegime, W - 5, pad + 12);
+
+    // Metrics
+    const aliveFirms = firms.filter(f => f.alive);
+    const gdp = gdpHistory[gdpHistory.length - 1];
+    const unemp = ((NUM_FIRMS - aliveFirms.length) / NUM_FIRMS * 100);
+    const innovRate = tick > 0 ? (innovations / tick) : 0;
+
+    gdpEl.textContent = gdp.toFixed(1);
+    unempEl.textContent = unemp.toFixed(0) + '%';
+    unempEl.style.color = unemp > 20 ? '#c96b5a' : '#1a1a2e';
+    innovEl.textContent = innovRate.toFixed(2) + '/t';
+    tickEl.textContent = 'Tick ' + tick;
+  }
+
+  // --- Controls ---
+  let timer = null;
+  toggleBtn.addEventListener('click', function() {
+    if (timer) {
+      clearInterval(timer);
+      timer = null;
+      toggleBtn.textContent = 'Start';
+    } else {
+      timer = setInterval(step, 150);
+      toggleBtn.textContent = 'Pause';
+    }
+  });
+
+  render();
+})();
+</script>
+</div>

@@ -1,0 +1,480 @@
+<div class="mini-sim" id="mini-stock-market">
+<style>
+  #mini-stock-market {
+    max-width: 680px;
+    margin: 2rem auto;
+    background: var(--bg-card, #ffffff);
+    border: 1px solid var(--border, #e2e0da);
+    border-radius: var(--radius-lg, 12px);
+    box-shadow: 0 2px 8px rgba(26,26,46,0.06);
+    padding: 1.5rem;
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    color: var(--text-primary, #1a1a2e);
+  }
+  #mini-stock-market .sim-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent-teal, #2a7f7f);
+    margin-bottom: 1rem;
+  }
+  #mini-stock-market .chart-wrap {
+    position: relative;
+    width: 100%;
+    height: 180px;
+    margin-bottom: 0.25rem;
+  }
+  #mini-stock-market .chart-wrap canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  #mini-stock-market .volume-wrap {
+    width: 100%;
+    height: 36px;
+    margin-bottom: 0.75rem;
+  }
+  #mini-stock-market .volume-wrap canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  #mini-stock-market .metrics {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+  #mini-stock-market .metric {
+    display: flex;
+    flex-direction: column;
+  }
+  #mini-stock-market .metric-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-tertiary, #7a7a8a);
+    margin-bottom: 2px;
+  }
+  #mini-stock-market .metric-value {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary, #1a1a2e);
+  }
+  #mini-stock-market .controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  #mini-stock-market .controls button {
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.4rem 1rem;
+    border: 1px solid var(--border, #e2e0da);
+    border-radius: 6px;
+    background: var(--bg, #faf9f5);
+    color: var(--text-primary, #1a1a2e);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  #mini-stock-market .controls button:hover {
+    background: var(--bg-hover, #f5f3ee);
+  }
+  #mini-stock-market .controls .speed-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+  #mini-stock-market .controls .speed-wrap label {
+    font-size: 0.65rem;
+    color: var(--text-tertiary, #7a7a8a);
+  }
+  #mini-stock-market .controls input[type="range"] {
+    width: 80px;
+    accent-color: var(--accent-teal, #2a7f7f);
+  }
+  #mini-stock-market .tick-badge {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 0.65rem;
+    color: var(--text-light, #9a9aaa);
+    margin-left: auto;
+  }
+</style>
+
+<div class="sim-title">Interactive: Stock Market</div>
+
+<div class="chart-wrap">
+  <canvas id="sm-chart"></canvas>
+</div>
+<div class="volume-wrap">
+  <canvas id="sm-volume"></canvas>
+</div>
+
+<div class="metrics">
+  <div class="metric">
+    <span class="metric-label">Price</span>
+    <span class="metric-value" id="sm-price">100.00</span>
+  </div>
+  <div class="metric">
+    <span class="metric-label">Fundamental</span>
+    <span class="metric-value" id="sm-fundamental">100.00</span>
+  </div>
+  <div class="metric">
+    <span class="metric-label">Volatility</span>
+    <span class="metric-value" id="sm-volatility">--</span>
+  </div>
+</div>
+
+<div class="controls">
+  <button id="sm-toggle-btn">Start</button>
+  <div class="speed-wrap">
+    <label>Speed</label>
+    <input type="range" id="sm-speed" min="1" max="10" value="5">
+  </div>
+  <span class="tick-badge" id="sm-tick">Tick 0</span>
+</div>
+
+<script>
+(function() {
+  // --- Config ---
+  const NUM_AGENTS = 15;
+  const NUM_RULES = 20;
+  const INTEREST_RATE = 0.10;
+  const D_BAR = 10.0;
+  const RHO = 0.95;
+  const SIGMA_D = Math.sqrt(0.0743);
+  const RISK_AVERSION = 0.5;
+  const GA_INTERVAL = 100;
+  const MUTATION_RATE = 0.03;
+  const CROSSOVER_PROB = 0.3;
+  const CHART_LEN = 100;
+
+  function gauss() {
+    let u=0,v=0;
+    while(u===0)u=Math.random();
+    while(v===0)v=Math.random();
+    return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);
+  }
+
+  // --- Stock ---
+  let dividend = D_BAR;
+  let fundamentalValue = D_BAR / INTEREST_RATE;
+  let price = fundamentalValue;
+  const priceHistory = [price];
+  const fvHistory = [fundamentalValue];
+  const volumeHistory = [0];
+
+  function nextDividend() {
+    dividend = D_BAR + RHO * (dividend - D_BAR) + gauss() * SIGMA_D;
+    dividend = Math.max(dividend, 0.001);
+    fundamentalValue = dividend / INTEREST_RATE;
+    return dividend;
+  }
+
+  function movingAvg(arr, w) {
+    if(arr.length < w) return arr.reduce((a,b)=>a+b,0)/arr.length;
+    let s=0; for(let i=arr.length-w;i<arr.length;i++) s+=arr[i]; return s/w;
+  }
+
+  // --- Market state encoder (12 bits) ---
+  function encodeState() {
+    const p = price, fv = fundamentalValue;
+    const r = fv > 0 ? p/fv : 1;
+    return [
+      r>0.25?1:0, r>0.5?1:0, r>0.75?1:0, r>0.875?1:0, r>1.0?1:0, r>1.125?1:0,
+      p>movingAvg(priceHistory,5)?1:0, p>movingAvg(priceHistory,10)?1:0,
+      p>movingAvg(priceHistory,100)?1:0, p>movingAvg(priceHistory,Math.min(500,priceHistory.length))?1:0,
+      1, 0
+    ];
+  }
+
+  // --- Forecast rules ---
+  function makeRule() {
+    const cond = [];
+    for(let i=0;i<12;i++){
+      const r=Math.random();
+      cond.push(r<0.90?2:(r<0.95?0:1));
+    }
+    return {
+      cond,
+      a: 0.7 + Math.random()*0.5,
+      b: -10 + Math.random()*29,
+      variance: 1 + Math.random()*7,
+      fitness: 0,
+      age: 0,
+      get specificity(){ return this.cond.filter(c=>c!==2).length; },
+      matches(state){ for(let i=0;i<12;i++){if(this.cond[i]!==2&&this.cond[i]!==state[i])return false;} return true; },
+      forecast(pd){ return this.a*pd+this.b; },
+      updateFitness(){ this.fitness = -this.variance - 0.005*this.specificity; }
+    };
+  }
+
+  // --- Agents ---
+  const agents = [];
+  for(let i=0;i<NUM_AGENTS;i++){
+    const rules = [];
+    for(let r=0;r<NUM_RULES;r++){const rl=makeRule(); rl.updateFitness(); rules.push(rl);}
+    agents.push({
+      cash: fundamentalValue*2, shares:1, rules,
+      activeRule:null,
+      selectRule(state){
+        let active=this.rules.filter(r=>r.matches(state));
+        if(!active.length) active=[this.rules.reduce((a,b)=>a.specificity<=b.specificity?a:b)];
+        this.activeRule=active.reduce((a,b)=>a.fitness>=b.fitness?a:b);
+      },
+      demand(p,d){
+        if(!this.activeRule) return 0;
+        const pd=p+d, exp=this.activeRule.forecast(pd);
+        const excess=exp-p*(1+INTEREST_RATE);
+        const v=Math.max(this.activeRule.variance,0.5);
+        let dem=excess/(RISK_AVERSION*v);
+        dem=Math.max(-5,Math.min(5,dem));
+        let desired=this.shares+dem;
+        desired=Math.max(-5,Math.min(10,desired));
+        return desired-this.shares;
+      },
+      updateRules(actualPD){
+        for(const r of this.rules){
+          if(r===this.activeRule){
+            const pred=r.forecast(actualPD);
+            const err=actualPD-pred;
+            r.variance=0.9*r.variance+0.1*(err*err);
+            r.updateFitness();
+          }
+          r.age++;
+        }
+      },
+      evolve(){
+        if(this.rules.length<5)return;
+        this.rules.sort((a,b)=>b.fitness-a.fitness);
+        const nKeep=Math.floor(this.rules.length*0.8);
+        const survivors=this.rules.slice(0,nKeep);
+        const newRules=[];
+        for(let i=0;i<this.rules.length-nKeep;i++){
+          let child;
+          if(Math.random()<CROSSOVER_PROB&&survivors.length>=2){
+            const [p1,p2]=[survivors[Math.floor(Math.random()*Math.min(nKeep,survivors.length))],
+                           survivors[Math.floor(Math.random()*Math.min(nKeep,survivors.length))]];
+            const cond=p1.cond.map((c,j)=>Math.random()<0.5?c:p2.cond[j]);
+            const m=Math.floor(Math.random()*3);
+            const a=m===0?p1.a:m===1?p2.a:(p1.a+p2.a)/2;
+            const b=m===0?p1.b:m===1?p2.b:(p1.b+p2.b)/2;
+            child={cond,a,b,variance:(p1.variance+p2.variance)/2,fitness:0,age:0,
+              get specificity(){return this.cond.filter(c=>c!==2).length;},
+              matches(state){for(let i=0;i<12;i++){if(this.cond[i]!==2&&this.cond[i]!==state[i])return false;}return true;},
+              forecast(pd){return this.a*pd+this.b;},
+              updateFitness(){this.fitness=-this.variance-0.005*this.specificity;}
+            };
+          } else {
+            const parent=survivors[Math.floor(Math.random()*Math.max(1,Math.floor(nKeep/2)))];
+            child={cond:[...parent.cond],a:parent.a,b:parent.b,variance:parent.variance,fitness:0,age:0,
+              get specificity(){return this.cond.filter(c=>c!==2).length;},
+              matches(state){for(let i=0;i<12;i++){if(this.cond[i]!==2&&this.cond[i]!==state[i])return false;}return true;},
+              forecast(pd){return this.a*pd+this.b;},
+              updateFitness(){this.fitness=-this.variance-0.005*this.specificity;}
+            };
+          }
+          // Mutate
+          for(let j=0;j<child.cond.length;j++) if(Math.random()<MUTATION_RATE) child.cond[j]=[0,1,2][Math.floor(Math.random()*3)];
+          if(Math.random()<MUTATION_RATE){child.a+=gauss()*0.05;child.a=Math.max(0,Math.min(2,child.a));}
+          if(Math.random()<MUTATION_RATE){child.b+=gauss()*2;child.b=Math.max(-30,Math.min(30,child.b));}
+          child.updateFitness();
+          newRules.push(child);
+        }
+        this.rules=survivors.concat(newRules);
+      }
+    });
+  }
+
+  let tick = 0;
+  let running = false;
+  let timer = null;
+
+  function clearMarket() {
+    const d = dividend;
+    function excessDemand(p) {
+      let total=0;
+      for(const ag of agents) total+=ag.demand(p,d);
+      return total;
+    }
+    let pLow=Math.max(price*0.5,0.01), pHigh=price*1.5+10;
+    for(let i=0;i<10;i++){
+      const edL=excessDemand(pLow),edH=excessDemand(pHigh);
+      if(edL>0&&edH<0)break;
+      if(edL<=0)pLow=Math.max(pLow*0.5,0.001);
+      if(edH>=0)pHigh*=2;
+    }
+    for(let i=0;i<60;i++){
+      const pMid=(pLow+pHigh)/2;
+      const ed=excessDemand(pMid);
+      if(Math.abs(ed)<0.001)break;
+      if(ed>0)pLow=pMid;else pHigh=pMid;
+    }
+    const cp=Math.max((pLow+pHigh)/2,0.01);
+    // Execute trades
+    let vol=0;
+    for(const ag of agents) ag.cash+=ag.shares*d;
+    for(const ag of agents){
+      const dem=ag.demand(cp,d);
+      ag.shares+=dem; ag.cash-=dem*cp;
+      vol+=Math.abs(dem);
+    }
+    return {price:cp, volume:vol/2};
+  }
+
+  function step() {
+    nextDividend();
+    const state=encodeState();
+    for(const ag of agents) ag.selectRule(state);
+    const result=clearMarket();
+    price=result.price;
+    priceHistory.push(price);
+    fvHistory.push(fundamentalValue);
+    volumeHistory.push(result.volume);
+
+    const actualPD=price+dividend;
+    for(const ag of agents) ag.updateRules(actualPD);
+
+    // GA
+    const gaProb=1/GA_INTERVAL;
+    for(const ag of agents) if(Math.random()<gaProb) ag.evolve();
+
+    tick++;
+    render();
+  }
+
+  // --- DOM ---
+  const chartCanvas = document.getElementById('sm-chart');
+  const volCanvas = document.getElementById('sm-volume');
+  const priceEl = document.getElementById('sm-price');
+  const fvEl = document.getElementById('sm-fundamental');
+  const volEl = document.getElementById('sm-volatility');
+  const tickEl = document.getElementById('sm-tick');
+  const toggleBtn = document.getElementById('sm-toggle-btn');
+  const speedSlider = document.getElementById('sm-speed');
+
+  function render() {
+    priceEl.textContent = price.toFixed(2);
+    fvEl.textContent = fundamentalValue.toFixed(2);
+    tickEl.textContent = 'Tick ' + tick;
+
+    // Volatility: std of last 20 returns
+    if(priceHistory.length > 2){
+      const n = Math.min(20, priceHistory.length-1);
+      const rets = [];
+      for(let i=priceHistory.length-n;i<priceHistory.length;i++){
+        if(priceHistory[i-1]>0) rets.push((priceHistory[i]-priceHistory[i-1])/priceHistory[i-1]);
+      }
+      if(rets.length>1){
+        const mean=rets.reduce((a,b)=>a+b,0)/rets.length;
+        const std=Math.sqrt(rets.reduce((a,b)=>a+(b-mean)**2,0)/rets.length);
+        volEl.textContent = (std*100).toFixed(2)+'%';
+      }
+    }
+
+    drawChart();
+    drawVolume();
+  }
+
+  function drawChart() {
+    const ctx=chartCanvas.getContext('2d');
+    const dpr=window.devicePixelRatio||1;
+    const rect=chartCanvas.getBoundingClientRect();
+    chartCanvas.width=rect.width*dpr; chartCanvas.height=rect.height*dpr;
+    ctx.scale(dpr,dpr);
+    const W=rect.width,H=rect.height;
+    ctx.clearRect(0,0,W,H);
+
+    const prices=priceHistory.slice(-CHART_LEN);
+    const fvs=fvHistory.slice(-CHART_LEN);
+    if(prices.length<2)return;
+    const all=prices.concat(fvs);
+    const minP=Math.min(...all)*0.98, maxP=Math.max(...all)*1.02;
+    const range=maxP-minP||1;
+    const stepX=W/(CHART_LEN-1);
+
+    function yOf(v){ return H-(v-minP)/range*H; }
+
+    // Fundamental value dashed line
+    ctx.strokeStyle='rgba(42,127,127,0.3)';
+    ctx.setLineDash([4,4]);
+    ctx.lineWidth=1;
+    ctx.beginPath();
+    for(let i=0;i<fvs.length;i++){
+      const x=(CHART_LEN-fvs.length+i)*stepX;
+      if(i===0)ctx.moveTo(x,yOf(fvs[i]));else ctx.lineTo(x,yOf(fvs[i]));
+    }
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Price line
+    ctx.strokeStyle='var(--text-primary, #1a1a2e)';
+    ctx.lineWidth=1.5;
+    ctx.lineJoin='round';
+    ctx.beginPath();
+    for(let i=0;i<prices.length;i++){
+      const x=(CHART_LEN-prices.length+i)*stepX;
+      if(i===0)ctx.moveTo(x,yOf(prices[i]));else ctx.lineTo(x,yOf(prices[i]));
+    }
+    ctx.stroke();
+
+    // Price labels
+    ctx.fillStyle='var(--text-tertiary, #7a7a8a)';
+    ctx.font='9px Inter, sans-serif';
+    ctx.textAlign='right';
+    ctx.fillText(maxP.toFixed(0),W-2,10);
+    ctx.fillText(minP.toFixed(0),W-2,H-2);
+  }
+
+  function drawVolume() {
+    const ctx=volCanvas.getContext('2d');
+    const dpr=window.devicePixelRatio||1;
+    const rect=volCanvas.getBoundingClientRect();
+    volCanvas.width=rect.width*dpr; volCanvas.height=rect.height*dpr;
+    ctx.scale(dpr,dpr);
+    const W=rect.width,H=rect.height;
+    ctx.clearRect(0,0,W,H);
+
+    const vols=volumeHistory.slice(-CHART_LEN);
+    if(vols.length<1)return;
+    const maxV=Math.max(...vols,0.01);
+    const barW=W/CHART_LEN;
+
+    ctx.fillStyle='rgba(42,127,127,0.25)';
+    for(let i=0;i<vols.length;i++){
+      const x=(CHART_LEN-vols.length+i)*barW;
+      const h=(vols[i]/maxV)*H;
+      ctx.fillRect(x,H-h,Math.max(barW-1,1),h);
+    }
+
+    ctx.fillStyle='var(--text-tertiary, #7a7a8a)';
+    ctx.font='8px Inter, sans-serif';
+    ctx.textAlign='left';
+    ctx.fillText('Volume',2,9);
+  }
+
+  toggleBtn.addEventListener('click', function(){
+    running=!running;
+    toggleBtn.textContent=running?'Pause':'Start';
+    if(running) startLoop(); else stopLoop();
+  });
+
+  function startLoop(){
+    stopLoop();
+    const speeds=[500,400,300,200,150,100,70,40,20,10];
+    const idx=parseInt(speedSlider.value)-1;
+    timer=setInterval(step,speeds[idx]);
+  }
+  function stopLoop(){ if(timer){clearInterval(timer);timer=null;} }
+
+  speedSlider.addEventListener('input',function(){
+    if(running){startLoop();}
+  });
+
+  render();
+})();
+</script>
+</div>

@@ -1,0 +1,348 @@
+<div class="mini-sim" id="mini-tech-evolution">
+<style>
+  #mini-tech-evolution {
+    max-width: 680px;
+    margin: 2rem auto;
+    background: var(--bg-card, #ffffff);
+    border: 1px solid var(--border, #e2e0da);
+    border-radius: var(--radius-lg, 12px);
+    box-shadow: 0 2px 8px rgba(26,26,46,0.06);
+    padding: 1.5rem;
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    color: var(--text-primary, #1a1a2e);
+  }
+  #mini-tech-evolution .sim-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent-teal, #2a7f7f);
+    margin-bottom: 1rem;
+  }
+  #mini-tech-evolution .canvas-wrap {
+    width: 100%;
+    height: 260px;
+    margin-bottom: 0.75rem;
+    position: relative;
+  }
+  #mini-tech-evolution .canvas-wrap canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    border-radius: 6px;
+  }
+  #mini-tech-evolution .metrics {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+  #mini-tech-evolution .metric {
+    display: flex;
+    flex-direction: column;
+  }
+  #mini-tech-evolution .metric-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-tertiary, #7a7a8a);
+    margin-bottom: 2px;
+  }
+  #mini-tech-evolution .metric-value {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary, #1a1a2e);
+  }
+  #mini-tech-evolution .controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  #mini-tech-evolution .controls button {
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.4rem 1rem;
+    border: 1px solid var(--border, #e2e0da);
+    border-radius: 6px;
+    background: var(--bg, #faf9f5);
+    color: var(--text-primary, #1a1a2e);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  #mini-tech-evolution .controls button:hover {
+    background: var(--bg-hover, #f5f3ee);
+  }
+  #mini-tech-evolution .legend {
+    display: flex;
+    gap: 0.75rem;
+    margin-left: auto;
+    flex-wrap: wrap;
+  }
+  #mini-tech-evolution .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.6rem;
+    color: var(--text-tertiary, #7a7a8a);
+  }
+  #mini-tech-evolution .legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  #mini-tech-evolution .tick-badge {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 0.65rem;
+    color: var(--text-light, #9a9aaa);
+    margin-left: auto;
+  }
+</style>
+
+<div class="sim-title">Interactive: Technology Evolution</div>
+
+<div class="canvas-wrap">
+  <canvas id="te-canvas"></canvas>
+</div>
+
+<div class="metrics">
+  <div class="metric">
+    <span class="metric-label">Best Fitness</span>
+    <span class="metric-value" id="te-best">--</span>
+  </div>
+  <div class="metric">
+    <span class="metric-label">Mean Fitness</span>
+    <span class="metric-value" id="te-mean">--</span>
+  </div>
+  <div class="metric">
+    <span class="metric-label">Destructions</span>
+    <span class="metric-value" id="te-destructions">0</span>
+  </div>
+</div>
+
+<div class="controls">
+  <button id="te-toggle-btn">Start</button>
+  <div class="legend">
+    <span class="legend-item"><span class="legend-dot" style="background:#3a5a8c"></span>Local</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#c96b5a"></span>Long-jump</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#4a8a5a"></span>Recomb</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#b08a3a"></span>Random</span>
+  </div>
+  <span class="tick-badge" id="te-tick">Tick 0</span>
+</div>
+
+<script>
+(function() {
+  // --- NK Landscape (N=8, K=3) ---
+  const N = 8, K = 3, NUM_FIRMS = 15;
+  const GRID = 16; // 2D projection: 16x16 heatmap from first 8 bits split into 4+4
+
+  // Build NK lookup tables
+  const interactions = [];
+  const tables = [];
+  const rng = () => Math.random();
+
+  for (let i = 0; i < N; i++) {
+    const others = [];
+    for (let j = 0; j < N; j++) if (j !== i) others.push(j);
+    // Shuffle
+    for (let s = others.length - 1; s > 0; s--) {
+      const r = Math.floor(rng() * (s + 1));
+      [others[s], others[r]] = [others[r], others[s]];
+    }
+    interactions.push(others.slice(0, K));
+    const table = {};
+    const combos = 1 << (K + 1);
+    for (let c = 0; c < combos; c++) {
+      table[c] = rng();
+    }
+    tables.push(table);
+  }
+
+  function fitness(genome) {
+    let total = 0;
+    for (let i = 0; i < N; i++) {
+      let key = genome[i];
+      for (let j = 0; j < K; j++) {
+        key |= (genome[interactions[i][j]] << (j + 1));
+      }
+      total += tables[i][key] || 0;
+    }
+    return total / N;
+  }
+
+  // Precompute 16x16 heatmap (first 4 bits = row, next 4 = col, rest = 0)
+  const heatmap = [];
+  for (let r = 0; r < GRID; r++) {
+    heatmap[r] = [];
+    for (let c = 0; c < GRID; c++) {
+      const genome = [0,0,0,0,0,0,0,0];
+      for (let b = 0; b < 4; b++) genome[b] = (r >> b) & 1;
+      for (let b = 0; b < 4; b++) genome[b + 4] = (c >> b) & 1;
+      heatmap[r][c] = fitness(genome);
+    }
+  }
+
+  // Strategies
+  const STRATEGIES = ['local', 'long_jump', 'recombination', 'random'];
+  const STRATEGY_COLORS = { local: '#3a5a8c', long_jump: '#c96b5a', recombination: '#4a8a5a', random: '#b08a3a' };
+
+  // Firms
+  const firms = [];
+  for (let i = 0; i < NUM_FIRMS; i++) {
+    const genome = [];
+    for (let b = 0; b < N; b++) genome.push(Math.random() < 0.5 ? 1 : 0);
+    firms.push({
+      genome: [...genome],
+      fitness: fitness(genome),
+      strategy: STRATEGIES[i % 4],
+      alive: true
+    });
+  }
+
+  let tick = 0;
+  let destructions = 0;
+
+  function mutateGenome(g, numBits) {
+    const ng = [...g];
+    const indices = [];
+    for (let i = 0; i < N; i++) indices.push(i);
+    for (let s = indices.length - 1; s > 0; s--) {
+      const r = Math.floor(rng() * (s + 1));
+      [indices[s], indices[r]] = [indices[r], indices[s]];
+    }
+    for (let i = 0; i < Math.min(numBits, N); i++) {
+      ng[indices[i]] ^= 1;
+    }
+    return ng;
+  }
+
+  function step() {
+    for (const f of firms) {
+      if (!f.alive) continue;
+      let candidate;
+      if (f.strategy === 'random') {
+        candidate = [];
+        for (let b = 0; b < N; b++) candidate.push(Math.random() < 0.5 ? 1 : 0);
+      } else if (f.strategy === 'local') {
+        candidate = mutateGenome(f.genome, 1);
+      } else if (f.strategy === 'long_jump') {
+        candidate = mutateGenome(f.genome, 3);
+      } else {
+        // Recombination: pick another alive firm, crossover
+        const others = firms.filter(o => o.alive && o !== f);
+        if (others.length > 0) {
+          const partner = others[Math.floor(rng() * others.length)];
+          candidate = [];
+          const crossPoint = Math.floor(rng() * N);
+          for (let b = 0; b < N; b++) {
+            candidate.push(b < crossPoint ? f.genome[b] : partner.genome[b]);
+          }
+        } else {
+          candidate = mutateGenome(f.genome, 1);
+        }
+      }
+      const cf = fitness(candidate);
+      if (cf > f.fitness) {
+        f.genome = candidate;
+        f.fitness = cf;
+      }
+    }
+
+    // Creative destruction: weakest firm replaced if below 60% of best
+    const aliveFirms = firms.filter(f => f.alive);
+    if (aliveFirms.length > 0) {
+      const bestFit = Math.max(...aliveFirms.map(f => f.fitness));
+      const worst = aliveFirms.reduce((a, b) => a.fitness < b.fitness ? a : b);
+      if (worst.fitness < bestFit * 0.6) {
+        // Replace with new entrant
+        const genome = [];
+        for (let b = 0; b < N; b++) genome.push(Math.random() < 0.5 ? 1 : 0);
+        worst.genome = genome;
+        worst.fitness = fitness(genome);
+        worst.strategy = STRATEGIES[Math.floor(rng() * 4)];
+        destructions++;
+      }
+    }
+
+    tick++;
+    render();
+  }
+
+  // --- Rendering ---
+  const canvas = document.getElementById('te-canvas');
+  const bestEl = document.getElementById('te-best');
+  const meanEl = document.getElementById('te-mean');
+  const destEl = document.getElementById('te-destructions');
+  const tickEl = document.getElementById('te-tick');
+  const toggleBtn = document.getElementById('te-toggle-btn');
+
+  function render() {
+    const ctx = canvas.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
+    const W = rect.width, H = rect.height;
+    ctx.clearRect(0, 0, W, H);
+
+    // Draw heatmap
+    const cellW = W / GRID, cellH = H / GRID;
+    for (let r = 0; r < GRID; r++) {
+      for (let c = 0; c < GRID; c++) {
+        const v = heatmap[r][c];
+        const intensity = Math.floor(v * 255);
+        ctx.fillStyle = `rgb(${235 - intensity * 0.5}, ${235 - intensity * 0.3}, ${235 - intensity * 0.6})`;
+        ctx.fillRect(c * cellW, r * cellH, cellW + 0.5, cellH + 0.5);
+      }
+    }
+
+    // Draw firms as dots
+    for (const f of firms) {
+      if (!f.alive) continue;
+      let row = 0, col = 0;
+      for (let b = 0; b < 4; b++) {
+        row |= (f.genome[b] << b);
+        col |= (f.genome[b + 4] << b);
+      }
+      const x = (col + 0.5) * cellW;
+      const y = (row + 0.5) * cellH;
+      ctx.fillStyle = STRATEGY_COLORS[f.strategy];
+      ctx.beginPath();
+      ctx.arc(x, y, Math.max(4, cellW * 0.3), 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    }
+
+    // Metrics
+    const aliveFirms = firms.filter(f => f.alive);
+    const best = aliveFirms.length ? Math.max(...aliveFirms.map(f => f.fitness)) : 0;
+    const mean = aliveFirms.length ? aliveFirms.reduce((s, f) => s + f.fitness, 0) / aliveFirms.length : 0;
+    bestEl.textContent = best.toFixed(3);
+    meanEl.textContent = mean.toFixed(3);
+    destEl.textContent = destructions;
+    tickEl.textContent = 'Tick ' + tick;
+  }
+
+  // --- Controls ---
+  let timer = null;
+  toggleBtn.addEventListener('click', function() {
+    if (timer) {
+      clearInterval(timer);
+      timer = null;
+      toggleBtn.textContent = 'Start';
+    } else {
+      timer = setInterval(step, 200);
+      toggleBtn.textContent = 'Pause';
+    }
+  });
+
+  render();
+})();
+</script>
+</div>

@@ -1,0 +1,379 @@
+<div class="mini-sim" id="mini-beer-game" style="max-width:680px;margin:0 auto;">
+<style>
+#mini-beer-game {
+  background: #ffffff;
+  border: 1px solid #e2e0da;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(26,26,46,0.06);
+  padding: 20px 24px 18px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: #1a1a2e;
+}
+#mini-beer-game .sim-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin-bottom: 12px;
+  color: #1a1a2e;
+}
+#mini-beer-game .sim-metrics {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+#mini-beer-game .metric {
+  font-size: 0.72rem;
+  color: #4a4a5a;
+}
+#mini-beer-game .metric span {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-weight: 500;
+  color: #1a1a2e;
+}
+#mini-beer-game canvas {
+  display: block;
+  width: 100%;
+  border-radius: 8px;
+  background: #faf9f5;
+  margin-bottom: 10px;
+}
+#mini-beer-game .sim-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+#mini-beer-game .sim-controls button {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 500;
+  padding: 5px 14px;
+  border: 1px solid #e2e0da;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #4a4a5a;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+#mini-beer-game .sim-controls button:hover {
+  background: #f5f3ee;
+  border-color: #ccc;
+}
+#mini-beer-game .sim-controls button.active {
+  background: #2a7f7f;
+  color: #fff;
+  border-color: #2a7f7f;
+}
+#mini-beer-game .sim-controls .week-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  color: #7a7a8a;
+  margin-left: auto;
+}
+</style>
+
+<div class="sim-title">Interactive: Beer Distribution Game</div>
+<div class="sim-metrics">
+  <div class="metric">Demand: <span id="bg-demand">4</span></div>
+  <div class="metric">Total Cost: <span id="bg-cost">$0.00</span></div>
+  <div class="metric">Bullwhip: <span id="bg-bullwhip">1.00</span></div>
+</div>
+<canvas id="bg-canvas" width="632" height="260"></canvas>
+<div class="sim-controls">
+  <button id="bg-next">Next Week</button>
+  <button id="bg-auto">Auto-play</button>
+  <span class="week-label">Week <span id="bg-week">0</span></span>
+</div>
+
+<script>
+(function() {
+  const ROLES = ['Retailer','Wholesaler','Distributor','Brewery'];
+  const HOLD = 0.5, BACK = 1.0;
+  const COLORS = {
+    normal: '#2a7f7f',
+    warn: '#b08a3a',
+    stress: '#c96b5a',
+    backlog: '#9a3a3a'
+  };
+
+  // Agent state
+  function makeAgent(name, pos) {
+    return {
+      name, pos,
+      inventory: 12, backlog: 0,
+      expectedDemand: 4, desiredInventory: 12,
+      alpha: 0.5, beta: 0.2, theta: 0.2,
+      incomingPipeline: [4, 4],
+      orderPipeline: [4],
+      lastOrder: 4, lastIncomingOrder: 4,
+      cumulativeCost: 0,
+      histOrders: [], histIncoming: [],
+      histInventory: [], histBacklog: []
+    };
+  }
+
+  let agents = ROLES.map((n, i) => makeAgent(n, i));
+  let tick = 0, demandHistory = [], autoTimer = null;
+
+  function demand(t) { return t < 5 ? 4 : 8; }
+
+  function eff(a) { return a.inventory - a.backlog; }
+  function supplyLine(a) { return a.incomingPipeline.reduce((s,v)=>s+v, 0); }
+  function desiredSL(a) { return a.expectedDemand * (2 + 1); }
+
+  function step() {
+    const d = demand(tick);
+    demandHistory.push(d);
+
+    // 1. Receive shipments
+    agents.forEach(a => { a.inventory += a.incomingPipeline.shift(); });
+
+    // 2. Fill orders
+    let inOrders = [d, 0, 0, 0];
+    for (let i = 1; i < 4; i++) inOrders[i] = agents[i].orderPipeline.shift();
+    let shipments = [0, 0, 0, 0];
+    agents.forEach((a, i) => {
+      const ord = inOrders[i];
+      a.lastIncomingOrder = ord;
+      const totalDem = a.backlog + ord;
+      const shipped = Math.min(a.inventory, totalDem);
+      a.inventory -= shipped;
+      a.backlog = totalDem - shipped;
+      shipments[i] = shipped;
+    });
+    for (let i = 1; i < 4; i++) agents[i - 1].incomingPipeline.push(shipments[i]);
+
+    // 3. Update demand expectations
+    agents.forEach(a => {
+      a.expectedDemand += a.theta * (a.lastIncomingOrder - a.expectedDemand);
+    });
+
+    // 4. Place orders
+    let orders = agents.map(a => {
+      const anchor = a.expectedDemand;
+      const invAdj = a.alpha * (a.desiredInventory - eff(a));
+      const slAdj = a.beta * (desiredSL(a) - supplyLine(a));
+      const o = Math.max(0, Math.round(anchor + invAdj + slAdj));
+      a.lastOrder = o;
+      return o;
+    });
+    for (let i = 0; i < 3; i++) agents[i + 1].orderPipeline.push(orders[i]);
+    agents[3].incomingPipeline.push(orders[3]);
+
+    // 5. Cost
+    agents.forEach(a => {
+      a.cumulativeCost += HOLD * a.inventory + BACK * a.backlog;
+    });
+
+    // 6. Record
+    agents.forEach(a => {
+      a.histOrders.push(a.lastOrder);
+      a.histIncoming.push(a.lastIncomingOrder);
+      a.histInventory.push(a.inventory);
+      a.histBacklog.push(a.backlog);
+    });
+
+    tick++;
+    render();
+  }
+
+  function variance(arr) {
+    if (arr.length < 2) return 0;
+    const m = arr.reduce((s,v)=>s+v,0)/arr.length;
+    return arr.reduce((s,v)=>s+(v-m)*(v-m),0)/(arr.length-1);
+  }
+
+  function bullwhipRatio() {
+    // brewery orders variance / retailer incoming orders variance
+    const vOut = variance(agents[3].histOrders);
+    const vIn = variance(agents[0].histIncoming);
+    return vIn > 0 ? (vOut / vIn) : 1;
+  }
+
+  function render() {
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+    ctx.clearRect(0, 0, W, H);
+
+    const d = tick > 0 ? demandHistory[tick - 1] : 4;
+    document.getElementById('bg-demand').textContent = d;
+    const totalCost = agents.reduce((s,a)=>s+a.cumulativeCost, 0);
+    document.getElementById('bg-cost').textContent = '$' + totalCost.toFixed(2);
+    document.getElementById('bg-bullwhip').textContent = bullwhipRatio().toFixed(2);
+    document.getElementById('bg-week').textContent = tick;
+
+    // Layout
+    const padL = 60, padR = 60, padT = 40, padB = 50;
+    const barAreaW = W - padL - padR;
+    const barAreaH = H - padT - padB;
+    const barW = 60;
+    const gap = (barAreaW - 4 * barW) / 3;
+
+    // Max scale
+    const maxInv = Math.max(24, ...agents.map(a => a.inventory), ...agents.map(a => a.backlog));
+
+    // Draw baseline
+    const baseY = padT + barAreaH;
+    ctx.strokeStyle = '#e2e0da';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(padL - 10, baseY);
+    ctx.lineTo(W - padR + 10, baseY);
+    ctx.stroke();
+
+    // Y axis ticks
+    ctx.fillStyle = '#7a7a8a';
+    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.textAlign = 'right';
+    for (let v = 0; v <= maxInv; v += Math.max(1, Math.ceil(maxInv / 4))) {
+      const y = baseY - (v / maxInv) * barAreaH;
+      ctx.fillText(v, padL - 14, y + 3);
+      ctx.strokeStyle = '#edecea';
+      ctx.beginPath();
+      ctx.moveTo(padL - 8, y);
+      ctx.lineTo(W - padR + 10, y);
+      ctx.stroke();
+    }
+
+    agents.forEach((a, i) => {
+      const x = padL + i * (barW + gap);
+      const inv = a.inventory;
+      const bl = a.backlog;
+
+      // Inventory bar (above baseline)
+      const invH = (inv / maxInv) * barAreaH;
+      let color;
+      if (bl > 0) color = COLORS.backlog;
+      else if (eff(a) < 4) color = COLORS.stress;
+      else if (eff(a) < 8) color = COLORS.warn;
+      else color = COLORS.normal;
+
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      const r = 4;
+      const bx = x, by = baseY - invH, bw = barW, bh = invH;
+      if (bh > r) {
+        ctx.moveTo(bx + r, by);
+        ctx.lineTo(bx + bw - r, by);
+        ctx.quadraticCurveTo(bx + bw, by, bx + bw, by + r);
+        ctx.lineTo(bx + bw, by + bh);
+        ctx.lineTo(bx, by + bh);
+        ctx.lineTo(bx, by + r);
+        ctx.quadraticCurveTo(bx, by, bx + r, by);
+      } else if (bh > 0) {
+        ctx.rect(bx, by, bw, bh);
+      }
+      ctx.fill();
+
+      // Backlog bar (below baseline, semi-transparent)
+      if (bl > 0) {
+        const blH = (bl / maxInv) * barAreaH;
+        ctx.fillStyle = 'rgba(154, 58, 58, 0.25)';
+        ctx.fillRect(x, baseY, barW, Math.min(blH, padB - 8));
+        ctx.fillStyle = '#9a3a3a';
+        ctx.font = '9px "JetBrains Mono", monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText('-' + bl, x + barW / 2, baseY + Math.min(blH, padB - 8) + 10);
+      }
+
+      // Inventory value on bar
+      ctx.fillStyle = invH > 16 ? '#fff' : '#1a1a2e';
+      ctx.font = '11px "JetBrains Mono", monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(inv, x + barW / 2, invH > 16 ? baseY - invH + 14 : baseY - invH - 4);
+
+      // Label
+      ctx.fillStyle = '#4a4a5a';
+      ctx.font = '10px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(a.name.slice(0, 6), x + barW / 2, baseY + (bl > 0 ? Math.min((bl/maxInv)*barAreaH, padB - 8) + 22 : 14));
+    });
+
+    // Animated arrows: orders flow right, beer flows left
+    const arrowY_orders = padT + 6;
+    const arrowY_beer = padT + 20;
+    const phase = (Date.now() % 2000) / 2000;
+
+    // Orders arrow (right)
+    ctx.strokeStyle = 'rgba(176, 138, 58, 0.5)';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([4, 4]);
+    ctx.lineDashOffset = -phase * 40;
+    ctx.beginPath();
+    const arrowStartX = padL + barW / 2;
+    const arrowEndX = padL + 3 * (barW + gap) + barW / 2;
+    ctx.moveTo(arrowStartX, arrowY_orders);
+    ctx.lineTo(arrowEndX, arrowY_orders);
+    ctx.stroke();
+    // Arrowhead
+    ctx.setLineDash([]);
+    ctx.fillStyle = 'rgba(176, 138, 58, 0.5)';
+    ctx.beginPath();
+    ctx.moveTo(arrowEndX, arrowY_orders);
+    ctx.lineTo(arrowEndX - 6, arrowY_orders - 3);
+    ctx.lineTo(arrowEndX - 6, arrowY_orders + 3);
+    ctx.fill();
+    ctx.fillStyle = '#b08a3a';
+    ctx.font = '9px Inter, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('orders', (arrowStartX + arrowEndX) / 2, arrowY_orders - 4);
+
+    // Beer arrow (left)
+    ctx.strokeStyle = 'rgba(42, 127, 127, 0.5)';
+    ctx.setLineDash([4, 4]);
+    ctx.lineDashOffset = phase * 40;
+    ctx.beginPath();
+    ctx.moveTo(arrowEndX, arrowY_beer);
+    ctx.lineTo(arrowStartX, arrowY_beer);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = 'rgba(42, 127, 127, 0.5)';
+    ctx.beginPath();
+    ctx.moveTo(arrowStartX, arrowY_beer);
+    ctx.lineTo(arrowStartX + 6, arrowY_beer - 3);
+    ctx.lineTo(arrowStartX + 6, arrowY_beer + 3);
+    ctx.fill();
+    ctx.fillStyle = '#2a7f7f';
+    ctx.font = '9px Inter, sans-serif';
+    ctx.fillText('beer', (arrowStartX + arrowEndX) / 2, arrowY_beer + 11);
+  }
+
+  // Animate arrows
+  let animFrame;
+  function animate() {
+    render();
+    animFrame = requestAnimationFrame(animate);
+  }
+
+  document.getElementById('bg-next').addEventListener('click', () => {
+    if (tick < 36) step();
+  });
+
+  const autoBtn = document.getElementById('bg-auto');
+  autoBtn.addEventListener('click', () => {
+    if (autoTimer) {
+      clearInterval(autoTimer);
+      autoTimer = null;
+      autoBtn.classList.remove('active');
+      autoBtn.textContent = 'Auto-play';
+    } else {
+      autoBtn.classList.add('active');
+      autoBtn.textContent = 'Pause';
+      autoTimer = setInterval(() => {
+        if (tick >= 36) {
+          clearInterval(autoTimer);
+          autoTimer = null;
+          autoBtn.classList.remove('active');
+          autoBtn.textContent = 'Auto-play';
+          return;
+        }
+        step();
+      }, 600);
+    }
+  });
+
+  animate();
+})();
+</script>
+</div>

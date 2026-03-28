@@ -1,0 +1,343 @@
+<div class="mini-sim" id="mini-rigids-flexibles">
+<style>
+  #mini-rigids-flexibles {
+    max-width: 680px;
+    margin: 2rem auto;
+    background: var(--bg-card, #ffffff);
+    border: 1px solid var(--border, #e2e0da);
+    border-radius: var(--radius-lg, 12px);
+    box-shadow: 0 2px 8px rgba(26,26,46,0.06);
+    padding: 1.5rem;
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    color: var(--text-primary, #1a1a2e);
+  }
+  #mini-rigids-flexibles .sim-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent-teal, #2a7f7f);
+    margin-bottom: 1rem;
+  }
+  #mini-rigids-flexibles .env-bar {
+    width: 100%;
+    height: 28px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 0.7rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    transition: background 0.3s;
+    color: #ffffff;
+  }
+  #mini-rigids-flexibles .canvas-wrap {
+    width: 100%;
+    height: 180px;
+    margin-bottom: 0.75rem;
+    position: relative;
+  }
+  #mini-rigids-flexibles .canvas-wrap canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  #mini-rigids-flexibles .metrics {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+  #mini-rigids-flexibles .metric {
+    display: flex;
+    flex-direction: column;
+  }
+  #mini-rigids-flexibles .metric-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-tertiary, #7a7a8a);
+    margin-bottom: 2px;
+  }
+  #mini-rigids-flexibles .metric-value {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary, #1a1a2e);
+  }
+  #mini-rigids-flexibles .controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+  #mini-rigids-flexibles .controls button {
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.4rem 1rem;
+    border: 1px solid var(--border, #e2e0da);
+    border-radius: 6px;
+    background: var(--bg, #faf9f5);
+    color: var(--text-primary, #1a1a2e);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  #mini-rigids-flexibles .controls button:hover {
+    background: var(--bg-hover, #f5f3ee);
+  }
+  #mini-rigids-flexibles .controls label {
+    font-size: 0.7rem;
+    color: var(--text-secondary, #4a4a5a);
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    cursor: pointer;
+    user-select: none;
+  }
+  #mini-rigids-flexibles .controls input[type="checkbox"] {
+    accent-color: var(--accent-teal, #2a7f7f);
+  }
+  #mini-rigids-flexibles .slider-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  #mini-rigids-flexibles .slider-wrap input[type="range"] {
+    width: 80px;
+    accent-color: var(--accent-teal, #2a7f7f);
+  }
+  #mini-rigids-flexibles .slider-label {
+    font-size: 0.65rem;
+    color: var(--text-tertiary, #7a7a8a);
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  }
+  #mini-rigids-flexibles .tick-badge {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 0.65rem;
+    color: var(--text-light, #9a9aaa);
+    margin-left: auto;
+  }
+</style>
+
+<div class="sim-title">Interactive: Rigids vs Flexibles</div>
+
+<div class="env-bar" id="rf-env-bar">Environment: A</div>
+
+<div class="canvas-wrap">
+  <canvas id="rf-canvas"></canvas>
+</div>
+
+<div class="metrics">
+  <div class="metric">
+    <span class="metric-label">Rigid %</span>
+    <span class="metric-value" id="rf-rigid-pct">--</span>
+  </div>
+  <div class="metric">
+    <span class="metric-label">Environment</span>
+    <span class="metric-value" id="rf-env-state">A</span>
+  </div>
+  <div class="metric">
+    <span class="metric-label">Performance</span>
+    <span class="metric-value" id="rf-perf">--</span>
+  </div>
+</div>
+
+<div class="controls">
+  <button id="rf-step-btn">Step</button>
+  <label><input type="checkbox" id="rf-autoplay"> Auto-play</label>
+  <div class="slider-wrap">
+    <span class="slider-label">Stability</span>
+    <input type="range" id="rf-stability" min="1" max="20" value="10">
+    <span class="slider-label" id="rf-stab-val">10</span>
+  </div>
+  <span class="tick-badge" id="rf-tick">Tick 0</span>
+</div>
+
+<script>
+(function() {
+  // 3-level hierarchy: 9 bottom, 3 middle, 1 top = 13 agents
+  const LEVELS = [9, 3, 1];
+  const TOTAL = 13;
+
+  let envState = 'A';
+  let ticksSinceSwitch = 0;
+  let stability = 10; // mean ticks between switches
+  let tick = 0;
+
+  // Build agents
+  const agents = [];
+  let id = 0;
+  for (let lv = 0; lv < LEVELS.length; lv++) {
+    for (let i = 0; i < LEVELS[lv]; i++) {
+      const isRigid = Math.random() < 0.6;
+      agents.push({
+        id: id++,
+        level: lv,
+        type: isRigid ? 'rigid' : 'flexible',
+        fixedStrategy: Math.random() < 0.5 ? 'A' : 'B',
+        experience: 0,
+        performance: 0
+      });
+    }
+  }
+
+  function getStabilitySlider() {
+    return parseInt(document.getElementById('rf-stability').value);
+  }
+
+  function step() {
+    stability = getStabilitySlider();
+    ticksSinceSwitch++;
+
+    // Environment switch with geometric distribution
+    if (Math.random() < 1 / stability) {
+      envState = envState === 'A' ? 'B' : 'A';
+      ticksSinceSwitch = 0;
+    }
+
+    // Evaluate performance
+    for (const ag of agents) {
+      let chosen;
+      if (ag.type === 'rigid') {
+        chosen = ag.fixedStrategy;
+      } else {
+        // Flexible: observe with noise
+        chosen = Math.random() < 0.15 ? (envState === 'A' ? 'B' : 'A') : envState;
+      }
+      const match = chosen === envState ? 1.0 : 0.0;
+      const expBonus = 0.1 * Math.log(1 + ag.experience);
+      ag.performance = match + expBonus;
+      ag.experience += ag.type === 'rigid' ? 1.0 : 0.5;
+    }
+
+    // Tournament promotion: within each level, worst performer replaced by type of best
+    for (let lv = 0; lv < LEVELS.length; lv++) {
+      const levelAgents = agents.filter(a => a.level === lv);
+      if (levelAgents.length < 2) continue;
+      const best = levelAgents.reduce((a, b) => a.performance > b.performance ? a : b);
+      const worst = levelAgents.reduce((a, b) => a.performance < b.performance ? a : b);
+      if (best !== worst && Math.random() < 0.3) {
+        worst.type = best.type;
+        worst.fixedStrategy = Math.random() < 0.5 ? 'A' : 'B';
+        worst.experience = 0;
+      }
+    }
+
+    tick++;
+    render();
+  }
+
+  // --- Rendering ---
+  const canvas = document.getElementById('rf-canvas');
+  const envBar = document.getElementById('rf-env-bar');
+  const rigidPctEl = document.getElementById('rf-rigid-pct');
+  const envStateEl = document.getElementById('rf-env-state');
+  const perfEl = document.getElementById('rf-perf');
+  const tickEl = document.getElementById('rf-tick');
+  const stepBtn = document.getElementById('rf-step-btn');
+  const autoBox = document.getElementById('rf-autoplay');
+  const stabSlider = document.getElementById('rf-stability');
+  const stabVal = document.getElementById('rf-stab-val');
+
+  stabSlider.addEventListener('input', function() {
+    stabVal.textContent = this.value;
+  });
+
+  function render() {
+    const ctx = canvas.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
+    const W = rect.width, H = rect.height;
+    ctx.clearRect(0, 0, W, H);
+
+    // Draw pyramid: level 0 (9) at bottom, level 1 (3) middle, level 2 (1) top
+    const cellSize = Math.min(W / 10, H / 5);
+    const gap = 4;
+    const pyramidH = LEVELS.length * (cellSize + gap);
+    const startY = (H - pyramidH) / 2;
+
+    for (let lv = LEVELS.length - 1; lv >= 0; lv--) {
+      const count = LEVELS[lv];
+      const rowW = count * (cellSize + gap) - gap;
+      const startX = (W - rowW) / 2;
+      const y = startY + (LEVELS.length - 1 - lv) * (cellSize + gap);
+
+      const levelAgents = agents.filter(a => a.level === lv);
+      for (let i = 0; i < levelAgents.length; i++) {
+        const ag = levelAgents[i];
+        const x = startX + i * (cellSize + gap);
+
+        if (ag.type === 'rigid') {
+          ctx.fillStyle = ag.fixedStrategy === 'A' ? '#c96b5a' : '#d4924a';
+        } else {
+          ctx.fillStyle = '#3a5a8c';
+        }
+
+        // Round rect
+        const r = 4;
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.lineTo(x + cellSize - r, y);
+        ctx.quadraticCurveTo(x + cellSize, y, x + cellSize, y + r);
+        ctx.lineTo(x + cellSize, y + cellSize - r);
+        ctx.quadraticCurveTo(x + cellSize, y + cellSize, x + cellSize - r, y + cellSize);
+        ctx.lineTo(x + r, y + cellSize);
+        ctx.quadraticCurveTo(x, y + cellSize, x, y + cellSize - r);
+        ctx.lineTo(x, y + r);
+        ctx.quadraticCurveTo(x, y, x + r, y);
+        ctx.closePath();
+        ctx.fill();
+
+        // Label
+        ctx.fillStyle = '#ffffff';
+        ctx.font = `${Math.max(9, cellSize * 0.35)}px 'Inter', sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        const label = ag.type === 'rigid' ? ag.fixedStrategy : 'F';
+        ctx.fillText(label, x + cellSize / 2, y + cellSize / 2);
+      }
+
+      // Level label
+      ctx.fillStyle = '#7a7a8a';
+      ctx.font = '10px Inter, sans-serif';
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'middle';
+      const labelY = y + cellSize / 2;
+      const labelNames = ['Top', 'Mid', 'Base'];
+      ctx.fillText(labelNames[LEVELS.length - 1 - lv], startX - 10, labelY);
+    }
+
+    // Environment bar
+    envBar.style.background = envState === 'A' ? '#c96b5a' : '#3a5a8c';
+    envBar.textContent = 'Environment: ' + envState;
+
+    // Metrics
+    const rigids = agents.filter(a => a.type === 'rigid');
+    const rigidPct = (rigids.length / TOTAL * 100).toFixed(0);
+    rigidPctEl.textContent = rigidPct + '%';
+    envStateEl.textContent = envState;
+    envStateEl.style.color = envState === 'A' ? '#c96b5a' : '#3a5a8c';
+
+    const avgPerf = agents.reduce((s, a) => s + a.performance, 0) / TOTAL;
+    perfEl.textContent = avgPerf.toFixed(2);
+    tickEl.textContent = 'Tick ' + tick;
+  }
+
+  // --- Controls ---
+  stepBtn.addEventListener('click', step);
+  let timer = null;
+  autoBox.addEventListener('change', function() {
+    if (this.checked) { timer = setInterval(step, 300); }
+    else { clearInterval(timer); timer = null; }
+  });
+
+  render();
+})();
+</script>
+</div>

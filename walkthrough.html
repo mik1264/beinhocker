@@ -519,13 +519,334 @@
 
 <p>The deepest finding is that accuracy itself is self-limiting. No strategy achieves better than 47% accuracy across any of our experiments, because the moment a strategy works, everyone adopts it, and it stops working. The rational expectations framework assumes agents can form correct predictions about the economy. El Farol shows that in a self-referential system, "correct prediction" is a contradiction in terms.</p>
 
-<div class="try-it">
-  <div class="try-it-icon">&#9654;</div>
-  <div class="try-it-content">
-    <div class="try-it-label">Try it yourself</div>
-    <p class="try-it-text">Watch 100 agents decide whether to go to the bar. Adjust the threshold and population to see how coordination fails. <a href="10-el-farol-bar/index.html">Open the El Farol simulation</a></p>
+<div class="mini-sim" id="mini-el-farol">
+<style>
+  #mini-el-farol {
+    max-width: 680px;
+    margin: 2rem auto;
+    background: var(--bg-card, #ffffff);
+    border: 1px solid var(--border, #e2e0da);
+    border-radius: var(--radius-lg, 12px);
+    box-shadow: 0 2px 8px rgba(26,26,46,0.06);
+    padding: 1.5rem;
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    color: var(--text-primary, #1a1a2e);
+  }
+  #mini-el-farol .sim-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent-teal, #2a7f7f);
+    margin-bottom: 1rem;
+  }
+  #mini-el-farol .bar-canvas {
+    width: 100%;
+    height: 48px;
+    border-radius: 6px;
+    overflow: hidden;
+    background: var(--bg-metric, #f0eeea);
+    position: relative;
+    margin-bottom: 0.5rem;
+  }
+  #mini-el-farol .bar-fill {
+    height: 100%;
+    transition: width 0.25s ease, background 0.25s ease;
+    border-radius: 6px 0 0 6px;
+  }
+  #mini-el-farol .threshold-line {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--text-primary, #1a1a2e);
+    opacity: 0.5;
+    pointer-events: none;
+  }
+  #mini-el-farol .threshold-label {
+    position: absolute;
+    top: -1px;
+    font-size: 0.6rem;
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    color: var(--text-tertiary, #7a7a8a);
+    transform: translateX(4px);
+  }
+  #mini-el-farol .sparkline-wrap {
+    width: 100%;
+    height: 50px;
+    margin-bottom: 0.75rem;
+  }
+  #mini-el-farol .sparkline-wrap canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  #mini-el-farol .metrics {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+  #mini-el-farol .metric {
+    display: flex;
+    flex-direction: column;
+  }
+  #mini-el-farol .metric-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-tertiary, #7a7a8a);
+    margin-bottom: 2px;
+  }
+  #mini-el-farol .metric-value {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary, #1a1a2e);
+  }
+  #mini-el-farol .controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  #mini-el-farol .controls button {
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.4rem 1rem;
+    border: 1px solid var(--border, #e2e0da);
+    border-radius: 6px;
+    background: var(--bg, #faf9f5);
+    color: var(--text-primary, #1a1a2e);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  #mini-el-farol .controls button:hover {
+    background: var(--bg-hover, #f5f3ee);
+  }
+  #mini-el-farol .controls label {
+    font-size: 0.7rem;
+    color: var(--text-secondary, #4a4a5a);
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    cursor: pointer;
+    user-select: none;
+  }
+  #mini-el-farol .controls input[type="checkbox"] {
+    accent-color: var(--accent-teal, #2a7f7f);
+  }
+  #mini-el-farol .week-badge {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 0.65rem;
+    color: var(--text-light, #9a9aaa);
+    margin-left: auto;
+  }
+</style>
+
+<div class="sim-title">Interactive: El Farol Bar</div>
+
+<div class="bar-canvas" id="ef-bar-canvas">
+  <div class="bar-fill" id="ef-bar-fill"></div>
+  <div class="threshold-line" id="ef-threshold-line">
+    <span class="threshold-label" id="ef-threshold-label">36</span>
   </div>
 </div>
+
+<div class="sparkline-wrap">
+  <canvas id="ef-sparkline"></canvas>
+</div>
+
+<div class="metrics">
+  <div class="metric">
+    <span class="metric-label">Attendance</span>
+    <span class="metric-value" id="ef-attendance">--</span>
+  </div>
+  <div class="metric">
+    <span class="metric-label">Threshold</span>
+    <span class="metric-value">36</span>
+  </div>
+  <div class="metric">
+    <span class="metric-label">Mean Accuracy</span>
+    <span class="metric-value" id="ef-accuracy">--</span>
+  </div>
+</div>
+
+<div class="controls">
+  <button id="ef-step-btn">Next Week</button>
+  <label><input type="checkbox" id="ef-autoplay"> Auto-play</label>
+  <span class="week-badge" id="ef-week">Week 0</span>
+</div>
+
+<script>
+(function() {
+  // --- Config ---
+  const NUM_AGENTS = 60;
+  const THRESHOLD = 36;
+  const NUM_STRATEGIES = 5;
+  const MEMORY_LEN = 5;
+  const SPARKLINE_LEN = 30;
+
+  // --- Strategy factories ---
+  function makeMirror() {
+    return { name:'mirror', predict(h) { return h.length ? h[h.length-1] < THRESHOLD : Math.random() < 0.5; }, score:0 };
+  }
+  function makeMeanN(n) {
+    return { name:'mean-'+n, predict(h) { if(!h.length) return Math.random()<0.5; const w=h.slice(-n); return w.reduce((a,b)=>a+b,0)/w.length < THRESHOLD; }, score:0 };
+  }
+  function makeTrend() {
+    return { name:'trend', predict(h) { if(h.length<2) return Math.random()<0.5; return h[h.length-1]+(h[h.length-1]-h[h.length-2]) < THRESHOLD; }, score:0 };
+  }
+  function makeContrarian() {
+    return { name:'contrarian', predict(h) { return h.length ? h[h.length-1] >= THRESHOLD : Math.random()<0.5; }, score:0 };
+  }
+  function makeRandom(p) {
+    return { name:'rnd-'+p, predict() { return Math.random()<p; }, score:0 };
+  }
+  function makeThresholdRule(t) {
+    return { name:'thr-'+t, predict(h) { return h.length ? h[h.length-1]<t : Math.random()<0.5; }, score:0 };
+  }
+  function makeWeightedAvg() {
+    return { name:'wma', predict(h) { if(!h.length) return Math.random()<0.5; let e=h[0]; for(let i=1;i<h.length;i++) e=0.3*h[i]+0.7*e; return e<THRESHOLD; }, score:0 };
+  }
+  function makeMedian() {
+    return { name:'median', predict(h) { if(!h.length) return Math.random()<0.5; const w=[...h.slice(-5)].sort((a,b)=>a-b); return w[Math.floor(w.length/2)]<THRESHOLD; }, score:0 };
+  }
+
+  const FACTORIES = [makeMirror,()=>makeMeanN(3),()=>makeMeanN(5),makeTrend,makeContrarian,
+    ()=>makeRandom(0.4),()=>makeRandom(0.6),()=>makeThresholdRule(THRESHOLD-5),
+    ()=>makeThresholdRule(THRESHOLD+5),makeWeightedAvg,makeMedian];
+
+  // --- Agents ---
+  const agents = [];
+  for(let i=0;i<NUM_AGENTS;i++){
+    const strats = [];
+    for(let s=0;s<NUM_STRATEGIES;s++) strats.push(FACTORIES[Math.floor(Math.random()*FACTORIES.length)]());
+    agents.push({ strategies:strats, attending:false });
+  }
+
+  // Bootstrap history
+  const history = [];
+  for(let i=0;i<MEMORY_LEN;i++) history.push(Math.floor(NUM_AGENTS*0.3 + Math.random()*NUM_AGENTS*0.4));
+
+  let week = 0;
+  let totalCorrect = 0;
+  let totalWeeks = 0;
+
+  // --- DOM refs ---
+  const barFill = document.getElementById('ef-bar-fill');
+  const threshLine = document.getElementById('ef-threshold-line');
+  const threshLabel = document.getElementById('ef-threshold-label');
+  const sparkCanvas = document.getElementById('ef-sparkline');
+  const attEl = document.getElementById('ef-attendance');
+  const accEl = document.getElementById('ef-accuracy');
+  const weekEl = document.getElementById('ef-week');
+  const stepBtn = document.getElementById('ef-step-btn');
+  const autoBox = document.getElementById('ef-autoplay');
+
+  // Position threshold line
+  const threshPct = (THRESHOLD / NUM_AGENTS) * 100;
+  threshLine.style.left = threshPct + '%';
+
+  function step() {
+    const snap = [...history];
+    let attendance = 0;
+    for(const ag of agents) {
+      const best = ag.strategies.reduce((a,b)=>a.score>=b.score?a:b);
+      ag.attending = best.predict(snap);
+      if(ag.attending) attendance++;
+    }
+    history.push(attendance);
+    const goodToGo = attendance <= THRESHOLD;
+
+    // Score strategies
+    for(const ag of agents) {
+      for(const st of ag.strategies) {
+        const wouldGo = st.predict(snap);
+        if((wouldGo && goodToGo)||(!wouldGo && !goodToGo)) st.score += 1;
+        else st.score -= 1;
+      }
+    }
+
+    // Accuracy
+    let correct = 0;
+    for(const ag of agents) {
+      if((ag.attending && goodToGo)||(!ag.attending && !goodToGo)) correct++;
+    }
+    totalCorrect += correct;
+    totalWeeks++;
+    week++;
+
+    render(attendance);
+  }
+
+  function render(attendance) {
+    const pct = (attendance / NUM_AGENTS) * 100;
+    const over = attendance > THRESHOLD;
+    barFill.style.width = pct + '%';
+    barFill.style.background = over ? 'var(--accent-coral, #c96b5a)' : 'var(--accent-green, #4a8a5a)';
+    attEl.textContent = attendance;
+    attEl.style.color = over ? 'var(--accent-coral, #c96b5a)' : 'var(--accent-green, #4a8a5a)';
+    accEl.textContent = totalWeeks ? (totalCorrect / (totalWeeks * NUM_AGENTS) * 100).toFixed(1) + '%' : '--';
+    weekEl.textContent = 'Week ' + week;
+    drawSparkline();
+  }
+
+  function drawSparkline() {
+    const ctx = sparkCanvas.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+    const rect = sparkCanvas.getBoundingClientRect();
+    sparkCanvas.width = rect.width * dpr;
+    sparkCanvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
+    const W = rect.width, H = rect.height;
+    ctx.clearRect(0,0,W,H);
+
+    const data = history.slice(-SPARKLINE_LEN);
+    if(data.length < 2) return;
+    const step = W / (SPARKLINE_LEN - 1);
+
+    // Threshold line
+    const ty = H - (THRESHOLD / NUM_AGENTS) * H;
+    ctx.strokeStyle = 'rgba(26,26,46,0.15)';
+    ctx.setLineDash([3,3]);
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(0,ty); ctx.lineTo(W,ty); ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Sparkline
+    ctx.strokeStyle = 'var(--accent-teal, #2a7f7f)';
+    ctx.lineWidth = 1.5;
+    ctx.lineJoin = 'round';
+    ctx.beginPath();
+    for(let i=0;i<data.length;i++){
+      const x = (SPARKLINE_LEN - data.length + i) * step;
+      const y = H - (data[i]/NUM_AGENTS)*H;
+      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+
+    // Dots on last point
+    const lastX = (SPARKLINE_LEN-1)*step;
+    const lastY = H - (data[data.length-1]/NUM_AGENTS)*H;
+    ctx.fillStyle = data[data.length-1] > THRESHOLD ? 'var(--accent-coral, #c96b5a)' : 'var(--accent-green, #4a8a5a)';
+    ctx.beginPath(); ctx.arc(lastX,lastY,3,0,Math.PI*2); ctx.fill();
+  }
+
+  // --- Controls ---
+  stepBtn.addEventListener('click', step);
+  let timer = null;
+  autoBox.addEventListener('change', function() {
+    if(this.checked) { timer = setInterval(step, 250); }
+    else { clearInterval(timer); timer = null; }
+  });
+
+  // Initial render
+  render(history[history.length-1]);
+})();
+</script>
+</div>
+<p style="text-align: center; margin-top: 12px;"><a href="10-el-farol-bar/index.html" style="color: #2a7f7f; font-size: 0.85rem;">Open full simulation →</a></p>
 
 <!-- ─── Ch 2: Stock Market ──────────────────────────── -->
 
@@ -548,13 +869,487 @@
 
 <p>The most revealing experiment: when we accelerated the genetic algorithm (evolving strategies every 50 ticks instead of 250), kurtosis tripled to 141. The evolutionary mechanism that allows agents to adapt is the same mechanism that generates systemic tail risk. Adaptation and instability are two sides of the same coin.</p>
 
-<div class="try-it">
-  <div class="try-it-icon">&#9654;</div>
-  <div class="try-it-content">
-    <div class="try-it-label">Try it yourself</div>
-    <p class="try-it-text">Compare rational vs. learning traders. Watch fat tails and volatility clustering emerge from the bottom up. <a href="01-stock-market/index.html">Open the Stock Market simulation</a></p>
+<div class="mini-sim" id="mini-stock-market">
+<style>
+  #mini-stock-market {
+    max-width: 680px;
+    margin: 2rem auto;
+    background: var(--bg-card, #ffffff);
+    border: 1px solid var(--border, #e2e0da);
+    border-radius: var(--radius-lg, 12px);
+    box-shadow: 0 2px 8px rgba(26,26,46,0.06);
+    padding: 1.5rem;
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    color: var(--text-primary, #1a1a2e);
+  }
+  #mini-stock-market .sim-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent-teal, #2a7f7f);
+    margin-bottom: 1rem;
+  }
+  #mini-stock-market .chart-wrap {
+    position: relative;
+    width: 100%;
+    height: 180px;
+    margin-bottom: 0.25rem;
+  }
+  #mini-stock-market .chart-wrap canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  #mini-stock-market .volume-wrap {
+    width: 100%;
+    height: 36px;
+    margin-bottom: 0.75rem;
+  }
+  #mini-stock-market .volume-wrap canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  #mini-stock-market .metrics {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+  #mini-stock-market .metric {
+    display: flex;
+    flex-direction: column;
+  }
+  #mini-stock-market .metric-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-tertiary, #7a7a8a);
+    margin-bottom: 2px;
+  }
+  #mini-stock-market .metric-value {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary, #1a1a2e);
+  }
+  #mini-stock-market .controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  #mini-stock-market .controls button {
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.4rem 1rem;
+    border: 1px solid var(--border, #e2e0da);
+    border-radius: 6px;
+    background: var(--bg, #faf9f5);
+    color: var(--text-primary, #1a1a2e);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  #mini-stock-market .controls button:hover {
+    background: var(--bg-hover, #f5f3ee);
+  }
+  #mini-stock-market .controls .speed-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+  #mini-stock-market .controls .speed-wrap label {
+    font-size: 0.65rem;
+    color: var(--text-tertiary, #7a7a8a);
+  }
+  #mini-stock-market .controls input[type="range"] {
+    width: 80px;
+    accent-color: var(--accent-teal, #2a7f7f);
+  }
+  #mini-stock-market .tick-badge {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 0.65rem;
+    color: var(--text-light, #9a9aaa);
+    margin-left: auto;
+  }
+</style>
+
+<div class="sim-title">Interactive: Stock Market</div>
+
+<div class="chart-wrap">
+  <canvas id="sm-chart"></canvas>
+</div>
+<div class="volume-wrap">
+  <canvas id="sm-volume"></canvas>
+</div>
+
+<div class="metrics">
+  <div class="metric">
+    <span class="metric-label">Price</span>
+    <span class="metric-value" id="sm-price">100.00</span>
+  </div>
+  <div class="metric">
+    <span class="metric-label">Fundamental</span>
+    <span class="metric-value" id="sm-fundamental">100.00</span>
+  </div>
+  <div class="metric">
+    <span class="metric-label">Volatility</span>
+    <span class="metric-value" id="sm-volatility">--</span>
   </div>
 </div>
+
+<div class="controls">
+  <button id="sm-toggle-btn">Start</button>
+  <div class="speed-wrap">
+    <label>Speed</label>
+    <input type="range" id="sm-speed" min="1" max="10" value="5">
+  </div>
+  <span class="tick-badge" id="sm-tick">Tick 0</span>
+</div>
+
+<script>
+(function() {
+  // --- Config ---
+  const NUM_AGENTS = 15;
+  const NUM_RULES = 20;
+  const INTEREST_RATE = 0.10;
+  const D_BAR = 10.0;
+  const RHO = 0.95;
+  const SIGMA_D = Math.sqrt(0.0743);
+  const RISK_AVERSION = 0.5;
+  const GA_INTERVAL = 100;
+  const MUTATION_RATE = 0.03;
+  const CROSSOVER_PROB = 0.3;
+  const CHART_LEN = 100;
+
+  function gauss() {
+    let u=0,v=0;
+    while(u===0)u=Math.random();
+    while(v===0)v=Math.random();
+    return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);
+  }
+
+  // --- Stock ---
+  let dividend = D_BAR;
+  let fundamentalValue = D_BAR / INTEREST_RATE;
+  let price = fundamentalValue;
+  const priceHistory = [price];
+  const fvHistory = [fundamentalValue];
+  const volumeHistory = [0];
+
+  function nextDividend() {
+    dividend = D_BAR + RHO * (dividend - D_BAR) + gauss() * SIGMA_D;
+    dividend = Math.max(dividend, 0.001);
+    fundamentalValue = dividend / INTEREST_RATE;
+    return dividend;
+  }
+
+  function movingAvg(arr, w) {
+    if(arr.length < w) return arr.reduce((a,b)=>a+b,0)/arr.length;
+    let s=0; for(let i=arr.length-w;i<arr.length;i++) s+=arr[i]; return s/w;
+  }
+
+  // --- Market state encoder (12 bits) ---
+  function encodeState() {
+    const p = price, fv = fundamentalValue;
+    const r = fv > 0 ? p/fv : 1;
+    return [
+      r>0.25?1:0, r>0.5?1:0, r>0.75?1:0, r>0.875?1:0, r>1.0?1:0, r>1.125?1:0,
+      p>movingAvg(priceHistory,5)?1:0, p>movingAvg(priceHistory,10)?1:0,
+      p>movingAvg(priceHistory,100)?1:0, p>movingAvg(priceHistory,Math.min(500,priceHistory.length))?1:0,
+      1, 0
+    ];
+  }
+
+  // --- Forecast rules ---
+  function makeRule() {
+    const cond = [];
+    for(let i=0;i<12;i++){
+      const r=Math.random();
+      cond.push(r<0.90?2:(r<0.95?0:1));
+    }
+    return {
+      cond,
+      a: 0.7 + Math.random()*0.5,
+      b: -10 + Math.random()*29,
+      variance: 1 + Math.random()*7,
+      fitness: 0,
+      age: 0,
+      get specificity(){ return this.cond.filter(c=>c!==2).length; },
+      matches(state){ for(let i=0;i<12;i++){if(this.cond[i]!==2&&this.cond[i]!==state[i])return false;} return true; },
+      forecast(pd){ return this.a*pd+this.b; },
+      updateFitness(){ this.fitness = -this.variance - 0.005*this.specificity; }
+    };
+  }
+
+  // --- Agents ---
+  const agents = [];
+  for(let i=0;i<NUM_AGENTS;i++){
+    const rules = [];
+    for(let r=0;r<NUM_RULES;r++){const rl=makeRule(); rl.updateFitness(); rules.push(rl);}
+    agents.push({
+      cash: fundamentalValue*2, shares:1, rules,
+      activeRule:null,
+      selectRule(state){
+        let active=this.rules.filter(r=>r.matches(state));
+        if(!active.length) active=[this.rules.reduce((a,b)=>a.specificity<=b.specificity?a:b)];
+        this.activeRule=active.reduce((a,b)=>a.fitness>=b.fitness?a:b);
+      },
+      demand(p,d){
+        if(!this.activeRule) return 0;
+        const pd=p+d, exp=this.activeRule.forecast(pd);
+        const excess=exp-p*(1+INTEREST_RATE);
+        const v=Math.max(this.activeRule.variance,0.5);
+        let dem=excess/(RISK_AVERSION*v);
+        dem=Math.max(-5,Math.min(5,dem));
+        let desired=this.shares+dem;
+        desired=Math.max(-5,Math.min(10,desired));
+        return desired-this.shares;
+      },
+      updateRules(actualPD){
+        for(const r of this.rules){
+          if(r===this.activeRule){
+            const pred=r.forecast(actualPD);
+            const err=actualPD-pred;
+            r.variance=0.9*r.variance+0.1*(err*err);
+            r.updateFitness();
+          }
+          r.age++;
+        }
+      },
+      evolve(){
+        if(this.rules.length<5)return;
+        this.rules.sort((a,b)=>b.fitness-a.fitness);
+        const nKeep=Math.floor(this.rules.length*0.8);
+        const survivors=this.rules.slice(0,nKeep);
+        const newRules=[];
+        for(let i=0;i<this.rules.length-nKeep;i++){
+          let child;
+          if(Math.random()<CROSSOVER_PROB&&survivors.length>=2){
+            const [p1,p2]=[survivors[Math.floor(Math.random()*Math.min(nKeep,survivors.length))],
+                           survivors[Math.floor(Math.random()*Math.min(nKeep,survivors.length))]];
+            const cond=p1.cond.map((c,j)=>Math.random()<0.5?c:p2.cond[j]);
+            const m=Math.floor(Math.random()*3);
+            const a=m===0?p1.a:m===1?p2.a:(p1.a+p2.a)/2;
+            const b=m===0?p1.b:m===1?p2.b:(p1.b+p2.b)/2;
+            child={cond,a,b,variance:(p1.variance+p2.variance)/2,fitness:0,age:0,
+              get specificity(){return this.cond.filter(c=>c!==2).length;},
+              matches(state){for(let i=0;i<12;i++){if(this.cond[i]!==2&&this.cond[i]!==state[i])return false;}return true;},
+              forecast(pd){return this.a*pd+this.b;},
+              updateFitness(){this.fitness=-this.variance-0.005*this.specificity;}
+            };
+          } else {
+            const parent=survivors[Math.floor(Math.random()*Math.max(1,Math.floor(nKeep/2)))];
+            child={cond:[...parent.cond],a:parent.a,b:parent.b,variance:parent.variance,fitness:0,age:0,
+              get specificity(){return this.cond.filter(c=>c!==2).length;},
+              matches(state){for(let i=0;i<12;i++){if(this.cond[i]!==2&&this.cond[i]!==state[i])return false;}return true;},
+              forecast(pd){return this.a*pd+this.b;},
+              updateFitness(){this.fitness=-this.variance-0.005*this.specificity;}
+            };
+          }
+          // Mutate
+          for(let j=0;j<child.cond.length;j++) if(Math.random()<MUTATION_RATE) child.cond[j]=[0,1,2][Math.floor(Math.random()*3)];
+          if(Math.random()<MUTATION_RATE){child.a+=gauss()*0.05;child.a=Math.max(0,Math.min(2,child.a));}
+          if(Math.random()<MUTATION_RATE){child.b+=gauss()*2;child.b=Math.max(-30,Math.min(30,child.b));}
+          child.updateFitness();
+          newRules.push(child);
+        }
+        this.rules=survivors.concat(newRules);
+      }
+    });
+  }
+
+  let tick = 0;
+  let running = false;
+  let timer = null;
+
+  function clearMarket() {
+    const d = dividend;
+    function excessDemand(p) {
+      let total=0;
+      for(const ag of agents) total+=ag.demand(p,d);
+      return total;
+    }
+    let pLow=Math.max(price*0.5,0.01), pHigh=price*1.5+10;
+    for(let i=0;i<10;i++){
+      const edL=excessDemand(pLow),edH=excessDemand(pHigh);
+      if(edL>0&&edH<0)break;
+      if(edL<=0)pLow=Math.max(pLow*0.5,0.001);
+      if(edH>=0)pHigh*=2;
+    }
+    for(let i=0;i<60;i++){
+      const pMid=(pLow+pHigh)/2;
+      const ed=excessDemand(pMid);
+      if(Math.abs(ed)<0.001)break;
+      if(ed>0)pLow=pMid;else pHigh=pMid;
+    }
+    const cp=Math.max((pLow+pHigh)/2,0.01);
+    // Execute trades
+    let vol=0;
+    for(const ag of agents) ag.cash+=ag.shares*d;
+    for(const ag of agents){
+      const dem=ag.demand(cp,d);
+      ag.shares+=dem; ag.cash-=dem*cp;
+      vol+=Math.abs(dem);
+    }
+    return {price:cp, volume:vol/2};
+  }
+
+  function step() {
+    nextDividend();
+    const state=encodeState();
+    for(const ag of agents) ag.selectRule(state);
+    const result=clearMarket();
+    price=result.price;
+    priceHistory.push(price);
+    fvHistory.push(fundamentalValue);
+    volumeHistory.push(result.volume);
+
+    const actualPD=price+dividend;
+    for(const ag of agents) ag.updateRules(actualPD);
+
+    // GA
+    const gaProb=1/GA_INTERVAL;
+    for(const ag of agents) if(Math.random()<gaProb) ag.evolve();
+
+    tick++;
+    render();
+  }
+
+  // --- DOM ---
+  const chartCanvas = document.getElementById('sm-chart');
+  const volCanvas = document.getElementById('sm-volume');
+  const priceEl = document.getElementById('sm-price');
+  const fvEl = document.getElementById('sm-fundamental');
+  const volEl = document.getElementById('sm-volatility');
+  const tickEl = document.getElementById('sm-tick');
+  const toggleBtn = document.getElementById('sm-toggle-btn');
+  const speedSlider = document.getElementById('sm-speed');
+
+  function render() {
+    priceEl.textContent = price.toFixed(2);
+    fvEl.textContent = fundamentalValue.toFixed(2);
+    tickEl.textContent = 'Tick ' + tick;
+
+    // Volatility: std of last 20 returns
+    if(priceHistory.length > 2){
+      const n = Math.min(20, priceHistory.length-1);
+      const rets = [];
+      for(let i=priceHistory.length-n;i<priceHistory.length;i++){
+        if(priceHistory[i-1]>0) rets.push((priceHistory[i]-priceHistory[i-1])/priceHistory[i-1]);
+      }
+      if(rets.length>1){
+        const mean=rets.reduce((a,b)=>a+b,0)/rets.length;
+        const std=Math.sqrt(rets.reduce((a,b)=>a+(b-mean)**2,0)/rets.length);
+        volEl.textContent = (std*100).toFixed(2)+'%';
+      }
+    }
+
+    drawChart();
+    drawVolume();
+  }
+
+  function drawChart() {
+    const ctx=chartCanvas.getContext('2d');
+    const dpr=window.devicePixelRatio||1;
+    const rect=chartCanvas.getBoundingClientRect();
+    chartCanvas.width=rect.width*dpr; chartCanvas.height=rect.height*dpr;
+    ctx.scale(dpr,dpr);
+    const W=rect.width,H=rect.height;
+    ctx.clearRect(0,0,W,H);
+
+    const prices=priceHistory.slice(-CHART_LEN);
+    const fvs=fvHistory.slice(-CHART_LEN);
+    if(prices.length<2)return;
+    const all=prices.concat(fvs);
+    const minP=Math.min(...all)*0.98, maxP=Math.max(...all)*1.02;
+    const range=maxP-minP||1;
+    const stepX=W/(CHART_LEN-1);
+
+    function yOf(v){ return H-(v-minP)/range*H; }
+
+    // Fundamental value dashed line
+    ctx.strokeStyle='rgba(42,127,127,0.3)';
+    ctx.setLineDash([4,4]);
+    ctx.lineWidth=1;
+    ctx.beginPath();
+    for(let i=0;i<fvs.length;i++){
+      const x=(CHART_LEN-fvs.length+i)*stepX;
+      if(i===0)ctx.moveTo(x,yOf(fvs[i]));else ctx.lineTo(x,yOf(fvs[i]));
+    }
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Price line
+    ctx.strokeStyle='var(--text-primary, #1a1a2e)';
+    ctx.lineWidth=1.5;
+    ctx.lineJoin='round';
+    ctx.beginPath();
+    for(let i=0;i<prices.length;i++){
+      const x=(CHART_LEN-prices.length+i)*stepX;
+      if(i===0)ctx.moveTo(x,yOf(prices[i]));else ctx.lineTo(x,yOf(prices[i]));
+    }
+    ctx.stroke();
+
+    // Price labels
+    ctx.fillStyle='var(--text-tertiary, #7a7a8a)';
+    ctx.font='9px Inter, sans-serif';
+    ctx.textAlign='right';
+    ctx.fillText(maxP.toFixed(0),W-2,10);
+    ctx.fillText(minP.toFixed(0),W-2,H-2);
+  }
+
+  function drawVolume() {
+    const ctx=volCanvas.getContext('2d');
+    const dpr=window.devicePixelRatio||1;
+    const rect=volCanvas.getBoundingClientRect();
+    volCanvas.width=rect.width*dpr; volCanvas.height=rect.height*dpr;
+    ctx.scale(dpr,dpr);
+    const W=rect.width,H=rect.height;
+    ctx.clearRect(0,0,W,H);
+
+    const vols=volumeHistory.slice(-CHART_LEN);
+    if(vols.length<1)return;
+    const maxV=Math.max(...vols,0.01);
+    const barW=W/CHART_LEN;
+
+    ctx.fillStyle='rgba(42,127,127,0.25)';
+    for(let i=0;i<vols.length;i++){
+      const x=(CHART_LEN-vols.length+i)*barW;
+      const h=(vols[i]/maxV)*H;
+      ctx.fillRect(x,H-h,Math.max(barW-1,1),h);
+    }
+
+    ctx.fillStyle='var(--text-tertiary, #7a7a8a)';
+    ctx.font='8px Inter, sans-serif';
+    ctx.textAlign='left';
+    ctx.fillText('Volume',2,9);
+  }
+
+  toggleBtn.addEventListener('click', function(){
+    running=!running;
+    toggleBtn.textContent=running?'Pause':'Start';
+    if(running) startLoop(); else stopLoop();
+  });
+
+  function startLoop(){
+    stopLoop();
+    const speeds=[500,400,300,200,150,100,70,40,20,10];
+    const idx=parseInt(speedSlider.value)-1;
+    timer=setInterval(step,speeds[idx]);
+  }
+  function stopLoop(){ if(timer){clearInterval(timer);timer=null;} }
+
+  speedSlider.addEventListener('input',function(){
+    if(running){startLoop();}
+  });
+
+  render();
+})();
+</script>
+</div>
+<p style="text-align: center; margin-top: 12px;"><a href="01-stock-market/index.html" style="color: #2a7f7f; font-size: 0.85rem;">Open full simulation →</a></p>
 
 <!-- ─── Ch 3: Prisoner's Dilemma ────────────────────── -->
 
@@ -582,13 +1377,367 @@
   <cite>-- Beinhocker, on emergent institutions</cite>
 </div>
 
-<div class="try-it">
-  <div class="try-it-icon">&#9654;</div>
-  <div class="try-it-content">
-    <div class="try-it-label">Try it yourself</div>
-    <p class="try-it-text">Watch cooperation emerge on the spatial grid, then collapse in the well-mixed tournament. Add noise and watch Pavlov take over. <a href="06-prisoners-dilemma/index.html">Open the Prisoner's Dilemma simulation</a></p>
+<div class="mini-sim" id="mini-prisoners-dilemma">
+<style>
+  #mini-prisoners-dilemma {
+    max-width: 680px;
+    margin: 2rem auto;
+    background: var(--bg-card, #ffffff);
+    border: 1px solid var(--border, #e2e0da);
+    border-radius: var(--radius-lg, 12px);
+    box-shadow: 0 2px 8px rgba(26,26,46,0.06);
+    padding: 1.5rem;
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    color: var(--text-primary, #1a1a2e);
+  }
+  #mini-prisoners-dilemma .sim-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent-teal, #2a7f7f);
+    margin-bottom: 1rem;
+  }
+  #mini-prisoners-dilemma .grid-wrap {
+    width: 100%;
+    aspect-ratio: 1;
+    max-height: 300px;
+    margin: 0 auto 0.75rem;
+    display: flex;
+    justify-content: center;
+  }
+  #mini-prisoners-dilemma .grid-wrap canvas {
+    height: 100%;
+    aspect-ratio: 1;
+    display: block;
+    border-radius: 4px;
+  }
+  #mini-prisoners-dilemma .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-bottom: 0.75rem;
+    justify-content: center;
+  }
+  #mini-prisoners-dilemma .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.6rem;
+    color: var(--text-secondary, #4a4a5a);
+  }
+  #mini-prisoners-dilemma .legend-swatch {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+  #mini-prisoners-dilemma .metrics {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+  #mini-prisoners-dilemma .metric {
+    display: flex;
+    flex-direction: column;
+  }
+  #mini-prisoners-dilemma .metric-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-tertiary, #7a7a8a);
+    margin-bottom: 2px;
+  }
+  #mini-prisoners-dilemma .metric-value {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary, #1a1a2e);
+  }
+  #mini-prisoners-dilemma .controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  #mini-prisoners-dilemma .controls button {
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.4rem 1rem;
+    border: 1px solid var(--border, #e2e0da);
+    border-radius: 6px;
+    background: var(--bg, #faf9f5);
+    color: var(--text-primary, #1a1a2e);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  #mini-prisoners-dilemma .controls button:hover {
+    background: var(--bg-hover, #f5f3ee);
+  }
+  #mini-prisoners-dilemma .controls label {
+    font-size: 0.7rem;
+    color: var(--text-secondary, #4a4a5a);
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    cursor: pointer;
+    user-select: none;
+  }
+  #mini-prisoners-dilemma .controls input[type="checkbox"] {
+    accent-color: var(--accent-teal, #2a7f7f);
+  }
+  #mini-prisoners-dilemma .gen-badge {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 0.65rem;
+    color: var(--text-light, #9a9aaa);
+    margin-left: auto;
+  }
+</style>
+
+<div class="sim-title">Interactive: Prisoner's Dilemma</div>
+
+<div class="grid-wrap">
+  <canvas id="pd-grid"></canvas>
+</div>
+
+<div class="legend" id="pd-legend"></div>
+
+<div class="metrics">
+  <div class="metric">
+    <span class="metric-label">Cooperation Rate</span>
+    <span class="metric-value" id="pd-coop">--</span>
+  </div>
+  <div class="metric">
+    <span class="metric-label">Dominant Strategy</span>
+    <span class="metric-value" id="pd-dominant">--</span>
   </div>
 </div>
+
+<div class="controls">
+  <button id="pd-step-btn">Step</button>
+  <label><input type="checkbox" id="pd-autoplay"> Auto-play</label>
+  <span class="gen-badge" id="pd-gen">Gen 0</span>
+</div>
+
+<script>
+(function() {
+  // --- Config ---
+  const GRID = 30;
+  const ROUNDS_PER_MATCH = 5;
+  const MUTATION_RATE = 0.001;
+  const COOPERATE = 0;
+  const DEFECT = 1;
+  const T = 5, R = 3, P = 1, S = 0;
+
+  const STRATEGIES = {
+    tft:  { name:'TFT',     color:'#4488ff' },
+    alld: { name:'AllD',    color:'#ff4444' },
+    allc: { name:'AllC',    color:'#00cc66' },
+    pavlov:{ name:'Pavlov', color:'#ffaa00' },
+    grudger:{ name:'Grudger',color:'#cc44ff' },
+    random:{ name:'Random', color:'#888888' }
+  };
+  const STRAT_KEYS = Object.keys(STRATEGIES);
+
+  // Build legend
+  const legendEl = document.getElementById('pd-legend');
+  for(const key of STRAT_KEYS) {
+    const item = document.createElement('div');
+    item.className = 'legend-item';
+    item.innerHTML = '<div class="legend-swatch" style="background:'+STRATEGIES[key].color+'"></div>'+STRATEGIES[key].name;
+    legendEl.appendChild(item);
+  }
+
+  function payoff(a, b) {
+    if(a===COOPERATE&&b===COOPERATE) return R;
+    if(a===COOPERATE&&b===DEFECT) return S;
+    if(a===DEFECT&&b===COOPERATE) return T;
+    return P;
+  }
+
+  // Strategy decision functions
+  function decide(type, oppHistory, myHistory) {
+    switch(type) {
+      case 'tft': return oppHistory.length ? oppHistory[oppHistory.length-1] : COOPERATE;
+      case 'alld': return DEFECT;
+      case 'allc': return COOPERATE;
+      case 'pavlov':
+        if(!oppHistory.length) return COOPERATE;
+        const lastMy = myHistory[myHistory.length-1];
+        const lastOpp = oppHistory[oppHistory.length-1];
+        // Win-stay lose-shift
+        if(lastMy===COOPERATE&&lastOpp===COOPERATE) return COOPERATE;
+        if(lastMy===DEFECT&&lastOpp===DEFECT) return COOPERATE;
+        if(lastMy===COOPERATE&&lastOpp===DEFECT) return DEFECT;
+        return DEFECT; // got T, stay
+      case 'grudger':
+        if(oppHistory.includes(DEFECT)) return DEFECT;
+        return COOPERATE;
+      case 'random': return Math.random()<0.5?COOPERATE:DEFECT;
+    }
+    return COOPERATE;
+  }
+
+  // --- Grid init ---
+  const grid = [];
+  for(let r=0;r<GRID;r++){
+    const row=[];
+    for(let c=0;c<GRID;c++){
+      row.push({ type: STRAT_KEYS[Math.floor(Math.random()*STRAT_KEYS.length)], fitness:0, gamesPlayed:0, coops:0, actions:0 });
+    }
+    grid.push(row);
+  }
+
+  let generation = 0;
+
+  function getNeighbors(r,c){
+    const nbrs=[];
+    for(let dr=-1;dr<=1;dr++) for(let dc=-1;dc<=1;dc++){
+      if(dr===0&&dc===0)continue;
+      nbrs.push([(r+dr+GRID)%GRID,(c+dc+GRID)%GRID]);
+    }
+    return nbrs;
+  }
+
+  function playMatch(a, b) {
+    const aHist=[], bHist=[];
+    let aFit=0, bFit=0, aCoops=0, bCoops=0;
+    for(let round=0;round<ROUNDS_PER_MATCH;round++){
+      const aAct=decide(a.type, bHist, aHist);
+      const bAct=decide(b.type, aHist, bHist);
+      aFit+=payoff(aAct,bAct);
+      bFit+=payoff(bAct,aAct);
+      if(aAct===COOPERATE)aCoops++;
+      if(bAct===COOPERATE)bCoops++;
+      aHist.push(aAct); bHist.push(bAct);
+    }
+    a.fitness+=aFit; a.gamesPlayed+=ROUNDS_PER_MATCH; a.coops+=aCoops; a.actions+=ROUNDS_PER_MATCH;
+    b.fitness+=bFit; b.gamesPlayed+=ROUNDS_PER_MATCH; b.coops+=bCoops; b.actions+=ROUNDS_PER_MATCH;
+  }
+
+  function step() {
+    // Reset
+    for(let r=0;r<GRID;r++) for(let c=0;c<GRID;c++){
+      const ag=grid[r][c]; ag.fitness=0; ag.gamesPlayed=0; ag.coops=0; ag.actions=0;
+    }
+
+    // Play matches with neighbors
+    const played = new Set();
+    for(let r=0;r<GRID;r++) for(let c=0;c<GRID;c++){
+      const nbrs=getNeighbors(r,c);
+      for(const [nr,nc] of nbrs){
+        const key=r*GRID+c<nr*GRID+nc ? r+','+c+'-'+nr+','+nc : nr+','+nc+'-'+r+','+c;
+        if(!played.has(key)){
+          playMatch(grid[r][c], grid[nr][nc]);
+          played.add(key);
+        }
+      }
+    }
+
+    // Reproduction
+    const newTypes=[];
+    for(let r=0;r<GRID;r++){
+      const row=[];
+      for(let c=0;c<GRID;c++){
+        const ag=grid[r][c];
+        const avgPay=ag.gamesPlayed?ag.fitness/ag.gamesPlayed:0;
+        let bestType=ag.type, bestPay=avgPay;
+        for(const [nr,nc] of getNeighbors(r,c)){
+          const nb=grid[nr][nc];
+          const nbPay=nb.gamesPlayed?nb.fitness/nb.gamesPlayed:0;
+          if(nbPay>bestPay){bestPay=nbPay;bestType=nb.type;}
+        }
+        if(Math.random()<MUTATION_RATE) bestType=STRAT_KEYS[Math.floor(Math.random()*STRAT_KEYS.length)];
+        row.push(bestType);
+      }
+      newTypes.push(row);
+    }
+    // Collect metrics before applying
+    let totalCoops=0, totalActions=0;
+    const counts={};
+    for(const k of STRAT_KEYS) counts[k]=0;
+    for(let r=0;r<GRID;r++) for(let c=0;c<GRID;c++){
+      totalCoops+=grid[r][c].coops;
+      totalActions+=grid[r][c].actions;
+      counts[grid[r][c].type]++;
+    }
+
+    // Apply
+    for(let r=0;r<GRID;r++) for(let c=0;c<GRID;c++) grid[r][c].type=newTypes[r][c];
+
+    generation++;
+    render(totalCoops, totalActions, counts);
+  }
+
+  // --- DOM ---
+  const canvas = document.getElementById('pd-grid');
+  const coopEl = document.getElementById('pd-coop');
+  const domEl = document.getElementById('pd-dominant');
+  const genEl = document.getElementById('pd-gen');
+  const stepBtn = document.getElementById('pd-step-btn');
+  const autoBox = document.getElementById('pd-autoplay');
+
+  function render(totalCoops, totalActions, counts) {
+    genEl.textContent = 'Gen ' + generation;
+
+    if(totalActions > 0) {
+      coopEl.textContent = (totalCoops/totalActions*100).toFixed(1) + '%';
+    }
+
+    // Dominant strategy
+    if(counts){
+      let maxK='',maxV=0;
+      for(const k of STRAT_KEYS) if(counts[k]>maxV){maxV=counts[k];maxK=k;}
+      domEl.textContent = STRATEGIES[maxK].name;
+      domEl.style.color = STRATEGIES[maxK].color;
+    }
+
+    drawGrid();
+  }
+
+  function drawGrid() {
+    const dpr = window.devicePixelRatio||1;
+    const rect = canvas.getBoundingClientRect();
+    const size = Math.min(rect.width, rect.height);
+    canvas.width = size*dpr;
+    canvas.height = size*dpr;
+    const ctx = canvas.getContext('2d');
+    ctx.scale(dpr,dpr);
+    ctx.clearRect(0,0,size,size);
+
+    const cellW = size/GRID;
+    const cellH = size/GRID;
+
+    for(let r=0;r<GRID;r++) for(let c=0;c<GRID;c++){
+      ctx.fillStyle = STRATEGIES[grid[r][c].type].color;
+      ctx.fillRect(c*cellW, r*cellH, cellW+0.5, cellH+0.5);
+    }
+  }
+
+  // --- Controls ---
+  stepBtn.addEventListener('click', step);
+  let timer = null;
+  autoBox.addEventListener('change', function(){
+    if(this.checked){timer=setInterval(step,350);}
+    else{clearInterval(timer);timer=null;}
+  });
+
+  // Initial draw
+  drawGrid();
+
+  // Compute initial counts for display
+  const initCounts={};
+  for(const k of STRAT_KEYS) initCounts[k]=0;
+  for(let r=0;r<GRID;r++) for(let c=0;c<GRID;c++) initCounts[grid[r][c].type]++;
+  let maxK='',maxV=0;
+  for(const k of STRAT_KEYS) if(initCounts[k]>maxV){maxV=initCounts[k];maxK=k;}
+  domEl.textContent=STRATEGIES[maxK].name;
+  domEl.style.color=STRATEGIES[maxK].color;
+})();
+</script>
+</div>
+<p style="text-align: center; margin-top: 12px;"><a href="06-prisoners-dilemma/index.html" style="color: #2a7f7f; font-size: 0.85rem;">Open full simulation →</a></p>
 
 <div class="thread">
   <div class="thread-label">The thread</div>
@@ -633,13 +1782,386 @@
   <cite>-- Beinhocker, Chapter 8</cite>
 </div>
 
-<div class="try-it">
-  <div class="try-it-icon">&#9654;</div>
-  <div class="try-it-content">
-    <div class="try-it-label">Try it yourself</div>
-    <p class="try-it-text">Change one demand step, then watch the supply chain amplify it into 35 weeks of chaos. Adjust delays and watch costs explode. <a href="02-beer-game/index.html">Open the Beer Game simulation</a></p>
-  </div>
+<div class="mini-sim" id="mini-beer-game" style="max-width:680px;margin:0 auto;">
+<style>
+#mini-beer-game {
+  background: #ffffff;
+  border: 1px solid #e2e0da;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(26,26,46,0.06);
+  padding: 20px 24px 18px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: #1a1a2e;
+}
+#mini-beer-game .sim-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin-bottom: 12px;
+  color: #1a1a2e;
+}
+#mini-beer-game .sim-metrics {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+#mini-beer-game .metric {
+  font-size: 0.72rem;
+  color: #4a4a5a;
+}
+#mini-beer-game .metric span {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-weight: 500;
+  color: #1a1a2e;
+}
+#mini-beer-game canvas {
+  display: block;
+  width: 100%;
+  border-radius: 8px;
+  background: #faf9f5;
+  margin-bottom: 10px;
+}
+#mini-beer-game .sim-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+#mini-beer-game .sim-controls button {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 500;
+  padding: 5px 14px;
+  border: 1px solid #e2e0da;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #4a4a5a;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+#mini-beer-game .sim-controls button:hover {
+  background: #f5f3ee;
+  border-color: #ccc;
+}
+#mini-beer-game .sim-controls button.active {
+  background: #2a7f7f;
+  color: #fff;
+  border-color: #2a7f7f;
+}
+#mini-beer-game .sim-controls .week-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  color: #7a7a8a;
+  margin-left: auto;
+}
+</style>
+
+<div class="sim-title">Interactive: Beer Distribution Game</div>
+<div class="sim-metrics">
+  <div class="metric">Demand: <span id="bg-demand">4</span></div>
+  <div class="metric">Total Cost: <span id="bg-cost">$0.00</span></div>
+  <div class="metric">Bullwhip: <span id="bg-bullwhip">1.00</span></div>
 </div>
+<canvas id="bg-canvas" width="632" height="260"></canvas>
+<div class="sim-controls">
+  <button id="bg-next">Next Week</button>
+  <button id="bg-auto">Auto-play</button>
+  <span class="week-label">Week <span id="bg-week">0</span></span>
+</div>
+
+<script>
+(function() {
+  const ROLES = ['Retailer','Wholesaler','Distributor','Brewery'];
+  const HOLD = 0.5, BACK = 1.0;
+  const COLORS = {
+    normal: '#2a7f7f',
+    warn: '#b08a3a',
+    stress: '#c96b5a',
+    backlog: '#9a3a3a'
+  };
+
+  // Agent state
+  function makeAgent(name, pos) {
+    return {
+      name, pos,
+      inventory: 12, backlog: 0,
+      expectedDemand: 4, desiredInventory: 12,
+      alpha: 0.5, beta: 0.2, theta: 0.2,
+      incomingPipeline: [4, 4],
+      orderPipeline: [4],
+      lastOrder: 4, lastIncomingOrder: 4,
+      cumulativeCost: 0,
+      histOrders: [], histIncoming: [],
+      histInventory: [], histBacklog: []
+    };
+  }
+
+  let agents = ROLES.map((n, i) => makeAgent(n, i));
+  let tick = 0, demandHistory = [], autoTimer = null;
+
+  function demand(t) { return t < 5 ? 4 : 8; }
+
+  function eff(a) { return a.inventory - a.backlog; }
+  function supplyLine(a) { return a.incomingPipeline.reduce((s,v)=>s+v, 0); }
+  function desiredSL(a) { return a.expectedDemand * (2 + 1); }
+
+  function step() {
+    const d = demand(tick);
+    demandHistory.push(d);
+
+    // 1. Receive shipments
+    agents.forEach(a => { a.inventory += a.incomingPipeline.shift(); });
+
+    // 2. Fill orders
+    let inOrders = [d, 0, 0, 0];
+    for (let i = 1; i < 4; i++) inOrders[i] = agents[i].orderPipeline.shift();
+    let shipments = [0, 0, 0, 0];
+    agents.forEach((a, i) => {
+      const ord = inOrders[i];
+      a.lastIncomingOrder = ord;
+      const totalDem = a.backlog + ord;
+      const shipped = Math.min(a.inventory, totalDem);
+      a.inventory -= shipped;
+      a.backlog = totalDem - shipped;
+      shipments[i] = shipped;
+    });
+    for (let i = 1; i < 4; i++) agents[i - 1].incomingPipeline.push(shipments[i]);
+
+    // 3. Update demand expectations
+    agents.forEach(a => {
+      a.expectedDemand += a.theta * (a.lastIncomingOrder - a.expectedDemand);
+    });
+
+    // 4. Place orders
+    let orders = agents.map(a => {
+      const anchor = a.expectedDemand;
+      const invAdj = a.alpha * (a.desiredInventory - eff(a));
+      const slAdj = a.beta * (desiredSL(a) - supplyLine(a));
+      const o = Math.max(0, Math.round(anchor + invAdj + slAdj));
+      a.lastOrder = o;
+      return o;
+    });
+    for (let i = 0; i < 3; i++) agents[i + 1].orderPipeline.push(orders[i]);
+    agents[3].incomingPipeline.push(orders[3]);
+
+    // 5. Cost
+    agents.forEach(a => {
+      a.cumulativeCost += HOLD * a.inventory + BACK * a.backlog;
+    });
+
+    // 6. Record
+    agents.forEach(a => {
+      a.histOrders.push(a.lastOrder);
+      a.histIncoming.push(a.lastIncomingOrder);
+      a.histInventory.push(a.inventory);
+      a.histBacklog.push(a.backlog);
+    });
+
+    tick++;
+    render();
+  }
+
+  function variance(arr) {
+    if (arr.length < 2) return 0;
+    const m = arr.reduce((s,v)=>s+v,0)/arr.length;
+    return arr.reduce((s,v)=>s+(v-m)*(v-m),0)/(arr.length-1);
+  }
+
+  function bullwhipRatio() {
+    // brewery orders variance / retailer incoming orders variance
+    const vOut = variance(agents[3].histOrders);
+    const vIn = variance(agents[0].histIncoming);
+    return vIn > 0 ? (vOut / vIn) : 1;
+  }
+
+  function render() {
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+    ctx.clearRect(0, 0, W, H);
+
+    const d = tick > 0 ? demandHistory[tick - 1] : 4;
+    document.getElementById('bg-demand').textContent = d;
+    const totalCost = agents.reduce((s,a)=>s+a.cumulativeCost, 0);
+    document.getElementById('bg-cost').textContent = '$' + totalCost.toFixed(2);
+    document.getElementById('bg-bullwhip').textContent = bullwhipRatio().toFixed(2);
+    document.getElementById('bg-week').textContent = tick;
+
+    // Layout
+    const padL = 60, padR = 60, padT = 40, padB = 50;
+    const barAreaW = W - padL - padR;
+    const barAreaH = H - padT - padB;
+    const barW = 60;
+    const gap = (barAreaW - 4 * barW) / 3;
+
+    // Max scale
+    const maxInv = Math.max(24, ...agents.map(a => a.inventory), ...agents.map(a => a.backlog));
+
+    // Draw baseline
+    const baseY = padT + barAreaH;
+    ctx.strokeStyle = '#e2e0da';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(padL - 10, baseY);
+    ctx.lineTo(W - padR + 10, baseY);
+    ctx.stroke();
+
+    // Y axis ticks
+    ctx.fillStyle = '#7a7a8a';
+    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.textAlign = 'right';
+    for (let v = 0; v <= maxInv; v += Math.max(1, Math.ceil(maxInv / 4))) {
+      const y = baseY - (v / maxInv) * barAreaH;
+      ctx.fillText(v, padL - 14, y + 3);
+      ctx.strokeStyle = '#edecea';
+      ctx.beginPath();
+      ctx.moveTo(padL - 8, y);
+      ctx.lineTo(W - padR + 10, y);
+      ctx.stroke();
+    }
+
+    agents.forEach((a, i) => {
+      const x = padL + i * (barW + gap);
+      const inv = a.inventory;
+      const bl = a.backlog;
+
+      // Inventory bar (above baseline)
+      const invH = (inv / maxInv) * barAreaH;
+      let color;
+      if (bl > 0) color = COLORS.backlog;
+      else if (eff(a) < 4) color = COLORS.stress;
+      else if (eff(a) < 8) color = COLORS.warn;
+      else color = COLORS.normal;
+
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      const r = 4;
+      const bx = x, by = baseY - invH, bw = barW, bh = invH;
+      if (bh > r) {
+        ctx.moveTo(bx + r, by);
+        ctx.lineTo(bx + bw - r, by);
+        ctx.quadraticCurveTo(bx + bw, by, bx + bw, by + r);
+        ctx.lineTo(bx + bw, by + bh);
+        ctx.lineTo(bx, by + bh);
+        ctx.lineTo(bx, by + r);
+        ctx.quadraticCurveTo(bx, by, bx + r, by);
+      } else if (bh > 0) {
+        ctx.rect(bx, by, bw, bh);
+      }
+      ctx.fill();
+
+      // Backlog bar (below baseline, semi-transparent)
+      if (bl > 0) {
+        const blH = (bl / maxInv) * barAreaH;
+        ctx.fillStyle = 'rgba(154, 58, 58, 0.25)';
+        ctx.fillRect(x, baseY, barW, Math.min(blH, padB - 8));
+        ctx.fillStyle = '#9a3a3a';
+        ctx.font = '9px "JetBrains Mono", monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText('-' + bl, x + barW / 2, baseY + Math.min(blH, padB - 8) + 10);
+      }
+
+      // Inventory value on bar
+      ctx.fillStyle = invH > 16 ? '#fff' : '#1a1a2e';
+      ctx.font = '11px "JetBrains Mono", monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(inv, x + barW / 2, invH > 16 ? baseY - invH + 14 : baseY - invH - 4);
+
+      // Label
+      ctx.fillStyle = '#4a4a5a';
+      ctx.font = '10px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(a.name.slice(0, 6), x + barW / 2, baseY + (bl > 0 ? Math.min((bl/maxInv)*barAreaH, padB - 8) + 22 : 14));
+    });
+
+    // Animated arrows: orders flow right, beer flows left
+    const arrowY_orders = padT + 6;
+    const arrowY_beer = padT + 20;
+    const phase = (Date.now() % 2000) / 2000;
+
+    // Orders arrow (right)
+    ctx.strokeStyle = 'rgba(176, 138, 58, 0.5)';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([4, 4]);
+    ctx.lineDashOffset = -phase * 40;
+    ctx.beginPath();
+    const arrowStartX = padL + barW / 2;
+    const arrowEndX = padL + 3 * (barW + gap) + barW / 2;
+    ctx.moveTo(arrowStartX, arrowY_orders);
+    ctx.lineTo(arrowEndX, arrowY_orders);
+    ctx.stroke();
+    // Arrowhead
+    ctx.setLineDash([]);
+    ctx.fillStyle = 'rgba(176, 138, 58, 0.5)';
+    ctx.beginPath();
+    ctx.moveTo(arrowEndX, arrowY_orders);
+    ctx.lineTo(arrowEndX - 6, arrowY_orders - 3);
+    ctx.lineTo(arrowEndX - 6, arrowY_orders + 3);
+    ctx.fill();
+    ctx.fillStyle = '#b08a3a';
+    ctx.font = '9px Inter, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('orders', (arrowStartX + arrowEndX) / 2, arrowY_orders - 4);
+
+    // Beer arrow (left)
+    ctx.strokeStyle = 'rgba(42, 127, 127, 0.5)';
+    ctx.setLineDash([4, 4]);
+    ctx.lineDashOffset = phase * 40;
+    ctx.beginPath();
+    ctx.moveTo(arrowEndX, arrowY_beer);
+    ctx.lineTo(arrowStartX, arrowY_beer);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = 'rgba(42, 127, 127, 0.5)';
+    ctx.beginPath();
+    ctx.moveTo(arrowStartX, arrowY_beer);
+    ctx.lineTo(arrowStartX + 6, arrowY_beer - 3);
+    ctx.lineTo(arrowStartX + 6, arrowY_beer + 3);
+    ctx.fill();
+    ctx.fillStyle = '#2a7f7f';
+    ctx.font = '9px Inter, sans-serif';
+    ctx.fillText('beer', (arrowStartX + arrowEndX) / 2, arrowY_beer + 11);
+  }
+
+  // Animate arrows
+  let animFrame;
+  function animate() {
+    render();
+    animFrame = requestAnimationFrame(animate);
+  }
+
+  document.getElementById('bg-next').addEventListener('click', () => {
+    if (tick < 36) step();
+  });
+
+  const autoBtn = document.getElementById('bg-auto');
+  autoBtn.addEventListener('click', () => {
+    if (autoTimer) {
+      clearInterval(autoTimer);
+      autoTimer = null;
+      autoBtn.classList.remove('active');
+      autoBtn.textContent = 'Auto-play';
+    } else {
+      autoBtn.classList.add('active');
+      autoBtn.textContent = 'Pause';
+      autoTimer = setInterval(() => {
+        if (tick >= 36) {
+          clearInterval(autoTimer);
+          autoTimer = null;
+          autoBtn.classList.remove('active');
+          autoBtn.textContent = 'Auto-play';
+          return;
+        }
+        step();
+      }, 600);
+    }
+  });
+
+  animate();
+})();
+</script>
+</div>
+<p style="text-align: center; margin-top: 12px;"><a href="02-beer-game/index.html" style="color: #2a7f7f; font-size: 0.85rem;">Open full simulation →</a></p>
 
 <!-- ─── Ch 5: Boolean Networks ──────────────────────── -->
 
@@ -662,13 +2184,338 @@
 
 <p>The implications for organizations are direct. The same connectivity that works at small scale produces paralysis at large scale: at K=4 with 20 nodes, the system is manageable; at 150 nodes, cascades engulf 90% of the network and no stable configurations exist. This is not a management failure -- it is mathematical inevitability. Hierarchy tames the chaos by creating modular firebreaks, cutting cascade sizes nearly in half at scale.</p>
 
-<div class="try-it">
-  <div class="try-it-icon">&#9654;</div>
-  <div class="try-it-content">
-    <div class="try-it-label">Try it yourself</div>
-    <p class="try-it-text">Flip one node and watch the cascade propagate. Compare ordered, critical, and chaotic regimes. <a href="03-boolean-network/index.html">Open the Boolean Network simulation</a></p>
-  </div>
+<div class="mini-sim" id="mini-boolean-network" style="max-width:680px;margin:0 auto;">
+<style>
+#mini-boolean-network {
+  background: #ffffff;
+  border: 1px solid #e2e0da;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(26,26,46,0.06);
+  padding: 20px 24px 18px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: #1a1a2e;
+}
+#mini-boolean-network .sim-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin-bottom: 12px;
+  color: #1a1a2e;
+}
+#mini-boolean-network .sim-metrics {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+#mini-boolean-network .metric {
+  font-size: 0.72rem;
+  color: #4a4a5a;
+}
+#mini-boolean-network .metric span {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-weight: 500;
+  color: #1a1a2e;
+}
+#mini-boolean-network .regime-label {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 1px 8px;
+  border-radius: 4px;
+}
+#mini-boolean-network .regime-ordered { background: #e8f4f4; color: #2a7f7f; }
+#mini-boolean-network .regime-critical { background: #fdf7ea; color: #b08a3a; }
+#mini-boolean-network .regime-chaotic { background: #fdf0ed; color: #c96b5a; }
+#mini-boolean-network canvas {
+  display: block;
+  width: 100%;
+  border-radius: 8px;
+  background: #faf9f5;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+#mini-boolean-network .sim-controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+#mini-boolean-network .sim-controls label {
+  font-size: 0.72rem;
+  color: #4a4a5a;
+}
+#mini-boolean-network .sim-controls input[type="range"] {
+  width: 100px;
+  accent-color: #2a7f7f;
+}
+#mini-boolean-network .sim-controls .k-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  color: #1a1a2e;
+  font-weight: 500;
+  min-width: 18px;
+}
+#mini-boolean-network .hint {
+  font-size: 0.65rem;
+  color: #7a7a8a;
+  margin-left: auto;
+}
+</style>
+
+<div class="sim-title">Interactive: Boolean Network</div>
+<div class="sim-metrics">
+  <div class="metric">Derrida: <span id="bn-derrida">--</span></div>
+  <div class="metric">Regime: <span id="bn-regime" class="regime-label regime-critical">--</span></div>
+  <div class="metric">ON nodes: <span id="bn-on">--</span></div>
 </div>
+<canvas id="bn-canvas" width="632" height="300"></canvas>
+<div class="sim-controls">
+  <label>K:</label>
+  <input type="range" id="bn-k-slider" min="1" max="5" value="2" step="1">
+  <span class="k-val" id="bn-k-val">2</span>
+  <span class="hint">Click a node to flip it</span>
+</div>
+
+<script>
+(function() {
+  const N = 20;
+  let K = 2;
+  let nodes = [];
+  let edges = [];
+  let animating = false;
+  let cascadeQueue = [];
+
+  const canvas = document.getElementById('bn-canvas');
+  const ctx = canvas.getContext('2d');
+  const CX = canvas.width / 2;
+  const CY = canvas.height / 2;
+  const RADIUS = Math.min(CX, CY) - 30;
+  const NODE_R = 12;
+
+  function initNetwork() {
+    nodes = [];
+    edges = [];
+    cascadeQueue = [];
+    for (let i = 0; i < N; i++) {
+      const angle = (2 * Math.PI * i) / N - Math.PI / 2;
+      const x = CX + RADIUS * Math.cos(angle);
+      const y = CY + RADIUS * Math.sin(angle);
+      const state = Math.random() < 0.5 ? 1 : 0;
+      // Truth table: 2^K entries
+      const ttLen = 1 << K;
+      const tt = [];
+      for (let j = 0; j < ttLen; j++) tt.push(Math.random() < 0.5 ? 1 : 0);
+      nodes.push({ x, y, state, inputs: [], tt, flash: 0 });
+    }
+    // Wire K random inputs per node
+    for (let i = 0; i < N; i++) {
+      const cands = [];
+      for (let j = 0; j < N; j++) if (j !== i) cands.push(j);
+      // Shuffle and pick K
+      for (let j = cands.length - 1; j > 0; j--) {
+        const k = Math.floor(Math.random() * (j + 1));
+        [cands[j], cands[k]] = [cands[k], cands[j]];
+      }
+      nodes[i].inputs = cands.slice(0, K);
+    }
+    // Build edge list for drawing
+    edges = [];
+    for (let i = 0; i < N; i++) {
+      for (const inp of nodes[i].inputs) {
+        edges.push([inp, i]);
+      }
+    }
+    estimateDerrida();
+    render();
+  }
+
+  function stepNetwork() {
+    const nextStates = [];
+    for (let i = 0; i < N; i++) {
+      let idx = 0;
+      for (let k = 0; k < nodes[i].inputs.length; k++) {
+        idx += nodes[nodes[i].inputs[k]].state << k;
+      }
+      nextStates.push(nodes[i].tt[idx] || 0);
+    }
+    let changed = 0;
+    for (let i = 0; i < N; i++) {
+      if (nodes[i].state !== nextStates[i]) {
+        nodes[i].flash = 1.0;
+        changed++;
+      }
+      nodes[i].state = nextStates[i];
+    }
+    return changed;
+  }
+
+  function estimateDerrida() {
+    // Quick Monte Carlo: flip 1 bit, step, measure spread
+    const trials = 80;
+    let totalSpread = 0;
+    for (let t = 0; t < trials; t++) {
+      // Random state
+      const s1 = [];
+      for (let i = 0; i < N; i++) s1.push(Math.random() < 0.5 ? 1 : 0);
+      const flipIdx = Math.floor(Math.random() * N);
+      const s2 = s1.slice();
+      s2[flipIdx] = 1 - s2[flipIdx];
+
+      // Step s1
+      const n1 = [];
+      for (let i = 0; i < N; i++) {
+        let idx = 0;
+        for (let k = 0; k < nodes[i].inputs.length; k++) {
+          idx += s1[nodes[i].inputs[k]] << k;
+        }
+        n1.push(nodes[i].tt[idx] || 0);
+      }
+      // Step s2
+      const n2 = [];
+      for (let i = 0; i < N; i++) {
+        let idx = 0;
+        for (let k = 0; k < nodes[i].inputs.length; k++) {
+          idx += s2[nodes[i].inputs[k]] << k;
+        }
+        n2.push(nodes[i].tt[idx] || 0);
+      }
+      let ham = 0;
+      for (let i = 0; i < N; i++) if (n1[i] !== n2[i]) ham++;
+      totalSpread += ham;
+    }
+    const derrida = totalSpread / trials;
+    const el = document.getElementById('bn-derrida');
+    el.textContent = derrida.toFixed(2);
+
+    const regEl = document.getElementById('bn-regime');
+    regEl.className = 'regime-label';
+    if (derrida < 0.8) {
+      regEl.textContent = 'ordered';
+      regEl.classList.add('regime-ordered');
+    } else if (derrida > 1.2) {
+      regEl.textContent = 'chaotic';
+      regEl.classList.add('regime-chaotic');
+    } else {
+      regEl.textContent = 'critical';
+      regEl.classList.add('regime-critical');
+    }
+  }
+
+  function render() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw edges
+    for (const [from, to] of edges) {
+      const nf = nodes[from], nt = nodes[to];
+      ctx.strokeStyle = 'rgba(226, 224, 218, 0.5)';
+      ctx.lineWidth = 0.7;
+      ctx.beginPath();
+      ctx.moveTo(nf.x, nf.y);
+      ctx.lineTo(nt.x, nt.y);
+      ctx.stroke();
+    }
+
+    // Draw nodes
+    let onCount = 0;
+    for (let i = 0; i < N; i++) {
+      const n = nodes[i];
+      if (n.state) onCount++;
+
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, NODE_R, 0, 2 * Math.PI);
+
+      if (n.state) {
+        ctx.fillStyle = '#2a7f7f';
+      } else {
+        ctx.fillStyle = '#d4d2cc';
+      }
+      ctx.fill();
+
+      // Flash ring for recently changed
+      if (n.flash > 0) {
+        ctx.strokeStyle = `rgba(201, 107, 90, ${n.flash})`;
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, NODE_R + 3, 0, 2 * Math.PI);
+        ctx.stroke();
+        n.flash = Math.max(0, n.flash - 0.04);
+      }
+
+      // Node index label
+      ctx.fillStyle = n.state ? '#ffffff' : '#7a7a8a';
+      ctx.font = '9px "JetBrains Mono", monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(i, n.x, n.y);
+    }
+
+    document.getElementById('bn-on').textContent = onCount + '/' + N;
+  }
+
+  // Click handler
+  canvas.addEventListener('click', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const mx = (e.clientX - rect.left) * scaleX;
+    const my = (e.clientY - rect.top) * scaleY;
+
+    for (let i = 0; i < N; i++) {
+      const dx = mx - nodes[i].x;
+      const dy = my - nodes[i].y;
+      if (dx * dx + dy * dy < (NODE_R + 4) * (NODE_R + 4)) {
+        // Flip node
+        nodes[i].state = 1 - nodes[i].state;
+        nodes[i].flash = 1.0;
+        // Run cascade: step network a few times with animation
+        if (!animating) {
+          animating = true;
+          let steps = 0;
+          const maxSteps = 15;
+          function cascadeStep() {
+            const changed = stepNetwork();
+            steps++;
+            render();
+            if (changed > 0 && steps < maxSteps) {
+              setTimeout(cascadeStep, 180);
+            } else {
+              animating = false;
+              estimateDerrida();
+            }
+          }
+          setTimeout(cascadeStep, 200);
+        }
+        break;
+      }
+    }
+  });
+
+  // K slider
+  const slider = document.getElementById('bn-k-slider');
+  slider.addEventListener('input', () => {
+    K = parseInt(slider.value);
+    document.getElementById('bn-k-val').textContent = K;
+    initNetwork();
+  });
+
+  // Flash decay animation
+  function animLoop() {
+    let needsRedraw = false;
+    for (const n of nodes) {
+      if (n.flash > 0) { needsRedraw = true; break; }
+    }
+    if (needsRedraw && !animating) render();
+    requestAnimationFrame(animLoop);
+  }
+  animLoop();
+
+  initNetwork();
+})();
+</script>
+</div>
+<p style="text-align: center; margin-top: 12px;"><a href="03-boolean-network/index.html" style="color: #2a7f7f; font-size: 0.85rem;">Open full simulation →</a></p>
 
 <!-- ─── Ch 6: Predator-Prey ─────────────────────────── -->
 
@@ -689,13 +2536,400 @@
   <span class="label">tick oscillation period, generated entirely by interaction -- no external driver needed</span>
 </div>
 
-<div class="try-it">
-  <div class="try-it-icon">&#9654;</div>
-  <div class="try-it-content">
-    <div class="try-it-label">Try it yourself</div>
-    <p class="try-it-text">Watch prey and predator populations chase each other through boom-bust cycles on the grid. Compare the agent model with the deterministic ODE. <a href="12-predator-prey/index.html">Open the Predator-Prey simulation</a></p>
-  </div>
+<div class="mini-sim" id="mini-predator-prey" style="max-width:680px;margin:0 auto;">
+<style>
+#mini-predator-prey {
+  background: #ffffff;
+  border: 1px solid #e2e0da;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(26,26,46,0.06);
+  padding: 20px 24px 18px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: #1a1a2e;
+}
+#mini-predator-prey .sim-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin-bottom: 12px;
+  color: #1a1a2e;
+}
+#mini-predator-prey .sim-metrics {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+#mini-predator-prey .metric {
+  font-size: 0.72rem;
+  color: #4a4a5a;
+}
+#mini-predator-prey .metric span {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-weight: 500;
+}
+#mini-predator-prey .prey-count { color: #4a8a5a; }
+#mini-predator-prey .pred-count { color: #c96b5a; }
+#mini-predator-prey canvas {
+  display: block;
+  width: 100%;
+  border-radius: 8px;
+  background: #1a1a2e;
+}
+#mini-predator-prey #pp-canvas { margin-bottom: 6px; }
+#mini-predator-prey #pp-spark { margin-bottom: 10px; background: #faf9f5; }
+#mini-predator-prey .sim-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+#mini-predator-prey .sim-controls button {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 500;
+  padding: 5px 14px;
+  border: 1px solid #e2e0da;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #4a4a5a;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+#mini-predator-prey .sim-controls button:hover {
+  background: #f5f3ee;
+  border-color: #ccc;
+}
+#mini-predator-prey .sim-controls button.active {
+  background: #2a7f7f;
+  color: #fff;
+  border-color: #2a7f7f;
+}
+#mini-predator-prey .sim-controls .tick-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  color: #7a7a8a;
+  margin-left: auto;
+}
+</style>
+
+<div class="sim-title">Interactive: Predator-Prey</div>
+<div class="sim-metrics">
+  <div class="metric">Prey: <span class="prey-count" id="pp-prey">--</span></div>
+  <div class="metric">Predators: <span class="pred-count" id="pp-pred">--</span></div>
+  <div class="metric">Tick: <span id="pp-tick">0</span></div>
 </div>
+<canvas id="pp-canvas" width="400" height="400"></canvas>
+<canvas id="pp-spark" width="632" height="60"></canvas>
+<div class="sim-controls">
+  <button id="pp-toggle">Start</button>
+  <span class="tick-label">40 x 40 grid</span>
+</div>
+
+<script>
+(function() {
+  const SIZE = 40;
+  const GRASS_REGROW = 8;
+  const PREY_GAIN = 5;
+  const PRED_GAIN = 5;
+  const PREY_REPRO = 0.08;
+  const PRED_REPRO = 0.02;
+  const INIT_PREY = 120;
+  const INIT_PRED = 20;
+  const DIRS = [[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[-1,1],[1,-1],[1,1]];
+
+  let grass, preyList, predList, tick, running, timer;
+  let preyHistory = [], predHistory = [];
+
+  const gridCanvas = document.getElementById('pp-canvas');
+  const gCtx = gridCanvas.getContext('2d');
+  const sparkCanvas = document.getElementById('pp-spark');
+  const sCtx = sparkCanvas.getContext('2d');
+
+  function wrap(v) { return ((v % SIZE) + SIZE) % SIZE; }
+
+  function init() {
+    tick = 0;
+    preyHistory = [];
+    predHistory = [];
+    // Grass: 0 = alive
+    grass = [];
+    for (let r = 0; r < SIZE; r++) {
+      grass[r] = [];
+      for (let c = 0; c < SIZE; c++) grass[r][c] = 0;
+    }
+    preyList = [];
+    for (let i = 0; i < INIT_PREY; i++) {
+      preyList.push({
+        x: Math.floor(Math.random() * SIZE),
+        y: Math.floor(Math.random() * SIZE),
+        energy: Math.floor(Math.random() * 10) + 1
+      });
+    }
+    predList = [];
+    for (let i = 0; i < INIT_PRED; i++) {
+      predList.push({
+        x: Math.floor(Math.random() * SIZE),
+        y: Math.floor(Math.random() * SIZE),
+        energy: Math.floor(Math.random() * 20) + 1
+      });
+    }
+    preyHistory.push(preyList.length);
+    predHistory.push(predList.length);
+    renderAll();
+  }
+
+  function shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+  }
+
+  function step() {
+    tick++;
+
+    // Grass regrowth
+    for (let r = 0; r < SIZE; r++)
+      for (let c = 0; c < SIZE; c++)
+        if (grass[r][c] > 0) grass[r][c]--;
+
+    // Prey actions
+    const newPrey = [];
+    shuffle(preyList);
+    for (const p of preyList) {
+      const d = DIRS[Math.floor(Math.random() * 8)];
+      p.x = wrap(p.x + d[0]);
+      p.y = wrap(p.y + d[1]);
+      p.energy--;
+      // Eat grass
+      if (grass[p.y][p.x] === 0) {
+        p.energy += PREY_GAIN;
+        grass[p.y][p.x] = GRASS_REGROW;
+      }
+      // Reproduce
+      if (Math.random() < PREY_REPRO) {
+        p.energy = Math.floor(p.energy / 2);
+        newPrey.push({ x: p.x, y: p.y, energy: p.energy });
+      }
+    }
+    preyList = preyList.filter(p => p.energy > 0);
+    preyList.push(...newPrey);
+
+    // Build prey location map
+    const preyMap = {};
+    for (const p of preyList) {
+      const key = p.y * SIZE + p.x;
+      if (!preyMap[key]) preyMap[key] = [];
+      preyMap[key].push(p);
+    }
+
+    // Predator actions
+    const newPred = [];
+    const eaten = new Set();
+    shuffle(predList);
+    for (const pr of predList) {
+      // Move toward nearby prey (detection radius 2)
+      let bestDist = Infinity, bestDx = 0, bestDy = 0, found = false;
+      for (const p of preyList) {
+        if (eaten.has(p)) continue;
+        let dx = p.x - pr.x, dy = p.y - pr.y;
+        if (Math.abs(dx) > SIZE / 2) dx = dx > 0 ? dx - SIZE : dx + SIZE;
+        if (Math.abs(dy) > SIZE / 2) dy = dy > 0 ? dy - SIZE : dy + SIZE;
+        const dist = Math.abs(dx) + Math.abs(dy);
+        if (dist < bestDist && dist <= 2) {
+          bestDist = dist;
+          bestDx = dx > 0 ? 1 : (dx < 0 ? -1 : 0);
+          bestDy = dy > 0 ? 1 : (dy < 0 ? -1 : 0);
+          found = true;
+        }
+      }
+      if (found && bestDist > 0) {
+        if (Math.random() < 0.5 && bestDx !== 0) pr.x = wrap(pr.x + bestDx);
+        else if (bestDy !== 0) pr.y = wrap(pr.y + bestDy);
+        else pr.x = wrap(pr.x + bestDx);
+      } else {
+        const d = DIRS[Math.floor(Math.random() * 8)];
+        pr.x = wrap(pr.x + d[0]);
+        pr.y = wrap(pr.y + d[1]);
+      }
+      pr.energy--;
+
+      // Eat prey
+      const key = pr.y * SIZE + pr.x;
+      if (preyMap[key] && preyMap[key].length > 0) {
+        const victim = preyMap[key].pop();
+        eaten.add(victim);
+        pr.energy += PRED_GAIN;
+      }
+
+      // Reproduce
+      if (Math.random() < PRED_REPRO) {
+        pr.energy = Math.floor(pr.energy / 2);
+        newPred.push({ x: pr.x, y: pr.y, energy: pr.energy });
+      }
+    }
+    predList = predList.filter(p => p.energy > 0);
+    predList.push(...newPred);
+    preyList = preyList.filter(p => !eaten.has(p));
+
+    preyHistory.push(preyList.length);
+    predHistory.push(predList.length);
+
+    renderAll();
+
+    if (preyList.length === 0 && predList.length === 0) {
+      stopSim();
+    }
+  }
+
+  function renderAll() {
+    renderGrid();
+    renderSpark();
+    document.getElementById('pp-prey').textContent = preyList.length;
+    document.getElementById('pp-pred').textContent = predList.length;
+    document.getElementById('pp-tick').textContent = tick;
+  }
+
+  function renderGrid() {
+    const W = gridCanvas.width, H = gridCanvas.height;
+    const cellW = W / SIZE, cellH = H / SIZE;
+    const imgData = gCtx.createImageData(W, H);
+    const data = imgData.data;
+
+    // Background: dark
+    for (let i = 0; i < data.length; i += 4) {
+      data[i] = 20; data[i+1] = 20; data[i+2] = 32; data[i+3] = 255;
+    }
+
+    // Grass cells
+    for (let r = 0; r < SIZE; r++) {
+      for (let c = 0; c < SIZE; c++) {
+        const px0 = Math.floor(c * cellW);
+        const py0 = Math.floor(r * cellH);
+        const px1 = Math.floor((c + 1) * cellW);
+        const py1 = Math.floor((r + 1) * cellH);
+        let cr, cg, cb;
+        if (grass[r][c] === 0) {
+          cr = 30; cg = 70; cb = 40; // live grass
+        } else {
+          cr = 22; cg = 35; cb = 28; // dead grass
+        }
+        for (let py = py0; py < py1; py++) {
+          for (let px = px0; px < px1; px++) {
+            const idx = (py * W + px) * 4;
+            data[idx] = cr; data[idx+1] = cg; data[idx+2] = cb;
+          }
+        }
+      }
+    }
+
+    // Prey (green)
+    for (const p of preyList) {
+      const px0 = Math.floor(p.x * cellW);
+      const py0 = Math.floor(p.y * cellH);
+      const px1 = Math.floor((p.x + 1) * cellW);
+      const py1 = Math.floor((p.y + 1) * cellH);
+      for (let py = py0; py < py1; py++) {
+        for (let px = px0; px < px1; px++) {
+          const idx = (py * W + px) * 4;
+          data[idx] = 80; data[idx+1] = 200; data[idx+2] = 100;
+        }
+      }
+    }
+
+    // Predators (red)
+    for (const p of predList) {
+      const px0 = Math.floor(p.x * cellW);
+      const py0 = Math.floor(p.y * cellH);
+      const px1 = Math.floor((p.x + 1) * cellW);
+      const py1 = Math.floor((p.y + 1) * cellH);
+      for (let py = py0; py < py1; py++) {
+        for (let px = px0; px < px1; px++) {
+          const idx = (py * W + px) * 4;
+          data[idx] = 210; data[idx+1] = 70; data[idx+2] = 70;
+        }
+      }
+    }
+
+    gCtx.putImageData(imgData, 0, 0);
+  }
+
+  function renderSpark() {
+    const W = sparkCanvas.width, H = sparkCanvas.height;
+    sCtx.clearRect(0, 0, W, H);
+
+    const maxLen = 300;
+    const ph = preyHistory.length > maxLen ? preyHistory.slice(-maxLen) : preyHistory;
+    const dh = predHistory.length > maxLen ? predHistory.slice(-maxLen) : predHistory;
+    const maxVal = Math.max(10, ...ph, ...dh);
+
+    const pad = 4;
+    const plotW = W - 2 * pad;
+    const plotH = H - 2 * pad;
+
+    // Prey sparkline (green)
+    sCtx.strokeStyle = '#4a8a5a';
+    sCtx.lineWidth = 1.5;
+    sCtx.beginPath();
+    for (let i = 0; i < ph.length; i++) {
+      const x = pad + (i / Math.max(1, ph.length - 1)) * plotW;
+      const y = pad + plotH - (ph[i] / maxVal) * plotH;
+      if (i === 0) sCtx.moveTo(x, y);
+      else sCtx.lineTo(x, y);
+    }
+    sCtx.stroke();
+
+    // Predator sparkline (red)
+    sCtx.strokeStyle = '#c96b5a';
+    sCtx.lineWidth = 1.5;
+    sCtx.beginPath();
+    for (let i = 0; i < dh.length; i++) {
+      const x = pad + (i / Math.max(1, dh.length - 1)) * plotW;
+      const y = pad + plotH - (dh[i] / maxVal) * plotH;
+      if (i === 0) sCtx.moveTo(x, y);
+      else sCtx.lineTo(x, y);
+    }
+    sCtx.stroke();
+
+    // Legend
+    sCtx.font = '9px "JetBrains Mono", monospace';
+    sCtx.fillStyle = '#4a8a5a';
+    sCtx.textAlign = 'right';
+    sCtx.fillText('prey', W - pad - 36, pad + 9);
+    sCtx.fillStyle = '#c96b5a';
+    sCtx.fillText('pred', W - pad, pad + 9);
+  }
+
+  let animTimer = null;
+  function startSim() {
+    running = true;
+    const btn = document.getElementById('pp-toggle');
+    btn.textContent = 'Pause';
+    btn.classList.add('active');
+    animTimer = setInterval(() => {
+      step();
+    }, 50);
+  }
+
+  function stopSim() {
+    running = false;
+    if (animTimer) clearInterval(animTimer);
+    animTimer = null;
+    const btn = document.getElementById('pp-toggle');
+    btn.textContent = 'Start';
+    btn.classList.remove('active');
+  }
+
+  document.getElementById('pp-toggle').addEventListener('click', () => {
+    if (running) stopSim();
+    else startSim();
+  });
+
+  init();
+})();
+</script>
+</div>
+<p style="text-align: center; margin-top: 12px;"><a href="12-predator-prey/index.html" style="color: #2a7f7f; font-size: 0.85rem;">Open full simulation →</a></p>
 
 <div class="thread">
   <div class="thread-label">The thread</div>
@@ -738,13 +2972,310 @@
   <cite>-- The complexity economics perspective</cite>
 </div>
 
-<div class="try-it">
-  <div class="try-it-icon">&#9654;</div>
-  <div class="try-it-content">
-    <div class="try-it-label">Try it yourself</div>
-    <p class="try-it-text">Watch inequality emerge from identical rules. Enable reproduction and observe trait evolution in real time. <a href="07-sugarscape/index.html">Open the Sugarscape simulation</a></p>
+<div class="mini-sim" id="mini-sugarscape">
+<style>
+  #mini-sugarscape {
+    max-width: 680px;
+    margin: 2rem auto;
+    background: var(--bg-card, #ffffff);
+    border: 1px solid var(--border, #e2e0da);
+    border-radius: var(--radius-lg, 12px);
+    box-shadow: 0 2px 8px rgba(26,26,46,0.06);
+    padding: 1.5rem;
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    color: var(--text-primary, #1a1a2e);
+  }
+  #mini-sugarscape .sim-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent-teal, #2a7f7f);
+    margin-bottom: 0.25rem;
+  }
+  #mini-sugarscape .sim-desc {
+    font-size: 0.72rem;
+    color: var(--text-tertiary, #7a7a8a);
+    margin-bottom: 0.75rem;
+  }
+  #mini-sugarscape canvas {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 8px;
+    background: #1a1a2e;
+    margin-bottom: 0.75rem;
+  }
+  #mini-sugarscape .metrics {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+  #mini-sugarscape .metric {
+    display: flex;
+    flex-direction: column;
+  }
+  #mini-sugarscape .metric-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-tertiary, #7a7a8a);
+    margin-bottom: 2px;
+  }
+  #mini-sugarscape .metric-value {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary, #1a1a2e);
+  }
+  #mini-sugarscape .controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  #mini-sugarscape .controls button {
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.4rem 1rem;
+    border: 1px solid var(--border, #e2e0da);
+    border-radius: 6px;
+    background: var(--bg, #faf9f5);
+    color: var(--text-primary, #1a1a2e);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  #mini-sugarscape .controls button:hover {
+    background: var(--bg-hover, #f5f3ee);
+  }
+  #mini-sugarscape .tick-badge {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 0.65rem;
+    color: var(--text-light, #9a9aaa);
+    margin-left: auto;
+  }
+</style>
+
+<div class="sim-title">Interactive: Sugarscape</div>
+<div class="sim-desc">Agents forage sugar peaks -- wealth inequality emerges from simple rules</div>
+
+<canvas id="ss-canvas" width="400" height="400"></canvas>
+
+<div class="metrics">
+  <div class="metric">
+    <span class="metric-label">Population</span>
+    <span class="metric-value" id="ss-pop">100</span>
+  </div>
+  <div class="metric">
+    <span class="metric-label">Gini</span>
+    <span class="metric-value" id="ss-gini">0.00</span>
+  </div>
+  <div class="metric">
+    <span class="metric-label">Avg Vision</span>
+    <span class="metric-value" id="ss-vision">3.5</span>
+  </div>
+  <div class="metric">
+    <span class="metric-label">Avg Metabolism</span>
+    <span class="metric-value" id="ss-metab">2.5</span>
   </div>
 </div>
+
+<div class="controls">
+  <button id="ss-toggle">Start</button>
+  <span class="tick-badge" id="ss-tick">tick 0</span>
+</div>
+
+<script>
+(function() {
+  const GRID = 40, N_AGENTS = 100;
+  const VISION_MIN = 1, VISION_MAX = 6;
+  const METAB_MIN = 1, METAB_MAX = 4;
+  const ENDOW_MIN = 5, ENDOW_MAX = 25;
+  const MAX_SUGAR = 4;
+  const PEAK1 = { x: 12, y: 12, h: 4, r: 16 };
+  const PEAK2 = { x: 28, y: 28, h: 4, r: 16 };
+
+  const canvas = document.getElementById('ss-canvas');
+  const ctx = canvas.getContext('2d');
+
+  let capacity = [], sugar = [], agents = [], tick = 0;
+  let running = false, raf = null;
+
+  function gauss(x, y, pk) {
+    var d = Math.sqrt((x - pk.x) * (x - pk.x) + (y - pk.y) * (y - pk.y));
+    return pk.h * Math.exp(-(d * d) / (2 * (pk.r / 2.5) * (pk.r / 2.5)));
+  }
+
+  function randInt(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+
+  function shuffle(arr) {
+    for (var i = arr.length - 1; i > 0; i--) {
+      var j = randInt(0, i);
+      var tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+    }
+  }
+
+  function init() {
+    tick = 0;
+    agents = [];
+    capacity = [];
+    sugar = [];
+    for (var y = 0; y < GRID; y++) {
+      capacity[y] = [];
+      sugar[y] = [];
+      for (var x = 0; x < GRID; x++) {
+        var c = Math.min(Math.max(Math.round(gauss(x, y, PEAK1) + gauss(x, y, PEAK2)), 0), MAX_SUGAR);
+        capacity[y][x] = c;
+        sugar[y][x] = c;
+      }
+    }
+    var pos = [];
+    for (var y = 0; y < GRID; y++)
+      for (var x = 0; x < GRID; x++) pos.push([x, y]);
+    shuffle(pos);
+    for (var i = 0; i < N_AGENTS; i++) {
+      agents.push({
+        x: pos[i][0], y: pos[i][1],
+        vision: randInt(VISION_MIN, VISION_MAX),
+        metabolism: randInt(METAB_MIN, METAB_MAX),
+        sugar: randInt(ENDOW_MIN, ENDOW_MAX),
+        alive: true
+      });
+    }
+  }
+
+  function occupied(x, y, exclude) {
+    for (var i = 0; i < agents.length; i++) {
+      var a = agents[i];
+      if (a.alive && a.x === x && a.y === y && a !== exclude) return true;
+    }
+    return false;
+  }
+
+  function step() {
+    shuffle(agents);
+    var dirs = [[0,1],[0,-1],[1,0],[-1,0]];
+    // move + gather
+    for (var i = 0; i < agents.length; i++) {
+      var a = agents[i];
+      if (!a.alive) continue;
+      var bestX = a.x, bestY = a.y, bestS = -1, bestD = 999;
+      for (var di = 0; di < 4; di++) {
+        var dx = dirs[di][0], dy = dirs[di][1];
+        for (var d = 1; d <= a.vision; d++) {
+          var nx = (a.x + dx * d + GRID) % GRID;
+          var ny = (a.y + dy * d + GRID) % GRID;
+          if (occupied(nx, ny, a)) continue;
+          var s = sugar[ny][nx];
+          if (s > bestS || (s === bestS && d < bestD)) {
+            bestS = s; bestX = nx; bestY = ny; bestD = d;
+          }
+        }
+      }
+      a.x = bestX; a.y = bestY;
+      a.sugar += sugar[bestY][bestX];
+      sugar[bestY][bestX] = 0;
+    }
+    // metabolism + death
+    for (var i = 0; i < agents.length; i++) {
+      var a = agents[i];
+      if (!a.alive) continue;
+      a.sugar -= a.metabolism;
+      if (a.sugar <= 0) a.alive = false;
+    }
+    agents = agents.filter(function(a) { return a.alive; });
+    // regrow
+    for (var y = 0; y < GRID; y++)
+      for (var x = 0; x < GRID; x++)
+        sugar[y][x] = Math.min(sugar[y][x] + 1, capacity[y][x]);
+    tick++;
+  }
+
+  function gini() {
+    if (agents.length === 0) return 0;
+    var w = agents.map(function(a) { return a.sugar; }).sort(function(a, b) { return a - b; });
+    var n = w.length, total = 0;
+    for (var i = 0; i < n; i++) total += w[i];
+    if (total <= 0) return 0;
+    var ws = 0;
+    for (var i = 0; i < n; i++) ws += (2 * (i + 1) - n - 1) * w[i];
+    return Math.max(0, Math.min(1, ws / (n * total)));
+  }
+
+  function draw() {
+    var cw = canvas.width, ch = canvas.height;
+    var cellW = cw / GRID, cellH = ch / GRID;
+    ctx.clearRect(0, 0, cw, ch);
+    // sugar landscape
+    for (var y = 0; y < GRID; y++) {
+      for (var x = 0; x < GRID; x++) {
+        var s = sugar[y][x] / MAX_SUGAR;
+        var r = Math.round(30 + s * 150);
+        var g = Math.round(25 + s * 110);
+        var b = Math.round(15 + s * 20);
+        ctx.fillStyle = 'rgb(' + r + ',' + g + ',' + b + ')';
+        ctx.fillRect(x * cellW, y * cellH, cellW, cellH);
+      }
+    }
+    // agents colored by wealth
+    if (agents.length === 0) return;
+    var maxW = 1;
+    for (var i = 0; i < agents.length; i++)
+      if (agents[i].sugar > maxW) maxW = agents[i].sugar;
+    for (var i = 0; i < agents.length; i++) {
+      var a = agents[i];
+      var t = Math.min(a.sugar / maxW, 1);
+      var r = Math.round(60 + t * 195);
+      var g = Math.round(180 - t * 80);
+      var b = Math.round(180 - t * 140);
+      ctx.fillStyle = 'rgb(' + r + ',' + g + ',' + b + ')';
+      ctx.beginPath();
+      ctx.arc(a.x * cellW + cellW / 2, a.y * cellH + cellH / 2, cellW * 0.35, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  function updateMetrics() {
+    var living = agents.filter(function(a) { return a.alive; });
+    document.getElementById('ss-pop').textContent = living.length;
+    document.getElementById('ss-gini').textContent = gini().toFixed(2);
+    if (living.length > 0) {
+      var sumV = 0, sumM = 0;
+      for (var i = 0; i < living.length; i++) {
+        sumV += living[i].vision;
+        sumM += living[i].metabolism;
+      }
+      document.getElementById('ss-vision').textContent = (sumV / living.length).toFixed(1);
+      document.getElementById('ss-metab').textContent = (sumM / living.length).toFixed(1);
+    } else {
+      document.getElementById('ss-vision').textContent = '--';
+      document.getElementById('ss-metab').textContent = '--';
+    }
+    document.getElementById('ss-tick').textContent = 'tick ' + tick;
+  }
+
+  function frame() {
+    step();
+    draw();
+    updateMetrics();
+    if (running) raf = requestAnimationFrame(frame);
+  }
+
+  document.getElementById('ss-toggle').addEventListener('click', function() {
+    running = !running;
+    this.textContent = running ? 'Pause' : 'Start';
+    if (running) raf = requestAnimationFrame(frame);
+    else if (raf) cancelAnimationFrame(raf);
+  });
+
+  init();
+  draw();
+  updateMetrics();
+})();
+</script>
+</div>
+<p style="text-align: center; margin-top: 12px;"><a href="07-sugarscape/index.html" style="color: #2a7f7f; font-size: 0.85rem;">Open full simulation →</a></p>
 
 <!-- ─── Ch 8: Schelling ─────────────────────────────── -->
 
@@ -767,13 +3298,311 @@
 
 <p>The relationship between threshold and segregation is sharply non-linear. At 10% threshold, amplification is trivial (7%). At 30%, it is major (49%). At 50%, neighborhoods are 90% homogeneous. At 75%, segregation is essentially perfect (99.8%), but at enormous cost: 65,820 moves over 95 ticks of shuffling. The system reaches the outcome eventually, but the path is tortuous.</p>
 
-<div class="try-it">
-  <div class="try-it-icon">&#9654;</div>
-  <div class="try-it-content">
-    <div class="try-it-label">Try it yourself</div>
-    <p class="try-it-text">Set a modest tolerance threshold and watch extreme segregation emerge. Adjust density and thresholds to explore the tipping point. <a href="11-schelling-segregation/index.html">Open the Schelling simulation</a></p>
+<div class="mini-sim" id="mini-schelling">
+<style>
+  #mini-schelling {
+    max-width: 680px;
+    margin: 2rem auto;
+    background: var(--bg-card, #ffffff);
+    border: 1px solid var(--border, #e2e0da);
+    border-radius: var(--radius-lg, 12px);
+    box-shadow: 0 2px 8px rgba(26,26,46,0.06);
+    padding: 1.5rem;
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    color: var(--text-primary, #1a1a2e);
+  }
+  #mini-schelling .sim-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent-teal, #2a7f7f);
+    margin-bottom: 0.25rem;
+  }
+  #mini-schelling .sim-desc {
+    font-size: 0.72rem;
+    color: var(--text-tertiary, #7a7a8a);
+    margin-bottom: 0.75rem;
+  }
+  #mini-schelling canvas {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 8px;
+    background: #f0eeea;
+    margin-bottom: 0.75rem;
+  }
+  #mini-schelling .metrics {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+  #mini-schelling .metric {
+    display: flex;
+    flex-direction: column;
+  }
+  #mini-schelling .metric-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-tertiary, #7a7a8a);
+    margin-bottom: 2px;
+  }
+  #mini-schelling .metric-value {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary, #1a1a2e);
+  }
+  #mini-schelling .controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+  #mini-schelling .controls button {
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.4rem 1rem;
+    border: 1px solid var(--border, #e2e0da);
+    border-radius: 6px;
+    background: var(--bg, #faf9f5);
+    color: var(--text-primary, #1a1a2e);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  #mini-schelling .controls button:hover {
+    background: var(--bg-hover, #f5f3ee);
+  }
+  #mini-schelling .controls .slider-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-left: auto;
+  }
+  #mini-schelling .controls .slider-wrap label {
+    font-size: 0.65rem;
+    color: var(--text-tertiary, #7a7a8a);
+  }
+  #mini-schelling .controls input[type="range"] {
+    width: 100px;
+    accent-color: var(--accent-teal, #2a7f7f);
+  }
+  #mini-schelling .controls .slider-val {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--text-primary, #1a1a2e);
+    min-width: 30px;
+  }
+  #mini-schelling .tick-badge {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 0.65rem;
+    color: var(--text-light, #9a9aaa);
+  }
+</style>
+
+<div class="sim-title">Interactive: Schelling Segregation</div>
+<div class="sim-desc">Mild individual preferences create extreme macro-level segregation</div>
+
+<canvas id="sch-canvas" width="400" height="400"></canvas>
+
+<div class="metrics">
+  <div class="metric">
+    <span class="metric-label">Segregation</span>
+    <span class="metric-value" id="sch-seg">50%</span>
+  </div>
+  <div class="metric">
+    <span class="metric-label">Happy</span>
+    <span class="metric-value" id="sch-happy">70%</span>
+  </div>
+  <div class="metric">
+    <span class="metric-label">Tick</span>
+    <span class="metric-value tick-badge" id="sch-tick-val">0</span>
   </div>
 </div>
+
+<div class="controls">
+  <button id="sch-step-btn">Step</button>
+  <button id="sch-auto-btn">Auto-play</button>
+  <button id="sch-reset-btn">Reset</button>
+  <div class="slider-wrap">
+    <label>Threshold</label>
+    <input type="range" id="sch-threshold" min="10" max="80" value="30" step="5">
+    <span class="slider-val" id="sch-thresh-val">0.30</span>
+  </div>
+</div>
+
+<script>
+(function() {
+  var GRID = 40, DENSITY = 0.7;
+  var CORAL = '#e07060', TEAL = '#50b0a0', EMPTY_CLR = '#f0eeea';
+
+  var canvas = document.getElementById('sch-canvas');
+  var ctx = canvas.getContext('2d');
+
+  var grid, emptyCells, allAgents, threshold, tick;
+  var autoRunning = false, timer = null;
+
+  function init() {
+    tick = 0;
+    grid = [];
+    emptyCells = [];
+    allAgents = [];
+    threshold = parseInt(document.getElementById('sch-threshold').value) / 100;
+    var positions = [];
+    for (var y = 0; y < GRID; y++) {
+      grid[y] = [];
+      for (var x = 0; x < GRID; x++) {
+        grid[y][x] = 0;
+        positions.push([x, y]);
+      }
+    }
+    shuffle(positions);
+    var nAgents = Math.floor(GRID * GRID * DENSITY);
+    var nA = Math.floor(nAgents * 0.5);
+    for (var i = 0; i < nAgents; i++) {
+      var x = positions[i][0], y = positions[i][1];
+      var type = i < nA ? 1 : 2;
+      grid[y][x] = type;
+      allAgents.push({ x: x, y: y, type: type, happy: true });
+    }
+    for (var i = nAgents; i < positions.length; i++)
+      emptyCells.push(positions[i]);
+    updateHappiness();
+  }
+
+  function shuffle(arr) {
+    for (var i = arr.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+    }
+  }
+
+  function neighbors(x, y) {
+    var n = [];
+    for (var dy = -1; dy <= 1; dy++)
+      for (var dx = -1; dx <= 1; dx++) {
+        if (dx === 0 && dy === 0) continue;
+        n.push([(x + dx + GRID) % GRID, (y + dy + GRID) % GRID]);
+      }
+    return n;
+  }
+
+  function isHappy(x, y) {
+    var type = grid[y][x];
+    if (type === 0) return true;
+    var same = 0, total = 0;
+    var nb = neighbors(x, y);
+    for (var i = 0; i < nb.length; i++) {
+      var n = grid[nb[i][1]][nb[i][0]];
+      if (n !== 0) { total++; if (n === type) same++; }
+    }
+    if (total === 0) return true;
+    return (same / total) >= threshold;
+  }
+
+  function updateHappiness() {
+    for (var i = 0; i < allAgents.length; i++)
+      allAgents[i].happy = isHappy(allAgents[i].x, allAgents[i].y);
+  }
+
+  function step() {
+    shuffle(allAgents);
+    for (var i = 0; i < allAgents.length; i++) {
+      var a = allAgents[i];
+      if (a.happy || emptyCells.length === 0) continue;
+      var idx = Math.floor(Math.random() * emptyCells.length);
+      var nx = emptyCells[idx][0], ny = emptyCells[idx][1];
+      grid[a.y][a.x] = 0;
+      emptyCells[idx] = [a.x, a.y];
+      a.x = nx; a.y = ny;
+      grid[ny][nx] = a.type;
+    }
+    updateHappiness();
+    tick++;
+  }
+
+  function segregationIndex() {
+    var totalFrac = 0, count = 0;
+    for (var i = 0; i < allAgents.length; i++) {
+      var a = allAgents[i];
+      var same = 0, occ = 0;
+      var nb = neighbors(a.x, a.y);
+      for (var j = 0; j < nb.length; j++) {
+        var n = grid[nb[j][1]][nb[j][0]];
+        if (n !== 0) { occ++; if (n === a.type) same++; }
+      }
+      if (occ > 0) { totalFrac += same / occ; count++; }
+    }
+    return count > 0 ? totalFrac / count : 0;
+  }
+
+  function happinessRate() {
+    if (allAgents.length === 0) return 1;
+    var h = 0;
+    for (var i = 0; i < allAgents.length; i++)
+      if (allAgents[i].happy) h++;
+    return h / allAgents.length;
+  }
+
+  function draw() {
+    var cw = canvas.width, ch = canvas.height;
+    var cellW = cw / GRID, cellH = ch / GRID;
+    ctx.clearRect(0, 0, cw, ch);
+    for (var y = 0; y < GRID; y++)
+      for (var x = 0; x < GRID; x++) {
+        var v = grid[y][x];
+        ctx.fillStyle = v === 1 ? CORAL : v === 2 ? TEAL : EMPTY_CLR;
+        ctx.fillRect(x * cellW, y * cellH, cellW - 0.5, cellH - 0.5);
+      }
+  }
+
+  function updateMetrics() {
+    document.getElementById('sch-seg').textContent = (segregationIndex() * 100).toFixed(0) + '%';
+    document.getElementById('sch-happy').textContent = (happinessRate() * 100).toFixed(0) + '%';
+    document.getElementById('sch-tick-val').textContent = tick;
+  }
+
+  function frame() {
+    step(); draw(); updateMetrics();
+    if (autoRunning) timer = setTimeout(frame, 60);
+  }
+
+  document.getElementById('sch-step-btn').addEventListener('click', function() {
+    step(); draw(); updateMetrics();
+  });
+
+  document.getElementById('sch-auto-btn').addEventListener('click', function() {
+    autoRunning = !autoRunning;
+    this.textContent = autoRunning ? 'Pause' : 'Auto-play';
+    if (autoRunning) frame();
+    else if (timer) { clearTimeout(timer); timer = null; }
+  });
+
+  document.getElementById('sch-reset-btn').addEventListener('click', function() {
+    autoRunning = false;
+    document.getElementById('sch-auto-btn').textContent = 'Auto-play';
+    if (timer) { clearTimeout(timer); timer = null; }
+    init(); draw(); updateMetrics();
+  });
+
+  document.getElementById('sch-threshold').addEventListener('input', function() {
+    threshold = parseInt(this.value) / 100;
+    document.getElementById('sch-thresh-val').textContent = threshold.toFixed(2);
+    updateHappiness();
+    updateMetrics();
+  });
+
+  init();
+  draw();
+  updateMetrics();
+})();
+</script>
+</div>
+<p style="text-align: center; margin-top: 12px;"><a href="11-schelling-segregation/index.html" style="color: #2a7f7f; font-size: 0.85rem;">Open full simulation →</a></p>
 
 <!-- ─── Ch 9: Sand Pile ─────────────────────────────── -->
 
@@ -794,13 +3623,279 @@
 
 <p>The avalanche size distribution follows a power law with exponent ~1.26. The median avalanche involves 22 topplings. The largest involves 6,647. Both extremes, and everything in between, emerge from the same mechanism: one grain, dropped on one cell. There is no characteristic scale, no "normal" event size. This is the core insight of SOC as applied to economics: traditional risk models based on normal distributions systematically underestimate tail risk because they assume a typical event size exists. In power-law systems, extreme events are not outliers -- they are inevitable consequences of the system's dynamics.</p>
 
-<div class="try-it">
-  <div class="try-it-icon">&#9654;</div>
-  <div class="try-it-content">
-    <div class="try-it-label">Try it yourself</div>
-    <p class="try-it-text">Drop grains and watch the pile reach criticality. See how one grain can trigger an avalanche spanning the entire grid. <a href="13-sand-pile/index.html">Open the Sand Pile simulation</a></p>
+<div class="mini-sim" id="mini-sandpile">
+<style>
+  #mini-sandpile {
+    max-width: 680px;
+    margin: 2rem auto;
+    background: var(--bg-card, #ffffff);
+    border: 1px solid var(--border, #e2e0da);
+    border-radius: var(--radius-lg, 12px);
+    box-shadow: 0 2px 8px rgba(26,26,46,0.06);
+    padding: 1.5rem;
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    color: var(--text-primary, #1a1a2e);
+  }
+  #mini-sandpile .sim-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent-teal, #2a7f7f);
+    margin-bottom: 0.25rem;
+  }
+  #mini-sandpile .sim-desc {
+    font-size: 0.72rem;
+    color: var(--text-tertiary, #7a7a8a);
+    margin-bottom: 0.75rem;
+  }
+  #mini-sandpile canvas {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 8px;
+    background: #1a1218;
+    margin-bottom: 0.75rem;
+    cursor: crosshair;
+  }
+  #mini-sandpile .metrics {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+  #mini-sandpile .metric {
+    display: flex;
+    flex-direction: column;
+  }
+  #mini-sandpile .metric-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-tertiary, #7a7a8a);
+    margin-bottom: 2px;
+  }
+  #mini-sandpile .metric-value {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary, #1a1a2e);
+  }
+  #mini-sandpile .controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  #mini-sandpile .controls button {
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.4rem 1rem;
+    border: 1px solid var(--border, #e2e0da);
+    border-radius: 6px;
+    background: var(--bg, #faf9f5);
+    color: var(--text-primary, #1a1a2e);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  #mini-sandpile .controls button:hover {
+    background: var(--bg-hover, #f5f3ee);
+  }
+  #mini-sandpile .tick-badge {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 0.65rem;
+    color: var(--text-light, #9a9aaa);
+    margin-left: auto;
+  }
+</style>
+
+<div class="sim-title">Interactive: Sand Pile</div>
+<div class="sim-desc">Self-organized criticality -- click to drop grains and trigger cascading avalanches</div>
+
+<canvas id="sp-canvas" width="390" height="390"></canvas>
+
+<div class="metrics">
+  <div class="metric">
+    <span class="metric-label">Total Grains</span>
+    <span class="metric-value" id="sp-grains">0</span>
+  </div>
+  <div class="metric">
+    <span class="metric-label">Last Avalanche</span>
+    <span class="metric-value" id="sp-last">0</span>
+  </div>
+  <div class="metric">
+    <span class="metric-label">Largest</span>
+    <span class="metric-value" id="sp-max">0</span>
   </div>
 </div>
+
+<div class="controls">
+  <button id="sp-drop-btn">Drop Grain</button>
+  <button id="sp-auto-btn">Auto-drop</button>
+  <span class="tick-badge" id="sp-tick">drops: 0</span>
+</div>
+
+<script>
+(function() {
+  var GRID = 30, THRESHOLD = 4;
+  var canvas = document.getElementById('sp-canvas');
+  var ctx = canvas.getContext('2d');
+
+  var heights, flash, drops, lastAvalanche, maxAvalanche;
+  var autoRunning = false, timer = null;
+
+  // color palette: height 0..3 gradient, 4+ bright
+  var COLORS = [
+    [20, 18, 30],
+    [50, 60, 90],
+    [80, 120, 140],
+    [140, 190, 180],
+    [240, 230, 180]
+  ];
+
+  function init() {
+    heights = [];
+    flash = [];
+    drops = 0;
+    lastAvalanche = 0;
+    maxAvalanche = 0;
+    for (var r = 0; r < GRID; r++) {
+      heights[r] = [];
+      flash[r] = [];
+      for (var c = 0; c < GRID; c++) {
+        heights[r][c] = 0;
+        flash[r][c] = 0;
+      }
+    }
+  }
+
+  function addGrain(row, col) {
+    heights[row][col]++;
+    var size = 0;
+    var affected = {};
+
+    var toTopple = {};
+    if (heights[row][col] >= THRESHOLD)
+      toTopple[row * GRID + col] = true;
+
+    var NB = [[-1,0],[1,0],[0,-1],[0,1]];
+
+    while (Object.keys(toTopple).length > 0) {
+      var next = {};
+      var keys = Object.keys(toTopple);
+      for (var ki = 0; ki < keys.length; ki++) {
+        var key = parseInt(keys[ki]);
+        var r = Math.floor(key / GRID), c = key % GRID;
+        while (heights[r][c] >= THRESHOLD) {
+          size++;
+          affected[key] = true;
+          heights[r][c] -= THRESHOLD;
+          for (var ni = 0; ni < 4; ni++) {
+            var nr = r + NB[ni][0], nc = c + NB[ni][1];
+            if (nr >= 0 && nr < GRID && nc >= 0 && nc < GRID) {
+              heights[nr][nc]++;
+              var nk = nr * GRID + nc;
+              affected[nk] = true;
+              if (heights[nr][nc] >= THRESHOLD) next[nk] = true;
+            }
+            // else grain falls off edge
+          }
+        }
+      }
+      toTopple = next;
+    }
+
+    // flash affected cells
+    if (size > 0) {
+      var affKeys = Object.keys(affected);
+      for (var i = 0; i < affKeys.length; i++) {
+        var k = parseInt(affKeys[i]);
+        flash[Math.floor(k / GRID)][k % GRID] = 1.0;
+      }
+    }
+
+    drops++;
+    lastAvalanche = size;
+    if (size > maxAvalanche) maxAvalanche = size;
+    return size;
+  }
+
+  function dropRandom() {
+    var r = Math.floor(Math.random() * GRID);
+    var c = Math.floor(Math.random() * GRID);
+    return addGrain(r, c);
+  }
+
+  function draw() {
+    var cw = canvas.width, ch = canvas.height;
+    var cellW = cw / GRID, cellH = ch / GRID;
+    ctx.clearRect(0, 0, cw, ch);
+    var anyFlash = false;
+    for (var r = 0; r < GRID; r++) {
+      for (var c = 0; c < GRID; c++) {
+        var idx = Math.min(heights[r][c], 4);
+        var base = COLORS[idx];
+        var f = flash[r][c];
+        var cr = Math.round(base[0] + (255 - base[0]) * f);
+        var cg = Math.round(base[1] + (255 - base[1]) * f);
+        var cb = Math.round(base[2] + (255 - base[2]) * f);
+        ctx.fillStyle = 'rgb(' + cr + ',' + cg + ',' + cb + ')';
+        ctx.fillRect(c * cellW, r * cellH, cellW - 0.5, cellH - 0.5);
+        if (f > 0) {
+          flash[r][c] = Math.max(0, f - 0.08);
+          if (flash[r][c] > 0) anyFlash = true;
+        }
+      }
+    }
+    if (anyFlash) requestAnimationFrame(draw);
+  }
+
+  function updateMetrics() {
+    var total = 0;
+    for (var r = 0; r < GRID; r++)
+      for (var c = 0; c < GRID; c++) total += heights[r][c];
+    document.getElementById('sp-grains').textContent = total;
+    document.getElementById('sp-last').textContent = lastAvalanche;
+    document.getElementById('sp-max').textContent = maxAvalanche;
+    document.getElementById('sp-tick').textContent = 'drops: ' + drops;
+  }
+
+  // click to drop grain at position
+  canvas.addEventListener('click', function(e) {
+    var rect = canvas.getBoundingClientRect();
+    var cellW = canvas.width / GRID, cellH = canvas.height / GRID;
+    var c = Math.floor((e.clientX - rect.left) / rect.width * GRID);
+    var r = Math.floor((e.clientY - rect.top) / rect.height * GRID);
+    if (r >= 0 && r < GRID && c >= 0 && c < GRID) {
+      addGrain(r, c);
+      draw();
+      updateMetrics();
+    }
+  });
+
+  document.getElementById('sp-drop-btn').addEventListener('click', function() {
+    dropRandom(); draw(); updateMetrics();
+  });
+
+  document.getElementById('sp-auto-btn').addEventListener('click', function() {
+    autoRunning = !autoRunning;
+    this.textContent = autoRunning ? 'Pause' : 'Auto-drop';
+    if (autoRunning) autoFrame();
+    else if (timer) { clearTimeout(timer); timer = null; }
+  });
+
+  function autoFrame() {
+    dropRandom(); draw(); updateMetrics();
+    if (autoRunning) timer = setTimeout(autoFrame, 40);
+  }
+
+  init();
+  draw();
+  updateMetrics();
+})();
+</script>
+</div>
+<p style="text-align: center; margin-top: 12px;"><a href="13-sand-pile/index.html" style="color: #2a7f7f; font-size: 0.85rem;">Open full simulation →</a></p>
 
 <!-- ─── Ch 10: Punctuated Equilibrium ───────────────── -->
 
@@ -828,13 +3923,359 @@
 
 <p>Size creates qualitative differences. Small ecosystems (N=20) undergo frequent, rapid turnover -- 94 phase transitions and 10 punctuation events. Large ecosystems (N=200) are more stable on average but produce rarer, catastrophic tail events: one cascade wiped out 60% of 200 species in a single event. This mirrors the real world: small island ecosystems undergo frequent turnover while continental systems experience rare mass extinctions.</p>
 
-<div class="try-it">
-  <div class="try-it-icon">&#9654;</div>
-  <div class="try-it-content">
-    <div class="try-it-label">Try it yourself</div>
-    <p class="try-it-text">Watch species replace the weakest, triggering cascades of creative destruction. Increase connectivity and observe the phase transition to perpetual catastrophe. <a href="04-punctuated-equilibrium/index.html">Open the Punctuated Equilibrium simulation</a></p>
+<div class="mini-sim" id="mini-puncteq">
+<style>
+  #mini-puncteq {
+    max-width: 680px;
+    margin: 2rem auto;
+    background: var(--bg-card, #ffffff);
+    border: 1px solid var(--border, #e2e0da);
+    border-radius: var(--radius-lg, 12px);
+    box-shadow: 0 2px 8px rgba(26,26,46,0.06);
+    padding: 1.5rem;
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    color: var(--text-primary, #1a1a2e);
+  }
+  #mini-puncteq .sim-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent-teal, #2a7f7f);
+    margin-bottom: 0.25rem;
+  }
+  #mini-puncteq .sim-desc {
+    font-size: 0.72rem;
+    color: var(--text-tertiary, #7a7a8a);
+    margin-bottom: 0.75rem;
+  }
+  #mini-puncteq canvas {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 8px;
+    background: var(--bg, #faf9f5);
+    margin-bottom: 0.75rem;
+  }
+  #mini-puncteq .metrics {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+  #mini-puncteq .metric {
+    display: flex;
+    flex-direction: column;
+  }
+  #mini-puncteq .metric-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-tertiary, #7a7a8a);
+    margin-bottom: 2px;
+  }
+  #mini-puncteq .metric-value {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary, #1a1a2e);
+  }
+  #mini-puncteq .phase-random { color: var(--text-tertiary, #7a7a8a); }
+  #mini-puncteq .phase-growth { color: var(--accent-green, #4a8a5a); }
+  #mini-puncteq .phase-organized { color: var(--accent-teal, #2a7f7f); }
+  #mini-puncteq .phase-punctuation { color: var(--accent-coral, #c96b5a); }
+  #mini-puncteq .controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  #mini-puncteq .controls button {
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.4rem 1rem;
+    border: 1px solid var(--border, #e2e0da);
+    border-radius: 6px;
+    background: var(--bg, #faf9f5);
+    color: var(--text-primary, #1a1a2e);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  #mini-puncteq .controls button:hover {
+    background: var(--bg-hover, #f5f3ee);
+  }
+  #mini-puncteq .tick-badge {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 0.65rem;
+    color: var(--text-light, #9a9aaa);
+    margin-left: auto;
+  }
+</style>
+
+<div class="sim-title">Interactive: Punctuated Equilibrium</div>
+<div class="sim-desc">Ecosystems self-organize until a keystone species dies, triggering cascades</div>
+
+<canvas id="pe-canvas" width="400" height="400"></canvas>
+
+<div class="metrics">
+  <div class="metric">
+    <span class="metric-label">Phase</span>
+    <span class="metric-value" id="pe-phase">Random</span>
+  </div>
+  <div class="metric">
+    <span class="metric-label">Mean Fitness</span>
+    <span class="metric-value" id="pe-fitness">0.50</span>
+  </div>
+  <div class="metric">
+    <span class="metric-label">Cascades</span>
+    <span class="metric-value" id="pe-cascades">0</span>
+  </div>
+  <div class="metric">
+    <span class="metric-label">Max Cascade</span>
+    <span class="metric-value" id="pe-maxcasc">0</span>
   </div>
 </div>
+
+<div class="controls">
+  <button id="pe-step-btn">Step</button>
+  <button id="pe-auto-btn">Auto-play</button>
+  <span class="tick-badge" id="pe-tick">tick 0</span>
+</div>
+
+<script>
+(function() {
+  var N = 30, CONN_PROB = 0.12;
+  var canvas = document.getElementById('pe-canvas');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+  var CX = W / 2, CY = H / 2, RADIUS = 160;
+
+  var species, weights, tick, cascadeCount, maxCascade, phase;
+  var recentFitness = [];
+  var autoRunning = false, timer = null;
+  var nodeX = [], nodeY = [];
+
+  function init() {
+    tick = 0;
+    cascadeCount = 0;
+    maxCascade = 0;
+    phase = 'Random';
+    recentFitness = [];
+    species = [];
+    weights = [];
+    for (var i = 0; i < N; i++) {
+      species.push({ fitness: 0, age: 0 });
+      weights[i] = new Float32Array(N);
+    }
+    // random connections
+    for (var i = 0; i < N; i++)
+      for (var j = 0; j < N; j++) {
+        if (i === j) continue;
+        if (Math.random() < CONN_PROB) weights[i][j] = Math.random() * 2 - 1;
+      }
+    // circle layout with jitter
+    for (var i = 0; i < N; i++) {
+      var angle = (2 * Math.PI * i) / N - Math.PI / 2;
+      nodeX[i] = CX + RADIUS * Math.cos(angle) + (Math.random() - 0.5) * 8;
+      nodeY[i] = CY + RADIUS * Math.sin(angle) + (Math.random() - 0.5) * 8;
+    }
+    computeAllFitness();
+  }
+
+  function sigmoid(x) { return 1 / (1 + Math.exp(-x)); }
+
+  function computeFitness(idx) {
+    var raw = 0, nPos = 0;
+    for (var j = 0; j < N; j++) {
+      if (j === idx || weights[idx][j] === 0) continue;
+      var sf = Math.max(species[j].fitness, 0.01);
+      raw += weights[idx][j] * sf;
+      if (weights[idx][j] > 0) nPos++;
+    }
+    if (nPos === 0) raw -= 0.5;
+    return sigmoid(raw * 2.0);
+  }
+
+  function computeAllFitness() {
+    for (var i = 0; i < N; i++) species[i].fitness = computeFitness(i);
+  }
+
+  function replaceSpecies(idx) {
+    species[idx] = { fitness: 0, age: 0 };
+    for (var j = 0; j < N; j++) { weights[idx][j] = 0; weights[j][idx] = 0; }
+    for (var j = 0; j < N; j++) {
+      if (j === idx) continue;
+      if (Math.random() < CONN_PROB) weights[idx][j] = Math.random() * 2 - 1;
+      if (Math.random() < CONN_PROB) weights[j][idx] = Math.random() * 2 - 1;
+    }
+    computeAllFitness();
+  }
+
+  function propagateCascade(preFitness, excluded) {
+    var totalRemoved = 0;
+    for (var iter = 0; iter < 15; iter++) {
+      var toRemove = [];
+      for (var i = 0; i < N; i++) {
+        if (excluded[i] || species[i].age === 0) continue;
+        var oldF = preFitness[i] || 0.5;
+        if (oldF > 0.25) {
+          var drop = (oldF - species[i].fitness) / oldF;
+          if (drop > 0.5 && species[i].fitness < 0.3) toRemove.push(i);
+        }
+      }
+      if (toRemove.length === 0) break;
+      var preRound = [];
+      for (var i = 0; i < N; i++) preRound[i] = species[i].fitness;
+      for (var k = 0; k < toRemove.length; k++) {
+        excluded[toRemove[k]] = true;
+        replaceSpecies(toRemove[k]);
+        totalRemoved++;
+      }
+      preFitness = preRound;
+    }
+    return totalRemoved;
+  }
+
+  function detectPhase() {
+    var sum = 0;
+    for (var i = 0; i < N; i++) sum += species[i].fitness;
+    var mean = sum / N;
+    recentFitness.push(mean);
+    if (recentFitness.length > 50) recentFitness = recentFitness.slice(-50);
+    if (recentFitness.length < 5) return 'Random';
+
+    if (recentFitness.length >= 3 &&
+        recentFitness[recentFitness.length - 1] < recentFitness[recentFitness.length - 2] * 0.85)
+      return 'Punctuation';
+
+    var variance = 0;
+    for (var i = 0; i < N; i++) variance += (species[i].fitness - mean) * (species[i].fitness - mean);
+    var std = Math.sqrt(variance / N);
+    if (mean > 0.6 && std < 0.15) return 'Organized';
+
+    var recentSlice = recentFitness.slice(-10);
+    var olderSlice = recentFitness.length >= 20 ? recentFitness.slice(-20, -10) : recentSlice;
+    var rMean = 0, oMean = 0;
+    for (var i = 0; i < recentSlice.length; i++) rMean += recentSlice[i];
+    rMean /= recentSlice.length;
+    for (var i = 0; i < olderSlice.length; i++) oMean += olderSlice[i];
+    oMean /= olderSlice.length;
+    if (rMean > oMean * 1.02) return 'Growth';
+
+    return 'Random';
+  }
+
+  function step() {
+    tick++;
+    for (var i = 0; i < N; i++) species[i].age++;
+
+    // find least fit
+    var minF = Infinity, minI = 0;
+    for (var i = 0; i < N; i++) {
+      if (species[i].fitness < minF) { minF = species[i].fitness; minI = i; }
+    }
+
+    var preFitness = [];
+    for (var i = 0; i < N; i++) preFitness[i] = species[i].fitness;
+    replaceSpecies(minI);
+
+    var excluded = {};
+    excluded[minI] = true;
+    var cascSize = propagateCascade(preFitness, excluded);
+    if (cascSize > 0) {
+      cascadeCount++;
+      if (cascSize > maxCascade) maxCascade = cascSize;
+    }
+
+    phase = detectPhase();
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+
+    // draw edges
+    for (var i = 0; i < N; i++) {
+      for (var j = i + 1; j < N; j++) {
+        var w = weights[i][j] + weights[j][i];
+        if (w === 0) continue;
+        var absW = Math.min(Math.abs(w), 2);
+        ctx.beginPath();
+        ctx.moveTo(nodeX[i], nodeY[i]);
+        ctx.lineTo(nodeX[j], nodeY[j]);
+        if (w > 0) {
+          ctx.strokeStyle = 'rgba(74, 138, 90, ' + (0.15 + absW * 0.2) + ')';
+        } else {
+          ctx.strokeStyle = 'rgba(201, 107, 90, ' + (0.15 + absW * 0.2) + ')';
+        }
+        ctx.lineWidth = 0.5 + absW * 0.5;
+        ctx.stroke();
+      }
+    }
+
+    // draw nodes
+    for (var i = 0; i < N; i++) {
+      var f = species[i].fitness;
+      var r = 4 + f * 10;
+      var red = Math.round(80 - f * 40);
+      var green = Math.round(100 + f * 80);
+      var blue = Math.round(100 + f * 80);
+      ctx.beginPath();
+      ctx.arc(nodeX[i], nodeY[i], r, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgb(' + red + ',' + green + ',' + blue + ')';
+      ctx.fill();
+      ctx.strokeStyle = '#1a1a2e';
+      ctx.lineWidth = 0.8;
+      ctx.stroke();
+
+      // highlight newly replaced species
+      if (species[i].age <= 1) {
+        ctx.beginPath();
+        ctx.arc(nodeX[i], nodeY[i], r + 3, 0, Math.PI * 2);
+        ctx.strokeStyle = '#c96b5a';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+      }
+    }
+  }
+
+  function updateMetrics() {
+    var sum = 0;
+    for (var i = 0; i < N; i++) sum += species[i].fitness;
+    var mean = sum / N;
+
+    var phaseEl = document.getElementById('pe-phase');
+    phaseEl.textContent = phase;
+    phaseEl.className = 'metric-value phase-' + phase.toLowerCase();
+
+    document.getElementById('pe-fitness').textContent = mean.toFixed(2);
+    document.getElementById('pe-cascades').textContent = cascadeCount;
+    document.getElementById('pe-maxcasc').textContent = maxCascade;
+    document.getElementById('pe-tick').textContent = 'tick ' + tick;
+  }
+
+  document.getElementById('pe-step-btn').addEventListener('click', function() {
+    step(); draw(); updateMetrics();
+  });
+
+  document.getElementById('pe-auto-btn').addEventListener('click', function() {
+    autoRunning = !autoRunning;
+    this.textContent = autoRunning ? 'Pause' : 'Auto-play';
+    if (autoRunning) autoFrame();
+    else if (timer) { clearTimeout(timer); timer = null; }
+  });
+
+  function autoFrame() {
+    step(); draw(); updateMetrics();
+    if (autoRunning) timer = setTimeout(autoFrame, 200);
+  }
+
+  init();
+  draw();
+  updateMetrics();
+})();
+</script>
+</div>
+<p style="text-align: center; margin-top: 12px;"><a href="04-punctuated-equilibrium/index.html" style="color: #2a7f7f; font-size: 0.85rem;">Open full simulation →</a></p>
 
 <div class="thread">
   <div class="thread-label">The thread</div>
@@ -875,13 +4316,355 @@
   <cite>-- Beinhocker, on creative destruction</cite>
 </div>
 
-<div class="try-it">
-  <div class="try-it-icon">&#9654;</div>
-  <div class="try-it-content">
-    <div class="try-it-label">Try it yourself</div>
-    <p class="try-it-text">Watch firms search fitness landscapes with different strategies. Increase landscape ruggedness and observe creative destruction intensify. <a href="08-technology-evolution/index.html">Open the Technology Evolution simulation</a></p>
+<div class="mini-sim" id="mini-tech-evolution">
+<style>
+  #mini-tech-evolution {
+    max-width: 680px;
+    margin: 2rem auto;
+    background: var(--bg-card, #ffffff);
+    border: 1px solid var(--border, #e2e0da);
+    border-radius: var(--radius-lg, 12px);
+    box-shadow: 0 2px 8px rgba(26,26,46,0.06);
+    padding: 1.5rem;
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    color: var(--text-primary, #1a1a2e);
+  }
+  #mini-tech-evolution .sim-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent-teal, #2a7f7f);
+    margin-bottom: 1rem;
+  }
+  #mini-tech-evolution .canvas-wrap {
+    width: 100%;
+    height: 260px;
+    margin-bottom: 0.75rem;
+    position: relative;
+  }
+  #mini-tech-evolution .canvas-wrap canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    border-radius: 6px;
+  }
+  #mini-tech-evolution .metrics {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+  #mini-tech-evolution .metric {
+    display: flex;
+    flex-direction: column;
+  }
+  #mini-tech-evolution .metric-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-tertiary, #7a7a8a);
+    margin-bottom: 2px;
+  }
+  #mini-tech-evolution .metric-value {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary, #1a1a2e);
+  }
+  #mini-tech-evolution .controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  #mini-tech-evolution .controls button {
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.4rem 1rem;
+    border: 1px solid var(--border, #e2e0da);
+    border-radius: 6px;
+    background: var(--bg, #faf9f5);
+    color: var(--text-primary, #1a1a2e);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  #mini-tech-evolution .controls button:hover {
+    background: var(--bg-hover, #f5f3ee);
+  }
+  #mini-tech-evolution .legend {
+    display: flex;
+    gap: 0.75rem;
+    margin-left: auto;
+    flex-wrap: wrap;
+  }
+  #mini-tech-evolution .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.6rem;
+    color: var(--text-tertiary, #7a7a8a);
+  }
+  #mini-tech-evolution .legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  #mini-tech-evolution .tick-badge {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 0.65rem;
+    color: var(--text-light, #9a9aaa);
+    margin-left: auto;
+  }
+</style>
+
+<div class="sim-title">Interactive: Technology Evolution</div>
+
+<div class="canvas-wrap">
+  <canvas id="te-canvas"></canvas>
+</div>
+
+<div class="metrics">
+  <div class="metric">
+    <span class="metric-label">Best Fitness</span>
+    <span class="metric-value" id="te-best">--</span>
+  </div>
+  <div class="metric">
+    <span class="metric-label">Mean Fitness</span>
+    <span class="metric-value" id="te-mean">--</span>
+  </div>
+  <div class="metric">
+    <span class="metric-label">Destructions</span>
+    <span class="metric-value" id="te-destructions">0</span>
   </div>
 </div>
+
+<div class="controls">
+  <button id="te-toggle-btn">Start</button>
+  <div class="legend">
+    <span class="legend-item"><span class="legend-dot" style="background:#3a5a8c"></span>Local</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#c96b5a"></span>Long-jump</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#4a8a5a"></span>Recomb</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#b08a3a"></span>Random</span>
+  </div>
+  <span class="tick-badge" id="te-tick">Tick 0</span>
+</div>
+
+<script>
+(function() {
+  // --- NK Landscape (N=8, K=3) ---
+  const N = 8, K = 3, NUM_FIRMS = 15;
+  const GRID = 16; // 2D projection: 16x16 heatmap from first 8 bits split into 4+4
+
+  // Build NK lookup tables
+  const interactions = [];
+  const tables = [];
+  const rng = () => Math.random();
+
+  for (let i = 0; i < N; i++) {
+    const others = [];
+    for (let j = 0; j < N; j++) if (j !== i) others.push(j);
+    // Shuffle
+    for (let s = others.length - 1; s > 0; s--) {
+      const r = Math.floor(rng() * (s + 1));
+      [others[s], others[r]] = [others[r], others[s]];
+    }
+    interactions.push(others.slice(0, K));
+    const table = {};
+    const combos = 1 << (K + 1);
+    for (let c = 0; c < combos; c++) {
+      table[c] = rng();
+    }
+    tables.push(table);
+  }
+
+  function fitness(genome) {
+    let total = 0;
+    for (let i = 0; i < N; i++) {
+      let key = genome[i];
+      for (let j = 0; j < K; j++) {
+        key |= (genome[interactions[i][j]] << (j + 1));
+      }
+      total += tables[i][key] || 0;
+    }
+    return total / N;
+  }
+
+  // Precompute 16x16 heatmap (first 4 bits = row, next 4 = col, rest = 0)
+  const heatmap = [];
+  for (let r = 0; r < GRID; r++) {
+    heatmap[r] = [];
+    for (let c = 0; c < GRID; c++) {
+      const genome = [0,0,0,0,0,0,0,0];
+      for (let b = 0; b < 4; b++) genome[b] = (r >> b) & 1;
+      for (let b = 0; b < 4; b++) genome[b + 4] = (c >> b) & 1;
+      heatmap[r][c] = fitness(genome);
+    }
+  }
+
+  // Strategies
+  const STRATEGIES = ['local', 'long_jump', 'recombination', 'random'];
+  const STRATEGY_COLORS = { local: '#3a5a8c', long_jump: '#c96b5a', recombination: '#4a8a5a', random: '#b08a3a' };
+
+  // Firms
+  const firms = [];
+  for (let i = 0; i < NUM_FIRMS; i++) {
+    const genome = [];
+    for (let b = 0; b < N; b++) genome.push(Math.random() < 0.5 ? 1 : 0);
+    firms.push({
+      genome: [...genome],
+      fitness: fitness(genome),
+      strategy: STRATEGIES[i % 4],
+      alive: true
+    });
+  }
+
+  let tick = 0;
+  let destructions = 0;
+
+  function mutateGenome(g, numBits) {
+    const ng = [...g];
+    const indices = [];
+    for (let i = 0; i < N; i++) indices.push(i);
+    for (let s = indices.length - 1; s > 0; s--) {
+      const r = Math.floor(rng() * (s + 1));
+      [indices[s], indices[r]] = [indices[r], indices[s]];
+    }
+    for (let i = 0; i < Math.min(numBits, N); i++) {
+      ng[indices[i]] ^= 1;
+    }
+    return ng;
+  }
+
+  function step() {
+    for (const f of firms) {
+      if (!f.alive) continue;
+      let candidate;
+      if (f.strategy === 'random') {
+        candidate = [];
+        for (let b = 0; b < N; b++) candidate.push(Math.random() < 0.5 ? 1 : 0);
+      } else if (f.strategy === 'local') {
+        candidate = mutateGenome(f.genome, 1);
+      } else if (f.strategy === 'long_jump') {
+        candidate = mutateGenome(f.genome, 3);
+      } else {
+        // Recombination: pick another alive firm, crossover
+        const others = firms.filter(o => o.alive && o !== f);
+        if (others.length > 0) {
+          const partner = others[Math.floor(rng() * others.length)];
+          candidate = [];
+          const crossPoint = Math.floor(rng() * N);
+          for (let b = 0; b < N; b++) {
+            candidate.push(b < crossPoint ? f.genome[b] : partner.genome[b]);
+          }
+        } else {
+          candidate = mutateGenome(f.genome, 1);
+        }
+      }
+      const cf = fitness(candidate);
+      if (cf > f.fitness) {
+        f.genome = candidate;
+        f.fitness = cf;
+      }
+    }
+
+    // Creative destruction: weakest firm replaced if below 60% of best
+    const aliveFirms = firms.filter(f => f.alive);
+    if (aliveFirms.length > 0) {
+      const bestFit = Math.max(...aliveFirms.map(f => f.fitness));
+      const worst = aliveFirms.reduce((a, b) => a.fitness < b.fitness ? a : b);
+      if (worst.fitness < bestFit * 0.6) {
+        // Replace with new entrant
+        const genome = [];
+        for (let b = 0; b < N; b++) genome.push(Math.random() < 0.5 ? 1 : 0);
+        worst.genome = genome;
+        worst.fitness = fitness(genome);
+        worst.strategy = STRATEGIES[Math.floor(rng() * 4)];
+        destructions++;
+      }
+    }
+
+    tick++;
+    render();
+  }
+
+  // --- Rendering ---
+  const canvas = document.getElementById('te-canvas');
+  const bestEl = document.getElementById('te-best');
+  const meanEl = document.getElementById('te-mean');
+  const destEl = document.getElementById('te-destructions');
+  const tickEl = document.getElementById('te-tick');
+  const toggleBtn = document.getElementById('te-toggle-btn');
+
+  function render() {
+    const ctx = canvas.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
+    const W = rect.width, H = rect.height;
+    ctx.clearRect(0, 0, W, H);
+
+    // Draw heatmap
+    const cellW = W / GRID, cellH = H / GRID;
+    for (let r = 0; r < GRID; r++) {
+      for (let c = 0; c < GRID; c++) {
+        const v = heatmap[r][c];
+        const intensity = Math.floor(v * 255);
+        ctx.fillStyle = `rgb(${235 - intensity * 0.5}, ${235 - intensity * 0.3}, ${235 - intensity * 0.6})`;
+        ctx.fillRect(c * cellW, r * cellH, cellW + 0.5, cellH + 0.5);
+      }
+    }
+
+    // Draw firms as dots
+    for (const f of firms) {
+      if (!f.alive) continue;
+      let row = 0, col = 0;
+      for (let b = 0; b < 4; b++) {
+        row |= (f.genome[b] << b);
+        col |= (f.genome[b + 4] << b);
+      }
+      const x = (col + 0.5) * cellW;
+      const y = (row + 0.5) * cellH;
+      ctx.fillStyle = STRATEGY_COLORS[f.strategy];
+      ctx.beginPath();
+      ctx.arc(x, y, Math.max(4, cellW * 0.3), 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    }
+
+    // Metrics
+    const aliveFirms = firms.filter(f => f.alive);
+    const best = aliveFirms.length ? Math.max(...aliveFirms.map(f => f.fitness)) : 0;
+    const mean = aliveFirms.length ? aliveFirms.reduce((s, f) => s + f.fitness, 0) / aliveFirms.length : 0;
+    bestEl.textContent = best.toFixed(3);
+    meanEl.textContent = mean.toFixed(3);
+    destEl.textContent = destructions;
+    tickEl.textContent = 'Tick ' + tick;
+  }
+
+  // --- Controls ---
+  let timer = null;
+  toggleBtn.addEventListener('click', function() {
+    if (timer) {
+      clearInterval(timer);
+      timer = null;
+      toggleBtn.textContent = 'Start';
+    } else {
+      timer = setInterval(step, 200);
+      toggleBtn.textContent = 'Pause';
+    }
+  });
+
+  render();
+})();
+</script>
+</div>
+<p style="text-align: center; margin-top: 12px;"><a href="08-technology-evolution/index.html" style="color: #2a7f7f; font-size: 0.85rem;">Open full simulation →</a></p>
 
 <!-- ─── Ch 12: Rigids vs Flexibles ──────────────────── -->
 
@@ -909,13 +4692,350 @@
   <cite>-- Beinhocker, Chapters 12-13</cite>
 </div>
 
-<div class="try-it">
-  <div class="try-it-icon">&#9654;</div>
-  <div class="try-it-content">
-    <div class="try-it-label">Try it yourself</div>
-    <p class="try-it-text">Watch the tournament purge Flexibles during stability, then trigger an environment switch and see the organization struggle. <a href="05-rigids-flexibles/index.html">Open the Rigids vs. Flexibles simulation</a></p>
+<div class="mini-sim" id="mini-rigids-flexibles">
+<style>
+  #mini-rigids-flexibles {
+    max-width: 680px;
+    margin: 2rem auto;
+    background: var(--bg-card, #ffffff);
+    border: 1px solid var(--border, #e2e0da);
+    border-radius: var(--radius-lg, 12px);
+    box-shadow: 0 2px 8px rgba(26,26,46,0.06);
+    padding: 1.5rem;
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    color: var(--text-primary, #1a1a2e);
+  }
+  #mini-rigids-flexibles .sim-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent-teal, #2a7f7f);
+    margin-bottom: 1rem;
+  }
+  #mini-rigids-flexibles .env-bar {
+    width: 100%;
+    height: 28px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 0.7rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    transition: background 0.3s;
+    color: #ffffff;
+  }
+  #mini-rigids-flexibles .canvas-wrap {
+    width: 100%;
+    height: 180px;
+    margin-bottom: 0.75rem;
+    position: relative;
+  }
+  #mini-rigids-flexibles .canvas-wrap canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  #mini-rigids-flexibles .metrics {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+  #mini-rigids-flexibles .metric {
+    display: flex;
+    flex-direction: column;
+  }
+  #mini-rigids-flexibles .metric-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-tertiary, #7a7a8a);
+    margin-bottom: 2px;
+  }
+  #mini-rigids-flexibles .metric-value {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary, #1a1a2e);
+  }
+  #mini-rigids-flexibles .controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+  #mini-rigids-flexibles .controls button {
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.4rem 1rem;
+    border: 1px solid var(--border, #e2e0da);
+    border-radius: 6px;
+    background: var(--bg, #faf9f5);
+    color: var(--text-primary, #1a1a2e);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  #mini-rigids-flexibles .controls button:hover {
+    background: var(--bg-hover, #f5f3ee);
+  }
+  #mini-rigids-flexibles .controls label {
+    font-size: 0.7rem;
+    color: var(--text-secondary, #4a4a5a);
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    cursor: pointer;
+    user-select: none;
+  }
+  #mini-rigids-flexibles .controls input[type="checkbox"] {
+    accent-color: var(--accent-teal, #2a7f7f);
+  }
+  #mini-rigids-flexibles .slider-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  #mini-rigids-flexibles .slider-wrap input[type="range"] {
+    width: 80px;
+    accent-color: var(--accent-teal, #2a7f7f);
+  }
+  #mini-rigids-flexibles .slider-label {
+    font-size: 0.65rem;
+    color: var(--text-tertiary, #7a7a8a);
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  }
+  #mini-rigids-flexibles .tick-badge {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 0.65rem;
+    color: var(--text-light, #9a9aaa);
+    margin-left: auto;
+  }
+</style>
+
+<div class="sim-title">Interactive: Rigids vs Flexibles</div>
+
+<div class="env-bar" id="rf-env-bar">Environment: A</div>
+
+<div class="canvas-wrap">
+  <canvas id="rf-canvas"></canvas>
+</div>
+
+<div class="metrics">
+  <div class="metric">
+    <span class="metric-label">Rigid %</span>
+    <span class="metric-value" id="rf-rigid-pct">--</span>
+  </div>
+  <div class="metric">
+    <span class="metric-label">Environment</span>
+    <span class="metric-value" id="rf-env-state">A</span>
+  </div>
+  <div class="metric">
+    <span class="metric-label">Performance</span>
+    <span class="metric-value" id="rf-perf">--</span>
   </div>
 </div>
+
+<div class="controls">
+  <button id="rf-step-btn">Step</button>
+  <label><input type="checkbox" id="rf-autoplay"> Auto-play</label>
+  <div class="slider-wrap">
+    <span class="slider-label">Stability</span>
+    <input type="range" id="rf-stability" min="1" max="20" value="10">
+    <span class="slider-label" id="rf-stab-val">10</span>
+  </div>
+  <span class="tick-badge" id="rf-tick">Tick 0</span>
+</div>
+
+<script>
+(function() {
+  // 3-level hierarchy: 9 bottom, 3 middle, 1 top = 13 agents
+  const LEVELS = [9, 3, 1];
+  const TOTAL = 13;
+
+  let envState = 'A';
+  let ticksSinceSwitch = 0;
+  let stability = 10; // mean ticks between switches
+  let tick = 0;
+
+  // Build agents
+  const agents = [];
+  let id = 0;
+  for (let lv = 0; lv < LEVELS.length; lv++) {
+    for (let i = 0; i < LEVELS[lv]; i++) {
+      const isRigid = Math.random() < 0.6;
+      agents.push({
+        id: id++,
+        level: lv,
+        type: isRigid ? 'rigid' : 'flexible',
+        fixedStrategy: Math.random() < 0.5 ? 'A' : 'B',
+        experience: 0,
+        performance: 0
+      });
+    }
+  }
+
+  function getStabilitySlider() {
+    return parseInt(document.getElementById('rf-stability').value);
+  }
+
+  function step() {
+    stability = getStabilitySlider();
+    ticksSinceSwitch++;
+
+    // Environment switch with geometric distribution
+    if (Math.random() < 1 / stability) {
+      envState = envState === 'A' ? 'B' : 'A';
+      ticksSinceSwitch = 0;
+    }
+
+    // Evaluate performance
+    for (const ag of agents) {
+      let chosen;
+      if (ag.type === 'rigid') {
+        chosen = ag.fixedStrategy;
+      } else {
+        // Flexible: observe with noise
+        chosen = Math.random() < 0.15 ? (envState === 'A' ? 'B' : 'A') : envState;
+      }
+      const match = chosen === envState ? 1.0 : 0.0;
+      const expBonus = 0.1 * Math.log(1 + ag.experience);
+      ag.performance = match + expBonus;
+      ag.experience += ag.type === 'rigid' ? 1.0 : 0.5;
+    }
+
+    // Tournament promotion: within each level, worst performer replaced by type of best
+    for (let lv = 0; lv < LEVELS.length; lv++) {
+      const levelAgents = agents.filter(a => a.level === lv);
+      if (levelAgents.length < 2) continue;
+      const best = levelAgents.reduce((a, b) => a.performance > b.performance ? a : b);
+      const worst = levelAgents.reduce((a, b) => a.performance < b.performance ? a : b);
+      if (best !== worst && Math.random() < 0.3) {
+        worst.type = best.type;
+        worst.fixedStrategy = Math.random() < 0.5 ? 'A' : 'B';
+        worst.experience = 0;
+      }
+    }
+
+    tick++;
+    render();
+  }
+
+  // --- Rendering ---
+  const canvas = document.getElementById('rf-canvas');
+  const envBar = document.getElementById('rf-env-bar');
+  const rigidPctEl = document.getElementById('rf-rigid-pct');
+  const envStateEl = document.getElementById('rf-env-state');
+  const perfEl = document.getElementById('rf-perf');
+  const tickEl = document.getElementById('rf-tick');
+  const stepBtn = document.getElementById('rf-step-btn');
+  const autoBox = document.getElementById('rf-autoplay');
+  const stabSlider = document.getElementById('rf-stability');
+  const stabVal = document.getElementById('rf-stab-val');
+
+  stabSlider.addEventListener('input', function() {
+    stabVal.textContent = this.value;
+  });
+
+  function render() {
+    const ctx = canvas.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
+    const W = rect.width, H = rect.height;
+    ctx.clearRect(0, 0, W, H);
+
+    // Draw pyramid: level 0 (9) at bottom, level 1 (3) middle, level 2 (1) top
+    const cellSize = Math.min(W / 10, H / 5);
+    const gap = 4;
+    const pyramidH = LEVELS.length * (cellSize + gap);
+    const startY = (H - pyramidH) / 2;
+
+    for (let lv = LEVELS.length - 1; lv >= 0; lv--) {
+      const count = LEVELS[lv];
+      const rowW = count * (cellSize + gap) - gap;
+      const startX = (W - rowW) / 2;
+      const y = startY + (LEVELS.length - 1 - lv) * (cellSize + gap);
+
+      const levelAgents = agents.filter(a => a.level === lv);
+      for (let i = 0; i < levelAgents.length; i++) {
+        const ag = levelAgents[i];
+        const x = startX + i * (cellSize + gap);
+
+        if (ag.type === 'rigid') {
+          ctx.fillStyle = ag.fixedStrategy === 'A' ? '#c96b5a' : '#d4924a';
+        } else {
+          ctx.fillStyle = '#3a5a8c';
+        }
+
+        // Round rect
+        const r = 4;
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.lineTo(x + cellSize - r, y);
+        ctx.quadraticCurveTo(x + cellSize, y, x + cellSize, y + r);
+        ctx.lineTo(x + cellSize, y + cellSize - r);
+        ctx.quadraticCurveTo(x + cellSize, y + cellSize, x + cellSize - r, y + cellSize);
+        ctx.lineTo(x + r, y + cellSize);
+        ctx.quadraticCurveTo(x, y + cellSize, x, y + cellSize - r);
+        ctx.lineTo(x, y + r);
+        ctx.quadraticCurveTo(x, y, x + r, y);
+        ctx.closePath();
+        ctx.fill();
+
+        // Label
+        ctx.fillStyle = '#ffffff';
+        ctx.font = `${Math.max(9, cellSize * 0.35)}px 'Inter', sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        const label = ag.type === 'rigid' ? ag.fixedStrategy : 'F';
+        ctx.fillText(label, x + cellSize / 2, y + cellSize / 2);
+      }
+
+      // Level label
+      ctx.fillStyle = '#7a7a8a';
+      ctx.font = '10px Inter, sans-serif';
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'middle';
+      const labelY = y + cellSize / 2;
+      const labelNames = ['Top', 'Mid', 'Base'];
+      ctx.fillText(labelNames[LEVELS.length - 1 - lv], startX - 10, labelY);
+    }
+
+    // Environment bar
+    envBar.style.background = envState === 'A' ? '#c96b5a' : '#3a5a8c';
+    envBar.textContent = 'Environment: ' + envState;
+
+    // Metrics
+    const rigids = agents.filter(a => a.type === 'rigid');
+    const rigidPct = (rigids.length / TOTAL * 100).toFixed(0);
+    rigidPctEl.textContent = rigidPct + '%';
+    envStateEl.textContent = envState;
+    envStateEl.style.color = envState === 'A' ? '#c96b5a' : '#3a5a8c';
+
+    const avgPerf = agents.reduce((s, a) => s + a.performance, 0) / TOTAL;
+    perfEl.textContent = avgPerf.toFixed(2);
+    tickEl.textContent = 'Tick ' + tick;
+  }
+
+  // --- Controls ---
+  stepBtn.addEventListener('click', step);
+  let timer = null;
+  autoBox.addEventListener('change', function() {
+    if (this.checked) { timer = setInterval(step, 300); }
+    else { clearInterval(timer); timer = null; }
+  });
+
+  render();
+})();
+</script>
+</div>
+<p style="text-align: center; margin-top: 12px;"><a href="05-rigids-flexibles/index.html" style="color: #2a7f7f; font-size: 0.85rem;">Open full simulation →</a></p>
 
 <!-- ─── Ch 13: Business Plans ───────────────────────── -->
 
@@ -938,13 +5058,351 @@
 
 <p>The exploration-exploitation tradeoff appeared with precision. Low mutation (0.01) produced higher wealth by preserving good solutions but at the cost of diversity. High mutation (0.15) destroyed accumulated knowledge faster than it could be replaced, dropping PT and ST fitness below baseline despite maximum diversity. Too much exploration is as damaging as too little.</p>
 
-<div class="try-it">
-  <div class="try-it-icon">&#9654;</div>
-  <div class="try-it-content">
-    <div class="try-it-label">Try it yourself</div>
-    <p class="try-it-text">Watch business plans evolve on fitness landscapes. Shift market preferences and watch the Red Queen effect unfold. <a href="14-business-plans/index.html">Open the Business Plans simulation</a></p>
+<div class="mini-sim" id="mini-business-plans">
+<style>
+  #mini-business-plans {
+    max-width: 680px;
+    margin: 2rem auto;
+    background: var(--bg-card, #ffffff);
+    border: 1px solid var(--border, #e2e0da);
+    border-radius: var(--radius-lg, 12px);
+    box-shadow: 0 2px 8px rgba(26,26,46,0.06);
+    padding: 1.5rem;
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    color: var(--text-primary, #1a1a2e);
+  }
+  #mini-business-plans .sim-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent-teal, #2a7f7f);
+    margin-bottom: 1rem;
+  }
+  #mini-business-plans .canvas-wrap {
+    width: 100%;
+    height: 200px;
+    margin-bottom: 0.75rem;
+  }
+  #mini-business-plans .canvas-wrap canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    border-radius: 6px;
+  }
+  #mini-business-plans .metrics {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+  #mini-business-plans .metric {
+    display: flex;
+    flex-direction: column;
+  }
+  #mini-business-plans .metric-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-tertiary, #7a7a8a);
+    margin-bottom: 2px;
+  }
+  #mini-business-plans .metric-value {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary, #1a1a2e);
+  }
+  #mini-business-plans .controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  #mini-business-plans .controls button {
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.4rem 1rem;
+    border: 1px solid var(--border, #e2e0da);
+    border-radius: 6px;
+    background: var(--bg, #faf9f5);
+    color: var(--text-primary, #1a1a2e);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  #mini-business-plans .controls button:hover {
+    background: var(--bg-hover, #f5f3ee);
+  }
+  #mini-business-plans .legend {
+    display: flex;
+    gap: 0.75rem;
+    margin-left: auto;
+  }
+  #mini-business-plans .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.6rem;
+    color: var(--text-tertiary, #7a7a8a);
+  }
+  #mini-business-plans .legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  #mini-business-plans .tick-badge {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 0.65rem;
+    color: var(--text-light, #9a9aaa);
+    margin-left: auto;
+  }
+</style>
+
+<div class="sim-title">Interactive: Business Plan Evolution</div>
+
+<div class="canvas-wrap">
+  <canvas id="bp-canvas"></canvas>
+</div>
+
+<div class="metrics">
+  <div class="metric">
+    <span class="metric-label">Total Wealth</span>
+    <span class="metric-value" id="bp-wealth">--</span>
+  </div>
+  <div class="metric">
+    <span class="metric-label">Diversity</span>
+    <span class="metric-value" id="bp-diversity">--</span>
+  </div>
+  <div class="metric">
+    <span class="metric-label">Avg Fitness</span>
+    <span class="metric-value" id="bp-fitness">--</span>
   </div>
 </div>
+
+<div class="controls">
+  <button id="bp-toggle-btn">Start</button>
+  <div class="legend">
+    <span class="legend-item"><span class="legend-dot" style="background:#3a5a8c"></span>PT</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#4a8a5a"></span>ST</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#b08a3a"></span>Strategy</span>
+  </div>
+  <span class="tick-badge" id="bp-tick">Gen 0</span>
+</div>
+
+<script>
+(function() {
+  const POP = 20;
+  const BITS = 6; // per component
+
+  // Simple NK-ish fitness: random lookup for each component
+  function makeLookup() {
+    const table = {};
+    const combos = 1 << BITS;
+    for (let i = 0; i < combos; i++) table[i] = Math.random();
+    return table;
+  }
+  const ptTable = makeLookup();
+  const stTable = makeLookup();
+  const stratTable = makeLookup();
+
+  // Market preferences (shift over time)
+  let prefShift = 0;
+
+  function toInt(bits) {
+    let v = 0;
+    for (let i = 0; i < bits.length; i++) v |= (bits[i] << i);
+    return v;
+  }
+
+  function componentFitness(bits, table) {
+    return table[toInt(bits)] || 0;
+  }
+
+  function totalFitness(bp) {
+    const ptF = componentFitness(bp.pt, ptTable);
+    const stF = componentFitness(bp.st, stTable);
+    // Strategy fitness is shifted by market preferences
+    const shifted = bp.strat.map((b, i) => i < prefShift % BITS ? (1 - b) : b);
+    const stratF = componentFitness(shifted, stratTable);
+    bp.ptFit = ptF;
+    bp.stFit = stF;
+    bp.stratFit = stratF;
+    bp.fitness = ptF * stF * stratF;
+    bp.dominant = ptF >= stF && ptF >= stratF ? 'pt' : (stF >= stratF ? 'st' : 'strat');
+    return bp.fitness;
+  }
+
+  function randomBits() {
+    const b = [];
+    for (let i = 0; i < BITS; i++) b.push(Math.random() < 0.5 ? 1 : 0);
+    return b;
+  }
+
+  function mutateBits(bits, rate) {
+    return bits.map(b => Math.random() < rate ? (1 - b) : b);
+  }
+
+  // Initialize population
+  const plans = [];
+  for (let i = 0; i < POP; i++) {
+    const bp = { id: i, pt: randomBits(), st: randomBits(), strat: randomBits(),
+                 fitness: 0, ptFit: 0, stFit: 0, stratFit: 0, dominant: 'pt', wealth: 1.0 };
+    totalFitness(bp);
+    plans.push(bp);
+  }
+
+  let gen = 0;
+
+  function step() {
+    // Shift market preferences occasionally
+    if (Math.random() < 0.03) prefShift++;
+
+    // Evaluate
+    for (const bp of plans) totalFitness(bp);
+
+    // Accumulate wealth
+    for (const bp of plans) bp.wealth += bp.fitness * 2;
+
+    // Sort by fitness
+    plans.sort((a, b) => b.fitness - a.fitness);
+
+    // Replace bottom 20% with offspring of top 20%
+    const cutoff = Math.floor(POP * 0.2);
+    for (let i = 0; i < cutoff; i++) {
+      const parent = plans[i]; // top
+      const child = plans[POP - 1 - i]; // bottom
+      child.pt = mutateBits([...parent.pt], 0.08);
+      child.st = mutateBits([...parent.st], 0.08);
+      child.strat = mutateBits([...parent.strat], 0.08);
+      child.wealth = 1.0;
+      totalFitness(child);
+    }
+
+    // Crossover between random pairs
+    if (Math.random() < 0.3) {
+      const i = Math.floor(Math.random() * POP);
+      const j = Math.floor(Math.random() * POP);
+      if (i !== j) {
+        const crossPt = Math.floor(Math.random() * BITS);
+        for (let b = crossPt; b < BITS; b++) {
+          [plans[i].strat[b], plans[j].strat[b]] = [plans[j].strat[b], plans[i].strat[b]];
+        }
+        totalFitness(plans[i]);
+        totalFitness(plans[j]);
+      }
+    }
+
+    gen++;
+    render();
+  }
+
+  // --- Rendering ---
+  const canvas = document.getElementById('bp-canvas');
+  const wealthEl = document.getElementById('bp-wealth');
+  const divEl = document.getElementById('bp-diversity');
+  const fitEl = document.getElementById('bp-fitness');
+  const tickEl = document.getElementById('bp-tick');
+  const toggleBtn = document.getElementById('bp-toggle-btn');
+
+  const COMPONENT_COLORS = { pt: '#3a5a8c', st: '#4a8a5a', strat: '#b08a3a' };
+
+  function render() {
+    const ctx = canvas.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
+    const W = rect.width, H = rect.height;
+    ctx.clearRect(0, 0, W, H);
+
+    // Sort by fitness and draw top 10 as horizontal bars
+    const sorted = [...plans].sort((a, b) => b.fitness - a.fitness).slice(0, 10);
+    const maxFit = Math.max(...sorted.map(b => b.fitness), 0.01);
+    const barH = (H - 20) / 10;
+    const padding = 2;
+    const labelW = 32;
+
+    for (let i = 0; i < sorted.length; i++) {
+      const bp = sorted[i];
+      const y = i * barH + padding;
+      const barW = (W - labelW - 10) * (bp.fitness / maxFit);
+
+      ctx.fillStyle = COMPONENT_COLORS[bp.dominant];
+      const r = 3;
+      ctx.beginPath();
+      ctx.moveTo(labelW + r, y);
+      ctx.lineTo(labelW + barW - r, y);
+      ctx.quadraticCurveTo(labelW + barW, y, labelW + barW, y + r);
+      ctx.lineTo(labelW + barW, y + barH - padding - r);
+      ctx.quadraticCurveTo(labelW + barW, y + barH - padding, labelW + barW - r, y + barH - padding);
+      ctx.lineTo(labelW + r, y + barH - padding);
+      ctx.quadraticCurveTo(labelW, y + barH - padding, labelW, y + barH - padding - r);
+      ctx.lineTo(labelW, y + r);
+      ctx.quadraticCurveTo(labelW, y, labelW + r, y);
+      ctx.closePath();
+      ctx.fill();
+
+      // Rank label
+      ctx.fillStyle = '#7a7a8a';
+      ctx.font = '10px JetBrains Mono, monospace';
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('#' + (i + 1), labelW - 5, y + (barH - padding) / 2);
+
+      // Fitness label on bar
+      if (barW > 45) {
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '10px JetBrains Mono, monospace';
+        ctx.textAlign = 'left';
+        ctx.fillText(bp.fitness.toFixed(3), labelW + 6, y + (barH - padding) / 2);
+      }
+    }
+
+    // Metrics
+    const totalWealth = plans.reduce((s, b) => s + b.wealth, 0);
+    const avgFit = plans.reduce((s, b) => s + b.fitness, 0) / POP;
+
+    // Diversity: count unique genomes (Hamming spread)
+    let divScore = 0;
+    for (let i = 0; i < POP; i++) {
+      for (let j = i + 1; j < POP; j++) {
+        let diff = 0;
+        for (let b = 0; b < BITS; b++) {
+          if (plans[i].pt[b] !== plans[j].pt[b]) diff++;
+          if (plans[i].st[b] !== plans[j].st[b]) diff++;
+          if (plans[i].strat[b] !== plans[j].strat[b]) diff++;
+        }
+        divScore += diff;
+      }
+    }
+    const maxDiv = POP * (POP - 1) / 2 * BITS * 3;
+
+    wealthEl.textContent = totalWealth.toFixed(0);
+    divEl.textContent = (divScore / maxDiv * 100).toFixed(0) + '%';
+    fitEl.textContent = avgFit.toFixed(3);
+    tickEl.textContent = 'Gen ' + gen;
+  }
+
+  // --- Controls ---
+  let timer = null;
+  toggleBtn.addEventListener('click', function() {
+    if (timer) {
+      clearInterval(timer);
+      timer = null;
+      toggleBtn.textContent = 'Start';
+    } else {
+      timer = setInterval(step, 300);
+      toggleBtn.textContent = 'Pause';
+    }
+  });
+
+  render();
+})();
+</script>
+</div>
+<p style="text-align: center; margin-top: 12px;"><a href="14-business-plans/index.html" style="color: #2a7f7f; font-size: 0.85rem;">Open full simulation →</a></p>
 
 <div class="thread">
   <div class="thread-label">The thread</div>
@@ -986,13 +5444,328 @@
 
 <p>But the most hopeful finding comes from the stress test. Repeated, well-spaced shocks make the economy <em>more</em> resilient by driving organizational flexibility upward. Each crisis pushes flexibility up rapidly; stability erodes it slowly. The asymmetry creates a ratchet: after three shocks, flexibility reaches 0.80, and the economy survives a market panic that would have destroyed it earlier. Periodic disruption is, paradoxically, the price of resilience.</p>
 
-<div class="try-it">
-  <div class="try-it-icon">&#9654;</div>
-  <div class="try-it-content">
-    <div class="try-it-label">Try it yourself</div>
-    <p class="try-it-text">Run supply shocks, tech disruptions, and market panics on an interconnected economy. Watch cascades propagate through the dependency network. <a href="09-integrated-economy/index.html">Open the Integrated Economy simulation</a></p>
+<div class="mini-sim" id="mini-integrated-economy">
+<style>
+  #mini-integrated-economy {
+    max-width: 680px;
+    margin: 2rem auto;
+    background: var(--bg-card, #ffffff);
+    border: 1px solid var(--border, #e2e0da);
+    border-radius: var(--radius-lg, 12px);
+    box-shadow: 0 2px 8px rgba(26,26,46,0.06);
+    padding: 1.5rem;
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    color: var(--text-primary, #1a1a2e);
+  }
+  #mini-integrated-economy .sim-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent-teal, #2a7f7f);
+    margin-bottom: 1rem;
+  }
+  #mini-integrated-economy .canvas-wrap {
+    width: 100%;
+    height: 260px;
+    margin-bottom: 0.75rem;
+  }
+  #mini-integrated-economy .canvas-wrap canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    border-radius: 6px;
+  }
+  #mini-integrated-economy .metrics {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+  #mini-integrated-economy .metric {
+    display: flex;
+    flex-direction: column;
+  }
+  #mini-integrated-economy .metric-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-tertiary, #7a7a8a);
+    margin-bottom: 2px;
+  }
+  #mini-integrated-economy .metric-value {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary, #1a1a2e);
+  }
+  #mini-integrated-economy .controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  #mini-integrated-economy .controls button {
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.4rem 0.8rem;
+    border: 1px solid var(--border, #e2e0da);
+    border-radius: 6px;
+    background: var(--bg, #faf9f5);
+    color: var(--text-primary, #1a1a2e);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  #mini-integrated-economy .controls button:hover {
+    background: var(--bg-hover, #f5f3ee);
+  }
+  #mini-integrated-economy .controls button.active {
+    background: var(--accent-teal, #2a7f7f);
+    color: #ffffff;
+    border-color: var(--accent-teal, #2a7f7f);
+  }
+  #mini-integrated-economy .tick-badge {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 0.65rem;
+    color: var(--text-light, #9a9aaa);
+    margin-left: auto;
+  }
+</style>
+
+<div class="sim-title">Interactive: Integrated Economy</div>
+
+<div class="canvas-wrap">
+  <canvas id="ie-canvas"></canvas>
+</div>
+
+<div class="metrics">
+  <div class="metric">
+    <span class="metric-label">GDP</span>
+    <span class="metric-value" id="ie-gdp">--</span>
+  </div>
+  <div class="metric">
+    <span class="metric-label">Alive Firms</span>
+    <span class="metric-value" id="ie-alive">20</span>
+  </div>
+  <div class="metric">
+    <span class="metric-label">Market Index</span>
+    <span class="metric-value" id="ie-index">--</span>
   </div>
 </div>
+
+<div class="controls">
+  <button id="ie-toggle-btn">Start</button>
+  <button id="ie-normal-btn" class="active">Normal</button>
+  <button id="ie-supply-btn">Supply Shock</button>
+  <button id="ie-crash-btn">Market Crash</button>
+  <span class="tick-badge" id="ie-tick">Tick 0</span>
+</div>
+
+<script>
+(function() {
+  const NUM_FIRMS = 20;
+  const DEP_PROB = 0.12;
+
+  // Build firms as network nodes
+  const firms = [];
+  for (let i = 0; i < NUM_FIRMS; i++) {
+    // Position in a circle
+    const angle = (i / NUM_FIRMS) * Math.PI * 2;
+    firms.push({
+      id: i,
+      x: 0.5 + 0.38 * Math.cos(angle),
+      y: 0.5 + 0.38 * Math.sin(angle),
+      health: 0.7 + Math.random() * 0.3,
+      stockPrice: 100,
+      output: 5 + Math.random() * 5,
+      alive: true,
+      deps: []
+    });
+  }
+
+  // Build dependency network
+  const edges = [];
+  for (let i = 0; i < NUM_FIRMS; i++) {
+    for (let j = i + 1; j < NUM_FIRMS; j++) {
+      if (Math.random() < DEP_PROB) {
+        firms[i].deps.push(j);
+        firms[j].deps.push(i);
+        edges.push([i, j]);
+      }
+    }
+  }
+
+  let scenario = 'normal';
+  let tick = 0;
+  let shockTicks = 0;
+
+  function setScenario(s) {
+    scenario = s;
+    shockTicks = s === 'normal' ? 0 : 15;
+    // Update button states
+    document.getElementById('ie-normal-btn').classList.toggle('active', s === 'normal');
+    document.getElementById('ie-supply-btn').classList.toggle('active', s === 'supply');
+    document.getElementById('ie-crash-btn').classList.toggle('active', s === 'crash');
+  }
+
+  function step() {
+    if (shockTicks > 0) shockTicks--;
+    else if (scenario !== 'normal') scenario = 'normal';
+
+    for (const f of firms) {
+      if (!f.alive) continue;
+
+      // Base health recovery
+      f.health += 0.02 * (1 - f.health);
+
+      // Scenario effects
+      if (scenario === 'supply' && shockTicks > 0) {
+        f.health -= 0.04 + Math.random() * 0.03;
+      }
+      if (scenario === 'crash' && shockTicks > 0) {
+        f.stockPrice *= (0.92 + Math.random() * 0.06);
+        f.health -= 0.02;
+      }
+
+      // Random fluctuations
+      f.health += (Math.random() - 0.5) * 0.05;
+      f.stockPrice *= (1 + (Math.random() - 0.5) * 0.04);
+
+      // Contagion: failing neighbors hurt health
+      for (const depId of f.deps) {
+        const dep = firms[depId];
+        if (!dep.alive) {
+          f.health -= 0.08;
+        } else if (dep.health < 0.4) {
+          f.health -= 0.03;
+        }
+      }
+
+      // Clamp
+      f.health = Math.max(0, Math.min(1, f.health));
+      f.stockPrice = Math.max(1, f.stockPrice);
+
+      // Output proportional to health
+      f.output = f.health * (5 + Math.random() * 3);
+
+      // Firm failure
+      if (f.health < 0.15) {
+        f.alive = false;
+        f.output = 0;
+      }
+
+      // Stock price tracks health
+      const target = f.health * 100;
+      f.stockPrice += (target - f.stockPrice) * 0.1;
+    }
+
+    // Revive dead firms occasionally (new entrants)
+    for (const f of firms) {
+      if (!f.alive && Math.random() < 0.03) {
+        f.alive = true;
+        f.health = 0.5;
+        f.stockPrice = 50;
+        f.output = 3;
+      }
+    }
+
+    tick++;
+    render();
+  }
+
+  // --- Rendering ---
+  const canvas = document.getElementById('ie-canvas');
+  const gdpEl = document.getElementById('ie-gdp');
+  const aliveEl = document.getElementById('ie-alive');
+  const indexEl = document.getElementById('ie-index');
+  const tickEl = document.getElementById('ie-tick');
+  const toggleBtn = document.getElementById('ie-toggle-btn');
+
+  function healthColor(h) {
+    if (h > 0.65) return '#4a8a5a';
+    if (h > 0.4) return '#b08a3a';
+    return '#c96b5a';
+  }
+
+  function render() {
+    const ctx = canvas.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
+    const W = rect.width, H = rect.height;
+    ctx.clearRect(0, 0, W, H);
+
+    // Draw edges
+    ctx.strokeStyle = 'rgba(26,26,46,0.1)';
+    ctx.lineWidth = 1;
+    for (const [a, b] of edges) {
+      if (!firms[a].alive && !firms[b].alive) continue;
+      ctx.beginPath();
+      ctx.moveTo(firms[a].x * W, firms[a].y * H);
+      ctx.lineTo(firms[b].x * W, firms[b].y * H);
+      ctx.stroke();
+    }
+
+    // Draw nodes
+    for (const f of firms) {
+      const x = f.x * W, y = f.y * H;
+      const radius = f.alive ? 8 + f.output * 0.8 : 4;
+
+      ctx.globalAlpha = f.alive ? 1 : 0.25;
+      ctx.fillStyle = f.alive ? healthColor(f.health) : '#999';
+      ctx.beginPath();
+      ctx.arc(x, y, radius, 0, Math.PI * 2);
+      ctx.fill();
+
+      // White border
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+
+    // Metrics
+    const aliveFirms = firms.filter(f => f.alive);
+    const gdp = aliveFirms.reduce((s, f) => s + f.output, 0);
+    const index = aliveFirms.length ? aliveFirms.reduce((s, f) => s + f.stockPrice, 0) / aliveFirms.length : 0;
+
+    gdpEl.textContent = gdp.toFixed(1);
+    aliveEl.textContent = aliveFirms.length;
+    aliveEl.style.color = aliveFirms.length < 15 ? '#c96b5a' : '#1a1a2e';
+    indexEl.textContent = index.toFixed(1);
+    tickEl.textContent = 'Tick ' + tick;
+
+    // Update scenario button highlights
+    document.getElementById('ie-normal-btn').classList.toggle('active', scenario === 'normal');
+    document.getElementById('ie-supply-btn').classList.toggle('active', scenario === 'supply');
+    document.getElementById('ie-crash-btn').classList.toggle('active', scenario === 'crash');
+  }
+
+  // --- Controls ---
+  let timer = null;
+  toggleBtn.addEventListener('click', function() {
+    if (timer) {
+      clearInterval(timer);
+      timer = null;
+      toggleBtn.textContent = 'Start';
+    } else {
+      timer = setInterval(step, 200);
+      toggleBtn.textContent = 'Pause';
+    }
+  });
+
+  document.getElementById('ie-normal-btn').addEventListener('click', () => setScenario('normal'));
+  document.getElementById('ie-supply-btn').addEventListener('click', () => setScenario('supply'));
+  document.getElementById('ie-crash-btn').addEventListener('click', () => setScenario('crash'));
+
+  render();
+})();
+</script>
+</div>
+<p style="text-align: center; margin-top: 12px;"><a href="09-integrated-economy/index.html" style="color: #2a7f7f; font-size: 0.85rem;">Open full simulation →</a></p>
 
 <!-- ─── Ch 15: Strategy as Evolution ────────────────── -->
 
@@ -1019,13 +5792,374 @@
 
 <p>In the large economy (100 firms, 10 niches), individual portfolio diversity drops from 0.79 to 0.47 &mdash; but the market as a whole still covers all 10 niches. This is Beinhocker's core insight about markets: they function as massively parallel search algorithms. Individual firms can specialize while the system as a whole explores broadly. The market does what no individual firm can.</p>
 
-<div class="try-it">
-  <div class="try-it-icon">&#9654;</div>
-  <div class="try-it-content">
-    <div class="try-it-label">Try it yourself</div>
-    <p class="try-it-text">Pit exploiters, explorers, and adaptive firms against each other across shifting niches. Adjust volatility and watch the competency trap unfold. <a href="15-strategy/index.html">Open the Strategy simulation</a></p>
+<div class="mini-sim" id="mini-strategy">
+<style>
+  #mini-strategy {
+    max-width: 680px;
+    margin: 2rem auto;
+    background: var(--bg-card, #ffffff);
+    border: 1px solid var(--border, #e2e0da);
+    border-radius: var(--radius-lg, 12px);
+    box-shadow: 0 2px 8px rgba(26,26,46,0.06);
+    padding: 1.5rem;
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    color: var(--text-primary, #1a1a2e);
+  }
+  #mini-strategy .sim-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent-teal, #2a7f7f);
+    margin-bottom: 1rem;
+  }
+  #mini-strategy .canvas-wrap {
+    width: 100%;
+    height: 200px;
+    margin-bottom: 0.75rem;
+  }
+  #mini-strategy .canvas-wrap canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    border-radius: 6px;
+  }
+  #mini-strategy .metrics {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+  #mini-strategy .metric {
+    display: flex;
+    flex-direction: column;
+  }
+  #mini-strategy .metric-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-tertiary, #7a7a8a);
+    margin-bottom: 2px;
+  }
+  #mini-strategy .metric-value {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary, #1a1a2e);
+  }
+  #mini-strategy .controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+  #mini-strategy .controls button {
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.4rem 1rem;
+    border: 1px solid var(--border, #e2e0da);
+    border-radius: 6px;
+    background: var(--bg, #faf9f5);
+    color: var(--text-primary, #1a1a2e);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  #mini-strategy .controls button:hover {
+    background: var(--bg-hover, #f5f3ee);
+  }
+  #mini-strategy .legend {
+    display: flex;
+    gap: 0.75rem;
+  }
+  #mini-strategy .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.6rem;
+    color: var(--text-tertiary, #7a7a8a);
+  }
+  #mini-strategy .legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  #mini-strategy .slider-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  #mini-strategy .slider-wrap input[type="range"] {
+    width: 70px;
+    accent-color: var(--accent-teal, #2a7f7f);
+  }
+  #mini-strategy .slider-label {
+    font-size: 0.65rem;
+    color: var(--text-tertiary, #7a7a8a);
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  }
+  #mini-strategy .tick-badge {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 0.65rem;
+    color: var(--text-light, #9a9aaa);
+    margin-left: auto;
+  }
+</style>
+
+<div class="sim-title">Interactive: Strategy as Evolution</div>
+
+<div class="canvas-wrap">
+  <canvas id="st-canvas"></canvas>
+</div>
+
+<div class="metrics">
+  <div class="metric">
+    <span class="metric-label">Exploiters</span>
+    <span class="metric-value" id="st-exploiters" style="color:#c96b5a">5</span>
+  </div>
+  <div class="metric">
+    <span class="metric-label">Explorers</span>
+    <span class="metric-value" id="st-explorers" style="color:#3a5a8c">5</span>
+  </div>
+  <div class="metric">
+    <span class="metric-label">Adaptive</span>
+    <span class="metric-value" id="st-adaptive" style="color:#4a8a5a">5</span>
+  </div>
+  <div class="metric">
+    <span class="metric-label">Concentration</span>
+    <span class="metric-value" id="st-hhi">--</span>
   </div>
 </div>
+
+<div class="controls">
+  <button id="st-toggle-btn">Start</button>
+  <div class="slider-wrap">
+    <span class="slider-label">Volatility</span>
+    <input type="range" id="st-volatility" min="1" max="20" value="5">
+    <span class="slider-label" id="st-vol-val">5</span>
+  </div>
+  <div class="legend">
+    <span class="legend-item"><span class="legend-dot" style="background:#c96b5a"></span>Exploit</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#3a5a8c"></span>Explore</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#4a8a5a"></span>Adaptive</span>
+  </div>
+  <span class="tick-badge" id="st-tick">Tick 0</span>
+</div>
+
+<script>
+(function() {
+  const NUM_FIRMS = 15;
+  const NUM_NICHES = 4;
+  const HISTORY_LEN = 60;
+
+  const TYPE_COLORS = { exploiter: '#c96b5a', explorer: '#3a5a8c', adaptive: '#4a8a5a' };
+  const TYPES = ['exploiter', 'explorer', 'adaptive'];
+
+  // Niche attractiveness (shifts over time)
+  const niches = [];
+  for (let i = 0; i < NUM_NICHES; i++) niches.push(0.3 + Math.random() * 0.7);
+
+  // Firms
+  const firms = [];
+  for (let i = 0; i < NUM_FIRMS; i++) {
+    const type = TYPES[i % 3];
+    const exps = [];
+    for (let e = 0; e < 3; e++) {
+      exps.push({ niche: Math.floor(Math.random() * NUM_NICHES), capability: Math.random(), resources: 1 / 3 });
+    }
+    firms.push({ id: i, type, experiments: exps, fitness: 0, marketShare: 1 / NUM_FIRMS, alive: true });
+  }
+
+  let tick = 0;
+  const history = []; // Array of { exploiter, explorer, adaptive } share snapshots
+
+  function step() {
+    const volatility = parseInt(document.getElementById('st-volatility').value) / 100;
+
+    // Shift niches
+    for (let i = 0; i < NUM_NICHES; i++) {
+      if (Math.random() < volatility) {
+        niches[i] = Math.max(0.1, Math.min(1, niches[i] + (Math.random() - 0.5) * 0.4));
+      }
+    }
+
+    // Evaluate firms
+    const aliveFirms = firms.filter(f => f.alive);
+    for (const f of aliveFirms) {
+      let totalFit = 0;
+      for (const exp of f.experiments) {
+        const nicheFit = niches[exp.niche] || 0;
+        totalFit += exp.resources * exp.capability * nicheFit;
+      }
+      f.fitness = totalFit;
+
+      // Strategy-specific behavior
+      if (f.type === 'exploiter') {
+        // Concentrate resources on best experiment
+        const best = f.experiments.reduce((a, b) => a.capability * (niches[a.niche] || 0) > b.capability * (niches[b.niche] || 0) ? a : b);
+        for (const exp of f.experiments) exp.resources = exp === best ? 0.7 : 0.15;
+        // Improve best capability
+        best.capability = Math.min(1, best.capability + 0.02);
+      } else if (f.type === 'explorer') {
+        // Equal resources, high mutation
+        for (const exp of f.experiments) exp.resources = 1 / f.experiments.length;
+        if (Math.random() < 0.2) {
+          const idx = Math.floor(Math.random() * f.experiments.length);
+          f.experiments[idx].niche = Math.floor(Math.random() * NUM_NICHES);
+          f.experiments[idx].capability = 0.2 + Math.random() * 0.3;
+        }
+      } else {
+        // Adaptive: shift allocation based on performance
+        const fitByExp = f.experiments.map(e => e.capability * (niches[e.niche] || 0));
+        const totalExpFit = fitByExp.reduce((a, b) => a + b, 0) || 1;
+        for (let i = 0; i < f.experiments.length; i++) {
+          f.experiments[i].resources = 0.3 * f.experiments[i].resources + 0.7 * (fitByExp[i] / totalExpFit);
+        }
+        // Occasional exploration
+        if (Math.random() < 0.08) {
+          const idx = Math.floor(Math.random() * f.experiments.length);
+          f.experiments[idx].niche = Math.floor(Math.random() * NUM_NICHES);
+          f.experiments[idx].capability = 0.3 + Math.random() * 0.3;
+        }
+        // Improve best
+        const bestIdx = fitByExp.indexOf(Math.max(...fitByExp));
+        f.experiments[bestIdx].capability = Math.min(1, f.experiments[bestIdx].capability + 0.01);
+      }
+    }
+
+    // Market share proportional to fitness
+    const totalFit = aliveFirms.reduce((s, f) => s + f.fitness, 0) || 1;
+    for (const f of aliveFirms) f.marketShare = f.fitness / totalFit;
+
+    // Cull weakest, replace with offspring of best
+    if (aliveFirms.length > 3) {
+      const sorted = [...aliveFirms].sort((a, b) => a.fitness - b.fitness);
+      if (Math.random() < 0.15) {
+        const worst = sorted[0];
+        const best = sorted[sorted.length - 1];
+        worst.type = best.type;
+        worst.experiments = best.experiments.map(e => ({
+          niche: e.niche,
+          capability: Math.max(0.1, e.capability + (Math.random() - 0.5) * 0.2),
+          resources: e.resources
+        }));
+        worst.fitness = 0;
+      }
+    }
+
+    // Record history
+    const shares = { exploiter: 0, explorer: 0, adaptive: 0 };
+    for (const f of firms) {
+      if (f.alive) shares[f.type] += f.marketShare;
+    }
+    history.push(shares);
+    if (history.length > HISTORY_LEN) history.shift();
+
+    tick++;
+    render();
+  }
+
+  // --- Rendering ---
+  const canvas = document.getElementById('st-canvas');
+  const exploiterEl = document.getElementById('st-exploiters');
+  const explorerEl = document.getElementById('st-explorers');
+  const adaptiveEl = document.getElementById('st-adaptive');
+  const hhiEl = document.getElementById('st-hhi');
+  const tickEl = document.getElementById('st-tick');
+  const toggleBtn = document.getElementById('st-toggle-btn');
+  const volSlider = document.getElementById('st-volatility');
+  const volVal = document.getElementById('st-vol-val');
+
+  volSlider.addEventListener('input', function() { volVal.textContent = this.value; });
+
+  function render() {
+    const ctx = canvas.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
+    const W = rect.width, H = rect.height;
+    ctx.clearRect(0, 0, W, H);
+
+    if (history.length < 2) return;
+
+    // Stacked area chart
+    const stepW = W / (HISTORY_LEN - 1);
+    const order = ['exploiter', 'explorer', 'adaptive'];
+    const colors = [TYPE_COLORS.exploiter, TYPE_COLORS.explorer, TYPE_COLORS.adaptive];
+
+    for (let t = 0; t < order.length; t++) {
+      ctx.fillStyle = colors[t];
+      ctx.globalAlpha = 0.8;
+      ctx.beginPath();
+
+      // Bottom edge (cumulative of previous types)
+      for (let i = 0; i < history.length; i++) {
+        const x = (HISTORY_LEN - history.length + i) * stepW;
+        let bottom = 0;
+        for (let p = 0; p < t; p++) bottom += history[i][order[p]] || 0;
+        const y = H - bottom * H;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+
+      // Top edge (cumulative including current type)
+      for (let i = history.length - 1; i >= 0; i--) {
+        const x = (HISTORY_LEN - history.length + i) * stepW;
+        let top = 0;
+        for (let p = 0; p <= t; p++) top += history[i][order[p]] || 0;
+        const y = H - top * H;
+        ctx.lineTo(x, y);
+      }
+
+      ctx.closePath();
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+
+    // Axis labels
+    ctx.fillStyle = '#7a7a8a';
+    ctx.font = '9px JetBrains Mono, monospace';
+    ctx.textAlign = 'left';
+    ctx.fillText('100%', 2, 12);
+    ctx.fillText('0%', 2, H - 3);
+
+    // Metrics
+    const aliveFirms = firms.filter(f => f.alive);
+    const counts = { exploiter: 0, explorer: 0, adaptive: 0 };
+    for (const f of aliveFirms) counts[f.type]++;
+
+    exploiterEl.textContent = counts.exploiter;
+    explorerEl.textContent = counts.explorer;
+    adaptiveEl.textContent = counts.adaptive;
+
+    // HHI
+    const hhi = aliveFirms.reduce((s, f) => s + f.marketShare * f.marketShare, 0);
+    hhiEl.textContent = (hhi * 10000).toFixed(0);
+
+    tickEl.textContent = 'Tick ' + tick;
+  }
+
+  // --- Controls ---
+  let timer = null;
+  toggleBtn.addEventListener('click', function() {
+    if (timer) {
+      clearInterval(timer);
+      timer = null;
+      toggleBtn.textContent = 'Start';
+    } else {
+      timer = setInterval(step, 200);
+      toggleBtn.textContent = 'Pause';
+    }
+  });
+
+  render();
+})();
+</script>
+</div>
+<p style="text-align: center; margin-top: 12px;"><a href="15-strategy/index.html" style="color: #2a7f7f; font-size: 0.85rem;">Open full simulation →</a></p>
 
 <!-- ─── Ch 16: Public Policy ──────────────────────────── -->
 
@@ -1054,13 +6188,402 @@
 
 <p>Entry barriers also matter more than tax rates. Social democracy (regulation 0.40, tax 0.45) achieved 62% higher GDP and 42% lower unemployment than protectionism (regulation 0.80, tax 0.35). In an evolutionary economy, the flow of new entrants &mdash; the variation supply &mdash; matters more than the tax burden on incumbents.</p>
 
-<div class="try-it">
-  <div class="try-it-icon">&#9654;</div>
-  <div class="try-it-content">
-    <div class="try-it-label">Try it yourself</div>
-    <p class="try-it-text">Compare policy regimes head to head. Watch how entry barriers, innovation subsidies, and safety nets shape the evolutionary dynamics of a complex economy. <a href="16-public-policy/index.html">Open the Public Policy simulation</a></p>
+<div class="mini-sim" id="mini-public-policy">
+<style>
+  #mini-public-policy {
+    max-width: 680px;
+    margin: 2rem auto;
+    background: var(--bg-card, #ffffff);
+    border: 1px solid var(--border, #e2e0da);
+    border-radius: var(--radius-lg, 12px);
+    box-shadow: 0 2px 8px rgba(26,26,46,0.06);
+    padding: 1.5rem;
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    color: var(--text-primary, #1a1a2e);
+  }
+  #mini-public-policy .sim-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent-teal, #2a7f7f);
+    margin-bottom: 1rem;
+  }
+  #mini-public-policy .canvas-wrap {
+    width: 100%;
+    height: 220px;
+    margin-bottom: 0.75rem;
+  }
+  #mini-public-policy .canvas-wrap canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    border-radius: 6px;
+  }
+  #mini-public-policy .metrics {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+  #mini-public-policy .metric {
+    display: flex;
+    flex-direction: column;
+  }
+  #mini-public-policy .metric-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-tertiary, #7a7a8a);
+    margin-bottom: 2px;
+  }
+  #mini-public-policy .metric-value {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary, #1a1a2e);
+  }
+  #mini-public-policy .regime-selector {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  #mini-public-policy .regime-selector label {
+    font-size: 0.7rem;
+    color: var(--text-secondary, #4a4a5a);
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    cursor: pointer;
+    user-select: none;
+    padding: 0.25rem 0.5rem;
+    border: 1px solid var(--border, #e2e0da);
+    border-radius: 6px;
+    transition: background 0.15s;
+  }
+  #mini-public-policy .regime-selector label:hover {
+    background: var(--bg-hover, #f5f3ee);
+  }
+  #mini-public-policy .regime-selector input[type="radio"] {
+    accent-color: var(--accent-teal, #2a7f7f);
+  }
+  #mini-public-policy .controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  #mini-public-policy .controls button {
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.4rem 1rem;
+    border: 1px solid var(--border, #e2e0da);
+    border-radius: 6px;
+    background: var(--bg, #faf9f5);
+    color: var(--text-primary, #1a1a2e);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  #mini-public-policy .controls button:hover {
+    background: var(--bg-hover, #f5f3ee);
+  }
+  #mini-public-policy .tick-badge {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 0.65rem;
+    color: var(--text-light, #9a9aaa);
+    margin-left: auto;
+  }
+</style>
+
+<div class="sim-title">Interactive: Public Policy</div>
+
+<div class="regime-selector">
+  <label><input type="radio" name="pp-regime" value="laissez-faire" checked> Laissez-faire</label>
+  <label><input type="radio" name="pp-regime" value="innovation"> Pro-innovation</label>
+  <label><input type="radio" name="pp-regime" value="regulated"> Regulated</label>
+  <label><input type="radio" name="pp-regime" value="redistributive"> Redistributive</label>
+  <label><input type="radio" name="pp-regime" value="balanced"> Balanced</label>
+</div>
+
+<div class="canvas-wrap">
+  <canvas id="pp-canvas"></canvas>
+</div>
+
+<div class="metrics">
+  <div class="metric">
+    <span class="metric-label">GDP</span>
+    <span class="metric-value" id="pp-gdp">--</span>
+  </div>
+  <div class="metric">
+    <span class="metric-label">Unemployment</span>
+    <span class="metric-value" id="pp-unemp">--</span>
+  </div>
+  <div class="metric">
+    <span class="metric-label">Innovation Rate</span>
+    <span class="metric-value" id="pp-innov">--</span>
   </div>
 </div>
+
+<div class="controls">
+  <button id="pp-toggle-btn">Start</button>
+  <span class="tick-badge" id="pp-tick">Tick 0</span>
+</div>
+
+<script>
+(function() {
+  const NUM_FIRMS = 25;
+  const GENOME_LEN = 8;
+  const HISTORY_LEN = 80;
+
+  // Policy regimes: { regulation, taxRate, innovationSubsidy, competitionLimit, safetyNet }
+  const REGIMES = {
+    'laissez-faire':   { regulation: 0.1, taxRate: 0.05, innovationSubsidy: 0.0, competitionLimit: 1.0, safetyNet: 0.1 },
+    'innovation':      { regulation: 0.15, taxRate: 0.15, innovationSubsidy: 0.4, competitionLimit: 0.8, safetyNet: 0.2 },
+    'regulated':       { regulation: 0.6, taxRate: 0.3, innovationSubsidy: 0.05, competitionLimit: 0.3, safetyNet: 0.4 },
+    'redistributive':  { regulation: 0.3, taxRate: 0.5, innovationSubsidy: 0.1, competitionLimit: 0.4, safetyNet: 0.8 },
+    'balanced':        { regulation: 0.3, taxRate: 0.2, innovationSubsidy: 0.2, competitionLimit: 0.6, safetyNet: 0.4 }
+  };
+
+  // NK landscape
+  const interactions = [];
+  const tables = [];
+  const K = 2;
+  for (let i = 0; i < GENOME_LEN; i++) {
+    const others = [];
+    for (let j = 0; j < GENOME_LEN; j++) if (j !== i) others.push(j);
+    for (let s = others.length - 1; s > 0; s--) {
+      const r = Math.floor(Math.random() * (s + 1));
+      [others[s], others[r]] = [others[r], others[s]];
+    }
+    interactions.push(others.slice(0, K));
+    const table = {};
+    for (let c = 0; c < (1 << (K + 1)); c++) table[c] = Math.random();
+    tables.push(table);
+  }
+
+  function fitness(genome) {
+    let total = 0;
+    for (let i = 0; i < GENOME_LEN; i++) {
+      let key = genome[i];
+      for (let j = 0; j < K; j++) key |= (genome[interactions[i][j]] << (j + 1));
+      total += tables[i][key] || 0;
+    }
+    return total / GENOME_LEN;
+  }
+
+  // Firms
+  const firms = [];
+  for (let i = 0; i < NUM_FIRMS; i++) {
+    const genome = [];
+    for (let b = 0; b < GENOME_LEN; b++) genome.push(Math.random() < 0.5 ? 1 : 0);
+    firms.push({ genome, fitness: fitness(genome), output: 0, alive: true, marketShare: 1 / NUM_FIRMS });
+  }
+
+  let tick = 0;
+  let innovations = 0;
+  const gdpHistory = [];
+  let currentRegime = 'laissez-faire';
+
+  function getRegime() {
+    const radios = document.querySelectorAll('input[name="pp-regime"]');
+    for (const r of radios) if (r.checked) return r.value;
+    return 'laissez-faire';
+  }
+
+  function step() {
+    currentRegime = getRegime();
+    const policy = REGIMES[currentRegime];
+    const mutRate = 0.05 + policy.innovationSubsidy * 0.15;
+    const entryCost = 0.3 + policy.regulation * 0.4;
+    const operatingCost = 0.05 + policy.regulation * 0.08;
+
+    const aliveFirms = firms.filter(f => f.alive);
+
+    for (const f of aliveFirms) {
+      // Mutation (innovation)
+      const newGenome = f.genome.map(b => Math.random() < mutRate ? (1 - b) : b);
+      const newFit = fitness(newGenome);
+      if (newFit > f.fitness) {
+        f.genome = newGenome;
+        f.fitness = newFit;
+        innovations++;
+      }
+
+      // Output
+      f.output = f.fitness * 10 * (1 - policy.taxRate) - operatingCost;
+      f.output = Math.max(0, f.output);
+    }
+
+    // Market share with competition limit
+    const totalFit = aliveFirms.reduce((s, f) => s + f.fitness, 0) || 1;
+    for (const f of aliveFirms) {
+      f.marketShare = Math.min(policy.competitionLimit, f.fitness / totalFit);
+    }
+    // Renormalize
+    const totalShare = aliveFirms.reduce((s, f) => s + f.marketShare, 0) || 1;
+    for (const f of aliveFirms) f.marketShare /= totalShare;
+
+    // Firm failure: low output firms die
+    for (const f of aliveFirms) {
+      if (f.output < operatingCost * 2 && Math.random() < 0.1) {
+        f.alive = false;
+      }
+    }
+
+    // New entrants (easier when regulation is low)
+    for (const f of firms) {
+      if (!f.alive && Math.random() < (0.05 * (1 - entryCost * 0.5) + policy.safetyNet * 0.03)) {
+        const genome = [];
+        for (let b = 0; b < GENOME_LEN; b++) genome.push(Math.random() < 0.5 ? 1 : 0);
+        f.genome = genome;
+        f.fitness = fitness(genome);
+        f.alive = true;
+        f.output = 0;
+        f.marketShare = 0;
+      }
+    }
+
+    // GDP
+    const gdp = firms.filter(f => f.alive).reduce((s, f) => s + f.output, 0);
+    gdpHistory.push(gdp);
+    if (gdpHistory.length > HISTORY_LEN) gdpHistory.shift();
+
+    tick++;
+    render();
+  }
+
+  // --- Rendering ---
+  const canvas = document.getElementById('pp-canvas');
+  const gdpEl = document.getElementById('pp-gdp');
+  const unempEl = document.getElementById('pp-unemp');
+  const innovEl = document.getElementById('pp-innov');
+  const tickEl = document.getElementById('pp-tick');
+  const toggleBtn = document.getElementById('pp-toggle-btn');
+
+  // Regime colors
+  const REGIME_COLORS = {
+    'laissez-faire': '#b08a3a',
+    'innovation': '#3a5a8c',
+    'regulated': '#c96b5a',
+    'redistributive': '#8a5a8c',
+    'balanced': '#2a7f7f'
+  };
+
+  function render() {
+    const ctx = canvas.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
+    const W = rect.width, H = rect.height;
+    ctx.clearRect(0, 0, W, H);
+
+    // GDP line chart
+    if (gdpHistory.length < 2) {
+      ctx.fillStyle = '#7a7a8a';
+      ctx.font = '11px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('Press Start to begin simulation', W / 2, H / 2);
+      return;
+    }
+
+    const maxGdp = Math.max(...gdpHistory, 1);
+    const minGdp = Math.min(...gdpHistory, 0);
+    const range = maxGdp - minGdp || 1;
+    const stepW = W / (HISTORY_LEN - 1);
+    const pad = 20;
+
+    // Grid lines
+    ctx.strokeStyle = 'rgba(26,26,46,0.08)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([3, 3]);
+    for (let i = 0; i <= 4; i++) {
+      const y = pad + (H - 2 * pad) * (i / 4);
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(W, y);
+      ctx.stroke();
+    }
+    ctx.setLineDash([]);
+
+    // Y-axis labels
+    ctx.fillStyle = '#7a7a8a';
+    ctx.font = '9px JetBrains Mono, monospace';
+    ctx.textAlign = 'left';
+    ctx.fillText(maxGdp.toFixed(0), 2, pad - 3);
+    ctx.fillText(minGdp.toFixed(0), 2, H - pad + 12);
+
+    // GDP line
+    const lineColor = REGIME_COLORS[currentRegime] || '#2a7f7f';
+    ctx.strokeStyle = lineColor;
+    ctx.lineWidth = 2;
+    ctx.lineJoin = 'round';
+    ctx.beginPath();
+    for (let i = 0; i < gdpHistory.length; i++) {
+      const x = (HISTORY_LEN - gdpHistory.length + i) * stepW;
+      const y = pad + (H - 2 * pad) * (1 - (gdpHistory[i] - minGdp) / range);
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+
+    // Fill under line
+    const lastX = (HISTORY_LEN - 1) * stepW;
+    const firstX = (HISTORY_LEN - gdpHistory.length) * stepW;
+    ctx.lineTo(lastX, H - pad);
+    ctx.lineTo(firstX, H - pad);
+    ctx.closePath();
+    ctx.fillStyle = lineColor;
+    ctx.globalAlpha = 0.08;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+
+    // Current value dot
+    const lastY = pad + (H - 2 * pad) * (1 - (gdpHistory[gdpHistory.length - 1] - minGdp) / range);
+    ctx.fillStyle = lineColor;
+    ctx.beginPath();
+    ctx.arc(lastX, lastY, 4, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Regime label
+    ctx.fillStyle = lineColor;
+    ctx.font = '10px Inter, sans-serif';
+    ctx.textAlign = 'right';
+    ctx.fillText(currentRegime, W - 5, pad + 12);
+
+    // Metrics
+    const aliveFirms = firms.filter(f => f.alive);
+    const gdp = gdpHistory[gdpHistory.length - 1];
+    const unemp = ((NUM_FIRMS - aliveFirms.length) / NUM_FIRMS * 100);
+    const innovRate = tick > 0 ? (innovations / tick) : 0;
+
+    gdpEl.textContent = gdp.toFixed(1);
+    unempEl.textContent = unemp.toFixed(0) + '%';
+    unempEl.style.color = unemp > 20 ? '#c96b5a' : '#1a1a2e';
+    innovEl.textContent = innovRate.toFixed(2) + '/t';
+    tickEl.textContent = 'Tick ' + tick;
+  }
+
+  // --- Controls ---
+  let timer = null;
+  toggleBtn.addEventListener('click', function() {
+    if (timer) {
+      clearInterval(timer);
+      timer = null;
+      toggleBtn.textContent = 'Start';
+    } else {
+      timer = setInterval(step, 150);
+      toggleBtn.textContent = 'Pause';
+    }
+  });
+
+  render();
+})();
+</script>
+</div>
+<p style="text-align: center; margin-top: 12px;"><a href="16-public-policy/index.html" style="color: #2a7f7f; font-size: 0.85rem;">Open full simulation →</a></p>
 
 <!-- ─── EPILOGUE ─────────────────────────────────────── -->
 

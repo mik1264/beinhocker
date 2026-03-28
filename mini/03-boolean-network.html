@@ -1,0 +1,331 @@
+<div class="mini-sim" id="mini-boolean-network" style="max-width:680px;margin:0 auto;">
+<style>
+#mini-boolean-network {
+  background: #ffffff;
+  border: 1px solid #e2e0da;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(26,26,46,0.06);
+  padding: 20px 24px 18px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: #1a1a2e;
+}
+#mini-boolean-network .sim-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin-bottom: 12px;
+  color: #1a1a2e;
+}
+#mini-boolean-network .sim-metrics {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+#mini-boolean-network .metric {
+  font-size: 0.72rem;
+  color: #4a4a5a;
+}
+#mini-boolean-network .metric span {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-weight: 500;
+  color: #1a1a2e;
+}
+#mini-boolean-network .regime-label {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 1px 8px;
+  border-radius: 4px;
+}
+#mini-boolean-network .regime-ordered { background: #e8f4f4; color: #2a7f7f; }
+#mini-boolean-network .regime-critical { background: #fdf7ea; color: #b08a3a; }
+#mini-boolean-network .regime-chaotic { background: #fdf0ed; color: #c96b5a; }
+#mini-boolean-network canvas {
+  display: block;
+  width: 100%;
+  border-radius: 8px;
+  background: #faf9f5;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+#mini-boolean-network .sim-controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+#mini-boolean-network .sim-controls label {
+  font-size: 0.72rem;
+  color: #4a4a5a;
+}
+#mini-boolean-network .sim-controls input[type="range"] {
+  width: 100px;
+  accent-color: #2a7f7f;
+}
+#mini-boolean-network .sim-controls .k-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  color: #1a1a2e;
+  font-weight: 500;
+  min-width: 18px;
+}
+#mini-boolean-network .hint {
+  font-size: 0.65rem;
+  color: #7a7a8a;
+  margin-left: auto;
+}
+</style>
+
+<div class="sim-title">Interactive: Boolean Network</div>
+<div class="sim-metrics">
+  <div class="metric">Derrida: <span id="bn-derrida">--</span></div>
+  <div class="metric">Regime: <span id="bn-regime" class="regime-label regime-critical">--</span></div>
+  <div class="metric">ON nodes: <span id="bn-on">--</span></div>
+</div>
+<canvas id="bn-canvas" width="632" height="300"></canvas>
+<div class="sim-controls">
+  <label>K:</label>
+  <input type="range" id="bn-k-slider" min="1" max="5" value="2" step="1">
+  <span class="k-val" id="bn-k-val">2</span>
+  <span class="hint">Click a node to flip it</span>
+</div>
+
+<script>
+(function() {
+  const N = 20;
+  let K = 2;
+  let nodes = [];
+  let edges = [];
+  let animating = false;
+  let cascadeQueue = [];
+
+  const canvas = document.getElementById('bn-canvas');
+  const ctx = canvas.getContext('2d');
+  const CX = canvas.width / 2;
+  const CY = canvas.height / 2;
+  const RADIUS = Math.min(CX, CY) - 30;
+  const NODE_R = 12;
+
+  function initNetwork() {
+    nodes = [];
+    edges = [];
+    cascadeQueue = [];
+    for (let i = 0; i < N; i++) {
+      const angle = (2 * Math.PI * i) / N - Math.PI / 2;
+      const x = CX + RADIUS * Math.cos(angle);
+      const y = CY + RADIUS * Math.sin(angle);
+      const state = Math.random() < 0.5 ? 1 : 0;
+      // Truth table: 2^K entries
+      const ttLen = 1 << K;
+      const tt = [];
+      for (let j = 0; j < ttLen; j++) tt.push(Math.random() < 0.5 ? 1 : 0);
+      nodes.push({ x, y, state, inputs: [], tt, flash: 0 });
+    }
+    // Wire K random inputs per node
+    for (let i = 0; i < N; i++) {
+      const cands = [];
+      for (let j = 0; j < N; j++) if (j !== i) cands.push(j);
+      // Shuffle and pick K
+      for (let j = cands.length - 1; j > 0; j--) {
+        const k = Math.floor(Math.random() * (j + 1));
+        [cands[j], cands[k]] = [cands[k], cands[j]];
+      }
+      nodes[i].inputs = cands.slice(0, K);
+    }
+    // Build edge list for drawing
+    edges = [];
+    for (let i = 0; i < N; i++) {
+      for (const inp of nodes[i].inputs) {
+        edges.push([inp, i]);
+      }
+    }
+    estimateDerrida();
+    render();
+  }
+
+  function stepNetwork() {
+    const nextStates = [];
+    for (let i = 0; i < N; i++) {
+      let idx = 0;
+      for (let k = 0; k < nodes[i].inputs.length; k++) {
+        idx += nodes[nodes[i].inputs[k]].state << k;
+      }
+      nextStates.push(nodes[i].tt[idx] || 0);
+    }
+    let changed = 0;
+    for (let i = 0; i < N; i++) {
+      if (nodes[i].state !== nextStates[i]) {
+        nodes[i].flash = 1.0;
+        changed++;
+      }
+      nodes[i].state = nextStates[i];
+    }
+    return changed;
+  }
+
+  function estimateDerrida() {
+    // Quick Monte Carlo: flip 1 bit, step, measure spread
+    const trials = 80;
+    let totalSpread = 0;
+    for (let t = 0; t < trials; t++) {
+      // Random state
+      const s1 = [];
+      for (let i = 0; i < N; i++) s1.push(Math.random() < 0.5 ? 1 : 0);
+      const flipIdx = Math.floor(Math.random() * N);
+      const s2 = s1.slice();
+      s2[flipIdx] = 1 - s2[flipIdx];
+
+      // Step s1
+      const n1 = [];
+      for (let i = 0; i < N; i++) {
+        let idx = 0;
+        for (let k = 0; k < nodes[i].inputs.length; k++) {
+          idx += s1[nodes[i].inputs[k]] << k;
+        }
+        n1.push(nodes[i].tt[idx] || 0);
+      }
+      // Step s2
+      const n2 = [];
+      for (let i = 0; i < N; i++) {
+        let idx = 0;
+        for (let k = 0; k < nodes[i].inputs.length; k++) {
+          idx += s2[nodes[i].inputs[k]] << k;
+        }
+        n2.push(nodes[i].tt[idx] || 0);
+      }
+      let ham = 0;
+      for (let i = 0; i < N; i++) if (n1[i] !== n2[i]) ham++;
+      totalSpread += ham;
+    }
+    const derrida = totalSpread / trials;
+    const el = document.getElementById('bn-derrida');
+    el.textContent = derrida.toFixed(2);
+
+    const regEl = document.getElementById('bn-regime');
+    regEl.className = 'regime-label';
+    if (derrida < 0.8) {
+      regEl.textContent = 'ordered';
+      regEl.classList.add('regime-ordered');
+    } else if (derrida > 1.2) {
+      regEl.textContent = 'chaotic';
+      regEl.classList.add('regime-chaotic');
+    } else {
+      regEl.textContent = 'critical';
+      regEl.classList.add('regime-critical');
+    }
+  }
+
+  function render() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw edges
+    for (const [from, to] of edges) {
+      const nf = nodes[from], nt = nodes[to];
+      ctx.strokeStyle = 'rgba(226, 224, 218, 0.5)';
+      ctx.lineWidth = 0.7;
+      ctx.beginPath();
+      ctx.moveTo(nf.x, nf.y);
+      ctx.lineTo(nt.x, nt.y);
+      ctx.stroke();
+    }
+
+    // Draw nodes
+    let onCount = 0;
+    for (let i = 0; i < N; i++) {
+      const n = nodes[i];
+      if (n.state) onCount++;
+
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, NODE_R, 0, 2 * Math.PI);
+
+      if (n.state) {
+        ctx.fillStyle = '#2a7f7f';
+      } else {
+        ctx.fillStyle = '#d4d2cc';
+      }
+      ctx.fill();
+
+      // Flash ring for recently changed
+      if (n.flash > 0) {
+        ctx.strokeStyle = `rgba(201, 107, 90, ${n.flash})`;
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, NODE_R + 3, 0, 2 * Math.PI);
+        ctx.stroke();
+        n.flash = Math.max(0, n.flash - 0.04);
+      }
+
+      // Node index label
+      ctx.fillStyle = n.state ? '#ffffff' : '#7a7a8a';
+      ctx.font = '9px "JetBrains Mono", monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(i, n.x, n.y);
+    }
+
+    document.getElementById('bn-on').textContent = onCount + '/' + N;
+  }
+
+  // Click handler
+  canvas.addEventListener('click', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const mx = (e.clientX - rect.left) * scaleX;
+    const my = (e.clientY - rect.top) * scaleY;
+
+    for (let i = 0; i < N; i++) {
+      const dx = mx - nodes[i].x;
+      const dy = my - nodes[i].y;
+      if (dx * dx + dy * dy < (NODE_R + 4) * (NODE_R + 4)) {
+        // Flip node
+        nodes[i].state = 1 - nodes[i].state;
+        nodes[i].flash = 1.0;
+        // Run cascade: step network a few times with animation
+        if (!animating) {
+          animating = true;
+          let steps = 0;
+          const maxSteps = 15;
+          function cascadeStep() {
+            const changed = stepNetwork();
+            steps++;
+            render();
+            if (changed > 0 && steps < maxSteps) {
+              setTimeout(cascadeStep, 180);
+            } else {
+              animating = false;
+              estimateDerrida();
+            }
+          }
+          setTimeout(cascadeStep, 200);
+        }
+        break;
+      }
+    }
+  });
+
+  // K slider
+  const slider = document.getElementById('bn-k-slider');
+  slider.addEventListener('input', () => {
+    K = parseInt(slider.value);
+    document.getElementById('bn-k-val').textContent = K;
+    initNetwork();
+  });
+
+  // Flash decay animation
+  function animLoop() {
+    let needsRedraw = false;
+    for (const n of nodes) {
+      if (n.flash > 0) { needsRedraw = true; break; }
+    }
+    if (needsRedraw && !animating) render();
+    requestAnimationFrame(animLoop);
+  }
+  animLoop();
+
+  initNetwork();
+})();
+</script>
+</div>

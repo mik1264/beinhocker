@@ -1,0 +1,327 @@
+<div class="mini-sim" id="mini-el-farol">
+<style>
+  #mini-el-farol {
+    max-width: 680px;
+    margin: 2rem auto;
+    background: var(--bg-card, #ffffff);
+    border: 1px solid var(--border, #e2e0da);
+    border-radius: var(--radius-lg, 12px);
+    box-shadow: 0 2px 8px rgba(26,26,46,0.06);
+    padding: 1.5rem;
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    color: var(--text-primary, #1a1a2e);
+  }
+  #mini-el-farol .sim-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent-teal, #2a7f7f);
+    margin-bottom: 1rem;
+  }
+  #mini-el-farol .bar-canvas {
+    width: 100%;
+    height: 48px;
+    border-radius: 6px;
+    overflow: hidden;
+    background: var(--bg-metric, #f0eeea);
+    position: relative;
+    margin-bottom: 0.5rem;
+  }
+  #mini-el-farol .bar-fill {
+    height: 100%;
+    transition: width 0.25s ease, background 0.25s ease;
+    border-radius: 6px 0 0 6px;
+  }
+  #mini-el-farol .threshold-line {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--text-primary, #1a1a2e);
+    opacity: 0.5;
+    pointer-events: none;
+  }
+  #mini-el-farol .threshold-label {
+    position: absolute;
+    top: -1px;
+    font-size: 0.6rem;
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    color: var(--text-tertiary, #7a7a8a);
+    transform: translateX(4px);
+  }
+  #mini-el-farol .sparkline-wrap {
+    width: 100%;
+    height: 50px;
+    margin-bottom: 0.75rem;
+  }
+  #mini-el-farol .sparkline-wrap canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  #mini-el-farol .metrics {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+  #mini-el-farol .metric {
+    display: flex;
+    flex-direction: column;
+  }
+  #mini-el-farol .metric-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-tertiary, #7a7a8a);
+    margin-bottom: 2px;
+  }
+  #mini-el-farol .metric-value {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary, #1a1a2e);
+  }
+  #mini-el-farol .controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  #mini-el-farol .controls button {
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.4rem 1rem;
+    border: 1px solid var(--border, #e2e0da);
+    border-radius: 6px;
+    background: var(--bg, #faf9f5);
+    color: var(--text-primary, #1a1a2e);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  #mini-el-farol .controls button:hover {
+    background: var(--bg-hover, #f5f3ee);
+  }
+  #mini-el-farol .controls label {
+    font-size: 0.7rem;
+    color: var(--text-secondary, #4a4a5a);
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    cursor: pointer;
+    user-select: none;
+  }
+  #mini-el-farol .controls input[type="checkbox"] {
+    accent-color: var(--accent-teal, #2a7f7f);
+  }
+  #mini-el-farol .week-badge {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 0.65rem;
+    color: var(--text-light, #9a9aaa);
+    margin-left: auto;
+  }
+</style>
+
+<div class="sim-title">Interactive: El Farol Bar</div>
+
+<div class="bar-canvas" id="ef-bar-canvas">
+  <div class="bar-fill" id="ef-bar-fill"></div>
+  <div class="threshold-line" id="ef-threshold-line">
+    <span class="threshold-label" id="ef-threshold-label">36</span>
+  </div>
+</div>
+
+<div class="sparkline-wrap">
+  <canvas id="ef-sparkline"></canvas>
+</div>
+
+<div class="metrics">
+  <div class="metric">
+    <span class="metric-label">Attendance</span>
+    <span class="metric-value" id="ef-attendance">--</span>
+  </div>
+  <div class="metric">
+    <span class="metric-label">Threshold</span>
+    <span class="metric-value">36</span>
+  </div>
+  <div class="metric">
+    <span class="metric-label">Mean Accuracy</span>
+    <span class="metric-value" id="ef-accuracy">--</span>
+  </div>
+</div>
+
+<div class="controls">
+  <button id="ef-step-btn">Next Week</button>
+  <label><input type="checkbox" id="ef-autoplay"> Auto-play</label>
+  <span class="week-badge" id="ef-week">Week 0</span>
+</div>
+
+<script>
+(function() {
+  // --- Config ---
+  const NUM_AGENTS = 60;
+  const THRESHOLD = 36;
+  const NUM_STRATEGIES = 5;
+  const MEMORY_LEN = 5;
+  const SPARKLINE_LEN = 30;
+
+  // --- Strategy factories ---
+  function makeMirror() {
+    return { name:'mirror', predict(h) { return h.length ? h[h.length-1] < THRESHOLD : Math.random() < 0.5; }, score:0 };
+  }
+  function makeMeanN(n) {
+    return { name:'mean-'+n, predict(h) { if(!h.length) return Math.random()<0.5; const w=h.slice(-n); return w.reduce((a,b)=>a+b,0)/w.length < THRESHOLD; }, score:0 };
+  }
+  function makeTrend() {
+    return { name:'trend', predict(h) { if(h.length<2) return Math.random()<0.5; return h[h.length-1]+(h[h.length-1]-h[h.length-2]) < THRESHOLD; }, score:0 };
+  }
+  function makeContrarian() {
+    return { name:'contrarian', predict(h) { return h.length ? h[h.length-1] >= THRESHOLD : Math.random()<0.5; }, score:0 };
+  }
+  function makeRandom(p) {
+    return { name:'rnd-'+p, predict() { return Math.random()<p; }, score:0 };
+  }
+  function makeThresholdRule(t) {
+    return { name:'thr-'+t, predict(h) { return h.length ? h[h.length-1]<t : Math.random()<0.5; }, score:0 };
+  }
+  function makeWeightedAvg() {
+    return { name:'wma', predict(h) { if(!h.length) return Math.random()<0.5; let e=h[0]; for(let i=1;i<h.length;i++) e=0.3*h[i]+0.7*e; return e<THRESHOLD; }, score:0 };
+  }
+  function makeMedian() {
+    return { name:'median', predict(h) { if(!h.length) return Math.random()<0.5; const w=[...h.slice(-5)].sort((a,b)=>a-b); return w[Math.floor(w.length/2)]<THRESHOLD; }, score:0 };
+  }
+
+  const FACTORIES = [makeMirror,()=>makeMeanN(3),()=>makeMeanN(5),makeTrend,makeContrarian,
+    ()=>makeRandom(0.4),()=>makeRandom(0.6),()=>makeThresholdRule(THRESHOLD-5),
+    ()=>makeThresholdRule(THRESHOLD+5),makeWeightedAvg,makeMedian];
+
+  // --- Agents ---
+  const agents = [];
+  for(let i=0;i<NUM_AGENTS;i++){
+    const strats = [];
+    for(let s=0;s<NUM_STRATEGIES;s++) strats.push(FACTORIES[Math.floor(Math.random()*FACTORIES.length)]());
+    agents.push({ strategies:strats, attending:false });
+  }
+
+  // Bootstrap history
+  const history = [];
+  for(let i=0;i<MEMORY_LEN;i++) history.push(Math.floor(NUM_AGENTS*0.3 + Math.random()*NUM_AGENTS*0.4));
+
+  let week = 0;
+  let totalCorrect = 0;
+  let totalWeeks = 0;
+
+  // --- DOM refs ---
+  const barFill = document.getElementById('ef-bar-fill');
+  const threshLine = document.getElementById('ef-threshold-line');
+  const threshLabel = document.getElementById('ef-threshold-label');
+  const sparkCanvas = document.getElementById('ef-sparkline');
+  const attEl = document.getElementById('ef-attendance');
+  const accEl = document.getElementById('ef-accuracy');
+  const weekEl = document.getElementById('ef-week');
+  const stepBtn = document.getElementById('ef-step-btn');
+  const autoBox = document.getElementById('ef-autoplay');
+
+  // Position threshold line
+  const threshPct = (THRESHOLD / NUM_AGENTS) * 100;
+  threshLine.style.left = threshPct + '%';
+
+  function step() {
+    const snap = [...history];
+    let attendance = 0;
+    for(const ag of agents) {
+      const best = ag.strategies.reduce((a,b)=>a.score>=b.score?a:b);
+      ag.attending = best.predict(snap);
+      if(ag.attending) attendance++;
+    }
+    history.push(attendance);
+    const goodToGo = attendance <= THRESHOLD;
+
+    // Score strategies
+    for(const ag of agents) {
+      for(const st of ag.strategies) {
+        const wouldGo = st.predict(snap);
+        if((wouldGo && goodToGo)||(!wouldGo && !goodToGo)) st.score += 1;
+        else st.score -= 1;
+      }
+    }
+
+    // Accuracy
+    let correct = 0;
+    for(const ag of agents) {
+      if((ag.attending && goodToGo)||(!ag.attending && !goodToGo)) correct++;
+    }
+    totalCorrect += correct;
+    totalWeeks++;
+    week++;
+
+    render(attendance);
+  }
+
+  function render(attendance) {
+    const pct = (attendance / NUM_AGENTS) * 100;
+    const over = attendance > THRESHOLD;
+    barFill.style.width = pct + '%';
+    barFill.style.background = over ? 'var(--accent-coral, #c96b5a)' : 'var(--accent-green, #4a8a5a)';
+    attEl.textContent = attendance;
+    attEl.style.color = over ? 'var(--accent-coral, #c96b5a)' : 'var(--accent-green, #4a8a5a)';
+    accEl.textContent = totalWeeks ? (totalCorrect / (totalWeeks * NUM_AGENTS) * 100).toFixed(1) + '%' : '--';
+    weekEl.textContent = 'Week ' + week;
+    drawSparkline();
+  }
+
+  function drawSparkline() {
+    const ctx = sparkCanvas.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+    const rect = sparkCanvas.getBoundingClientRect();
+    sparkCanvas.width = rect.width * dpr;
+    sparkCanvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
+    const W = rect.width, H = rect.height;
+    ctx.clearRect(0,0,W,H);
+
+    const data = history.slice(-SPARKLINE_LEN);
+    if(data.length < 2) return;
+    const step = W / (SPARKLINE_LEN - 1);
+
+    // Threshold line
+    const ty = H - (THRESHOLD / NUM_AGENTS) * H;
+    ctx.strokeStyle = 'rgba(26,26,46,0.15)';
+    ctx.setLineDash([3,3]);
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(0,ty); ctx.lineTo(W,ty); ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Sparkline
+    ctx.strokeStyle = 'var(--accent-teal, #2a7f7f)';
+    ctx.lineWidth = 1.5;
+    ctx.lineJoin = 'round';
+    ctx.beginPath();
+    for(let i=0;i<data.length;i++){
+      const x = (SPARKLINE_LEN - data.length + i) * step;
+      const y = H - (data[i]/NUM_AGENTS)*H;
+      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+
+    // Dots on last point
+    const lastX = (SPARKLINE_LEN-1)*step;
+    const lastY = H - (data[data.length-1]/NUM_AGENTS)*H;
+    ctx.fillStyle = data[data.length-1] > THRESHOLD ? 'var(--accent-coral, #c96b5a)' : 'var(--accent-green, #4a8a5a)';
+    ctx.beginPath(); ctx.arc(lastX,lastY,3,0,Math.PI*2); ctx.fill();
+  }
+
+  // --- Controls ---
+  stepBtn.addEventListener('click', step);
+  let timer = null;
+  autoBox.addEventListener('change', function() {
+    if(this.checked) { timer = setInterval(step, 250); }
+    else { clearInterval(timer); timer = null; }
+  });
+
+  // Initial render
+  render(history[history.length-1]);
+})();
+</script>
+</div>

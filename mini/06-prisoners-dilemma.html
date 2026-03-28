@@ -1,0 +1,360 @@
+<div class="mini-sim" id="mini-prisoners-dilemma">
+<style>
+  #mini-prisoners-dilemma {
+    max-width: 680px;
+    margin: 2rem auto;
+    background: var(--bg-card, #ffffff);
+    border: 1px solid var(--border, #e2e0da);
+    border-radius: var(--radius-lg, 12px);
+    box-shadow: 0 2px 8px rgba(26,26,46,0.06);
+    padding: 1.5rem;
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    color: var(--text-primary, #1a1a2e);
+  }
+  #mini-prisoners-dilemma .sim-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent-teal, #2a7f7f);
+    margin-bottom: 1rem;
+  }
+  #mini-prisoners-dilemma .grid-wrap {
+    width: 100%;
+    aspect-ratio: 1;
+    max-height: 300px;
+    margin: 0 auto 0.75rem;
+    display: flex;
+    justify-content: center;
+  }
+  #mini-prisoners-dilemma .grid-wrap canvas {
+    height: 100%;
+    aspect-ratio: 1;
+    display: block;
+    border-radius: 4px;
+  }
+  #mini-prisoners-dilemma .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-bottom: 0.75rem;
+    justify-content: center;
+  }
+  #mini-prisoners-dilemma .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.6rem;
+    color: var(--text-secondary, #4a4a5a);
+  }
+  #mini-prisoners-dilemma .legend-swatch {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+  #mini-prisoners-dilemma .metrics {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+  #mini-prisoners-dilemma .metric {
+    display: flex;
+    flex-direction: column;
+  }
+  #mini-prisoners-dilemma .metric-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-tertiary, #7a7a8a);
+    margin-bottom: 2px;
+  }
+  #mini-prisoners-dilemma .metric-value {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary, #1a1a2e);
+  }
+  #mini-prisoners-dilemma .controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  #mini-prisoners-dilemma .controls button {
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.4rem 1rem;
+    border: 1px solid var(--border, #e2e0da);
+    border-radius: 6px;
+    background: var(--bg, #faf9f5);
+    color: var(--text-primary, #1a1a2e);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  #mini-prisoners-dilemma .controls button:hover {
+    background: var(--bg-hover, #f5f3ee);
+  }
+  #mini-prisoners-dilemma .controls label {
+    font-size: 0.7rem;
+    color: var(--text-secondary, #4a4a5a);
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    cursor: pointer;
+    user-select: none;
+  }
+  #mini-prisoners-dilemma .controls input[type="checkbox"] {
+    accent-color: var(--accent-teal, #2a7f7f);
+  }
+  #mini-prisoners-dilemma .gen-badge {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 0.65rem;
+    color: var(--text-light, #9a9aaa);
+    margin-left: auto;
+  }
+</style>
+
+<div class="sim-title">Interactive: Prisoner's Dilemma</div>
+
+<div class="grid-wrap">
+  <canvas id="pd-grid"></canvas>
+</div>
+
+<div class="legend" id="pd-legend"></div>
+
+<div class="metrics">
+  <div class="metric">
+    <span class="metric-label">Cooperation Rate</span>
+    <span class="metric-value" id="pd-coop">--</span>
+  </div>
+  <div class="metric">
+    <span class="metric-label">Dominant Strategy</span>
+    <span class="metric-value" id="pd-dominant">--</span>
+  </div>
+</div>
+
+<div class="controls">
+  <button id="pd-step-btn">Step</button>
+  <label><input type="checkbox" id="pd-autoplay"> Auto-play</label>
+  <span class="gen-badge" id="pd-gen">Gen 0</span>
+</div>
+
+<script>
+(function() {
+  // --- Config ---
+  const GRID = 30;
+  const ROUNDS_PER_MATCH = 5;
+  const MUTATION_RATE = 0.001;
+  const COOPERATE = 0;
+  const DEFECT = 1;
+  const T = 5, R = 3, P = 1, S = 0;
+
+  const STRATEGIES = {
+    tft:  { name:'TFT',     color:'#4488ff' },
+    alld: { name:'AllD',    color:'#ff4444' },
+    allc: { name:'AllC',    color:'#00cc66' },
+    pavlov:{ name:'Pavlov', color:'#ffaa00' },
+    grudger:{ name:'Grudger',color:'#cc44ff' },
+    random:{ name:'Random', color:'#888888' }
+  };
+  const STRAT_KEYS = Object.keys(STRATEGIES);
+
+  // Build legend
+  const legendEl = document.getElementById('pd-legend');
+  for(const key of STRAT_KEYS) {
+    const item = document.createElement('div');
+    item.className = 'legend-item';
+    item.innerHTML = '<div class="legend-swatch" style="background:'+STRATEGIES[key].color+'"></div>'+STRATEGIES[key].name;
+    legendEl.appendChild(item);
+  }
+
+  function payoff(a, b) {
+    if(a===COOPERATE&&b===COOPERATE) return R;
+    if(a===COOPERATE&&b===DEFECT) return S;
+    if(a===DEFECT&&b===COOPERATE) return T;
+    return P;
+  }
+
+  // Strategy decision functions
+  function decide(type, oppHistory, myHistory) {
+    switch(type) {
+      case 'tft': return oppHistory.length ? oppHistory[oppHistory.length-1] : COOPERATE;
+      case 'alld': return DEFECT;
+      case 'allc': return COOPERATE;
+      case 'pavlov':
+        if(!oppHistory.length) return COOPERATE;
+        const lastMy = myHistory[myHistory.length-1];
+        const lastOpp = oppHistory[oppHistory.length-1];
+        // Win-stay lose-shift
+        if(lastMy===COOPERATE&&lastOpp===COOPERATE) return COOPERATE;
+        if(lastMy===DEFECT&&lastOpp===DEFECT) return COOPERATE;
+        if(lastMy===COOPERATE&&lastOpp===DEFECT) return DEFECT;
+        return DEFECT; // got T, stay
+      case 'grudger':
+        if(oppHistory.includes(DEFECT)) return DEFECT;
+        return COOPERATE;
+      case 'random': return Math.random()<0.5?COOPERATE:DEFECT;
+    }
+    return COOPERATE;
+  }
+
+  // --- Grid init ---
+  const grid = [];
+  for(let r=0;r<GRID;r++){
+    const row=[];
+    for(let c=0;c<GRID;c++){
+      row.push({ type: STRAT_KEYS[Math.floor(Math.random()*STRAT_KEYS.length)], fitness:0, gamesPlayed:0, coops:0, actions:0 });
+    }
+    grid.push(row);
+  }
+
+  let generation = 0;
+
+  function getNeighbors(r,c){
+    const nbrs=[];
+    for(let dr=-1;dr<=1;dr++) for(let dc=-1;dc<=1;dc++){
+      if(dr===0&&dc===0)continue;
+      nbrs.push([(r+dr+GRID)%GRID,(c+dc+GRID)%GRID]);
+    }
+    return nbrs;
+  }
+
+  function playMatch(a, b) {
+    const aHist=[], bHist=[];
+    let aFit=0, bFit=0, aCoops=0, bCoops=0;
+    for(let round=0;round<ROUNDS_PER_MATCH;round++){
+      const aAct=decide(a.type, bHist, aHist);
+      const bAct=decide(b.type, aHist, bHist);
+      aFit+=payoff(aAct,bAct);
+      bFit+=payoff(bAct,aAct);
+      if(aAct===COOPERATE)aCoops++;
+      if(bAct===COOPERATE)bCoops++;
+      aHist.push(aAct); bHist.push(bAct);
+    }
+    a.fitness+=aFit; a.gamesPlayed+=ROUNDS_PER_MATCH; a.coops+=aCoops; a.actions+=ROUNDS_PER_MATCH;
+    b.fitness+=bFit; b.gamesPlayed+=ROUNDS_PER_MATCH; b.coops+=bCoops; b.actions+=ROUNDS_PER_MATCH;
+  }
+
+  function step() {
+    // Reset
+    for(let r=0;r<GRID;r++) for(let c=0;c<GRID;c++){
+      const ag=grid[r][c]; ag.fitness=0; ag.gamesPlayed=0; ag.coops=0; ag.actions=0;
+    }
+
+    // Play matches with neighbors
+    const played = new Set();
+    for(let r=0;r<GRID;r++) for(let c=0;c<GRID;c++){
+      const nbrs=getNeighbors(r,c);
+      for(const [nr,nc] of nbrs){
+        const key=r*GRID+c<nr*GRID+nc ? r+','+c+'-'+nr+','+nc : nr+','+nc+'-'+r+','+c;
+        if(!played.has(key)){
+          playMatch(grid[r][c], grid[nr][nc]);
+          played.add(key);
+        }
+      }
+    }
+
+    // Reproduction
+    const newTypes=[];
+    for(let r=0;r<GRID;r++){
+      const row=[];
+      for(let c=0;c<GRID;c++){
+        const ag=grid[r][c];
+        const avgPay=ag.gamesPlayed?ag.fitness/ag.gamesPlayed:0;
+        let bestType=ag.type, bestPay=avgPay;
+        for(const [nr,nc] of getNeighbors(r,c)){
+          const nb=grid[nr][nc];
+          const nbPay=nb.gamesPlayed?nb.fitness/nb.gamesPlayed:0;
+          if(nbPay>bestPay){bestPay=nbPay;bestType=nb.type;}
+        }
+        if(Math.random()<MUTATION_RATE) bestType=STRAT_KEYS[Math.floor(Math.random()*STRAT_KEYS.length)];
+        row.push(bestType);
+      }
+      newTypes.push(row);
+    }
+    // Collect metrics before applying
+    let totalCoops=0, totalActions=0;
+    const counts={};
+    for(const k of STRAT_KEYS) counts[k]=0;
+    for(let r=0;r<GRID;r++) for(let c=0;c<GRID;c++){
+      totalCoops+=grid[r][c].coops;
+      totalActions+=grid[r][c].actions;
+      counts[grid[r][c].type]++;
+    }
+
+    // Apply
+    for(let r=0;r<GRID;r++) for(let c=0;c<GRID;c++) grid[r][c].type=newTypes[r][c];
+
+    generation++;
+    render(totalCoops, totalActions, counts);
+  }
+
+  // --- DOM ---
+  const canvas = document.getElementById('pd-grid');
+  const coopEl = document.getElementById('pd-coop');
+  const domEl = document.getElementById('pd-dominant');
+  const genEl = document.getElementById('pd-gen');
+  const stepBtn = document.getElementById('pd-step-btn');
+  const autoBox = document.getElementById('pd-autoplay');
+
+  function render(totalCoops, totalActions, counts) {
+    genEl.textContent = 'Gen ' + generation;
+
+    if(totalActions > 0) {
+      coopEl.textContent = (totalCoops/totalActions*100).toFixed(1) + '%';
+    }
+
+    // Dominant strategy
+    if(counts){
+      let maxK='',maxV=0;
+      for(const k of STRAT_KEYS) if(counts[k]>maxV){maxV=counts[k];maxK=k;}
+      domEl.textContent = STRATEGIES[maxK].name;
+      domEl.style.color = STRATEGIES[maxK].color;
+    }
+
+    drawGrid();
+  }
+
+  function drawGrid() {
+    const dpr = window.devicePixelRatio||1;
+    const rect = canvas.getBoundingClientRect();
+    const size = Math.min(rect.width, rect.height);
+    canvas.width = size*dpr;
+    canvas.height = size*dpr;
+    const ctx = canvas.getContext('2d');
+    ctx.scale(dpr,dpr);
+    ctx.clearRect(0,0,size,size);
+
+    const cellW = size/GRID;
+    const cellH = size/GRID;
+
+    for(let r=0;r<GRID;r++) for(let c=0;c<GRID;c++){
+      ctx.fillStyle = STRATEGIES[grid[r][c].type].color;
+      ctx.fillRect(c*cellW, r*cellH, cellW+0.5, cellH+0.5);
+    }
+  }
+
+  // --- Controls ---
+  stepBtn.addEventListener('click', step);
+  let timer = null;
+  autoBox.addEventListener('change', function(){
+    if(this.checked){timer=setInterval(step,350);}
+    else{clearInterval(timer);timer=null;}
+  });
+
+  // Initial draw
+  drawGrid();
+
+  // Compute initial counts for display
+  const initCounts={};
+  for(const k of STRAT_KEYS) initCounts[k]=0;
+  for(let r=0;r<GRID;r++) for(let c=0;c<GRID;c++) initCounts[grid[r][c].type]++;
+  let maxK='',maxV=0;
+  for(const k of STRAT_KEYS) if(initCounts[k]>maxV){maxV=initCounts[k];maxK=k;}
+  domEl.textContent=STRATEGIES[maxK].name;
+  domEl.style.color=STRATEGIES[maxK].color;
+})();
+</script>
+</div>

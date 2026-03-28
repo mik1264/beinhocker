@@ -1,0 +1,304 @@
+<div class="mini-sim" id="mini-schelling">
+<style>
+  #mini-schelling {
+    max-width: 680px;
+    margin: 2rem auto;
+    background: var(--bg-card, #ffffff);
+    border: 1px solid var(--border, #e2e0da);
+    border-radius: var(--radius-lg, 12px);
+    box-shadow: 0 2px 8px rgba(26,26,46,0.06);
+    padding: 1.5rem;
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    color: var(--text-primary, #1a1a2e);
+  }
+  #mini-schelling .sim-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent-teal, #2a7f7f);
+    margin-bottom: 0.25rem;
+  }
+  #mini-schelling .sim-desc {
+    font-size: 0.72rem;
+    color: var(--text-tertiary, #7a7a8a);
+    margin-bottom: 0.75rem;
+  }
+  #mini-schelling canvas {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 8px;
+    background: #f0eeea;
+    margin-bottom: 0.75rem;
+  }
+  #mini-schelling .metrics {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+  #mini-schelling .metric {
+    display: flex;
+    flex-direction: column;
+  }
+  #mini-schelling .metric-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-tertiary, #7a7a8a);
+    margin-bottom: 2px;
+  }
+  #mini-schelling .metric-value {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary, #1a1a2e);
+  }
+  #mini-schelling .controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+  #mini-schelling .controls button {
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.4rem 1rem;
+    border: 1px solid var(--border, #e2e0da);
+    border-radius: 6px;
+    background: var(--bg, #faf9f5);
+    color: var(--text-primary, #1a1a2e);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  #mini-schelling .controls button:hover {
+    background: var(--bg-hover, #f5f3ee);
+  }
+  #mini-schelling .controls .slider-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-left: auto;
+  }
+  #mini-schelling .controls .slider-wrap label {
+    font-size: 0.65rem;
+    color: var(--text-tertiary, #7a7a8a);
+  }
+  #mini-schelling .controls input[type="range"] {
+    width: 100px;
+    accent-color: var(--accent-teal, #2a7f7f);
+  }
+  #mini-schelling .controls .slider-val {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--text-primary, #1a1a2e);
+    min-width: 30px;
+  }
+  #mini-schelling .tick-badge {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 0.65rem;
+    color: var(--text-light, #9a9aaa);
+  }
+</style>
+
+<div class="sim-title">Interactive: Schelling Segregation</div>
+<div class="sim-desc">Mild individual preferences create extreme macro-level segregation</div>
+
+<canvas id="sch-canvas" width="400" height="400"></canvas>
+
+<div class="metrics">
+  <div class="metric">
+    <span class="metric-label">Segregation</span>
+    <span class="metric-value" id="sch-seg">50%</span>
+  </div>
+  <div class="metric">
+    <span class="metric-label">Happy</span>
+    <span class="metric-value" id="sch-happy">70%</span>
+  </div>
+  <div class="metric">
+    <span class="metric-label">Tick</span>
+    <span class="metric-value tick-badge" id="sch-tick-val">0</span>
+  </div>
+</div>
+
+<div class="controls">
+  <button id="sch-step-btn">Step</button>
+  <button id="sch-auto-btn">Auto-play</button>
+  <button id="sch-reset-btn">Reset</button>
+  <div class="slider-wrap">
+    <label>Threshold</label>
+    <input type="range" id="sch-threshold" min="10" max="80" value="30" step="5">
+    <span class="slider-val" id="sch-thresh-val">0.30</span>
+  </div>
+</div>
+
+<script>
+(function() {
+  var GRID = 40, DENSITY = 0.7;
+  var CORAL = '#e07060', TEAL = '#50b0a0', EMPTY_CLR = '#f0eeea';
+
+  var canvas = document.getElementById('sch-canvas');
+  var ctx = canvas.getContext('2d');
+
+  var grid, emptyCells, allAgents, threshold, tick;
+  var autoRunning = false, timer = null;
+
+  function init() {
+    tick = 0;
+    grid = [];
+    emptyCells = [];
+    allAgents = [];
+    threshold = parseInt(document.getElementById('sch-threshold').value) / 100;
+    var positions = [];
+    for (var y = 0; y < GRID; y++) {
+      grid[y] = [];
+      for (var x = 0; x < GRID; x++) {
+        grid[y][x] = 0;
+        positions.push([x, y]);
+      }
+    }
+    shuffle(positions);
+    var nAgents = Math.floor(GRID * GRID * DENSITY);
+    var nA = Math.floor(nAgents * 0.5);
+    for (var i = 0; i < nAgents; i++) {
+      var x = positions[i][0], y = positions[i][1];
+      var type = i < nA ? 1 : 2;
+      grid[y][x] = type;
+      allAgents.push({ x: x, y: y, type: type, happy: true });
+    }
+    for (var i = nAgents; i < positions.length; i++)
+      emptyCells.push(positions[i]);
+    updateHappiness();
+  }
+
+  function shuffle(arr) {
+    for (var i = arr.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+    }
+  }
+
+  function neighbors(x, y) {
+    var n = [];
+    for (var dy = -1; dy <= 1; dy++)
+      for (var dx = -1; dx <= 1; dx++) {
+        if (dx === 0 && dy === 0) continue;
+        n.push([(x + dx + GRID) % GRID, (y + dy + GRID) % GRID]);
+      }
+    return n;
+  }
+
+  function isHappy(x, y) {
+    var type = grid[y][x];
+    if (type === 0) return true;
+    var same = 0, total = 0;
+    var nb = neighbors(x, y);
+    for (var i = 0; i < nb.length; i++) {
+      var n = grid[nb[i][1]][nb[i][0]];
+      if (n !== 0) { total++; if (n === type) same++; }
+    }
+    if (total === 0) return true;
+    return (same / total) >= threshold;
+  }
+
+  function updateHappiness() {
+    for (var i = 0; i < allAgents.length; i++)
+      allAgents[i].happy = isHappy(allAgents[i].x, allAgents[i].y);
+  }
+
+  function step() {
+    shuffle(allAgents);
+    for (var i = 0; i < allAgents.length; i++) {
+      var a = allAgents[i];
+      if (a.happy || emptyCells.length === 0) continue;
+      var idx = Math.floor(Math.random() * emptyCells.length);
+      var nx = emptyCells[idx][0], ny = emptyCells[idx][1];
+      grid[a.y][a.x] = 0;
+      emptyCells[idx] = [a.x, a.y];
+      a.x = nx; a.y = ny;
+      grid[ny][nx] = a.type;
+    }
+    updateHappiness();
+    tick++;
+  }
+
+  function segregationIndex() {
+    var totalFrac = 0, count = 0;
+    for (var i = 0; i < allAgents.length; i++) {
+      var a = allAgents[i];
+      var same = 0, occ = 0;
+      var nb = neighbors(a.x, a.y);
+      for (var j = 0; j < nb.length; j++) {
+        var n = grid[nb[j][1]][nb[j][0]];
+        if (n !== 0) { occ++; if (n === a.type) same++; }
+      }
+      if (occ > 0) { totalFrac += same / occ; count++; }
+    }
+    return count > 0 ? totalFrac / count : 0;
+  }
+
+  function happinessRate() {
+    if (allAgents.length === 0) return 1;
+    var h = 0;
+    for (var i = 0; i < allAgents.length; i++)
+      if (allAgents[i].happy) h++;
+    return h / allAgents.length;
+  }
+
+  function draw() {
+    var cw = canvas.width, ch = canvas.height;
+    var cellW = cw / GRID, cellH = ch / GRID;
+    ctx.clearRect(0, 0, cw, ch);
+    for (var y = 0; y < GRID; y++)
+      for (var x = 0; x < GRID; x++) {
+        var v = grid[y][x];
+        ctx.fillStyle = v === 1 ? CORAL : v === 2 ? TEAL : EMPTY_CLR;
+        ctx.fillRect(x * cellW, y * cellH, cellW - 0.5, cellH - 0.5);
+      }
+  }
+
+  function updateMetrics() {
+    document.getElementById('sch-seg').textContent = (segregationIndex() * 100).toFixed(0) + '%';
+    document.getElementById('sch-happy').textContent = (happinessRate() * 100).toFixed(0) + '%';
+    document.getElementById('sch-tick-val').textContent = tick;
+  }
+
+  function frame() {
+    step(); draw(); updateMetrics();
+    if (autoRunning) timer = setTimeout(frame, 60);
+  }
+
+  document.getElementById('sch-step-btn').addEventListener('click', function() {
+    step(); draw(); updateMetrics();
+  });
+
+  document.getElementById('sch-auto-btn').addEventListener('click', function() {
+    autoRunning = !autoRunning;
+    this.textContent = autoRunning ? 'Pause' : 'Auto-play';
+    if (autoRunning) frame();
+    else if (timer) { clearTimeout(timer); timer = null; }
+  });
+
+  document.getElementById('sch-reset-btn').addEventListener('click', function() {
+    autoRunning = false;
+    document.getElementById('sch-auto-btn').textContent = 'Auto-play';
+    if (timer) { clearTimeout(timer); timer = null; }
+    init(); draw(); updateMetrics();
+  });
+
+  document.getElementById('sch-threshold').addEventListener('input', function() {
+    threshold = parseInt(this.value) / 100;
+    document.getElementById('sch-thresh-val').textContent = threshold.toFixed(2);
+    updateHappiness();
+    updateMetrics();
+  });
+
+  init();
+  draw();
+  updateMetrics();
+})();
+</script>
+</div>

@@ -1,0 +1,321 @@
+<div class="mini-sim" id="mini-integrated-economy">
+<style>
+  #mini-integrated-economy {
+    max-width: 680px;
+    margin: 2rem auto;
+    background: var(--bg-card, #ffffff);
+    border: 1px solid var(--border, #e2e0da);
+    border-radius: var(--radius-lg, 12px);
+    box-shadow: 0 2px 8px rgba(26,26,46,0.06);
+    padding: 1.5rem;
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    color: var(--text-primary, #1a1a2e);
+  }
+  #mini-integrated-economy .sim-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent-teal, #2a7f7f);
+    margin-bottom: 1rem;
+  }
+  #mini-integrated-economy .canvas-wrap {
+    width: 100%;
+    height: 260px;
+    margin-bottom: 0.75rem;
+  }
+  #mini-integrated-economy .canvas-wrap canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    border-radius: 6px;
+  }
+  #mini-integrated-economy .metrics {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+  #mini-integrated-economy .metric {
+    display: flex;
+    flex-direction: column;
+  }
+  #mini-integrated-economy .metric-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-tertiary, #7a7a8a);
+    margin-bottom: 2px;
+  }
+  #mini-integrated-economy .metric-value {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary, #1a1a2e);
+  }
+  #mini-integrated-economy .controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  #mini-integrated-economy .controls button {
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.4rem 0.8rem;
+    border: 1px solid var(--border, #e2e0da);
+    border-radius: 6px;
+    background: var(--bg, #faf9f5);
+    color: var(--text-primary, #1a1a2e);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  #mini-integrated-economy .controls button:hover {
+    background: var(--bg-hover, #f5f3ee);
+  }
+  #mini-integrated-economy .controls button.active {
+    background: var(--accent-teal, #2a7f7f);
+    color: #ffffff;
+    border-color: var(--accent-teal, #2a7f7f);
+  }
+  #mini-integrated-economy .tick-badge {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 0.65rem;
+    color: var(--text-light, #9a9aaa);
+    margin-left: auto;
+  }
+</style>
+
+<div class="sim-title">Interactive: Integrated Economy</div>
+
+<div class="canvas-wrap">
+  <canvas id="ie-canvas"></canvas>
+</div>
+
+<div class="metrics">
+  <div class="metric">
+    <span class="metric-label">GDP</span>
+    <span class="metric-value" id="ie-gdp">--</span>
+  </div>
+  <div class="metric">
+    <span class="metric-label">Alive Firms</span>
+    <span class="metric-value" id="ie-alive">20</span>
+  </div>
+  <div class="metric">
+    <span class="metric-label">Market Index</span>
+    <span class="metric-value" id="ie-index">--</span>
+  </div>
+</div>
+
+<div class="controls">
+  <button id="ie-toggle-btn">Start</button>
+  <button id="ie-normal-btn" class="active">Normal</button>
+  <button id="ie-supply-btn">Supply Shock</button>
+  <button id="ie-crash-btn">Market Crash</button>
+  <span class="tick-badge" id="ie-tick">Tick 0</span>
+</div>
+
+<script>
+(function() {
+  const NUM_FIRMS = 20;
+  const DEP_PROB = 0.12;
+
+  // Build firms as network nodes
+  const firms = [];
+  for (let i = 0; i < NUM_FIRMS; i++) {
+    // Position in a circle
+    const angle = (i / NUM_FIRMS) * Math.PI * 2;
+    firms.push({
+      id: i,
+      x: 0.5 + 0.38 * Math.cos(angle),
+      y: 0.5 + 0.38 * Math.sin(angle),
+      health: 0.7 + Math.random() * 0.3,
+      stockPrice: 100,
+      output: 5 + Math.random() * 5,
+      alive: true,
+      deps: []
+    });
+  }
+
+  // Build dependency network
+  const edges = [];
+  for (let i = 0; i < NUM_FIRMS; i++) {
+    for (let j = i + 1; j < NUM_FIRMS; j++) {
+      if (Math.random() < DEP_PROB) {
+        firms[i].deps.push(j);
+        firms[j].deps.push(i);
+        edges.push([i, j]);
+      }
+    }
+  }
+
+  let scenario = 'normal';
+  let tick = 0;
+  let shockTicks = 0;
+
+  function setScenario(s) {
+    scenario = s;
+    shockTicks = s === 'normal' ? 0 : 15;
+    // Update button states
+    document.getElementById('ie-normal-btn').classList.toggle('active', s === 'normal');
+    document.getElementById('ie-supply-btn').classList.toggle('active', s === 'supply');
+    document.getElementById('ie-crash-btn').classList.toggle('active', s === 'crash');
+  }
+
+  function step() {
+    if (shockTicks > 0) shockTicks--;
+    else if (scenario !== 'normal') scenario = 'normal';
+
+    for (const f of firms) {
+      if (!f.alive) continue;
+
+      // Base health recovery
+      f.health += 0.02 * (1 - f.health);
+
+      // Scenario effects
+      if (scenario === 'supply' && shockTicks > 0) {
+        f.health -= 0.04 + Math.random() * 0.03;
+      }
+      if (scenario === 'crash' && shockTicks > 0) {
+        f.stockPrice *= (0.92 + Math.random() * 0.06);
+        f.health -= 0.02;
+      }
+
+      // Random fluctuations
+      f.health += (Math.random() - 0.5) * 0.05;
+      f.stockPrice *= (1 + (Math.random() - 0.5) * 0.04);
+
+      // Contagion: failing neighbors hurt health
+      for (const depId of f.deps) {
+        const dep = firms[depId];
+        if (!dep.alive) {
+          f.health -= 0.08;
+        } else if (dep.health < 0.4) {
+          f.health -= 0.03;
+        }
+      }
+
+      // Clamp
+      f.health = Math.max(0, Math.min(1, f.health));
+      f.stockPrice = Math.max(1, f.stockPrice);
+
+      // Output proportional to health
+      f.output = f.health * (5 + Math.random() * 3);
+
+      // Firm failure
+      if (f.health < 0.15) {
+        f.alive = false;
+        f.output = 0;
+      }
+
+      // Stock price tracks health
+      const target = f.health * 100;
+      f.stockPrice += (target - f.stockPrice) * 0.1;
+    }
+
+    // Revive dead firms occasionally (new entrants)
+    for (const f of firms) {
+      if (!f.alive && Math.random() < 0.03) {
+        f.alive = true;
+        f.health = 0.5;
+        f.stockPrice = 50;
+        f.output = 3;
+      }
+    }
+
+    tick++;
+    render();
+  }
+
+  // --- Rendering ---
+  const canvas = document.getElementById('ie-canvas');
+  const gdpEl = document.getElementById('ie-gdp');
+  const aliveEl = document.getElementById('ie-alive');
+  const indexEl = document.getElementById('ie-index');
+  const tickEl = document.getElementById('ie-tick');
+  const toggleBtn = document.getElementById('ie-toggle-btn');
+
+  function healthColor(h) {
+    if (h > 0.65) return '#4a8a5a';
+    if (h > 0.4) return '#b08a3a';
+    return '#c96b5a';
+  }
+
+  function render() {
+    const ctx = canvas.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
+    const W = rect.width, H = rect.height;
+    ctx.clearRect(0, 0, W, H);
+
+    // Draw edges
+    ctx.strokeStyle = 'rgba(26,26,46,0.1)';
+    ctx.lineWidth = 1;
+    for (const [a, b] of edges) {
+      if (!firms[a].alive && !firms[b].alive) continue;
+      ctx.beginPath();
+      ctx.moveTo(firms[a].x * W, firms[a].y * H);
+      ctx.lineTo(firms[b].x * W, firms[b].y * H);
+      ctx.stroke();
+    }
+
+    // Draw nodes
+    for (const f of firms) {
+      const x = f.x * W, y = f.y * H;
+      const radius = f.alive ? 8 + f.output * 0.8 : 4;
+
+      ctx.globalAlpha = f.alive ? 1 : 0.25;
+      ctx.fillStyle = f.alive ? healthColor(f.health) : '#999';
+      ctx.beginPath();
+      ctx.arc(x, y, radius, 0, Math.PI * 2);
+      ctx.fill();
+
+      // White border
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+
+    // Metrics
+    const aliveFirms = firms.filter(f => f.alive);
+    const gdp = aliveFirms.reduce((s, f) => s + f.output, 0);
+    const index = aliveFirms.length ? aliveFirms.reduce((s, f) => s + f.stockPrice, 0) / aliveFirms.length : 0;
+
+    gdpEl.textContent = gdp.toFixed(1);
+    aliveEl.textContent = aliveFirms.length;
+    aliveEl.style.color = aliveFirms.length < 15 ? '#c96b5a' : '#1a1a2e';
+    indexEl.textContent = index.toFixed(1);
+    tickEl.textContent = 'Tick ' + tick;
+
+    // Update scenario button highlights
+    document.getElementById('ie-normal-btn').classList.toggle('active', scenario === 'normal');
+    document.getElementById('ie-supply-btn').classList.toggle('active', scenario === 'supply');
+    document.getElementById('ie-crash-btn').classList.toggle('active', scenario === 'crash');
+  }
+
+  // --- Controls ---
+  let timer = null;
+  toggleBtn.addEventListener('click', function() {
+    if (timer) {
+      clearInterval(timer);
+      timer = null;
+      toggleBtn.textContent = 'Start';
+    } else {
+      timer = setInterval(step, 200);
+      toggleBtn.textContent = 'Pause';
+    }
+  });
+
+  document.getElementById('ie-normal-btn').addEventListener('click', () => setScenario('normal'));
+  document.getElementById('ie-supply-btn').addEventListener('click', () => setScenario('supply'));
+  document.getElementById('ie-crash-btn').addEventListener('click', () => setScenario('crash'));
+
+  render();
+})();
+</script>
+</div>

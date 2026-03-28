@@ -1,0 +1,272 @@
+<div class="mini-sim" id="mini-sandpile">
+<style>
+  #mini-sandpile {
+    max-width: 680px;
+    margin: 2rem auto;
+    background: var(--bg-card, #ffffff);
+    border: 1px solid var(--border, #e2e0da);
+    border-radius: var(--radius-lg, 12px);
+    box-shadow: 0 2px 8px rgba(26,26,46,0.06);
+    padding: 1.5rem;
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    color: var(--text-primary, #1a1a2e);
+  }
+  #mini-sandpile .sim-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent-teal, #2a7f7f);
+    margin-bottom: 0.25rem;
+  }
+  #mini-sandpile .sim-desc {
+    font-size: 0.72rem;
+    color: var(--text-tertiary, #7a7a8a);
+    margin-bottom: 0.75rem;
+  }
+  #mini-sandpile canvas {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 8px;
+    background: #1a1218;
+    margin-bottom: 0.75rem;
+    cursor: crosshair;
+  }
+  #mini-sandpile .metrics {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+  #mini-sandpile .metric {
+    display: flex;
+    flex-direction: column;
+  }
+  #mini-sandpile .metric-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-tertiary, #7a7a8a);
+    margin-bottom: 2px;
+  }
+  #mini-sandpile .metric-value {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary, #1a1a2e);
+  }
+  #mini-sandpile .controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  #mini-sandpile .controls button {
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.4rem 1rem;
+    border: 1px solid var(--border, #e2e0da);
+    border-radius: 6px;
+    background: var(--bg, #faf9f5);
+    color: var(--text-primary, #1a1a2e);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  #mini-sandpile .controls button:hover {
+    background: var(--bg-hover, #f5f3ee);
+  }
+  #mini-sandpile .tick-badge {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 0.65rem;
+    color: var(--text-light, #9a9aaa);
+    margin-left: auto;
+  }
+</style>
+
+<div class="sim-title">Interactive: Sand Pile</div>
+<div class="sim-desc">Self-organized criticality -- click to drop grains and trigger cascading avalanches</div>
+
+<canvas id="sp-canvas" width="390" height="390"></canvas>
+
+<div class="metrics">
+  <div class="metric">
+    <span class="metric-label">Total Grains</span>
+    <span class="metric-value" id="sp-grains">0</span>
+  </div>
+  <div class="metric">
+    <span class="metric-label">Last Avalanche</span>
+    <span class="metric-value" id="sp-last">0</span>
+  </div>
+  <div class="metric">
+    <span class="metric-label">Largest</span>
+    <span class="metric-value" id="sp-max">0</span>
+  </div>
+</div>
+
+<div class="controls">
+  <button id="sp-drop-btn">Drop Grain</button>
+  <button id="sp-auto-btn">Auto-drop</button>
+  <span class="tick-badge" id="sp-tick">drops: 0</span>
+</div>
+
+<script>
+(function() {
+  var GRID = 30, THRESHOLD = 4;
+  var canvas = document.getElementById('sp-canvas');
+  var ctx = canvas.getContext('2d');
+
+  var heights, flash, drops, lastAvalanche, maxAvalanche;
+  var autoRunning = false, timer = null;
+
+  // color palette: height 0..3 gradient, 4+ bright
+  var COLORS = [
+    [20, 18, 30],
+    [50, 60, 90],
+    [80, 120, 140],
+    [140, 190, 180],
+    [240, 230, 180]
+  ];
+
+  function init() {
+    heights = [];
+    flash = [];
+    drops = 0;
+    lastAvalanche = 0;
+    maxAvalanche = 0;
+    for (var r = 0; r < GRID; r++) {
+      heights[r] = [];
+      flash[r] = [];
+      for (var c = 0; c < GRID; c++) {
+        heights[r][c] = 0;
+        flash[r][c] = 0;
+      }
+    }
+  }
+
+  function addGrain(row, col) {
+    heights[row][col]++;
+    var size = 0;
+    var affected = {};
+
+    var toTopple = {};
+    if (heights[row][col] >= THRESHOLD)
+      toTopple[row * GRID + col] = true;
+
+    var NB = [[-1,0],[1,0],[0,-1],[0,1]];
+
+    while (Object.keys(toTopple).length > 0) {
+      var next = {};
+      var keys = Object.keys(toTopple);
+      for (var ki = 0; ki < keys.length; ki++) {
+        var key = parseInt(keys[ki]);
+        var r = Math.floor(key / GRID), c = key % GRID;
+        while (heights[r][c] >= THRESHOLD) {
+          size++;
+          affected[key] = true;
+          heights[r][c] -= THRESHOLD;
+          for (var ni = 0; ni < 4; ni++) {
+            var nr = r + NB[ni][0], nc = c + NB[ni][1];
+            if (nr >= 0 && nr < GRID && nc >= 0 && nc < GRID) {
+              heights[nr][nc]++;
+              var nk = nr * GRID + nc;
+              affected[nk] = true;
+              if (heights[nr][nc] >= THRESHOLD) next[nk] = true;
+            }
+            // else grain falls off edge
+          }
+        }
+      }
+      toTopple = next;
+    }
+
+    // flash affected cells
+    if (size > 0) {
+      var affKeys = Object.keys(affected);
+      for (var i = 0; i < affKeys.length; i++) {
+        var k = parseInt(affKeys[i]);
+        flash[Math.floor(k / GRID)][k % GRID] = 1.0;
+      }
+    }
+
+    drops++;
+    lastAvalanche = size;
+    if (size > maxAvalanche) maxAvalanche = size;
+    return size;
+  }
+
+  function dropRandom() {
+    var r = Math.floor(Math.random() * GRID);
+    var c = Math.floor(Math.random() * GRID);
+    return addGrain(r, c);
+  }
+
+  function draw() {
+    var cw = canvas.width, ch = canvas.height;
+    var cellW = cw / GRID, cellH = ch / GRID;
+    ctx.clearRect(0, 0, cw, ch);
+    var anyFlash = false;
+    for (var r = 0; r < GRID; r++) {
+      for (var c = 0; c < GRID; c++) {
+        var idx = Math.min(heights[r][c], 4);
+        var base = COLORS[idx];
+        var f = flash[r][c];
+        var cr = Math.round(base[0] + (255 - base[0]) * f);
+        var cg = Math.round(base[1] + (255 - base[1]) * f);
+        var cb = Math.round(base[2] + (255 - base[2]) * f);
+        ctx.fillStyle = 'rgb(' + cr + ',' + cg + ',' + cb + ')';
+        ctx.fillRect(c * cellW, r * cellH, cellW - 0.5, cellH - 0.5);
+        if (f > 0) {
+          flash[r][c] = Math.max(0, f - 0.08);
+          if (flash[r][c] > 0) anyFlash = true;
+        }
+      }
+    }
+    if (anyFlash) requestAnimationFrame(draw);
+  }
+
+  function updateMetrics() {
+    var total = 0;
+    for (var r = 0; r < GRID; r++)
+      for (var c = 0; c < GRID; c++) total += heights[r][c];
+    document.getElementById('sp-grains').textContent = total;
+    document.getElementById('sp-last').textContent = lastAvalanche;
+    document.getElementById('sp-max').textContent = maxAvalanche;
+    document.getElementById('sp-tick').textContent = 'drops: ' + drops;
+  }
+
+  // click to drop grain at position
+  canvas.addEventListener('click', function(e) {
+    var rect = canvas.getBoundingClientRect();
+    var cellW = canvas.width / GRID, cellH = canvas.height / GRID;
+    var c = Math.floor((e.clientX - rect.left) / rect.width * GRID);
+    var r = Math.floor((e.clientY - rect.top) / rect.height * GRID);
+    if (r >= 0 && r < GRID && c >= 0 && c < GRID) {
+      addGrain(r, c);
+      draw();
+      updateMetrics();
+    }
+  });
+
+  document.getElementById('sp-drop-btn').addEventListener('click', function() {
+    dropRandom(); draw(); updateMetrics();
+  });
+
+  document.getElementById('sp-auto-btn').addEventListener('click', function() {
+    autoRunning = !autoRunning;
+    this.textContent = autoRunning ? 'Pause' : 'Auto-drop';
+    if (autoRunning) autoFrame();
+    else if (timer) { clearTimeout(timer); timer = null; }
+  });
+
+  function autoFrame() {
+    dropRandom(); draw(); updateMetrics();
+    if (autoRunning) timer = setTimeout(autoFrame, 40);
+  }
+
+  init();
+  draw();
+  updateMetrics();
+})();
+</script>
+</div>

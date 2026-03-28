@@ -1,0 +1,367 @@
+<div class="mini-sim" id="mini-strategy">
+<style>
+  #mini-strategy {
+    max-width: 680px;
+    margin: 2rem auto;
+    background: var(--bg-card, #ffffff);
+    border: 1px solid var(--border, #e2e0da);
+    border-radius: var(--radius-lg, 12px);
+    box-shadow: 0 2px 8px rgba(26,26,46,0.06);
+    padding: 1.5rem;
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    color: var(--text-primary, #1a1a2e);
+  }
+  #mini-strategy .sim-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent-teal, #2a7f7f);
+    margin-bottom: 1rem;
+  }
+  #mini-strategy .canvas-wrap {
+    width: 100%;
+    height: 200px;
+    margin-bottom: 0.75rem;
+  }
+  #mini-strategy .canvas-wrap canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    border-radius: 6px;
+  }
+  #mini-strategy .metrics {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+  #mini-strategy .metric {
+    display: flex;
+    flex-direction: column;
+  }
+  #mini-strategy .metric-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-tertiary, #7a7a8a);
+    margin-bottom: 2px;
+  }
+  #mini-strategy .metric-value {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary, #1a1a2e);
+  }
+  #mini-strategy .controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+  #mini-strategy .controls button {
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.4rem 1rem;
+    border: 1px solid var(--border, #e2e0da);
+    border-radius: 6px;
+    background: var(--bg, #faf9f5);
+    color: var(--text-primary, #1a1a2e);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  #mini-strategy .controls button:hover {
+    background: var(--bg-hover, #f5f3ee);
+  }
+  #mini-strategy .legend {
+    display: flex;
+    gap: 0.75rem;
+  }
+  #mini-strategy .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.6rem;
+    color: var(--text-tertiary, #7a7a8a);
+  }
+  #mini-strategy .legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  #mini-strategy .slider-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  #mini-strategy .slider-wrap input[type="range"] {
+    width: 70px;
+    accent-color: var(--accent-teal, #2a7f7f);
+  }
+  #mini-strategy .slider-label {
+    font-size: 0.65rem;
+    color: var(--text-tertiary, #7a7a8a);
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  }
+  #mini-strategy .tick-badge {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 0.65rem;
+    color: var(--text-light, #9a9aaa);
+    margin-left: auto;
+  }
+</style>
+
+<div class="sim-title">Interactive: Strategy as Evolution</div>
+
+<div class="canvas-wrap">
+  <canvas id="st-canvas"></canvas>
+</div>
+
+<div class="metrics">
+  <div class="metric">
+    <span class="metric-label">Exploiters</span>
+    <span class="metric-value" id="st-exploiters" style="color:#c96b5a">5</span>
+  </div>
+  <div class="metric">
+    <span class="metric-label">Explorers</span>
+    <span class="metric-value" id="st-explorers" style="color:#3a5a8c">5</span>
+  </div>
+  <div class="metric">
+    <span class="metric-label">Adaptive</span>
+    <span class="metric-value" id="st-adaptive" style="color:#4a8a5a">5</span>
+  </div>
+  <div class="metric">
+    <span class="metric-label">Concentration</span>
+    <span class="metric-value" id="st-hhi">--</span>
+  </div>
+</div>
+
+<div class="controls">
+  <button id="st-toggle-btn">Start</button>
+  <div class="slider-wrap">
+    <span class="slider-label">Volatility</span>
+    <input type="range" id="st-volatility" min="1" max="20" value="5">
+    <span class="slider-label" id="st-vol-val">5</span>
+  </div>
+  <div class="legend">
+    <span class="legend-item"><span class="legend-dot" style="background:#c96b5a"></span>Exploit</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#3a5a8c"></span>Explore</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#4a8a5a"></span>Adaptive</span>
+  </div>
+  <span class="tick-badge" id="st-tick">Tick 0</span>
+</div>
+
+<script>
+(function() {
+  const NUM_FIRMS = 15;
+  const NUM_NICHES = 4;
+  const HISTORY_LEN = 60;
+
+  const TYPE_COLORS = { exploiter: '#c96b5a', explorer: '#3a5a8c', adaptive: '#4a8a5a' };
+  const TYPES = ['exploiter', 'explorer', 'adaptive'];
+
+  // Niche attractiveness (shifts over time)
+  const niches = [];
+  for (let i = 0; i < NUM_NICHES; i++) niches.push(0.3 + Math.random() * 0.7);
+
+  // Firms
+  const firms = [];
+  for (let i = 0; i < NUM_FIRMS; i++) {
+    const type = TYPES[i % 3];
+    const exps = [];
+    for (let e = 0; e < 3; e++) {
+      exps.push({ niche: Math.floor(Math.random() * NUM_NICHES), capability: Math.random(), resources: 1 / 3 });
+    }
+    firms.push({ id: i, type, experiments: exps, fitness: 0, marketShare: 1 / NUM_FIRMS, alive: true });
+  }
+
+  let tick = 0;
+  const history = []; // Array of { exploiter, explorer, adaptive } share snapshots
+
+  function step() {
+    const volatility = parseInt(document.getElementById('st-volatility').value) / 100;
+
+    // Shift niches
+    for (let i = 0; i < NUM_NICHES; i++) {
+      if (Math.random() < volatility) {
+        niches[i] = Math.max(0.1, Math.min(1, niches[i] + (Math.random() - 0.5) * 0.4));
+      }
+    }
+
+    // Evaluate firms
+    const aliveFirms = firms.filter(f => f.alive);
+    for (const f of aliveFirms) {
+      let totalFit = 0;
+      for (const exp of f.experiments) {
+        const nicheFit = niches[exp.niche] || 0;
+        totalFit += exp.resources * exp.capability * nicheFit;
+      }
+      f.fitness = totalFit;
+
+      // Strategy-specific behavior
+      if (f.type === 'exploiter') {
+        // Concentrate resources on best experiment
+        const best = f.experiments.reduce((a, b) => a.capability * (niches[a.niche] || 0) > b.capability * (niches[b.niche] || 0) ? a : b);
+        for (const exp of f.experiments) exp.resources = exp === best ? 0.7 : 0.15;
+        // Improve best capability
+        best.capability = Math.min(1, best.capability + 0.02);
+      } else if (f.type === 'explorer') {
+        // Equal resources, high mutation
+        for (const exp of f.experiments) exp.resources = 1 / f.experiments.length;
+        if (Math.random() < 0.2) {
+          const idx = Math.floor(Math.random() * f.experiments.length);
+          f.experiments[idx].niche = Math.floor(Math.random() * NUM_NICHES);
+          f.experiments[idx].capability = 0.2 + Math.random() * 0.3;
+        }
+      } else {
+        // Adaptive: shift allocation based on performance
+        const fitByExp = f.experiments.map(e => e.capability * (niches[e.niche] || 0));
+        const totalExpFit = fitByExp.reduce((a, b) => a + b, 0) || 1;
+        for (let i = 0; i < f.experiments.length; i++) {
+          f.experiments[i].resources = 0.3 * f.experiments[i].resources + 0.7 * (fitByExp[i] / totalExpFit);
+        }
+        // Occasional exploration
+        if (Math.random() < 0.08) {
+          const idx = Math.floor(Math.random() * f.experiments.length);
+          f.experiments[idx].niche = Math.floor(Math.random() * NUM_NICHES);
+          f.experiments[idx].capability = 0.3 + Math.random() * 0.3;
+        }
+        // Improve best
+        const bestIdx = fitByExp.indexOf(Math.max(...fitByExp));
+        f.experiments[bestIdx].capability = Math.min(1, f.experiments[bestIdx].capability + 0.01);
+      }
+    }
+
+    // Market share proportional to fitness
+    const totalFit = aliveFirms.reduce((s, f) => s + f.fitness, 0) || 1;
+    for (const f of aliveFirms) f.marketShare = f.fitness / totalFit;
+
+    // Cull weakest, replace with offspring of best
+    if (aliveFirms.length > 3) {
+      const sorted = [...aliveFirms].sort((a, b) => a.fitness - b.fitness);
+      if (Math.random() < 0.15) {
+        const worst = sorted[0];
+        const best = sorted[sorted.length - 1];
+        worst.type = best.type;
+        worst.experiments = best.experiments.map(e => ({
+          niche: e.niche,
+          capability: Math.max(0.1, e.capability + (Math.random() - 0.5) * 0.2),
+          resources: e.resources
+        }));
+        worst.fitness = 0;
+      }
+    }
+
+    // Record history
+    const shares = { exploiter: 0, explorer: 0, adaptive: 0 };
+    for (const f of firms) {
+      if (f.alive) shares[f.type] += f.marketShare;
+    }
+    history.push(shares);
+    if (history.length > HISTORY_LEN) history.shift();
+
+    tick++;
+    render();
+  }
+
+  // --- Rendering ---
+  const canvas = document.getElementById('st-canvas');
+  const exploiterEl = document.getElementById('st-exploiters');
+  const explorerEl = document.getElementById('st-explorers');
+  const adaptiveEl = document.getElementById('st-adaptive');
+  const hhiEl = document.getElementById('st-hhi');
+  const tickEl = document.getElementById('st-tick');
+  const toggleBtn = document.getElementById('st-toggle-btn');
+  const volSlider = document.getElementById('st-volatility');
+  const volVal = document.getElementById('st-vol-val');
+
+  volSlider.addEventListener('input', function() { volVal.textContent = this.value; });
+
+  function render() {
+    const ctx = canvas.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
+    const W = rect.width, H = rect.height;
+    ctx.clearRect(0, 0, W, H);
+
+    if (history.length < 2) return;
+
+    // Stacked area chart
+    const stepW = W / (HISTORY_LEN - 1);
+    const order = ['exploiter', 'explorer', 'adaptive'];
+    const colors = [TYPE_COLORS.exploiter, TYPE_COLORS.explorer, TYPE_COLORS.adaptive];
+
+    for (let t = 0; t < order.length; t++) {
+      ctx.fillStyle = colors[t];
+      ctx.globalAlpha = 0.8;
+      ctx.beginPath();
+
+      // Bottom edge (cumulative of previous types)
+      for (let i = 0; i < history.length; i++) {
+        const x = (HISTORY_LEN - history.length + i) * stepW;
+        let bottom = 0;
+        for (let p = 0; p < t; p++) bottom += history[i][order[p]] || 0;
+        const y = H - bottom * H;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+
+      // Top edge (cumulative including current type)
+      for (let i = history.length - 1; i >= 0; i--) {
+        const x = (HISTORY_LEN - history.length + i) * stepW;
+        let top = 0;
+        for (let p = 0; p <= t; p++) top += history[i][order[p]] || 0;
+        const y = H - top * H;
+        ctx.lineTo(x, y);
+      }
+
+      ctx.closePath();
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+
+    // Axis labels
+    ctx.fillStyle = '#7a7a8a';
+    ctx.font = '9px JetBrains Mono, monospace';
+    ctx.textAlign = 'left';
+    ctx.fillText('100%', 2, 12);
+    ctx.fillText('0%', 2, H - 3);
+
+    // Metrics
+    const aliveFirms = firms.filter(f => f.alive);
+    const counts = { exploiter: 0, explorer: 0, adaptive: 0 };
+    for (const f of aliveFirms) counts[f.type]++;
+
+    exploiterEl.textContent = counts.exploiter;
+    explorerEl.textContent = counts.explorer;
+    adaptiveEl.textContent = counts.adaptive;
+
+    // HHI
+    const hhi = aliveFirms.reduce((s, f) => s + f.marketShare * f.marketShare, 0);
+    hhiEl.textContent = (hhi * 10000).toFixed(0);
+
+    tickEl.textContent = 'Tick ' + tick;
+  }
+
+  // --- Controls ---
+  let timer = null;
+  toggleBtn.addEventListener('click', function() {
+    if (timer) {
+      clearInterval(timer);
+      timer = null;
+      toggleBtn.textContent = 'Start';
+    } else {
+      timer = setInterval(step, 200);
+      toggleBtn.textContent = 'Pause';
+    }
+  });
+
+  render();
+})();
+</script>
+</div>

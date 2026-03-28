@@ -1,0 +1,303 @@
+<div class="mini-sim" id="mini-sugarscape">
+<style>
+  #mini-sugarscape {
+    max-width: 680px;
+    margin: 2rem auto;
+    background: var(--bg-card, #ffffff);
+    border: 1px solid var(--border, #e2e0da);
+    border-radius: var(--radius-lg, 12px);
+    box-shadow: 0 2px 8px rgba(26,26,46,0.06);
+    padding: 1.5rem;
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    color: var(--text-primary, #1a1a2e);
+  }
+  #mini-sugarscape .sim-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent-teal, #2a7f7f);
+    margin-bottom: 0.25rem;
+  }
+  #mini-sugarscape .sim-desc {
+    font-size: 0.72rem;
+    color: var(--text-tertiary, #7a7a8a);
+    margin-bottom: 0.75rem;
+  }
+  #mini-sugarscape canvas {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 8px;
+    background: #1a1a2e;
+    margin-bottom: 0.75rem;
+  }
+  #mini-sugarscape .metrics {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+  #mini-sugarscape .metric {
+    display: flex;
+    flex-direction: column;
+  }
+  #mini-sugarscape .metric-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-tertiary, #7a7a8a);
+    margin-bottom: 2px;
+  }
+  #mini-sugarscape .metric-value {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary, #1a1a2e);
+  }
+  #mini-sugarscape .controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  #mini-sugarscape .controls button {
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.4rem 1rem;
+    border: 1px solid var(--border, #e2e0da);
+    border-radius: 6px;
+    background: var(--bg, #faf9f5);
+    color: var(--text-primary, #1a1a2e);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  #mini-sugarscape .controls button:hover {
+    background: var(--bg-hover, #f5f3ee);
+  }
+  #mini-sugarscape .tick-badge {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 0.65rem;
+    color: var(--text-light, #9a9aaa);
+    margin-left: auto;
+  }
+</style>
+
+<div class="sim-title">Interactive: Sugarscape</div>
+<div class="sim-desc">Agents forage sugar peaks -- wealth inequality emerges from simple rules</div>
+
+<canvas id="ss-canvas" width="400" height="400"></canvas>
+
+<div class="metrics">
+  <div class="metric">
+    <span class="metric-label">Population</span>
+    <span class="metric-value" id="ss-pop">100</span>
+  </div>
+  <div class="metric">
+    <span class="metric-label">Gini</span>
+    <span class="metric-value" id="ss-gini">0.00</span>
+  </div>
+  <div class="metric">
+    <span class="metric-label">Avg Vision</span>
+    <span class="metric-value" id="ss-vision">3.5</span>
+  </div>
+  <div class="metric">
+    <span class="metric-label">Avg Metabolism</span>
+    <span class="metric-value" id="ss-metab">2.5</span>
+  </div>
+</div>
+
+<div class="controls">
+  <button id="ss-toggle">Start</button>
+  <span class="tick-badge" id="ss-tick">tick 0</span>
+</div>
+
+<script>
+(function() {
+  const GRID = 40, N_AGENTS = 100;
+  const VISION_MIN = 1, VISION_MAX = 6;
+  const METAB_MIN = 1, METAB_MAX = 4;
+  const ENDOW_MIN = 5, ENDOW_MAX = 25;
+  const MAX_SUGAR = 4;
+  const PEAK1 = { x: 12, y: 12, h: 4, r: 16 };
+  const PEAK2 = { x: 28, y: 28, h: 4, r: 16 };
+
+  const canvas = document.getElementById('ss-canvas');
+  const ctx = canvas.getContext('2d');
+
+  let capacity = [], sugar = [], agents = [], tick = 0;
+  let running = false, raf = null;
+
+  function gauss(x, y, pk) {
+    var d = Math.sqrt((x - pk.x) * (x - pk.x) + (y - pk.y) * (y - pk.y));
+    return pk.h * Math.exp(-(d * d) / (2 * (pk.r / 2.5) * (pk.r / 2.5)));
+  }
+
+  function randInt(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+
+  function shuffle(arr) {
+    for (var i = arr.length - 1; i > 0; i--) {
+      var j = randInt(0, i);
+      var tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+    }
+  }
+
+  function init() {
+    tick = 0;
+    agents = [];
+    capacity = [];
+    sugar = [];
+    for (var y = 0; y < GRID; y++) {
+      capacity[y] = [];
+      sugar[y] = [];
+      for (var x = 0; x < GRID; x++) {
+        var c = Math.min(Math.max(Math.round(gauss(x, y, PEAK1) + gauss(x, y, PEAK2)), 0), MAX_SUGAR);
+        capacity[y][x] = c;
+        sugar[y][x] = c;
+      }
+    }
+    var pos = [];
+    for (var y = 0; y < GRID; y++)
+      for (var x = 0; x < GRID; x++) pos.push([x, y]);
+    shuffle(pos);
+    for (var i = 0; i < N_AGENTS; i++) {
+      agents.push({
+        x: pos[i][0], y: pos[i][1],
+        vision: randInt(VISION_MIN, VISION_MAX),
+        metabolism: randInt(METAB_MIN, METAB_MAX),
+        sugar: randInt(ENDOW_MIN, ENDOW_MAX),
+        alive: true
+      });
+    }
+  }
+
+  function occupied(x, y, exclude) {
+    for (var i = 0; i < agents.length; i++) {
+      var a = agents[i];
+      if (a.alive && a.x === x && a.y === y && a !== exclude) return true;
+    }
+    return false;
+  }
+
+  function step() {
+    shuffle(agents);
+    var dirs = [[0,1],[0,-1],[1,0],[-1,0]];
+    // move + gather
+    for (var i = 0; i < agents.length; i++) {
+      var a = agents[i];
+      if (!a.alive) continue;
+      var bestX = a.x, bestY = a.y, bestS = -1, bestD = 999;
+      for (var di = 0; di < 4; di++) {
+        var dx = dirs[di][0], dy = dirs[di][1];
+        for (var d = 1; d <= a.vision; d++) {
+          var nx = (a.x + dx * d + GRID) % GRID;
+          var ny = (a.y + dy * d + GRID) % GRID;
+          if (occupied(nx, ny, a)) continue;
+          var s = sugar[ny][nx];
+          if (s > bestS || (s === bestS && d < bestD)) {
+            bestS = s; bestX = nx; bestY = ny; bestD = d;
+          }
+        }
+      }
+      a.x = bestX; a.y = bestY;
+      a.sugar += sugar[bestY][bestX];
+      sugar[bestY][bestX] = 0;
+    }
+    // metabolism + death
+    for (var i = 0; i < agents.length; i++) {
+      var a = agents[i];
+      if (!a.alive) continue;
+      a.sugar -= a.metabolism;
+      if (a.sugar <= 0) a.alive = false;
+    }
+    agents = agents.filter(function(a) { return a.alive; });
+    // regrow
+    for (var y = 0; y < GRID; y++)
+      for (var x = 0; x < GRID; x++)
+        sugar[y][x] = Math.min(sugar[y][x] + 1, capacity[y][x]);
+    tick++;
+  }
+
+  function gini() {
+    if (agents.length === 0) return 0;
+    var w = agents.map(function(a) { return a.sugar; }).sort(function(a, b) { return a - b; });
+    var n = w.length, total = 0;
+    for (var i = 0; i < n; i++) total += w[i];
+    if (total <= 0) return 0;
+    var ws = 0;
+    for (var i = 0; i < n; i++) ws += (2 * (i + 1) - n - 1) * w[i];
+    return Math.max(0, Math.min(1, ws / (n * total)));
+  }
+
+  function draw() {
+    var cw = canvas.width, ch = canvas.height;
+    var cellW = cw / GRID, cellH = ch / GRID;
+    ctx.clearRect(0, 0, cw, ch);
+    // sugar landscape
+    for (var y = 0; y < GRID; y++) {
+      for (var x = 0; x < GRID; x++) {
+        var s = sugar[y][x] / MAX_SUGAR;
+        var r = Math.round(30 + s * 150);
+        var g = Math.round(25 + s * 110);
+        var b = Math.round(15 + s * 20);
+        ctx.fillStyle = 'rgb(' + r + ',' + g + ',' + b + ')';
+        ctx.fillRect(x * cellW, y * cellH, cellW, cellH);
+      }
+    }
+    // agents colored by wealth
+    if (agents.length === 0) return;
+    var maxW = 1;
+    for (var i = 0; i < agents.length; i++)
+      if (agents[i].sugar > maxW) maxW = agents[i].sugar;
+    for (var i = 0; i < agents.length; i++) {
+      var a = agents[i];
+      var t = Math.min(a.sugar / maxW, 1);
+      var r = Math.round(60 + t * 195);
+      var g = Math.round(180 - t * 80);
+      var b = Math.round(180 - t * 140);
+      ctx.fillStyle = 'rgb(' + r + ',' + g + ',' + b + ')';
+      ctx.beginPath();
+      ctx.arc(a.x * cellW + cellW / 2, a.y * cellH + cellH / 2, cellW * 0.35, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  function updateMetrics() {
+    var living = agents.filter(function(a) { return a.alive; });
+    document.getElementById('ss-pop').textContent = living.length;
+    document.getElementById('ss-gini').textContent = gini().toFixed(2);
+    if (living.length > 0) {
+      var sumV = 0, sumM = 0;
+      for (var i = 0; i < living.length; i++) {
+        sumV += living[i].vision;
+        sumM += living[i].metabolism;
+      }
+      document.getElementById('ss-vision').textContent = (sumV / living.length).toFixed(1);
+      document.getElementById('ss-metab').textContent = (sumM / living.length).toFixed(1);
+    } else {
+      document.getElementById('ss-vision').textContent = '--';
+      document.getElementById('ss-metab').textContent = '--';
+    }
+    document.getElementById('ss-tick').textContent = 'tick ' + tick;
+  }
+
+  function frame() {
+    step();
+    draw();
+    updateMetrics();
+    if (running) raf = requestAnimationFrame(frame);
+  }
+
+  document.getElementById('ss-toggle').addEventListener('click', function() {
+    running = !running;
+    this.textContent = running ? 'Pause' : 'Start';
+    if (running) raf = requestAnimationFrame(frame);
+    else if (raf) cancelAnimationFrame(raf);
+  });
+
+  init();
+  draw();
+  updateMetrics();
+})();
+</script>
+</div>

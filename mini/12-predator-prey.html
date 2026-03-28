@@ -1,0 +1,393 @@
+<div class="mini-sim" id="mini-predator-prey" style="max-width:680px;margin:0 auto;">
+<style>
+#mini-predator-prey {
+  background: #ffffff;
+  border: 1px solid #e2e0da;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(26,26,46,0.06);
+  padding: 20px 24px 18px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: #1a1a2e;
+}
+#mini-predator-prey .sim-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin-bottom: 12px;
+  color: #1a1a2e;
+}
+#mini-predator-prey .sim-metrics {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+#mini-predator-prey .metric {
+  font-size: 0.72rem;
+  color: #4a4a5a;
+}
+#mini-predator-prey .metric span {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-weight: 500;
+}
+#mini-predator-prey .prey-count { color: #4a8a5a; }
+#mini-predator-prey .pred-count { color: #c96b5a; }
+#mini-predator-prey canvas {
+  display: block;
+  width: 100%;
+  border-radius: 8px;
+  background: #1a1a2e;
+}
+#mini-predator-prey #pp-canvas { margin-bottom: 6px; }
+#mini-predator-prey #pp-spark { margin-bottom: 10px; background: #faf9f5; }
+#mini-predator-prey .sim-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+#mini-predator-prey .sim-controls button {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 500;
+  padding: 5px 14px;
+  border: 1px solid #e2e0da;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #4a4a5a;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+#mini-predator-prey .sim-controls button:hover {
+  background: #f5f3ee;
+  border-color: #ccc;
+}
+#mini-predator-prey .sim-controls button.active {
+  background: #2a7f7f;
+  color: #fff;
+  border-color: #2a7f7f;
+}
+#mini-predator-prey .sim-controls .tick-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  color: #7a7a8a;
+  margin-left: auto;
+}
+</style>
+
+<div class="sim-title">Interactive: Predator-Prey</div>
+<div class="sim-metrics">
+  <div class="metric">Prey: <span class="prey-count" id="pp-prey">--</span></div>
+  <div class="metric">Predators: <span class="pred-count" id="pp-pred">--</span></div>
+  <div class="metric">Tick: <span id="pp-tick">0</span></div>
+</div>
+<canvas id="pp-canvas" width="400" height="400"></canvas>
+<canvas id="pp-spark" width="632" height="60"></canvas>
+<div class="sim-controls">
+  <button id="pp-toggle">Start</button>
+  <span class="tick-label">40 x 40 grid</span>
+</div>
+
+<script>
+(function() {
+  const SIZE = 40;
+  const GRASS_REGROW = 8;
+  const PREY_GAIN = 5;
+  const PRED_GAIN = 5;
+  const PREY_REPRO = 0.08;
+  const PRED_REPRO = 0.02;
+  const INIT_PREY = 120;
+  const INIT_PRED = 20;
+  const DIRS = [[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[-1,1],[1,-1],[1,1]];
+
+  let grass, preyList, predList, tick, running, timer;
+  let preyHistory = [], predHistory = [];
+
+  const gridCanvas = document.getElementById('pp-canvas');
+  const gCtx = gridCanvas.getContext('2d');
+  const sparkCanvas = document.getElementById('pp-spark');
+  const sCtx = sparkCanvas.getContext('2d');
+
+  function wrap(v) { return ((v % SIZE) + SIZE) % SIZE; }
+
+  function init() {
+    tick = 0;
+    preyHistory = [];
+    predHistory = [];
+    // Grass: 0 = alive
+    grass = [];
+    for (let r = 0; r < SIZE; r++) {
+      grass[r] = [];
+      for (let c = 0; c < SIZE; c++) grass[r][c] = 0;
+    }
+    preyList = [];
+    for (let i = 0; i < INIT_PREY; i++) {
+      preyList.push({
+        x: Math.floor(Math.random() * SIZE),
+        y: Math.floor(Math.random() * SIZE),
+        energy: Math.floor(Math.random() * 10) + 1
+      });
+    }
+    predList = [];
+    for (let i = 0; i < INIT_PRED; i++) {
+      predList.push({
+        x: Math.floor(Math.random() * SIZE),
+        y: Math.floor(Math.random() * SIZE),
+        energy: Math.floor(Math.random() * 20) + 1
+      });
+    }
+    preyHistory.push(preyList.length);
+    predHistory.push(predList.length);
+    renderAll();
+  }
+
+  function shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+  }
+
+  function step() {
+    tick++;
+
+    // Grass regrowth
+    for (let r = 0; r < SIZE; r++)
+      for (let c = 0; c < SIZE; c++)
+        if (grass[r][c] > 0) grass[r][c]--;
+
+    // Prey actions
+    const newPrey = [];
+    shuffle(preyList);
+    for (const p of preyList) {
+      const d = DIRS[Math.floor(Math.random() * 8)];
+      p.x = wrap(p.x + d[0]);
+      p.y = wrap(p.y + d[1]);
+      p.energy--;
+      // Eat grass
+      if (grass[p.y][p.x] === 0) {
+        p.energy += PREY_GAIN;
+        grass[p.y][p.x] = GRASS_REGROW;
+      }
+      // Reproduce
+      if (Math.random() < PREY_REPRO) {
+        p.energy = Math.floor(p.energy / 2);
+        newPrey.push({ x: p.x, y: p.y, energy: p.energy });
+      }
+    }
+    preyList = preyList.filter(p => p.energy > 0);
+    preyList.push(...newPrey);
+
+    // Build prey location map
+    const preyMap = {};
+    for (const p of preyList) {
+      const key = p.y * SIZE + p.x;
+      if (!preyMap[key]) preyMap[key] = [];
+      preyMap[key].push(p);
+    }
+
+    // Predator actions
+    const newPred = [];
+    const eaten = new Set();
+    shuffle(predList);
+    for (const pr of predList) {
+      // Move toward nearby prey (detection radius 2)
+      let bestDist = Infinity, bestDx = 0, bestDy = 0, found = false;
+      for (const p of preyList) {
+        if (eaten.has(p)) continue;
+        let dx = p.x - pr.x, dy = p.y - pr.y;
+        if (Math.abs(dx) > SIZE / 2) dx = dx > 0 ? dx - SIZE : dx + SIZE;
+        if (Math.abs(dy) > SIZE / 2) dy = dy > 0 ? dy - SIZE : dy + SIZE;
+        const dist = Math.abs(dx) + Math.abs(dy);
+        if (dist < bestDist && dist <= 2) {
+          bestDist = dist;
+          bestDx = dx > 0 ? 1 : (dx < 0 ? -1 : 0);
+          bestDy = dy > 0 ? 1 : (dy < 0 ? -1 : 0);
+          found = true;
+        }
+      }
+      if (found && bestDist > 0) {
+        if (Math.random() < 0.5 && bestDx !== 0) pr.x = wrap(pr.x + bestDx);
+        else if (bestDy !== 0) pr.y = wrap(pr.y + bestDy);
+        else pr.x = wrap(pr.x + bestDx);
+      } else {
+        const d = DIRS[Math.floor(Math.random() * 8)];
+        pr.x = wrap(pr.x + d[0]);
+        pr.y = wrap(pr.y + d[1]);
+      }
+      pr.energy--;
+
+      // Eat prey
+      const key = pr.y * SIZE + pr.x;
+      if (preyMap[key] && preyMap[key].length > 0) {
+        const victim = preyMap[key].pop();
+        eaten.add(victim);
+        pr.energy += PRED_GAIN;
+      }
+
+      // Reproduce
+      if (Math.random() < PRED_REPRO) {
+        pr.energy = Math.floor(pr.energy / 2);
+        newPred.push({ x: pr.x, y: pr.y, energy: pr.energy });
+      }
+    }
+    predList = predList.filter(p => p.energy > 0);
+    predList.push(...newPred);
+    preyList = preyList.filter(p => !eaten.has(p));
+
+    preyHistory.push(preyList.length);
+    predHistory.push(predList.length);
+
+    renderAll();
+
+    if (preyList.length === 0 && predList.length === 0) {
+      stopSim();
+    }
+  }
+
+  function renderAll() {
+    renderGrid();
+    renderSpark();
+    document.getElementById('pp-prey').textContent = preyList.length;
+    document.getElementById('pp-pred').textContent = predList.length;
+    document.getElementById('pp-tick').textContent = tick;
+  }
+
+  function renderGrid() {
+    const W = gridCanvas.width, H = gridCanvas.height;
+    const cellW = W / SIZE, cellH = H / SIZE;
+    const imgData = gCtx.createImageData(W, H);
+    const data = imgData.data;
+
+    // Background: dark
+    for (let i = 0; i < data.length; i += 4) {
+      data[i] = 20; data[i+1] = 20; data[i+2] = 32; data[i+3] = 255;
+    }
+
+    // Grass cells
+    for (let r = 0; r < SIZE; r++) {
+      for (let c = 0; c < SIZE; c++) {
+        const px0 = Math.floor(c * cellW);
+        const py0 = Math.floor(r * cellH);
+        const px1 = Math.floor((c + 1) * cellW);
+        const py1 = Math.floor((r + 1) * cellH);
+        let cr, cg, cb;
+        if (grass[r][c] === 0) {
+          cr = 30; cg = 70; cb = 40; // live grass
+        } else {
+          cr = 22; cg = 35; cb = 28; // dead grass
+        }
+        for (let py = py0; py < py1; py++) {
+          for (let px = px0; px < px1; px++) {
+            const idx = (py * W + px) * 4;
+            data[idx] = cr; data[idx+1] = cg; data[idx+2] = cb;
+          }
+        }
+      }
+    }
+
+    // Prey (green)
+    for (const p of preyList) {
+      const px0 = Math.floor(p.x * cellW);
+      const py0 = Math.floor(p.y * cellH);
+      const px1 = Math.floor((p.x + 1) * cellW);
+      const py1 = Math.floor((p.y + 1) * cellH);
+      for (let py = py0; py < py1; py++) {
+        for (let px = px0; px < px1; px++) {
+          const idx = (py * W + px) * 4;
+          data[idx] = 80; data[idx+1] = 200; data[idx+2] = 100;
+        }
+      }
+    }
+
+    // Predators (red)
+    for (const p of predList) {
+      const px0 = Math.floor(p.x * cellW);
+      const py0 = Math.floor(p.y * cellH);
+      const px1 = Math.floor((p.x + 1) * cellW);
+      const py1 = Math.floor((p.y + 1) * cellH);
+      for (let py = py0; py < py1; py++) {
+        for (let px = px0; px < px1; px++) {
+          const idx = (py * W + px) * 4;
+          data[idx] = 210; data[idx+1] = 70; data[idx+2] = 70;
+        }
+      }
+    }
+
+    gCtx.putImageData(imgData, 0, 0);
+  }
+
+  function renderSpark() {
+    const W = sparkCanvas.width, H = sparkCanvas.height;
+    sCtx.clearRect(0, 0, W, H);
+
+    const maxLen = 300;
+    const ph = preyHistory.length > maxLen ? preyHistory.slice(-maxLen) : preyHistory;
+    const dh = predHistory.length > maxLen ? predHistory.slice(-maxLen) : predHistory;
+    const maxVal = Math.max(10, ...ph, ...dh);
+
+    const pad = 4;
+    const plotW = W - 2 * pad;
+    const plotH = H - 2 * pad;
+
+    // Prey sparkline (green)
+    sCtx.strokeStyle = '#4a8a5a';
+    sCtx.lineWidth = 1.5;
+    sCtx.beginPath();
+    for (let i = 0; i < ph.length; i++) {
+      const x = pad + (i / Math.max(1, ph.length - 1)) * plotW;
+      const y = pad + plotH - (ph[i] / maxVal) * plotH;
+      if (i === 0) sCtx.moveTo(x, y);
+      else sCtx.lineTo(x, y);
+    }
+    sCtx.stroke();
+
+    // Predator sparkline (red)
+    sCtx.strokeStyle = '#c96b5a';
+    sCtx.lineWidth = 1.5;
+    sCtx.beginPath();
+    for (let i = 0; i < dh.length; i++) {
+      const x = pad + (i / Math.max(1, dh.length - 1)) * plotW;
+      const y = pad + plotH - (dh[i] / maxVal) * plotH;
+      if (i === 0) sCtx.moveTo(x, y);
+      else sCtx.lineTo(x, y);
+    }
+    sCtx.stroke();
+
+    // Legend
+    sCtx.font = '9px "JetBrains Mono", monospace';
+    sCtx.fillStyle = '#4a8a5a';
+    sCtx.textAlign = 'right';
+    sCtx.fillText('prey', W - pad - 36, pad + 9);
+    sCtx.fillStyle = '#c96b5a';
+    sCtx.fillText('pred', W - pad, pad + 9);
+  }
+
+  let animTimer = null;
+  function startSim() {
+    running = true;
+    const btn = document.getElementById('pp-toggle');
+    btn.textContent = 'Pause';
+    btn.classList.add('active');
+    animTimer = setInterval(() => {
+      step();
+    }, 50);
+  }
+
+  function stopSim() {
+    running = false;
+    if (animTimer) clearInterval(animTimer);
+    animTimer = null;
+    const btn = document.getElementById('pp-toggle');
+    btn.textContent = 'Start';
+    btn.classList.remove('active');
+  }
+
+  document.getElementById('pp-toggle').addEventListener('click', () => {
+    if (running) stopSim();
+    else startSim();
+  });
+
+  init();
+})();
+</script>
+</div>

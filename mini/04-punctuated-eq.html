@@ -1,0 +1,352 @@
+<div class="mini-sim" id="mini-puncteq">
+<style>
+  #mini-puncteq {
+    max-width: 680px;
+    margin: 2rem auto;
+    background: var(--bg-card, #ffffff);
+    border: 1px solid var(--border, #e2e0da);
+    border-radius: var(--radius-lg, 12px);
+    box-shadow: 0 2px 8px rgba(26,26,46,0.06);
+    padding: 1.5rem;
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    color: var(--text-primary, #1a1a2e);
+  }
+  #mini-puncteq .sim-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent-teal, #2a7f7f);
+    margin-bottom: 0.25rem;
+  }
+  #mini-puncteq .sim-desc {
+    font-size: 0.72rem;
+    color: var(--text-tertiary, #7a7a8a);
+    margin-bottom: 0.75rem;
+  }
+  #mini-puncteq canvas {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 8px;
+    background: var(--bg, #faf9f5);
+    margin-bottom: 0.75rem;
+  }
+  #mini-puncteq .metrics {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+  #mini-puncteq .metric {
+    display: flex;
+    flex-direction: column;
+  }
+  #mini-puncteq .metric-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-tertiary, #7a7a8a);
+    margin-bottom: 2px;
+  }
+  #mini-puncteq .metric-value {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary, #1a1a2e);
+  }
+  #mini-puncteq .phase-random { color: var(--text-tertiary, #7a7a8a); }
+  #mini-puncteq .phase-growth { color: var(--accent-green, #4a8a5a); }
+  #mini-puncteq .phase-organized { color: var(--accent-teal, #2a7f7f); }
+  #mini-puncteq .phase-punctuation { color: var(--accent-coral, #c96b5a); }
+  #mini-puncteq .controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  #mini-puncteq .controls button {
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.4rem 1rem;
+    border: 1px solid var(--border, #e2e0da);
+    border-radius: 6px;
+    background: var(--bg, #faf9f5);
+    color: var(--text-primary, #1a1a2e);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  #mini-puncteq .controls button:hover {
+    background: var(--bg-hover, #f5f3ee);
+  }
+  #mini-puncteq .tick-badge {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 0.65rem;
+    color: var(--text-light, #9a9aaa);
+    margin-left: auto;
+  }
+</style>
+
+<div class="sim-title">Interactive: Punctuated Equilibrium</div>
+<div class="sim-desc">Ecosystems self-organize until a keystone species dies, triggering cascades</div>
+
+<canvas id="pe-canvas" width="400" height="400"></canvas>
+
+<div class="metrics">
+  <div class="metric">
+    <span class="metric-label">Phase</span>
+    <span class="metric-value" id="pe-phase">Random</span>
+  </div>
+  <div class="metric">
+    <span class="metric-label">Mean Fitness</span>
+    <span class="metric-value" id="pe-fitness">0.50</span>
+  </div>
+  <div class="metric">
+    <span class="metric-label">Cascades</span>
+    <span class="metric-value" id="pe-cascades">0</span>
+  </div>
+  <div class="metric">
+    <span class="metric-label">Max Cascade</span>
+    <span class="metric-value" id="pe-maxcasc">0</span>
+  </div>
+</div>
+
+<div class="controls">
+  <button id="pe-step-btn">Step</button>
+  <button id="pe-auto-btn">Auto-play</button>
+  <span class="tick-badge" id="pe-tick">tick 0</span>
+</div>
+
+<script>
+(function() {
+  var N = 30, CONN_PROB = 0.12;
+  var canvas = document.getElementById('pe-canvas');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+  var CX = W / 2, CY = H / 2, RADIUS = 160;
+
+  var species, weights, tick, cascadeCount, maxCascade, phase;
+  var recentFitness = [];
+  var autoRunning = false, timer = null;
+  var nodeX = [], nodeY = [];
+
+  function init() {
+    tick = 0;
+    cascadeCount = 0;
+    maxCascade = 0;
+    phase = 'Random';
+    recentFitness = [];
+    species = [];
+    weights = [];
+    for (var i = 0; i < N; i++) {
+      species.push({ fitness: 0, age: 0 });
+      weights[i] = new Float32Array(N);
+    }
+    // random connections
+    for (var i = 0; i < N; i++)
+      for (var j = 0; j < N; j++) {
+        if (i === j) continue;
+        if (Math.random() < CONN_PROB) weights[i][j] = Math.random() * 2 - 1;
+      }
+    // circle layout with jitter
+    for (var i = 0; i < N; i++) {
+      var angle = (2 * Math.PI * i) / N - Math.PI / 2;
+      nodeX[i] = CX + RADIUS * Math.cos(angle) + (Math.random() - 0.5) * 8;
+      nodeY[i] = CY + RADIUS * Math.sin(angle) + (Math.random() - 0.5) * 8;
+    }
+    computeAllFitness();
+  }
+
+  function sigmoid(x) { return 1 / (1 + Math.exp(-x)); }
+
+  function computeFitness(idx) {
+    var raw = 0, nPos = 0;
+    for (var j = 0; j < N; j++) {
+      if (j === idx || weights[idx][j] === 0) continue;
+      var sf = Math.max(species[j].fitness, 0.01);
+      raw += weights[idx][j] * sf;
+      if (weights[idx][j] > 0) nPos++;
+    }
+    if (nPos === 0) raw -= 0.5;
+    return sigmoid(raw * 2.0);
+  }
+
+  function computeAllFitness() {
+    for (var i = 0; i < N; i++) species[i].fitness = computeFitness(i);
+  }
+
+  function replaceSpecies(idx) {
+    species[idx] = { fitness: 0, age: 0 };
+    for (var j = 0; j < N; j++) { weights[idx][j] = 0; weights[j][idx] = 0; }
+    for (var j = 0; j < N; j++) {
+      if (j === idx) continue;
+      if (Math.random() < CONN_PROB) weights[idx][j] = Math.random() * 2 - 1;
+      if (Math.random() < CONN_PROB) weights[j][idx] = Math.random() * 2 - 1;
+    }
+    computeAllFitness();
+  }
+
+  function propagateCascade(preFitness, excluded) {
+    var totalRemoved = 0;
+    for (var iter = 0; iter < 15; iter++) {
+      var toRemove = [];
+      for (var i = 0; i < N; i++) {
+        if (excluded[i] || species[i].age === 0) continue;
+        var oldF = preFitness[i] || 0.5;
+        if (oldF > 0.25) {
+          var drop = (oldF - species[i].fitness) / oldF;
+          if (drop > 0.5 && species[i].fitness < 0.3) toRemove.push(i);
+        }
+      }
+      if (toRemove.length === 0) break;
+      var preRound = [];
+      for (var i = 0; i < N; i++) preRound[i] = species[i].fitness;
+      for (var k = 0; k < toRemove.length; k++) {
+        excluded[toRemove[k]] = true;
+        replaceSpecies(toRemove[k]);
+        totalRemoved++;
+      }
+      preFitness = preRound;
+    }
+    return totalRemoved;
+  }
+
+  function detectPhase() {
+    var sum = 0;
+    for (var i = 0; i < N; i++) sum += species[i].fitness;
+    var mean = sum / N;
+    recentFitness.push(mean);
+    if (recentFitness.length > 50) recentFitness = recentFitness.slice(-50);
+    if (recentFitness.length < 5) return 'Random';
+
+    if (recentFitness.length >= 3 &&
+        recentFitness[recentFitness.length - 1] < recentFitness[recentFitness.length - 2] * 0.85)
+      return 'Punctuation';
+
+    var variance = 0;
+    for (var i = 0; i < N; i++) variance += (species[i].fitness - mean) * (species[i].fitness - mean);
+    var std = Math.sqrt(variance / N);
+    if (mean > 0.6 && std < 0.15) return 'Organized';
+
+    var recentSlice = recentFitness.slice(-10);
+    var olderSlice = recentFitness.length >= 20 ? recentFitness.slice(-20, -10) : recentSlice;
+    var rMean = 0, oMean = 0;
+    for (var i = 0; i < recentSlice.length; i++) rMean += recentSlice[i];
+    rMean /= recentSlice.length;
+    for (var i = 0; i < olderSlice.length; i++) oMean += olderSlice[i];
+    oMean /= olderSlice.length;
+    if (rMean > oMean * 1.02) return 'Growth';
+
+    return 'Random';
+  }
+
+  function step() {
+    tick++;
+    for (var i = 0; i < N; i++) species[i].age++;
+
+    // find least fit
+    var minF = Infinity, minI = 0;
+    for (var i = 0; i < N; i++) {
+      if (species[i].fitness < minF) { minF = species[i].fitness; minI = i; }
+    }
+
+    var preFitness = [];
+    for (var i = 0; i < N; i++) preFitness[i] = species[i].fitness;
+    replaceSpecies(minI);
+
+    var excluded = {};
+    excluded[minI] = true;
+    var cascSize = propagateCascade(preFitness, excluded);
+    if (cascSize > 0) {
+      cascadeCount++;
+      if (cascSize > maxCascade) maxCascade = cascSize;
+    }
+
+    phase = detectPhase();
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+
+    // draw edges
+    for (var i = 0; i < N; i++) {
+      for (var j = i + 1; j < N; j++) {
+        var w = weights[i][j] + weights[j][i];
+        if (w === 0) continue;
+        var absW = Math.min(Math.abs(w), 2);
+        ctx.beginPath();
+        ctx.moveTo(nodeX[i], nodeY[i]);
+        ctx.lineTo(nodeX[j], nodeY[j]);
+        if (w > 0) {
+          ctx.strokeStyle = 'rgba(74, 138, 90, ' + (0.15 + absW * 0.2) + ')';
+        } else {
+          ctx.strokeStyle = 'rgba(201, 107, 90, ' + (0.15 + absW * 0.2) + ')';
+        }
+        ctx.lineWidth = 0.5 + absW * 0.5;
+        ctx.stroke();
+      }
+    }
+
+    // draw nodes
+    for (var i = 0; i < N; i++) {
+      var f = species[i].fitness;
+      var r = 4 + f * 10;
+      var red = Math.round(80 - f * 40);
+      var green = Math.round(100 + f * 80);
+      var blue = Math.round(100 + f * 80);
+      ctx.beginPath();
+      ctx.arc(nodeX[i], nodeY[i], r, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgb(' + red + ',' + green + ',' + blue + ')';
+      ctx.fill();
+      ctx.strokeStyle = '#1a1a2e';
+      ctx.lineWidth = 0.8;
+      ctx.stroke();
+
+      // highlight newly replaced species
+      if (species[i].age <= 1) {
+        ctx.beginPath();
+        ctx.arc(nodeX[i], nodeY[i], r + 3, 0, Math.PI * 2);
+        ctx.strokeStyle = '#c96b5a';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+      }
+    }
+  }
+
+  function updateMetrics() {
+    var sum = 0;
+    for (var i = 0; i < N; i++) sum += species[i].fitness;
+    var mean = sum / N;
+
+    var phaseEl = document.getElementById('pe-phase');
+    phaseEl.textContent = phase;
+    phaseEl.className = 'metric-value phase-' + phase.toLowerCase();
+
+    document.getElementById('pe-fitness').textContent = mean.toFixed(2);
+    document.getElementById('pe-cascades').textContent = cascadeCount;
+    document.getElementById('pe-maxcasc').textContent = maxCascade;
+    document.getElementById('pe-tick').textContent = 'tick ' + tick;
+  }
+
+  document.getElementById('pe-step-btn').addEventListener('click', function() {
+    step(); draw(); updateMetrics();
+  });
+
+  document.getElementById('pe-auto-btn').addEventListener('click', function() {
+    autoRunning = !autoRunning;
+    this.textContent = autoRunning ? 'Pause' : 'Auto-play';
+    if (autoRunning) autoFrame();
+    else if (timer) { clearTimeout(timer); timer = null; }
+  });
+
+  function autoFrame() {
+    step(); draw(); updateMetrics();
+    if (autoRunning) timer = setTimeout(autoFrame, 200);
+  }
+
+  init();
+  draw();
+  updateMetrics();
+})();
+</script>
+</div>
