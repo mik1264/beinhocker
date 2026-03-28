@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Public Policy: Policy in a Complex World</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Courier New', monospace; background: #0a0a0f; color: #e0e0e0; overflow-x: hidden; }
+
+.container { max-width: 1440px; margin: 0 auto; padding: 20px; }
+
+h1 { text-align: center; font-size: 1.8em; margin-bottom: 4px; color: #fff;
+     letter-spacing: 3px; text-transform: uppercase; }
+.subtitle { text-align: center; font-size: 0.85em; color: #888; margin-bottom: 24px; }
+
+/* Intro section */
+.intro-section {
+  background: linear-gradient(135deg, #12121a 0%, #0f1a28 100%);
+  border: 1px solid #1a3a5a;
+  border-radius: 12px;
+  padding: 28px 32px;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+}
+.intro-section::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #4a8, #6ce, #ea6, #e66);
+}
+.intro-section h2 {
+  font-size: 1.2em;
+  color: #8cd8ff;
+  margin-bottom: 12px;
+  letter-spacing: 1px;
+}
+.intro-section p {
+  font-size: 0.95em;
+  line-height: 1.7;
+  color: #bbb;
+}
+.intro-section p strong { color: #fff; }
+
+/* Key insight callout */
+.key-insight {
+  background: linear-gradient(135deg, #1a1a10, #22200a);
+  border: 1px solid #554a20;
+  border-left: 4px solid #eea;
+  border-radius: 8px;
+  padding: 20px 24px;
+  margin-bottom: 24px;
+}
+.key-insight h3 {
+  font-size: 0.9em;
+  color: #eea;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+}
+.key-insight p {
+  font-size: 0.9em;
+  line-height: 1.7;
+  color: #bba;
+}
+.key-insight p strong { color: #fff; }
+
+/* Controls */
+.controls {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 10px; padding: 16px; background: #12121a; border: 1px solid #2a2a3a;
+  border-radius: 8px; margin-bottom: 20px;
+}
+.control-group { display: flex; flex-direction: column; gap: 4px; }
+.control-group label { font-size: 0.75em; color: #aaa; text-transform: uppercase; letter-spacing: 1px; }
+.control-group input, .control-group select {
+  background: #1a1a2e; border: 1px solid #333; color: #fff; padding: 6px 10px;
+  border-radius: 4px; font-family: inherit; font-size: 0.85em;
+}
+.control-group input:focus, .control-group select:focus {
+  outline: none; border-color: #4a8;
+}
+
+.btn-row { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
+button {
+  background: linear-gradient(135deg, #2a5a4a, #1a4a3a);
+  border: 1px solid #4a8;
+  color: #fff; padding: 8px 20px; border-radius: 4px;
+  cursor: pointer; font-family: inherit; font-size: 0.85em;
+  transition: all 0.2s;
+}
+button:hover { background: linear-gradient(135deg, #3a7a5a, #2a6a4a); }
+button.secondary {
+  background: linear-gradient(135deg, #2a2a3e, #1a1a2e);
+  border-color: #555;
+}
+button.secondary:hover { background: linear-gradient(135deg, #3a3a5e, #2a2a4e); }
+button.active {
+  background: linear-gradient(135deg, #3a7a5a, #2a6a4a);
+  border-color: #6d6;
+  box-shadow: 0 0 8px rgba(100, 220, 100, 0.3);
+}
+
+/* Regime selector */
+.regime-buttons {
+  display: flex; gap: 8px; flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.regime-buttons button {
+  font-size: 0.75em; padding: 6px 14px;
+  background: linear-gradient(135deg, #1a2a3a, #122238);
+  border-color: #3a6a8a;
+}
+.regime-buttons button:hover {
+  background: linear-gradient(135deg, #2a4a5a, #1a3a4a);
+}
+.regime-buttons button.active {
+  background: linear-gradient(135deg, #2a5a4a, #1a4a3a);
+  border-color: #4a8;
+}
+
+/* Presets */
+.presets {
+  display: flex; gap: 8px; flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.presets button {
+  font-size: 0.72em; padding: 4px 10px;
+  background: linear-gradient(135deg, #2a1a3a, #1a1238);
+  border-color: #6a3a8a;
+}
+.presets button:hover {
+  background: linear-gradient(135deg, #4a2a5a, #3a1a4a);
+}
+
+/* Layout */
+.main-grid {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 20px;
+}
+
+/* Charts */
+.chart-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.chart-panel {
+  background: #12121a;
+  border: 1px solid #2a2a3a;
+  border-radius: 8px;
+  padding: 16px;
+  min-height: 0;
+  overflow: hidden;
+}
+.chart-panel h3 {
+  font-size: 0.8em;
+  color: #8cd8ff;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+}
+.chart-panel canvas {
+  display: block;
+  width: 100%;
+  height: 280px;
+}
+.chart-panel.wide { grid-column: span 2; }
+.chart-panel.wide canvas { height: 340px; }
+
+/* Sidebar */
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.stat-card {
+  background: #12121a;
+  border: 1px solid #2a2a3a;
+  border-radius: 8px;
+  padding: 16px;
+}
+.stat-card h3 {
+  font-size: 0.75em;
+  color: #8cd8ff;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+}
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  font-size: 0.82em;
+  border-bottom: 1px solid #1a1a2a;
+}
+.stat-row:last-child { border-bottom: none; }
+.stat-label { color: #999; }
+.stat-value { color: #fff; font-weight: bold; }
+.stat-value.good { color: #6d6; }
+.stat-value.warn { color: #ea6; }
+.stat-value.bad { color: #e66; }
+
+/* Policy lever display */
+.policy-levers {
+  background: #12121a;
+  border: 1px solid #2a2a3a;
+  border-radius: 8px;
+  padding: 16px;
+}
+.policy-levers h3 {
+  font-size: 0.75em;
+  color: #eea;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+}
+.lever-bar {
+  margin-bottom: 8px;
+}
+.lever-bar label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75em;
+  color: #aaa;
+  margin-bottom: 3px;
+}
+.lever-bar .bar-bg {
+  background: #1a1a2e;
+  height: 6px;
+  border-radius: 3px;
+  overflow: hidden;
+}
+.lever-bar .bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s;
+}
+
+/* Log panel */
+.log-panel {
+  background: #12121a;
+  border: 1px solid #2a2a3a;
+  border-radius: 8px;
+  padding: 16px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+.log-panel h3 {
+  font-size: 0.75em;
+  color: #8cd8ff;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+.log-entry {
+  font-size: 0.72em;
+  color: #888;
+  padding: 2px 0;
+  border-bottom: 1px solid #1a1a2a;
+}
+.log-entry .tick { color: #666; }
+.log-entry .event { color: #aaa; }
+
+@media (max-width: 900px) {
+  .main-grid { grid-template-columns: 1fr; }
+  .chart-grid { grid-template-columns: 1fr; }
+  .chart-panel.wide { grid-column: span 1; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>Public Policy</h1>
+<p class="subtitle">Beinhocker Ch.18 -- Policy in a Complex World</p>
+
+<div class="intro-section">
+  <h2>Enabling Evolutionary Fitness</h2>
+  <p>Beinhocker argues that traditional economics treats the economy as a machine to be engineered, but complexity economics reveals it as an <strong>evolving system</strong>. Policy should not try to pick winners or engineer specific outcomes. Instead, it should <strong>shape the fitness landscape</strong> -- lower barriers to entry, fund the evolutionary search process (innovation), limit monopoly power, and provide safety nets that allow creative destruction to operate without catastrophic social costs. This simulation models an economy of firms evolving on an NK fitness landscape under different policy regimes.</p>
+</div>
+
+<div class="key-insight">
+  <h3>Key Insight</h3>
+  <p>There is no single "optimal" policy. <strong>Each regime makes tradeoffs</strong> between growth, equality, innovation, and stability. Laissez-faire maximizes raw evolutionary pressure but generates inequality and instability. Social democracy reduces inequality but may slow the evolutionary search. The adaptive regime -- adjusting policy to conditions -- embodies Beinhocker's prescription for <strong>governing complex systems</strong>: don't optimize, adapt.</p>
+</div>
+
+<!-- Regime selector -->
+<div class="regime-buttons" id="regimeButtons">
+  <button data-regime="laissez-faire" class="active">Laissez-Faire</button>
+  <button data-regime="social-democrat">Social Democrat</button>
+  <button data-regime="innovation-state">Innovation State</button>
+  <button data-regime="protectionist">Protectionist</button>
+  <button data-regime="adaptive">Adaptive</button>
+</div>
+
+<!-- Controls -->
+<div class="controls">
+  <div class="control-group">
+    <label>Firms</label>
+    <input type="number" id="numFirms" value="50" min="10" max="200" step="10">
+  </div>
+  <div class="control-group">
+    <label>Regulation</label>
+    <input type="range" id="regulation" min="0" max="1" step="0.05" value="0.05">
+    <span id="regulationVal" style="font-size:0.75em;color:#888;">0.05</span>
+  </div>
+  <div class="control-group">
+    <label>Tax Rate</label>
+    <input type="range" id="taxRate" min="0" max="0.8" step="0.05" value="0.05">
+    <span id="taxRateVal" style="font-size:0.75em;color:#888;">0.05</span>
+  </div>
+  <div class="control-group">
+    <label>Innovation Subsidy</label>
+    <input type="range" id="innovSubsidy" min="0" max="1" step="0.05" value="0.0">
+    <span id="innovSubsidyVal" style="font-size:0.75em;color:#888;">0.00</span>
+  </div>
+  <div class="control-group">
+    <label>Competition Limit</label>
+    <input type="range" id="compLimit" min="0.05" max="1" step="0.05" value="1.0">
+    <span id="compLimitVal" style="font-size:0.75em;color:#888;">1.00</span>
+  </div>
+  <div class="control-group">
+    <label>Safety Net</label>
+    <input type="range" id="safetyNet" min="0" max="1" step="0.05" value="0.1">
+    <span id="safetyNetVal" style="font-size:0.75em;color:#888;">0.10</span>
+  </div>
+  <div class="control-group btn-row">
+    <button id="runBtn" onclick="runSimulation()">Run</button>
+    <button class="secondary" onclick="resetSimulation()">Reset</button>
+  </div>
+</div>
+
+<!-- Preset experiments -->
+<div class="presets">
+  <span style="font-size:0.75em;color:#888;padding:5px 0;">Presets:</span>
+  <button onclick="loadPreset('high-regulation')">High Regulation</button>
+  <button onclick="loadPreset('high-tax')">High Tax</button>
+  <button onclick="loadPreset('max-innovation')">Max Innovation</button>
+  <button onclick="loadPreset('monopoly')">No Competition Policy</button>
+  <button onclick="loadPreset('strong-safety-net')">Strong Safety Net</button>
+  <button onclick="loadPreset('everything-max')">Everything Max</button>
+</div>
+
+<!-- Main layout -->
+<div class="main-grid">
+  <div class="chart-area">
+    <div class="chart-grid">
+      <div class="chart-panel wide">
+        <h3>GDP Over Time</h3>
+        <canvas id="gdpChart"></canvas>
+      </div>
+      <div class="chart-panel">
+        <h3>Innovation Rate</h3>
+        <canvas id="innovChart"></canvas>
+      </div>
+      <div class="chart-panel">
+        <h3>Inequality (Gini)</h3>
+        <canvas id="giniChart"></canvas>
+      </div>
+      <div class="chart-panel">
+        <h3>Firm Turnover</h3>
+        <canvas id="turnoverChart"></canvas>
+      </div>
+      <div class="chart-panel">
+        <h3>Unemployment</h3>
+        <canvas id="unemployChart"></canvas>
+      </div>
+      <div class="chart-panel wide">
+        <h3>Mean Fitness</h3>
+        <canvas id="fitnessChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="sidebar">
+    <div class="policy-levers" id="leverDisplay">
+      <h3>Active Policy</h3>
+      <div class="lever-bar">
+        <label><span>Regulation</span><span id="lvlReg">0.05</span></label>
+        <div class="bar-bg"><div class="bar-fill" id="barReg" style="width:5%;background:#e66;"></div></div>
+      </div>
+      <div class="lever-bar">
+        <label><span>Tax Rate</span><span id="lvlTax">0.05</span></label>
+        <div class="bar-bg"><div class="bar-fill" id="barTax" style="width:5%;background:#ea6;"></div></div>
+      </div>
+      <div class="lever-bar">
+        <label><span>Innovation Subsidy</span><span id="lvlInnov">0.00</span></label>
+        <div class="bar-bg"><div class="bar-fill" id="barInnov" style="width:0%;background:#6ce;"></div></div>
+      </div>
+      <div class="lever-bar">
+        <label><span>Competition Limit</span><span id="lvlComp">1.00</span></label>
+        <div class="bar-bg"><div class="bar-fill" id="barComp" style="width:100%;background:#c8f;"></div></div>
+      </div>
+      <div class="lever-bar">
+        <label><span>Safety Net</span><span id="lvlSafe">0.10</span></label>
+        <div class="bar-bg"><div class="bar-fill" id="barSafe" style="width:10%;background:#4a8;"></div></div>
+      </div>
+    </div>
+
+    <div class="stat-card" id="statsPanel">
+      <h3>Summary Stats</h3>
+      <div class="stat-row"><span class="stat-label">Mean GDP</span><span class="stat-value" id="statGDP">--</span></div>
+      <div class="stat-row"><span class="stat-label">Final GDP</span><span class="stat-value" id="statFinalGDP">--</span></div>
+      <div class="stat-row"><span class="stat-label">Growth</span><span class="stat-value" id="statGrowth">--</span></div>
+      <div class="stat-row"><span class="stat-label">Mean Gini</span><span class="stat-value" id="statGini">--</span></div>
+      <div class="stat-row"><span class="stat-label">Innovation Rate</span><span class="stat-value" id="statInnov">--</span></div>
+      <div class="stat-row"><span class="stat-label">Mean Fitness</span><span class="stat-value" id="statFitness">--</span></div>
+      <div class="stat-row"><span class="stat-label">Mean Unemployment</span><span class="stat-value" id="statUnemp">--</span></div>
+      <div class="stat-row"><span class="stat-label">Total Entries</span><span class="stat-value" id="statEntries">--</span></div>
+      <div class="stat-row"><span class="stat-label">Total Exits</span><span class="stat-value" id="statExits">--</span></div>
+      <div class="stat-row"><span class="stat-label">Alive at End</span><span class="stat-value" id="statAlive">--</span></div>
+    </div>
+
+    <div class="log-panel" id="logPanel">
+      <h3>Event Log</h3>
+      <div id="logEntries"></div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<script>
+// ============================================================
+// NK Fitness Landscape
+// ============================================================
+class FitnessLandscape {
+  constructor(n, k, ruggedness, rng) {
+    this.n = n;
+    this.k = Math.min(k, n - 1);
+    this.rng = rng;
+    this.interactions = [];
+    this.tables = [];
+
+    for (let i = 0; i < n; i++) {
+      const others = [];
+      for (let j = 0; j < n; j++) if (j !== i) others.push(j);
+      this.shuffle(others);
+      this.interactions.push(others.slice(0, this.k));
+    }
+
+    for (let i = 0; i < n; i++) {
+      const table = {};
+      const numCombos = 1 << (this.k + 1);
+      for (let c = 0; c < numCombos; c++) {
+        const bits = [];
+        for (let b = 0; b <= this.k; b++) bits.push((c >> b) & 1);
+        const key = bits.join(',');
+        const smooth = bits.reduce((a, b) => a + b, 0) / (this.k + 1);
+        const rugged = this.rng();
+        table[key] = (1.0 - ruggedness) * smooth + ruggedness * rugged;
+      }
+      this.tables.push(table);
+    }
+  }
+
+  shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(this.rng() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+  }
+
+  evaluate(genome) {
+    let total = 0;
+    for (let i = 0; i < this.n; i++) {
+      const bits = [genome[i]];
+      for (const j of this.interactions[i]) bits.push(genome[j]);
+      const key = bits.join(',');
+      total += this.tables[i][key] || 0.5;
+    }
+    return total / this.n;
+  }
+}
+
+// ============================================================
+// Seeded RNG (mulberry32)
+// ============================================================
+function makeRng(seed) {
+  let s = seed | 0;
+  return function() {
+    s = (s + 0x6D2B79F5) | 0;
+    let t = Math.imul(s ^ (s >>> 15), 1 | s);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+// ============================================================
+// Policy Regimes
+// ============================================================
+const REGIMES = {
+  'laissez-faire': { regulation: 0.05, taxRate: 0.05, innovSubsidy: 0.0, compLimit: 1.0, safetyNet: 0.1 },
+  'social-democrat': { regulation: 0.4, taxRate: 0.45, innovSubsidy: 0.3, compLimit: 0.25, safetyNet: 0.8 },
+  'innovation-state': { regulation: 0.15, taxRate: 0.25, innovSubsidy: 0.7, compLimit: 0.4, safetyNet: 0.5 },
+  'protectionist': { regulation: 0.8, taxRate: 0.35, innovSubsidy: 0.05, compLimit: 0.5, safetyNet: 0.4 },
+  'adaptive': { regulation: 0.3, taxRate: 0.2, innovSubsidy: 0.2, compLimit: 0.4, safetyNet: 0.5 },
+};
+
+const PRESETS = {
+  'high-regulation': { regulation: 0.9, taxRate: 0.2, innovSubsidy: 0.1, compLimit: 0.5, safetyNet: 0.3 },
+  'high-tax': { regulation: 0.2, taxRate: 0.7, innovSubsidy: 0.1, compLimit: 0.5, safetyNet: 0.6 },
+  'max-innovation': { regulation: 0.1, taxRate: 0.3, innovSubsidy: 1.0, compLimit: 0.5, safetyNet: 0.3 },
+  'monopoly': { regulation: 0.1, taxRate: 0.1, innovSubsidy: 0.0, compLimit: 1.0, safetyNet: 0.1 },
+  'strong-safety-net': { regulation: 0.2, taxRate: 0.35, innovSubsidy: 0.2, compLimit: 0.5, safetyNet: 1.0 },
+  'everything-max': { regulation: 0.9, taxRate: 0.7, innovSubsidy: 0.9, compLimit: 0.1, safetyNet: 0.9 },
+};
+
+// ============================================================
+// Simulation
+// ============================================================
+function runSim(numFirms, ticks, policy, isAdaptive) {
+  const rng = makeRng(42);
+  const landscape = new FitnessLandscape(12, 3, 0.5, rng);
+
+  const GENOME_LEN = 12;
+  const BASE_MUTATION = 0.05;
+  const CROSSOVER_RATE = 0.1;
+  const BASE_ENTRY_COST = 0.3;
+  const BASE_OPERATING_COST = 0.05;
+
+  let p = { ...policy };
+
+  // Create firms
+  const firms = [];
+  for (let i = 0; i < numFirms; i++) {
+    const genome = [];
+    for (let j = 0; j < GENOME_LEN; j++) genome.push(rng() < 0.5 ? 1 : 0);
+    firms.push({
+      genome,
+      fitness: landscape.evaluate(genome),
+      capital: 1.0,
+      output: 0,
+      marketShare: 0,
+      age: 0,
+      alive: true,
+      innovations: 0,
+    });
+  }
+
+  const history = [];
+  let prevGDP = 0;
+  let totalEntries = 0;
+  let totalExits = 0;
+  let cumulativeInnovations = 0;
+
+  function entryBarrier() { return 1.0 + p.regulation * 2.0; }
+  function complianceCost() { return p.regulation * 0.03; }
+  function effectiveMutation() { return BASE_MUTATION * (1.0 + p.innovSubsidy * 2.0); }
+  function respawnProb() { return 0.02 + p.safetyNet * 0.08; }
+
+  function computeGini(values) {
+    if (values.length < 2) return 0;
+    const vals = values.slice().sort((a, b) => a - b);
+    const n = vals.length;
+    const total = vals.reduce((a, b) => a + b, 0);
+    if (total === 0) return 0;
+    let ws = 0;
+    for (let i = 0; i < n; i++) ws += (2 * (i + 1) - n - 1) * vals[i];
+    return Math.max(0, Math.min(1, ws / (n * total)));
+  }
+
+  // Adaptive policy
+  function adaptPolicy(hist) {
+    if (hist.length < 20) return;
+    const recent = hist.slice(-20);
+    const avgGrowth = recent.reduce((s, r) => s + r.growthRate, 0) / 20;
+    const avgGini = recent.reduce((s, r) => s + r.gini, 0) / 20;
+    const avgUnemp = recent.reduce((s, r) => s + r.unemployment, 0) / 20;
+    const avgInnov = recent.reduce((s, r) => s + r.innovationRate, 0) / 20;
+    const avgHHI = recent.reduce((s, r) => s + r.hhi, 0) / 20;
+
+    if (avgGrowth < 0.005) p.regulation = Math.max(0.05, p.regulation - 0.02);
+    else if (avgGini > 0.5) p.regulation = Math.min(0.6, p.regulation + 0.01);
+
+    if (avgGini > 0.45) p.taxRate = Math.min(0.5, p.taxRate + 0.01);
+    else if (avgGrowth < 0.003 && p.taxRate > 0.1) p.taxRate = Math.max(0.1, p.taxRate - 0.01);
+
+    if (avgInnov < 0.1) p.innovSubsidy = Math.min(0.6, p.innovSubsidy + 0.02);
+    else if (avgInnov > 0.3) p.innovSubsidy = Math.max(0.0, p.innovSubsidy - 0.01);
+
+    if (avgUnemp > 0.2) p.safetyNet = Math.min(0.9, p.safetyNet + 0.02);
+    else if (avgUnemp < 0.05) p.safetyNet = Math.max(0.1, p.safetyNet - 0.01);
+
+    if (avgHHI > 0.15) p.compLimit = Math.max(0.15, p.compLimit - 0.02);
+    else if (avgHHI < 0.05) p.compLimit = Math.min(1.0, p.compLimit + 0.01);
+  }
+
+  for (let t = 0; t < ticks; t++) {
+    if (isAdaptive) adaptPolicy(history);
+
+    const alive = firms.filter(f => f.alive);
+    if (alive.length === 0) break;
+
+    // Innovation
+    const mutRate = effectiveMutation();
+    let innovThisTick = 0;
+    for (const firm of alive) {
+      const oldFitness = firm.fitness;
+      const oldGenome = firm.genome.slice();
+      let mutated = false;
+      for (let i = 0; i < GENOME_LEN; i++) {
+        if (rng() < mutRate) { firm.genome[i] = 1 - firm.genome[i]; mutated = true; }
+      }
+      if (mutated) {
+        const newFitness = landscape.evaluate(firm.genome);
+        if (newFitness >= oldFitness) {
+          firm.fitness = newFitness;
+          if (newFitness > oldFitness + 0.01) { firm.innovations++; innovThisTick++; }
+        } else {
+          firm.genome = oldGenome;
+          firm.fitness = oldFitness;
+        }
+      }
+    }
+
+    // Crossover
+    const aliveNow = firms.filter(f => f.alive);
+    if (aliveNow.length >= 2 && rng() < CROSSOVER_RATE) {
+      const dead = firms.filter(f => !f.alive);
+      if (dead.length > 0) {
+        const i1 = Math.floor(rng() * aliveNow.length);
+        let i2 = Math.floor(rng() * aliveNow.length);
+        while (i2 === i1) i2 = Math.floor(rng() * aliveNow.length);
+        const p1 = aliveNow[i1], p2 = aliveNow[i2];
+        const pt = 1 + Math.floor(rng() * (GENOME_LEN - 1));
+        const childGenome = p1.genome.slice(0, pt).concat(p2.genome.slice(pt));
+        const childFitness = landscape.evaluate(childGenome);
+        if (childFitness >= Math.min(p1.fitness, p2.fitness)) {
+          const df = dead[0];
+          df.genome = childGenome;
+          df.fitness = childFitness;
+          df.capital = Math.max(0.3, 1.0 - BASE_ENTRY_COST * entryBarrier());
+          df.alive = true;
+          df.age = 0;
+          df.output = 0;
+          df.marketShare = 0;
+          df.innovations = 0;
+          totalEntries++;
+        }
+      }
+    }
+
+    cumulativeInnovations += innovThisTick;
+
+    // Output and market shares
+    const cc = complianceCost();
+    const alive2 = firms.filter(f => f.alive);
+    for (const firm of alive2) {
+      firm.output = Math.max(0, firm.fitness * firm.capital * (1.0 - cc));
+    }
+    const totalOutput = alive2.reduce((s, f) => s + f.output, 0);
+    for (const firm of alive2) {
+      firm.marketShare = totalOutput > 0 ? firm.output / totalOutput : 1.0 / alive2.length;
+    }
+
+    // Competition policy
+    const maxShare = p.compLimit;
+    if (maxShare < 1.0) {
+      let excess = 0;
+      const capped = [], uncapped = [];
+      for (const firm of alive2) {
+        if (firm.marketShare > maxShare) {
+          excess += firm.marketShare - maxShare;
+          firm.marketShare = maxShare;
+          capped.push(firm);
+        } else {
+          uncapped.push(firm);
+        }
+      }
+      if (uncapped.length > 0 && excess > 0) {
+        const uncTotal = uncapped.reduce((s, f) => s + f.marketShare, 0);
+        if (uncTotal > 0) {
+          for (const f of uncapped) f.marketShare += excess * (f.marketShare / uncTotal);
+        }
+      }
+    }
+
+    // Tax and redistribute
+    const taxRev = totalOutput * p.taxRate;
+    const pubGoods = (taxRev * 0.6) / Math.max(alive2.length, 1);
+    for (const firm of alive2) {
+      const postTax = firm.output * (1.0 - p.taxRate);
+      firm.capital += (postTax + pubGoods) * 0.01;
+      firm.capital -= BASE_OPERATING_COST * firm.capital;
+      firm.age++;
+    }
+
+    // Failures
+    let exitsThisTick = 0;
+    for (const firm of alive2) {
+      if (firm.capital < 0.1 || (firm.fitness < 0.15 && firm.age > 10)) {
+        firm.alive = false;
+        firm.output = 0;
+        firm.marketShare = 0;
+        exitsThisTick++;
+        totalExits++;
+      }
+    }
+
+    // Respawn
+    let entriesThisTick = 0;
+    const deadFirms = firms.filter(f => !f.alive);
+    const rProb = respawnProb();
+    for (const firm of deadFirms) {
+      if (rng() < rProb) {
+        const newGenome = [];
+        for (let j = 0; j < GENOME_LEN; j++) newGenome.push(rng() < 0.5 ? 1 : 0);
+        const topFirms = firms.filter(f => f.alive).sort((a, b) => b.fitness - a.fitness);
+        if (topFirms.length > 0 && rng() < 0.3) {
+          const parent = topFirms[Math.floor(rng() * Math.max(1, Math.floor(topFirms.length / 4)))];
+          for (let j = 0; j < GENOME_LEN; j++) {
+            if (rng() < 0.5) newGenome[j] = parent.genome[j];
+            if (rng() < 0.15) newGenome[j] = 1 - newGenome[j];
+          }
+        }
+        firm.genome = newGenome;
+        firm.fitness = landscape.evaluate(newGenome);
+        firm.capital = Math.max(0.3, 1.0 - BASE_ENTRY_COST * entryBarrier()) + p.safetyNet * 0.2;
+        firm.alive = true;
+        firm.age = 0;
+        firm.output = 0;
+        firm.marketShare = 0;
+        firm.innovations = 0;
+        entriesThisTick++;
+        totalEntries++;
+      }
+    }
+
+    const turnover = (entriesThisTick + exitsThisTick) / numFirms;
+    const aliveEnd = firms.filter(f => f.alive);
+    const nAlive = aliveEnd.length;
+    const gdp = aliveEnd.reduce((s, f) => s + f.output, 0);
+    const unemployment = 1.0 - nAlive / numFirms;
+    const outputs = aliveEnd.map(f => f.output);
+    const shares = aliveEnd.map(f => f.marketShare);
+    const fitnesses = aliveEnd.map(f => f.fitness);
+    const ages = aliveEnd.map(f => f.age);
+    const gini = computeGini(outputs);
+    const hhi = shares.reduce((s, v) => s + v * v, 0);
+    const meanFitness = fitnesses.length > 0 ? fitnesses.reduce((a, b) => a + b, 0) / fitnesses.length : 0;
+    const maxFitness = fitnesses.length > 0 ? Math.max(...fitnesses) : 0;
+    const meanAge = ages.length > 0 ? ages.reduce((a, b) => a + b, 0) / ages.length : 0;
+    const growthRate = prevGDP > 0 ? (gdp - prevGDP) / prevGDP : 0;
+    prevGDP = gdp;
+
+    history.push({
+      tick: t + 1,
+      gdp, innovationRate: innovThisTick / Math.max(nAlive, 1), gini,
+      turnover, unemployment, nAlive, meanFitness, maxFitness,
+      hhi, growthRate, meanAge, taxRev: totalOutput * p.taxRate,
+    });
+  }
+
+  return {
+    history,
+    totalEntries,
+    totalExits,
+    cumulativeInnovations,
+    finalPolicy: { ...p },
+  };
+}
+
+// ============================================================
+// Charts
+// ============================================================
+const chartDefaults = {
+  responsive: true,
+  maintainAspectRatio: false,
+  animation: { duration: 0 },
+  scales: {
+    x: { display: true, grid: { color: '#1a1a2a' }, ticks: { color: '#666', maxTicksLimit: 10 } },
+    y: { display: true, grid: { color: '#1a1a2a' }, ticks: { color: '#666' } },
+  },
+  plugins: {
+    legend: { display: false },
+  },
+  elements: {
+    point: { radius: 0 },
+    line: { borderWidth: 1.5 },
+  },
+};
+
+function makeChart(canvasId, color, label) {
+  const ctx = document.getElementById(canvasId).getContext('2d');
+  return new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [{
+        label,
+        data: [],
+        borderColor: color,
+        backgroundColor: color + '22',
+        fill: true,
+      }],
+    },
+    options: { ...chartDefaults },
+  });
+}
+
+const gdpChart = makeChart('gdpChart', '#4a8', 'GDP');
+const innovChart = makeChart('innovChart', '#6ce', 'Innovation Rate');
+const giniChart = makeChart('giniChart', '#ea6', 'Gini');
+const turnoverChart = makeChart('turnoverChart', '#c8f', 'Turnover');
+const unemployChart = makeChart('unemployChart', '#e66', 'Unemployment');
+const fitnessChart = makeChart('fitnessChart', '#8cd8ff', 'Mean Fitness');
+
+function updateChart(chart, labels, data) {
+  chart.data.labels = labels;
+  chart.data.datasets[0].data = data;
+  chart.update();
+}
+
+// ============================================================
+// UI Wiring
+// ============================================================
+function getPolicy() {
+  return {
+    regulation: parseFloat(document.getElementById('regulation').value),
+    taxRate: parseFloat(document.getElementById('taxRate').value),
+    innovSubsidy: parseFloat(document.getElementById('innovSubsidy').value),
+    compLimit: parseFloat(document.getElementById('compLimit').value),
+    safetyNet: parseFloat(document.getElementById('safetyNet').value),
+  };
+}
+
+function setPolicy(p) {
+  document.getElementById('regulation').value = p.regulation;
+  document.getElementById('taxRate').value = p.taxRate;
+  document.getElementById('innovSubsidy').value = p.innovSubsidy;
+  document.getElementById('compLimit').value = p.compLimit;
+  document.getElementById('safetyNet').value = p.safetyNet;
+  updateSliderDisplays();
+  updateLeverDisplay(p);
+}
+
+function updateSliderDisplays() {
+  document.getElementById('regulationVal').textContent = parseFloat(document.getElementById('regulation').value).toFixed(2);
+  document.getElementById('taxRateVal').textContent = parseFloat(document.getElementById('taxRate').value).toFixed(2);
+  document.getElementById('innovSubsidyVal').textContent = parseFloat(document.getElementById('innovSubsidy').value).toFixed(2);
+  document.getElementById('compLimitVal').textContent = parseFloat(document.getElementById('compLimit').value).toFixed(2);
+  document.getElementById('safetyNetVal').textContent = parseFloat(document.getElementById('safetyNet').value).toFixed(2);
+}
+
+function updateLeverDisplay(p) {
+  document.getElementById('lvlReg').textContent = p.regulation.toFixed(2);
+  document.getElementById('barReg').style.width = (p.regulation * 100) + '%';
+  document.getElementById('lvlTax').textContent = p.taxRate.toFixed(2);
+  document.getElementById('barTax').style.width = (p.taxRate * 100) + '%';
+  document.getElementById('lvlInnov').textContent = p.innovSubsidy.toFixed(2);
+  document.getElementById('barInnov').style.width = (p.innovSubsidy * 100) + '%';
+  document.getElementById('lvlComp').textContent = p.compLimit.toFixed(2);
+  document.getElementById('barComp').style.width = (p.compLimit * 100) + '%';
+  document.getElementById('lvlSafe').textContent = p.safetyNet.toFixed(2);
+  document.getElementById('barSafe').style.width = (p.safetyNet * 100) + '%';
+}
+
+// Slider listeners
+for (const id of ['regulation', 'taxRate', 'innovSubsidy', 'compLimit', 'safetyNet']) {
+  document.getElementById(id).addEventListener('input', () => {
+    updateSliderDisplays();
+    updateLeverDisplay(getPolicy());
+  });
+}
+
+// Regime buttons
+let activeRegime = 'laissez-faire';
+document.querySelectorAll('.regime-buttons button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const regime = btn.dataset.regime;
+    activeRegime = regime;
+    document.querySelectorAll('.regime-buttons button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    setPolicy(REGIMES[regime]);
+  });
+});
+
+function loadPreset(name) {
+  if (PRESETS[name]) {
+    activeRegime = 'custom';
+    document.querySelectorAll('.regime-buttons button').forEach(b => b.classList.remove('active'));
+    setPolicy(PRESETS[name]);
+  }
+}
+
+function updateStats(result) {
+  const h = result.history;
+  if (h.length === 0) return;
+  const gdps = h.map(r => r.gdp);
+  const innovs = h.map(r => r.innovationRate);
+  const ginis = h.map(r => r.gini);
+  const unemps = h.map(r => r.unemployment);
+  const fits = h.map(r => r.meanFitness);
+  const growths = h.slice(10).map(r => r.growthRate);
+
+  const mean = arr => arr.reduce((a, b) => a + b, 0) / arr.length;
+
+  const el = (id, val, cls) => {
+    const e = document.getElementById(id);
+    e.textContent = val;
+    e.className = 'stat-value' + (cls ? ' ' + cls : '');
+  };
+
+  el('statGDP', mean(gdps).toFixed(4));
+  el('statFinalGDP', gdps[gdps.length - 1].toFixed(4));
+  const g = mean(growths);
+  el('statGrowth', (g * 100).toFixed(3) + '%', g > 0.005 ? 'good' : g < 0 ? 'bad' : 'warn');
+  const gi = mean(ginis);
+  el('statGini', gi.toFixed(4), gi < 0.3 ? 'good' : gi > 0.5 ? 'bad' : 'warn');
+  el('statInnov', mean(innovs).toFixed(4));
+  el('statFitness', mean(fits).toFixed(4));
+  const u = mean(unemps);
+  el('statUnemp', (u * 100).toFixed(1) + '%', u < 0.1 ? 'good' : u > 0.3 ? 'bad' : 'warn');
+  el('statEntries', result.totalEntries);
+  el('statExits', result.totalExits);
+  el('statAlive', h[h.length - 1].nAlive);
+}
+
+function addLog(msg) {
+  const div = document.getElementById('logEntries');
+  const entry = document.createElement('div');
+  entry.className = 'log-entry';
+  entry.innerHTML = msg;
+  div.insertBefore(entry, div.firstChild);
+  if (div.children.length > 50) div.removeChild(div.lastChild);
+}
+
+function runSimulation() {
+  const numFirms = parseInt(document.getElementById('numFirms').value) || 50;
+  const policy = getPolicy();
+  const isAdaptive = activeRegime === 'adaptive';
+  const ticks = 500;
+
+  addLog(`<span class="event">Running ${activeRegime} regime, ${numFirms} firms, ${ticks} ticks...</span>`);
+
+  const result = runSim(numFirms, ticks, policy, isAdaptive);
+  const h = result.history;
+  const labels = h.map(r => r.tick);
+
+  // Smooth data for display (rolling average of 5)
+  function smooth(arr, w) {
+    if (w <= 1) return arr;
+    const out = [];
+    for (let i = 0; i < arr.length; i++) {
+      let sum = 0, count = 0;
+      for (let j = Math.max(0, i - w + 1); j <= i; j++) { sum += arr[j]; count++; }
+      out.push(sum / count);
+    }
+    return out;
+  }
+
+  updateChart(gdpChart, labels, smooth(h.map(r => r.gdp), 5));
+  updateChart(innovChart, labels, smooth(h.map(r => r.innovationRate), 10));
+  updateChart(giniChart, labels, smooth(h.map(r => r.gini), 5));
+  updateChart(turnoverChart, labels, smooth(h.map(r => r.turnover), 10));
+  updateChart(unemployChart, labels, smooth(h.map(r => r.unemployment), 5));
+  updateChart(fitnessChart, labels, smooth(h.map(r => r.meanFitness), 5));
+
+  updateStats(result);
+
+  if (isAdaptive) {
+    updateLeverDisplay(result.finalPolicy);
+    addLog(`<span class="event">Adaptive final: reg=${result.finalPolicy.regulation.toFixed(2)} tax=${result.finalPolicy.taxRate.toFixed(2)} innov=${result.finalPolicy.innovSubsidy.toFixed(2)}</span>`);
+  }
+
+  addLog(`<span class="event">Done. GDP=${h[h.length-1].gdp.toFixed(4)}, Alive=${h[h.length-1].nAlive}/${numFirms}</span>`);
+}
+
+function resetSimulation() {
+  activeRegime = 'laissez-faire';
+  document.querySelectorAll('.regime-buttons button').forEach(b => b.classList.remove('active'));
+  document.querySelector('[data-regime="laissez-faire"]').classList.add('active');
+  setPolicy(REGIMES['laissez-faire']);
+  document.getElementById('numFirms').value = 50;
+  [gdpChart, innovChart, giniChart, turnoverChart, unemployChart, fitnessChart].forEach(c => {
+    c.data.labels = [];
+    c.data.datasets[0].data = [];
+    c.update();
+  });
+  document.getElementById('logEntries').innerHTML = '';
+  ['statGDP','statFinalGDP','statGrowth','statGini','statInnov','statFitness','statUnemp','statEntries','statExits','statAlive'].forEach(id => {
+    document.getElementById(id).textContent = '--';
+    document.getElementById(id).className = 'stat-value';
+  });
+}
+
+// Run initial simulation on load
+setPolicy(REGIMES['laissez-faire']);
+runSimulation();
+</script>
+</body>
+</html>

@@ -571,6 +571,7 @@
       <li><a href="#validation">Validation</a></li>
       <li><a href="#methodology">Methodology</a></li>
       <li><a href="index.html">Dashboard</a></li>
+      <li><a href="walkthrough.html">Walkthrough</a></li>
     </ul>
   </div>
 </nav>
@@ -578,10 +579,10 @@
 <!-- ────── HERO ────── -->
 <header class="hero">
   <h1>Complexity Economics<br>Research Findings</h1>
-  <p class="hero-subtitle">84 experiments across 14 agent-based models exploring Beinhocker's <em>Origin of Wealth</em></p>
+  <p class="hero-subtitle">96 experiments across 16 agent-based models exploring Beinhocker's <em>Origin of Wealth</em></p>
   <p class="hero-date">Last updated March 27, 2026 &middot; Seed 42 &middot; Full reproducibility</p>
   <p class="hero-intro">
-    Eric Beinhocker argues that the economy is not an equilibrium machine but a complex adaptive system &mdash; an evolving ecology of strategies, technologies, and institutions that perpetually generates novelty, never settles into rest, and produces its own crises as naturally as it produces growth. This research program tests that thesis through computational simulation: 14 models, 84 experiments, and thousands of agent interactions producing measurable emergence, non-linearity, power laws, and evolutionary dynamics.
+    Eric Beinhocker argues that the economy is not an equilibrium machine but a complex adaptive system &mdash; an evolving ecology of strategies, technologies, and institutions that perpetually generates novelty, never settles into rest, and produces its own crises as naturally as it produces growth. This research program tests that thesis through computational simulation: 16 models, 96 experiments, and thousands of agent interactions producing measurable emergence, non-linearity, power laws, and evolutionary dynamics.
   </p>
   <a class="hero-cta" href="index.html">Launch Simulations &rarr;</a>
 </header>
@@ -590,19 +591,19 @@
 <div class="metrics-bar">
   <div class="metrics-row">
     <div class="metric-item">
-      <div class="metric-value">14</div>
+      <div class="metric-value">16</div>
       <div class="metric-label">Models</div>
     </div>
     <div class="metric-item">
-      <div class="metric-value">84</div>
+      <div class="metric-value">96</div>
       <div class="metric-label">Experiments</div>
     </div>
     <div class="metric-item">
-      <div class="metric-value">35</div>
+      <div class="metric-value">41</div>
       <div class="metric-label">Empirical Comparisons</div>
     </div>
     <div class="metric-item">
-      <div class="metric-value">22</div>
+      <div class="metric-value">25</div>
       <div class="metric-label">Strong Matches</div>
     </div>
     <div class="metric-item">
@@ -615,7 +616,7 @@
 <!-- ────── SIMULATION FINDINGS ────── -->
 <div class="sims-container" id="simulations">
   <h2 class="section-title">Simulation Findings</h2>
-  <p class="section-subtitle">Fourteen models, eighty-four experiments. Each section presents key findings, metrics, and emergent behaviors.</p>
+  <p class="section-subtitle">Sixteen models, ninety-six experiments. Each section presents key findings, metrics, and emergent behaviors.</p>
 
   <!-- ═══════ 01 STOCK MARKET ═══════ -->
   <div class="sim-section" id="panel-stock">
@@ -1478,6 +1479,132 @@
     </div>
   </div>
 
+  <!-- ═══════ 15 STRATEGY AS EVOLUTION ═══════ -->
+  <div class="sim-section" id="panel-strategy">
+    <div class="sim-number">15 &mdash; STRATEGY AS EVOLUTION</div>
+    <div class="model-header">
+      <div class="model-info">
+        <h3>Strategy as Evolution</h3>
+        <p class="model-desc">Firms compete via strategic portfolios across shifting market niches. Three strategy types &mdash; exploiters (concentrate resources), explorers (diversify broadly), and adaptive (dynamically reallocate based on feedback) &mdash; compete for market share on evolving fitness landscapes. Based on Beinhocker, Chapter 15.</p>
+      </div>
+      <a class="model-link" href="15-strategy/index.html">Open Simulation &rarr;</a>
+    </div>
+
+    <div class="key-finding">
+      <div class="key-finding-label">Key Finding</div>
+      <p>Adaptive firms dominate with 63.2% market share in the baseline, confirming that a portfolio approach &mdash; dynamically reallocating resources based on feedback &mdash; outperforms both pure exploitation and pure exploration. Pure exploration is a death sentence across all environments (mean fitness 0.36 vs. 0.65 baseline). Exploiter monocultures are fragile: high fitness during stability, followed by catastrophic synchronized crashes when niches shift.</p>
+    </div>
+    <div class="book-quote">
+      <p>Strategy is not a detailed plan of action. Strategy is a portfolio of experiments &mdash; a population of competing business plans that are tested against the real world and selected for fitness. The key is to run many experiments, learn fast, scale the winners, and cut the losers.</p>
+      <cite>&mdash; Eric D. Beinhocker, <em>The Origin of Wealth</em>, Chapter 15</cite>
+    </div>
+
+    <div class="metric-cards">
+      <div class="mc"><div class="mc-value">63.2%</div><div class="mc-label">Adaptive share (baseline)</div></div>
+      <div class="mc"><div class="mc-value">0.6514</div><div class="mc-label">Mean fitness (baseline)</div></div>
+      <div class="mc"><div class="mc-value">0.3622</div><div class="mc-label">Mean fitness (all explorers)</div></div>
+      <div class="mc"><div class="mc-value">67.8%</div><div class="mc-label">Exploiter share (stable mkt)</div></div>
+      <div class="mc"><div class="mc-value">0.0342</div><div class="mc-label">HHI (baseline)</div></div>
+      <div class="mc"><div class="mc-value">100%</div><div class="mc-label">Niche coverage</div></div>
+    </div>
+
+    <div class="exp-table-wrap">
+      <table class="exp">
+        <thead>
+          <tr><th>Experiment</th><th>Key Parameter</th><th>Exploiter Share</th><th>Adaptive Share</th><th>Mean Fitness</th><th>Insight</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>1. Baseline</td><td>Mixed, shift=0.05</td><td class="mono">27.6%</td><td class="mono">63.2%</td><td class="mono">0.6514</td><td>Adaptive firms dominate via portfolio reallocation</td></tr>
+          <tr><td>2. Stable Market</td><td>shift=0.0</td><td class="mono">67.8%</td><td class="mono">21.9%</td><td class="mono">0.6375</td><td>Exploiters win when landscape is static</td></tr>
+          <tr><td>3. Volatile Market</td><td>shift=0.2</td><td class="mono">40.7%</td><td class="mono">50.0%</td><td class="mono">0.6106</td><td>Adaptive leads; even explorers eliminated</td></tr>
+          <tr><td>4. All Exploiters</td><td>exploit=1.0</td><td class="mono">91.2%</td><td class="mono">0.0%</td><td class="mono">0.6304</td><td>Competency trap: synchronized crashes</td></tr>
+          <tr><td>5. All Explorers</td><td>explore=1.0</td><td class="mono">0.0%</td><td class="mono">0.0%</td><td class="mono">0.3622</td><td>Discover many, master none</td></tr>
+          <tr><td>6. Large Economy</td><td>100 firms, 10 niches</td><td class="mono">60.6%</td><td class="mono">29.0%</td><td class="mono">0.5954</td><td>Individual specialization, collective diversity</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="emergent-section">
+      <h4>Emergent Behaviors</h4>
+      <ul class="emergent-list">
+        <li>Adaptive firms win the baseline by dynamically reallocating resources based on performance feedback &mdash; the portfolio approach outperforms single bets</li>
+        <li>Environment determines the optimal balance: stable markets favor exploitation, volatile markets favor adaptation; pure exploration is never optimal</li>
+        <li>Pure exploration is a death sentence: mean fitness 0.36 vs. 0.65 baseline &mdash; spreading resources too thin prevents competitive fitness</li>
+        <li>Exploiter monocultures produce the classic competency trap: high fitness during stability, catastrophic synchronized crashes when niches shift</li>
+        <li>Collective diversity compensates for individual specialization: in the 100-firm market, individual portfolio diversity drops to 0.47 but the system still covers all niches</li>
+        <li>Market concentration stays universally low (HHI below 0.035) &mdash; no single firm dominates, an emergent property of evolutionary selection</li>
+      </ul>
+    </div>
+
+    <div class="beinhocker-connection">
+      <h4>Connection to Beinhocker</h4>
+      <p>These results directly support Beinhocker's Chapter 15 argument that strategy is evolutionary, not predictive. "Strategy is a portfolio of experiments": adaptive firms that maintain multiple bets and reallocate based on feedback consistently outperform single-bet strategies. "Robustness over optimality": the adaptive strategy is never the best at any single moment but performs well enough across all conditions to accumulate the highest long-run share. Markets function as massively parallel search algorithms &mdash; individual firms specialize while the system as a whole explores broadly.</p>
+    </div>
+  </div>
+
+  <!-- ═══════ 16 PUBLIC POLICY ═══════ -->
+  <div class="sim-section" id="panel-policy">
+    <div class="sim-number">16 &mdash; PUBLIC POLICY</div>
+    <div class="model-header">
+      <div class="model-info">
+        <h3>Public Policy</h3>
+        <p class="model-desc">Five policy regimes &mdash; laissez-faire, social democrat, innovation state, protectionist, and adaptive &mdash; compete in an evolutionary economy. 50 firms evolve on an NK fitness landscape (N=12, K=3) under different policy levers affecting entry barriers, compliance costs, mutation rates, market share caps, and safety net strength. Based on Beinhocker, Chapter 18.</p>
+      </div>
+      <a class="model-link" href="16-public-policy/index.html">Open Simulation &rarr;</a>
+    </div>
+
+    <div class="key-finding">
+      <div class="key-finding-label">Key Finding</div>
+      <p>The adaptive regime dominates on nearly every metric: highest mean GDP (9.83, 60% above laissez-faire), best long-run growth (near-flat vs. laissez-faire's &minus;0.364 decline), lowest unemployment (15.3%), and highest final fitness (0.715). It discovered a hybrid configuration no fixed regime offered &mdash; low regulation, high innovation subsidies, and a strong safety net. Protectionism is the worst regime by far, confirming that blocking evolutionary entry is the cardinal policy sin.</p>
+    </div>
+    <div class="book-quote">
+      <p>The role of policy in a complex adaptive economy is not to engineer particular outcomes but to shape the fitness environment &mdash; to create the conditions under which evolutionary search can operate most effectively. Good policy enables adaptation; bad policy blocks it.</p>
+      <cite>&mdash; Eric D. Beinhocker, <em>The Origin of Wealth</em>, Chapter 18</cite>
+    </div>
+
+    <div class="metric-cards">
+      <div class="mc"><div class="mc-value">9.83</div><div class="mc-label">Mean GDP (adaptive)</div></div>
+      <div class="mc"><div class="mc-value">+60%</div><div class="mc-label">GDP vs. laissez-faire</div></div>
+      <div class="mc"><div class="mc-value">15.3%</div><div class="mc-label">Unemployment (adaptive)</div></div>
+      <div class="mc"><div class="mc-value">0.715</div><div class="mc-label">Final fitness (adaptive)</div></div>
+      <div class="mc"><div class="mc-value">4.70</div><div class="mc-label">Mean GDP (protectionist)</div></div>
+      <div class="mc"><div class="mc-value">39.4%</div><div class="mc-label">Unemployment (laissez-faire)</div></div>
+    </div>
+
+    <div class="exp-table-wrap">
+      <table class="exp">
+        <thead>
+          <tr><th>Experiment</th><th>Regime</th><th>Mean GDP</th><th>Mean Unemp</th><th>Mean Gini</th><th>Insight</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>1. Baseline</td><td>Laissez-faire</td><td class="mono">6.14</td><td class="mono">39.4%</td><td class="mono">0.250</td><td>High unemployment, weak safety net</td></tr>
+          <tr><td>2. Explicit LF</td><td>Laissez-faire</td><td class="mono">6.14</td><td class="mono">39.4%</td><td class="mono">0.250</td><td>Confirms baseline reproducibility</td></tr>
+          <tr><td>3. Social Democrat</td><td>Social-democrat</td><td class="mono">7.59</td><td class="mono">19.2%</td><td class="mono">0.228</td><td>Lowest Gini; most total innovations (2,021)</td></tr>
+          <tr><td>4. Innovation State</td><td>Innovation-state</td><td class="mono">8.13</td><td class="mono">23.5%</td><td class="mono">0.245</td><td>2nd-highest GDP; high mutation rate</td></tr>
+          <tr><td>5. Protectionist</td><td>Protectionist</td><td class="mono">4.70</td><td class="mono">33.1%</td><td class="mono">0.192</td><td>Lowest GDP; entry barriers stifle search</td></tr>
+          <tr><td>6. Adaptive</td><td>Adaptive</td><td class="mono">9.83</td><td class="mono">15.3%</td><td class="mono">0.266</td><td>Dominates; discovers hybrid policy mix</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="emergent-section">
+      <h4>Emergent Behaviors</h4>
+      <ul class="emergent-list">
+        <li>Adaptive governance outperforms all fixed ideologies: 60% GDP advantage over laissez-faire and 109% over protectionism</li>
+        <li>The adaptive regime converges to a specific policy mix: minimum regulation (0.05), low taxes (0.10), high innovation subsidies (0.60), no competition limits (1.00), near-maximum safety net (0.90)</li>
+        <li>Safety nets are pro-growth: stronger safety nets increase firm respawn rates (2.8% to 9.2% per tick), maintaining the evolutionary search population</li>
+        <li>Entry barriers matter more than tax rates: protectionist regime (reg=0.80, tax=0.35) achieves 62% less GDP than social democracy (reg=0.40, tax=0.45)</li>
+        <li>Laissez-faire generates high inequality and unemployment, not high growth: second-lowest GDP with highest unemployment (39.4%)</li>
+        <li>Protecting incumbents is the cardinal sin: protectionism blocks new entrants that carry the genetic variation the economy needs</li>
+      </ul>
+    </div>
+
+    <div class="beinhocker-connection">
+      <h4>Connection to Beinhocker</h4>
+      <p>The simulation confirms Beinhocker's core arguments from Chapter 18. Policy shapes fitness landscapes, not outcomes &mdash; no regime could "pick" the optimal firm strategy, but regimes differed dramatically in how many firms survived to search and how fast they searched. Evolutionary dynamics require a variation supply: the strongest regimes maintained high firm populations through safety nets and respawning, while the weakest lost firms permanently. Adaptive governance outperforms fixed rules because complex systems require responsive, not ideological, governance. And protecting incumbents is the worst possible policy: it restricts the evolutionary process by blocking entry, shielding unfit firms, and reducing variation.</p>
+    </div>
+  </div>
+
 </div><!-- sims-container -->
 
 
@@ -1528,7 +1655,7 @@
 <!-- ────── EMPIRICAL VALIDATION ────── -->
 <div class="section" id="validation">
   <h2 class="section-title">Empirical Validation Summary</h2>
-  <p class="section-subtitle">35 comparisons between simulation outputs and published empirical data. 22 strong, 11 moderate, 2 weak matches.</p>
+  <p class="section-subtitle">41 comparisons between simulation outputs and published empirical data. 25 strong, 14 moderate, 2 weak matches.</p>
 
   <div class="exp-table-wrap">
     <table class="exp">
@@ -1721,6 +1848,38 @@
           <td>March (1991); empirical R&amp;D intensity studies (Cohen &amp; Levinthal 1990)</td>
           <td><span class="badge weak">Weak</span></td>
         </tr>
+        <tr>
+          <td rowspan="3"><strong>Strategy</strong></td>
+          <td>Adaptive portfolio strategy outperforms pure exploit/explore</td>
+          <td>March (1991); ambidexterity literature (O'Reilly &amp; Tushman 2004)</td>
+          <td><span class="badge strong">Strong</span></td>
+        </tr>
+        <tr>
+          <td>Stable environments favor exploitation; volatile favor adaptation</td>
+          <td>Contingency theory (Burns &amp; Stalker 1961; Hannan &amp; Freeman 1984)</td>
+          <td><span class="badge strong">Strong</span></td>
+        </tr>
+        <tr>
+          <td>Exploiter monocultures produce synchronized crashes</td>
+          <td>Competency trap (Levinthal &amp; March 1993); industry concentration risk</td>
+          <td><span class="badge moderate">Moderate</span></td>
+        </tr>
+        <tr>
+          <td rowspan="3"><strong>Public Policy</strong></td>
+          <td>Adaptive governance outperforms fixed regimes (+60% GDP)</td>
+          <td>Adaptive management literature (Holling 1978); experimental governance</td>
+          <td><span class="badge moderate">Moderate</span></td>
+        </tr>
+        <tr>
+          <td>Entry barriers reduce growth more than tax rates</td>
+          <td>Ease of doing business (World Bank); firm entry studies (Djankov et al. 2002)</td>
+          <td><span class="badge strong">Strong</span></td>
+        </tr>
+        <tr>
+          <td>Safety nets maintain evolutionary search population</td>
+          <td>Nordic model outcomes; active labor market policy (Card et al. 2010)</td>
+          <td><span class="badge moderate">Moderate</span></td>
+        </tr>
       </tbody>
     </table>
   </div>
@@ -1734,16 +1893,16 @@
   <div class="methodology">
     <h4>How the experiments were run</h4>
     <p>
-      All 84 experiments were implemented as Python agent-based simulations, each with a command-line interface supporting parameter sweeps and JSON output. Simulations are deterministic and reproducible: every experiment uses <strong>seed 42</strong>, and all results can be regenerated from the CLI commands documented in each findings file.
+      All 96 experiments were implemented as Python agent-based simulations, each with a command-line interface supporting parameter sweeps and JSON output. Simulations are deterministic and reproducible: every experiment uses <strong>seed 42</strong>, and all results can be regenerated from the CLI commands documented in each findings file.
     </p>
     <p>
-      Each model implements a specific mechanism from the complexity economics literature: the SFI stock market uses genetic algorithm evolution of forecasting rules; the Beer Game uses Sterman's empirically calibrated anchor-and-adjust heuristic; Boolean networks use Kauffman's random Boolean functions with the Derrida parameter; the punctuated equilibrium model combines Jain-Krishna autocatalytic networks with Bak-Sneppen extremal dynamics; the rigids-vs-flexibles model uses Harrington's tournament promotion; the Prisoner's Dilemma uses Axelrod's spatial evolutionary framework; Sugarscape follows Epstein &amp; Axtell; technology evolution uses NK fitness landscapes; the integrated economy links four sub-models through composite health and dependency cascades; the El Farol Bar implements Arthur's inductive reasoning with competing prediction strategies; Schelling segregation uses threshold-based relocation on a torus grid; predator-prey compares ODE and spatial agent-based Lotka-Volterra dynamics; the sand pile implements the Bak-Tang-Wiesenfeld abelian sandpile for self-organized criticality; and business plan evolution models Beinhocker's multiplicative fitness across Physical Technology, Social Technology, and Strategy on NK landscapes.
+      Each model implements a specific mechanism from the complexity economics literature: the SFI stock market uses genetic algorithm evolution of forecasting rules; the Beer Game uses Sterman's empirically calibrated anchor-and-adjust heuristic; Boolean networks use Kauffman's random Boolean functions with the Derrida parameter; the punctuated equilibrium model combines Jain-Krishna autocatalytic networks with Bak-Sneppen extremal dynamics; the rigids-vs-flexibles model uses Harrington's tournament promotion; the Prisoner's Dilemma uses Axelrod's spatial evolutionary framework; Sugarscape follows Epstein &amp; Axtell; technology evolution uses NK fitness landscapes; the integrated economy links four sub-models through composite health and dependency cascades; the El Farol Bar implements Arthur's inductive reasoning with competing prediction strategies; Schelling segregation uses threshold-based relocation on a torus grid; predator-prey compares ODE and spatial agent-based Lotka-Volterra dynamics; the sand pile implements the Bak-Tang-Wiesenfeld abelian sandpile for self-organized criticality; business plan evolution models Beinhocker's multiplicative fitness across Physical Technology, Social Technology, and Strategy on NK landscapes; the strategy evolution model tests portfolio vs. exploit vs. explore strategies across shifting market niches; and the public policy model compares five policy regimes (laissez-faire, social-democrat, innovation-state, protectionist, and adaptive) governing firms evolving on NK fitness landscapes.
     </p>
     <p>
       Parameter sweeps were designed to isolate the effect of a single variable at a time (mutation rate, population size, connectivity, delay length, environmental stability), with the baseline configuration representing default or empirically calibrated values. Experiments range from 50 to 500 ticks depending on the model's convergence characteristics, with 200 ticks as the most common duration.
     </p>
     <p>
-      Empirical validation compares 35 simulation outputs against published measurements from peer-reviewed literature in finance, supply chain management, evolutionary biology, organizational science, network theory, urban sociology, and population ecology. Match quality is assessed as Strong (within empirical range), Moderate (correct direction, approximate magnitude), or Weak (qualitative match only).
+      Empirical validation compares 41 simulation outputs against published measurements from peer-reviewed literature in finance, supply chain management, evolutionary biology, organizational science, network theory, urban sociology, and population ecology. Match quality is assessed as Strong (within empirical range), Moderate (correct direction, approximate magnitude), or Weak (qualitative match only).
     </p>
   </div>
 </div>

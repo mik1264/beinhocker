@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Strategy as Evolution: Portfolio-Based Competition</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Courier New', monospace; background: #0a0a0f; color: #e0e0e0; overflow-x: hidden; }
+
+.container { max-width: 1440px; margin: 0 auto; padding: 20px; }
+
+h1 { text-align: center; font-size: 1.8em; margin-bottom: 4px; color: #fff;
+     letter-spacing: 3px; text-transform: uppercase; }
+.subtitle { text-align: center; font-size: 0.85em; color: #888; margin-bottom: 24px; }
+
+/* Intro section */
+.intro-section {
+  background: linear-gradient(135deg, #12121a 0%, #0f1a28 100%);
+  border: 1px solid #1a3a5a;
+  border-radius: 12px;
+  padding: 28px 32px;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+}
+.intro-section::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #e66, #ea6, #4a8, #6ce);
+}
+.intro-section h2 {
+  font-size: 1.2em;
+  color: #8cd8ff;
+  margin-bottom: 12px;
+  letter-spacing: 1px;
+}
+.intro-section p {
+  font-size: 0.95em;
+  line-height: 1.7;
+  color: #bbb;
+}
+.intro-section p strong { color: #fff; }
+
+/* Key insight callout */
+.key-insight {
+  background: linear-gradient(135deg, #1a1a10, #22200a);
+  border: 1px solid #554a20;
+  border-left: 4px solid #eea;
+  border-radius: 8px;
+  padding: 20px 24px;
+  margin-bottom: 24px;
+}
+.key-insight h3 {
+  font-size: 0.9em;
+  color: #eea;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+}
+.key-insight p {
+  font-size: 0.9em;
+  line-height: 1.7;
+  color: #bba;
+}
+.key-insight p strong { color: #fff; }
+
+/* Controls */
+.controls {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 10px; padding: 16px; background: #12121a; border: 1px solid #2a2a3a;
+  border-radius: 8px; margin-bottom: 20px;
+}
+.control-group { display: flex; flex-direction: column; gap: 4px; }
+.control-group label { font-size: 0.75em; color: #aaa; text-transform: uppercase; letter-spacing: 1px; }
+.control-group input, .control-group select {
+  background: #1a1a2e; border: 1px solid #333; color: #fff; padding: 6px 10px;
+  border-radius: 4px; font-family: inherit; font-size: 0.85em;
+}
+.control-group input:focus, .control-group select:focus {
+  outline: none; border-color: #4a8;
+}
+
+.btn-row { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
+button {
+  background: linear-gradient(135deg, #2a5a4a, #1a4a3a);
+  border: 1px solid #4a8;
+  color: #fff; padding: 8px 20px; border-radius: 4px;
+  cursor: pointer; font-family: inherit; font-size: 0.85em;
+  transition: all 0.2s;
+}
+button:hover { background: linear-gradient(135deg, #3a7a5a, #2a6a4a); }
+button.secondary {
+  background: linear-gradient(135deg, #2a2a3e, #1a1a2e);
+  border-color: #555;
+}
+button.secondary:hover { background: linear-gradient(135deg, #3a3a5e, #2a2a4e); }
+
+/* Presets */
+.presets {
+  display: flex; gap: 8px; flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.presets button {
+  font-size: 0.75em; padding: 5px 12px;
+  background: linear-gradient(135deg, #1a2a3a, #122238);
+  border-color: #3a6a8a;
+}
+.presets button:hover {
+  background: linear-gradient(135deg, #2a4a5a, #1a3a4a);
+}
+
+/* Layout */
+.main-grid {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 20px;
+}
+
+/* Charts */
+.chart-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.chart-panel {
+  background: #12121a;
+  border: 1px solid #2a2a3a;
+  border-radius: 8px;
+  padding: 16px;
+  min-height: 0;
+  overflow: hidden;
+}
+.chart-panel h3 {
+  font-size: 0.8em;
+  color: #8cd8ff;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+}
+.chart-panel canvas {
+  display: block;
+  width: 100%;
+  height: 280px;
+}
+.chart-panel.tall canvas {
+  height: 340px;
+}
+
+/* Sidebar */
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.stat-card {
+  background: #12121a;
+  border: 1px solid #2a2a3a;
+  border-radius: 8px;
+  padding: 16px;
+}
+.stat-card h3 {
+  font-size: 0.8em;
+  color: #8cd8ff;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+}
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.82em;
+  padding: 4px 0;
+  border-bottom: 1px solid #1a1a2a;
+}
+.stat-row:last-child { border-bottom: none; }
+.stat-label { color: #888; }
+.stat-value { color: #fff; font-weight: bold; }
+.stat-value.green { color: #4a8; }
+.stat-value.yellow { color: #ea6; }
+.stat-value.red { color: #e66; }
+.stat-value.blue { color: #6ce; }
+
+/* Legend */
+.legend {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72em;
+  color: #aaa;
+}
+.legend-swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+}
+
+/* Status bar */
+.status-bar {
+  margin-top: 20px;
+  padding: 10px 16px;
+  background: #12121a;
+  border: 1px solid #2a2a3a;
+  border-radius: 8px;
+  font-size: 0.8em;
+  color: #888;
+  text-align: center;
+}
+.status-bar .running { color: #4a8; }
+.status-bar .paused { color: #ea6; }
+
+@media (max-width: 1000px) {
+  .main-grid { grid-template-columns: 1fr; }
+  .chart-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Strategy as Evolution</h1>
+  <p class="subtitle">Beinhocker Ch.15 -- Strategy Is a Portfolio of Experiments, Not a Single Plan</p>
+
+  <div class="intro-section">
+    <h2>Strategy Is Not Planning</h2>
+    <p>
+      Beinhocker argues that <strong>strategy is not about finding the one right answer</strong>. In a complex
+      adaptive economy, the future is inherently unpredictable. The best strategy is a
+      <strong>portfolio of experiments</strong> -- multiple bets across different market niches, with resources
+      dynamically reallocated based on feedback. This simulation models firms competing via three archetypes:
+      <strong>Exploiters</strong> (concentrate on what works), <strong>Explorers</strong> (spread bets widely),
+      and <strong>Adaptive</strong> firms (balance both). As market niches shift, which strategy survives?
+    </p>
+  </div>
+
+  <div class="key-insight">
+    <h3>The Exploration-Exploitation Tradeoff</h3>
+    <p>
+      James March (1991) showed that organizations face a fundamental tension: <strong>exploitation</strong>
+      refines existing capabilities for short-term efficiency, while <strong>exploration</strong> searches
+      for new opportunities for long-term survival. Organizations that only exploit become
+      <strong>competency traps</strong> -- supremely efficient at something the world no longer wants.
+      Organizations that only explore never develop enough competence to compete. The adaptive sweet
+      spot requires <strong>maintaining a portfolio</strong> that balances both.
+    </p>
+  </div>
+
+  <div class="controls">
+    <div class="control-group">
+      <label>Firms</label>
+      <input type="number" id="numFirms" value="30" min="5" max="200" step="5">
+    </div>
+    <div class="control-group">
+      <label>Ticks</label>
+      <input type="number" id="numTicks" value="300" min="50" max="2000" step="50">
+    </div>
+    <div class="control-group">
+      <label>Niches</label>
+      <input type="number" id="numNiches" value="5" min="2" max="20" step="1">
+    </div>
+    <div class="control-group">
+      <label>Shift Rate</label>
+      <input type="number" id="shiftRate" value="0.05" min="0" max="0.5" step="0.01">
+    </div>
+    <div class="control-group">
+      <label>Exploiter Frac</label>
+      <input type="number" id="exploiterFrac" value="0.33" min="0" max="1" step="0.05">
+    </div>
+    <div class="control-group">
+      <label>Explorer Frac</label>
+      <input type="number" id="explorerFrac" value="0.33" min="0" max="1" step="0.05">
+    </div>
+    <div class="control-group">
+      <label>Mutation Rate</label>
+      <input type="number" id="mutationRate" value="0.1" min="0" max="0.5" step="0.01">
+    </div>
+    <div class="control-group btn-row">
+      <button id="btnRun" onclick="runSimulation()">Run</button>
+      <button id="btnPause" class="secondary" onclick="togglePause()">Pause</button>
+      <button id="btnReset" class="secondary" onclick="resetSimulation()">Reset</button>
+    </div>
+  </div>
+
+  <div class="presets">
+    <button onclick="applyPreset('baseline')">Baseline</button>
+    <button onclick="applyPreset('stable')">Stable Market</button>
+    <button onclick="applyPreset('volatile')">Volatile Market</button>
+    <button onclick="applyPreset('allExploiters')">All Exploiters</button>
+    <button onclick="applyPreset('allExplorers')">All Explorers</button>
+    <button onclick="applyPreset('largeEconomy')">Large Economy</button>
+  </div>
+
+  <div class="main-grid">
+    <div class="chart-grid">
+      <div class="chart-panel tall">
+        <h3>Survival by Type</h3>
+        <canvas id="chartSurvival"></canvas>
+        <div class="legend">
+          <div class="legend-item"><div class="legend-swatch" style="background:#e66"></div> Exploiters</div>
+          <div class="legend-item"><div class="legend-swatch" style="background:#6ce"></div> Explorers</div>
+          <div class="legend-item"><div class="legend-swatch" style="background:#4a8"></div> Adaptive</div>
+        </div>
+      </div>
+      <div class="chart-panel tall">
+        <h3>Market Share Over Time</h3>
+        <canvas id="chartShare"></canvas>
+        <div class="legend">
+          <div class="legend-item"><div class="legend-swatch" style="background:#e66"></div> Exploiters</div>
+          <div class="legend-item"><div class="legend-swatch" style="background:#6ce"></div> Explorers</div>
+          <div class="legend-item"><div class="legend-swatch" style="background:#4a8"></div> Adaptive</div>
+        </div>
+      </div>
+      <div class="chart-panel">
+        <h3>Niche Fitness Landscape</h3>
+        <canvas id="chartNiche"></canvas>
+      </div>
+      <div class="chart-panel">
+        <h3>Portfolio Diversity</h3>
+        <canvas id="chartDiversity"></canvas>
+      </div>
+      <div class="chart-panel">
+        <h3>Market Concentration (HHI)</h3>
+        <canvas id="chartHHI"></canvas>
+      </div>
+      <div class="chart-panel">
+        <h3>Mean vs Best Fitness</h3>
+        <canvas id="chartFitness"></canvas>
+        <div class="legend">
+          <div class="legend-item"><div class="legend-swatch" style="background:#ea6"></div> Best</div>
+          <div class="legend-item"><div class="legend-swatch" style="background:#888"></div> Mean</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar">
+      <div class="stat-card">
+        <h3>Current State</h3>
+        <div class="stat-row"><span class="stat-label">Tick</span><span class="stat-value" id="statTick">0</span></div>
+        <div class="stat-row"><span class="stat-label">Total Firms</span><span class="stat-value" id="statFirms">0</span></div>
+        <div class="stat-row"><span class="stat-label">Mean Fitness</span><span class="stat-value green" id="statMeanFit">0</span></div>
+        <div class="stat-row"><span class="stat-label">Best Fitness</span><span class="stat-value yellow" id="statBestFit">0</span></div>
+      </div>
+      <div class="stat-card">
+        <h3>Type Counts</h3>
+        <div class="stat-row"><span class="stat-label">Exploiters</span><span class="stat-value red" id="statExploiters">0</span></div>
+        <div class="stat-row"><span class="stat-label">Explorers</span><span class="stat-value blue" id="statExplorers">0</span></div>
+        <div class="stat-row"><span class="stat-label">Adaptive</span><span class="stat-value green" id="statAdaptive">0</span></div>
+      </div>
+      <div class="stat-card">
+        <h3>Market Share</h3>
+        <div class="stat-row"><span class="stat-label">Exploiter</span><span class="stat-value red" id="statExpShare">0%</span></div>
+        <div class="stat-row"><span class="stat-label">Explorer</span><span class="stat-value blue" id="statExrShare">0%</span></div>
+        <div class="stat-row"><span class="stat-label">Adaptive</span><span class="stat-value green" id="statAdaShare">0%</span></div>
+      </div>
+      <div class="stat-card">
+        <h3>Market Structure</h3>
+        <div class="stat-row"><span class="stat-label">HHI</span><span class="stat-value" id="statHHI">0</span></div>
+        <div class="stat-row"><span class="stat-label">Portfolio Div.</span><span class="stat-value" id="statDiversity">0</span></div>
+        <div class="stat-row"><span class="stat-label">Niche Coverage</span><span class="stat-value" id="statCoverage">0%</span></div>
+        <div class="stat-row"><span class="stat-label">Niche Shifts</span><span class="stat-value yellow" id="statShifts">0</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="status-bar" id="statusBar">Ready. Click Run to start simulation.</div>
+</div>
+
+<script>
+// ============================================================
+// Strategy as Evolution -- JS simulation for browser
+// ============================================================
+
+class Experiment {
+  constructor(niche, capability, numNiches, rng) {
+    this.niche = niche !== undefined ? niche : Math.floor(rng() * numNiches);
+    this.capability = capability !== undefined ? capability : rng();
+    this.resources = 0;
+    this.age = 0;
+    this.cumulativeFitness = 0;
+  }
+}
+
+class Firm {
+  constructor(id, type, experiments) {
+    this.id = id;
+    this.type = type;
+    this.experiments = experiments;
+    this.marketShare = 0;
+    this.totalFitness = 0;
+    this.age = 0;
+    this.alive = true;
+  }
+}
+
+class NicheLandscape {
+  constructor(numNiches, shiftRate, rng) {
+    this.numNiches = numNiches;
+    this.shiftRate = shiftRate;
+    this.rng = rng;
+    this.ideals = [];
+    this.attractiveness = [];
+    this.shiftsThisTick = 0;
+    for (let i = 0; i < numNiches; i++) {
+      this.ideals.push(rng());
+      this.attractiveness.push(0.5 + 0.5 * rng());
+    }
+  }
+
+  step() {
+    this.shiftsThisTick = 0;
+    for (let i = 0; i < this.numNiches; i++) {
+      if (this.rng() < this.shiftRate) {
+        this.ideals[i] = Math.max(0, Math.min(1, this.ideals[i] + gaussRng(this.rng) * 0.15));
+        this.shiftsThisTick++;
+      }
+      if (this.rng() < this.shiftRate * 0.5) {
+        this.attractiveness[i] = Math.max(0.2, Math.min(1, this.attractiveness[i] + gaussRng(this.rng) * 0.05));
+      }
+    }
+  }
+
+  evaluate(exp) {
+    const ideal = this.ideals[exp.niche];
+    const attract = this.attractiveness[exp.niche];
+    const dist = Math.abs(exp.capability - ideal);
+    const match = Math.exp(-8.0 * dist * dist);
+    return attract * match * exp.resources;
+  }
+}
+
+function gaussRng(rng) {
+  // Box-Muller transform
+  let u1 = rng(), u2 = rng();
+  while (u1 === 0) u1 = rng();
+  return Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+}
+
+function mulberry32(seed) {
+  let s = seed | 0;
+  return function() {
+    s = (s + 0x6D2B79F5) | 0;
+    let t = Math.imul(s ^ (s >>> 15), 1 | s);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+class StrategySim {
+  constructor(params) {
+    this.numFirms = params.numFirms || 30;
+    this.numNiches = params.numNiches || 5;
+    this.ticks = params.ticks || 300;
+    this.shiftRate = params.shiftRate !== undefined ? params.shiftRate : 0.05;
+    this.exploiterFrac = params.exploiterFrac !== undefined ? params.exploiterFrac : 0.33;
+    this.explorerFrac = params.explorerFrac !== undefined ? params.explorerFrac : 0.33;
+    this.mutationRate = params.mutationRate || 0.1;
+    this.experimentsPerFirm = 6;
+    this.exitThreshold = 0.15;
+
+    const seed = params.seed || Math.floor(Math.random() * 1e9);
+    this.rng = mulberry32(seed);
+
+    this.landscape = new NicheLandscape(this.numNiches, this.shiftRate, this.rng);
+    this.firms = [];
+    this.nextId = 0;
+    this.tick = 0;
+    this.history = [];
+    this.totalShifts = 0;
+
+    this._createFirms();
+  }
+
+  _createFirms() {
+    const nExp = Math.round(this.numFirms * this.exploiterFrac);
+    const nExr = Math.round(this.numFirms * this.explorerFrac);
+    const nAda = this.numFirms - nExp - nExr;
+    for (let i = 0; i < nExp; i++) this.firms.push(this._makeFirm('exploiter'));
+    for (let i = 0; i < nExr; i++) this.firms.push(this._makeFirm('explorer'));
+    for (let i = 0; i < nAda; i++) this.firms.push(this._makeFirm('adaptive'));
+  }
+
+  _makeFirm(type) {
+    const exps = [];
+    for (let i = 0; i < this.experimentsPerFirm; i++) {
+      exps.push(new Experiment(undefined, undefined, this.numNiches, this.rng));
+    }
+    const even = 1.0 / this.experimentsPerFirm;
+    exps.forEach(e => e.resources = even);
+    return new Firm(this.nextId++, type, exps);
+  }
+
+  _allocate(firm, fitnesses) {
+    const n = firm.experiments.length;
+    if (n === 0) return;
+
+    if (firm.type === 'exploiter') {
+      const maxF = Math.max(...fitnesses);
+      if (maxF > 0) {
+        const bestIdx = fitnesses.indexOf(maxF);
+        firm.experiments.forEach((e, i) => {
+          e.resources = i === bestIdx ? 0.7 : 0.3 / Math.max(n - 1, 1);
+        });
+      } else {
+        firm.experiments.forEach(e => e.resources = 1.0 / n);
+      }
+    } else if (firm.type === 'explorer') {
+      const shares = firm.experiments.map(() => 1.0 + this.rng() * 0.3);
+      const total = shares.reduce((a, b) => a + b, 0);
+      firm.experiments.forEach((e, i) => e.resources = shares[i] / total);
+    } else {
+      const floor = 0.1 / n;
+      const sumF = fitnesses.reduce((a, b) => a + b, 0);
+      if (sumF > 0) {
+        const weights = fitnesses.map(f => Math.max(f, 0.001));
+        const totalW = weights.reduce((a, b) => a + b, 0);
+        firm.experiments.forEach((e, i) => {
+          e.resources = (1.0 - floor * n) * weights[i] / totalW + floor;
+        });
+      } else {
+        firm.experiments.forEach(e => e.resources = 1.0 / n);
+      }
+    }
+  }
+
+  _mutate(firm) {
+    let rate;
+    if (firm.type === 'explorer') rate = this.mutationRate * 2.0;
+    else if (firm.type === 'adaptive') rate = this.mutationRate;
+    else rate = this.mutationRate * 0.2;
+
+    for (const exp of firm.experiments) {
+      if (this.rng() < rate) {
+        if (this.rng() < 0.3) {
+          exp.niche = Math.floor(this.rng() * this.numNiches);
+          exp.capability = this.rng();
+          exp.age = 0;
+        } else {
+          exp.capability = Math.max(0, Math.min(1, exp.capability + gaussRng(this.rng) * 0.1));
+        }
+      }
+    }
+  }
+
+  step() {
+    this.landscape.step();
+    this.totalShifts += this.landscape.shiftsThisTick;
+
+    // Evaluate and allocate
+    for (const firm of this.firms) {
+      if (!firm.alive) continue;
+      let fitnesses = firm.experiments.map(e => this.landscape.evaluate(e));
+      this._allocate(firm, fitnesses);
+      fitnesses = firm.experiments.map(e => this.landscape.evaluate(e));
+      firm.totalFitness = fitnesses.reduce((a, b) => a + b, 0);
+      firm.age++;
+      firm.experiments.forEach((e, i) => { e.age++; e.cumulativeFitness += fitnesses[i]; });
+    }
+
+    // Mutate
+    for (const firm of this.firms) {
+      if (firm.alive) this._mutate(firm);
+    }
+
+    // Selection
+    let alive = this.firms.filter(f => f.alive);
+    const totalFit = alive.reduce((s, f) => s + f.totalFitness, 0);
+    if (totalFit > 0) alive.forEach(f => f.marketShare = f.totalFitness / totalFit);
+    else alive.forEach(f => f.marketShare = 1.0 / alive.length);
+
+    if (alive.length > 3) {
+      alive.sort((a, b) => a.totalFitness - b.totalFitness);
+      const nExit = Math.max(1, Math.floor(alive.length * this.exitThreshold));
+      for (let i = 0; i < nExit; i++) alive[i].alive = false;
+      for (let i = 0; i < nExit; i++) {
+        const r = this.rng();
+        let type;
+        if (r < this.exploiterFrac) type = 'exploiter';
+        else if (r < this.exploiterFrac + this.explorerFrac) type = 'explorer';
+        else type = 'adaptive';
+        this.firms.push(this._makeFirm(type));
+      }
+    }
+
+    this.firms = this.firms.filter(f => f.alive);
+
+    // Record
+    const rec = { tick: this.tick };
+    const counts = { exploiter: 0, explorer: 0, adaptive: 0 };
+    const shares = { exploiter: 0, explorer: 0, adaptive: 0 };
+    const fits = { exploiter: [], explorer: [], adaptive: [] };
+    let allFit = [];
+    const coveredNiches = new Set();
+
+    for (const f of this.firms) {
+      counts[f.type]++;
+      shares[f.type] += f.marketShare;
+      fits[f.type].push(f.totalFitness);
+      allFit.push(f.totalFitness);
+      for (const e of f.experiments) coveredNiches.add(e.niche);
+    }
+
+    const n = this.firms.length;
+    const mean = arr => arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : 0;
+
+    rec.exploiterCount = counts.exploiter;
+    rec.explorerCount = counts.explorer;
+    rec.adaptiveCount = counts.adaptive;
+    rec.totalFirms = n;
+    rec.exploiterShare = shares.exploiter;
+    rec.explorerShare = shares.explorer;
+    rec.adaptiveShare = shares.adaptive;
+    rec.meanFitness = mean(allFit);
+    rec.bestFitness = allFit.length ? Math.max(...allFit) : 0;
+    rec.exploiterFit = mean(fits.exploiter);
+    rec.explorerFit = mean(fits.explorer);
+    rec.adaptiveFit = mean(fits.adaptive);
+    rec.hhi = this.firms.reduce((s, f) => s + f.marketShare * f.marketShare, 0);
+    rec.nicheCoverage = coveredNiches.size / this.numNiches;
+    rec.nicheShifts = this.landscape.shiftsThisTick;
+
+    // Portfolio diversity
+    let divSum = 0;
+    for (const f of this.firms) {
+      const niches = new Set(f.experiments.map(e => e.niche));
+      divSum += niches.size / this.numNiches;
+    }
+    rec.portfolioDiversity = n > 0 ? divSum / n : 0;
+
+    // Niche ideals snapshot
+    rec.nicheIdeals = [...this.landscape.ideals];
+    rec.nicheAttract = [...this.landscape.attractiveness];
+
+    this.history.push(rec);
+    this.tick++;
+    return rec;
+  }
+}
+
+// ============================================================
+// Chart setup and UI
+// ============================================================
+
+let sim = null;
+let animFrame = null;
+let paused = false;
+let charts = {};
+
+const COLORS = {
+  exploiter: '#e66',
+  explorer: '#6ce',
+  adaptive: '#4a8',
+  best: '#ea6',
+  mean: '#888',
+  hhi: '#c8a',
+  diversity: '#8e8',
+  coverage: '#6ce',
+};
+
+function initCharts() {
+  const commonOpts = {
+    responsive: true,
+    maintainAspectRatio: false,
+    animation: false,
+    plugins: {
+      legend: { display: false },
+    },
+    scales: {
+      x: { grid: { color: '#1a1a2a' }, ticks: { color: '#555', font: { size: 10 } } },
+      y: { grid: { color: '#1a1a2a' }, ticks: { color: '#555', font: { size: 10 } } },
+    },
+  };
+
+  // Survival by type
+  charts.survival = new Chart(document.getElementById('chartSurvival'), {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [
+        { label: 'Exploiters', data: [], borderColor: COLORS.exploiter, borderWidth: 1.5, pointRadius: 0, tension: 0.2 },
+        { label: 'Explorers', data: [], borderColor: COLORS.explorer, borderWidth: 1.5, pointRadius: 0, tension: 0.2 },
+        { label: 'Adaptive', data: [], borderColor: COLORS.adaptive, borderWidth: 1.5, pointRadius: 0, tension: 0.2 },
+      ],
+    },
+    options: { ...commonOpts, scales: { ...commonOpts.scales, y: { ...commonOpts.scales.y, title: { display: true, text: 'Count', color: '#555', font: { size: 10 } } } } },
+  });
+
+  // Market share
+  charts.share = new Chart(document.getElementById('chartShare'), {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [
+        { label: 'Exploiters', data: [], borderColor: COLORS.exploiter, borderWidth: 1.5, pointRadius: 0, fill: true, backgroundColor: 'rgba(238,102,102,0.08)', tension: 0.2 },
+        { label: 'Explorers', data: [], borderColor: COLORS.explorer, borderWidth: 1.5, pointRadius: 0, fill: true, backgroundColor: 'rgba(102,204,238,0.08)', tension: 0.2 },
+        { label: 'Adaptive', data: [], borderColor: COLORS.adaptive, borderWidth: 1.5, pointRadius: 0, fill: true, backgroundColor: 'rgba(68,170,136,0.08)', tension: 0.2 },
+      ],
+    },
+    options: { ...commonOpts, scales: { ...commonOpts.scales, y: { ...commonOpts.scales.y, min: 0, max: 1, title: { display: true, text: 'Share', color: '#555', font: { size: 10 } } } } },
+  });
+
+  // Niche landscape (bar chart of niche ideals + attractiveness)
+  charts.niche = new Chart(document.getElementById('chartNiche'), {
+    type: 'bar',
+    data: {
+      labels: [],
+      datasets: [
+        { label: 'Ideal', data: [], backgroundColor: 'rgba(102,204,238,0.6)', borderColor: '#6ce', borderWidth: 1 },
+        { label: 'Attractiveness', data: [], backgroundColor: 'rgba(234,166,102,0.4)', borderColor: '#ea6', borderWidth: 1 },
+      ],
+    },
+    options: {
+      ...commonOpts,
+      plugins: { ...commonOpts.plugins, legend: { display: true, labels: { color: '#888', font: { size: 10 } } } },
+      scales: { ...commonOpts.scales, y: { ...commonOpts.scales.y, min: 0, max: 1 } },
+    },
+  });
+
+  // Portfolio diversity
+  charts.diversity = new Chart(document.getElementById('chartDiversity'), {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [
+        { label: 'Diversity', data: [], borderColor: COLORS.diversity, borderWidth: 1.5, pointRadius: 0, tension: 0.2 },
+        { label: 'Coverage', data: [], borderColor: COLORS.coverage, borderWidth: 1.5, pointRadius: 0, borderDash: [4, 2], tension: 0.2 },
+      ],
+    },
+    options: {
+      ...commonOpts,
+      plugins: { ...commonOpts.plugins, legend: { display: true, labels: { color: '#888', font: { size: 10 } } } },
+      scales: { ...commonOpts.scales, y: { ...commonOpts.scales.y, min: 0, max: 1 } },
+    },
+  });
+
+  // HHI
+  charts.hhi = new Chart(document.getElementById('chartHHI'), {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [
+        { label: 'HHI', data: [], borderColor: COLORS.hhi, borderWidth: 1.5, pointRadius: 0, fill: true, backgroundColor: 'rgba(204,136,170,0.1)', tension: 0.2 },
+      ],
+    },
+    options: { ...commonOpts, scales: { ...commonOpts.scales, y: { ...commonOpts.scales.y, min: 0 } } },
+  });
+
+  // Mean vs Best fitness
+  charts.fitness = new Chart(document.getElementById('chartFitness'), {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [
+        { label: 'Best', data: [], borderColor: COLORS.best, borderWidth: 1.5, pointRadius: 0, tension: 0.2 },
+        { label: 'Mean', data: [], borderColor: COLORS.mean, borderWidth: 1.5, pointRadius: 0, tension: 0.2 },
+      ],
+    },
+    options: commonOpts,
+  });
+}
+
+function updateCharts(rec) {
+  const t = rec.tick;
+
+  // Survival
+  charts.survival.data.labels.push(t);
+  charts.survival.data.datasets[0].data.push(rec.exploiterCount);
+  charts.survival.data.datasets[1].data.push(rec.explorerCount);
+  charts.survival.data.datasets[2].data.push(rec.adaptiveCount);
+  charts.survival.update('none');
+
+  // Share
+  charts.share.data.labels.push(t);
+  charts.share.data.datasets[0].data.push(rec.exploiterShare);
+  charts.share.data.datasets[1].data.push(rec.explorerShare);
+  charts.share.data.datasets[2].data.push(rec.adaptiveShare);
+  charts.share.update('none');
+
+  // Niche landscape
+  const nicheLabels = rec.nicheIdeals.map((_, i) => `N${i}`);
+  charts.niche.data.labels = nicheLabels;
+  charts.niche.data.datasets[0].data = rec.nicheIdeals;
+  charts.niche.data.datasets[1].data = rec.nicheAttract;
+  charts.niche.update('none');
+
+  // Diversity
+  charts.diversity.data.labels.push(t);
+  charts.diversity.data.datasets[0].data.push(rec.portfolioDiversity);
+  charts.diversity.data.datasets[1].data.push(rec.nicheCoverage);
+  charts.diversity.update('none');
+
+  // HHI
+  charts.hhi.data.labels.push(t);
+  charts.hhi.data.datasets[0].data.push(rec.hhi);
+  charts.hhi.update('none');
+
+  // Fitness
+  charts.fitness.data.labels.push(t);
+  charts.fitness.data.datasets[0].data.push(rec.bestFitness);
+  charts.fitness.data.datasets[1].data.push(rec.meanFitness);
+  charts.fitness.update('none');
+}
+
+function updateStats(rec) {
+  document.getElementById('statTick').textContent = rec.tick;
+  document.getElementById('statFirms').textContent = rec.totalFirms;
+  document.getElementById('statMeanFit').textContent = rec.meanFitness.toFixed(4);
+  document.getElementById('statBestFit').textContent = rec.bestFitness.toFixed(4);
+  document.getElementById('statExploiters').textContent = rec.exploiterCount;
+  document.getElementById('statExplorers').textContent = rec.explorerCount;
+  document.getElementById('statAdaptive').textContent = rec.adaptiveCount;
+  document.getElementById('statExpShare').textContent = (rec.exploiterShare * 100).toFixed(1) + '%';
+  document.getElementById('statExrShare').textContent = (rec.explorerShare * 100).toFixed(1) + '%';
+  document.getElementById('statAdaShare').textContent = (rec.adaptiveShare * 100).toFixed(1) + '%';
+  document.getElementById('statHHI').textContent = rec.hhi.toFixed(4);
+  document.getElementById('statDiversity').textContent = rec.portfolioDiversity.toFixed(3);
+  document.getElementById('statCoverage').textContent = (rec.nicheCoverage * 100).toFixed(0) + '%';
+  document.getElementById('statShifts').textContent = sim.totalShifts;
+}
+
+function clearCharts() {
+  for (const key in charts) {
+    const chart = charts[key];
+    chart.data.labels = [];
+    chart.data.datasets.forEach(ds => ds.data = []);
+    chart.update('none');
+  }
+}
+
+function getParams() {
+  return {
+    numFirms: parseInt(document.getElementById('numFirms').value),
+    ticks: parseInt(document.getElementById('numTicks').value),
+    numNiches: parseInt(document.getElementById('numNiches').value),
+    shiftRate: parseFloat(document.getElementById('shiftRate').value),
+    exploiterFrac: parseFloat(document.getElementById('exploiterFrac').value),
+    explorerFrac: parseFloat(document.getElementById('explorerFrac').value),
+    mutationRate: parseFloat(document.getElementById('mutationRate').value),
+    seed: Date.now() % 1e9,
+  };
+}
+
+function runSimulation() {
+  if (animFrame) cancelAnimationFrame(animFrame);
+  paused = false;
+
+  clearCharts();
+  const params = getParams();
+  sim = new StrategySim(params);
+
+  document.getElementById('statusBar').innerHTML = '<span class="running">Running...</span>';
+
+  const stepsPerFrame = Math.max(1, Math.floor(params.ticks / 300));
+  let t = 0;
+
+  function frame() {
+    if (paused) return;
+    for (let i = 0; i < stepsPerFrame && t < params.ticks; i++, t++) {
+      const rec = sim.step();
+      if (t % Math.max(1, Math.floor(params.ticks / 150)) === 0 || t === params.ticks - 1) {
+        updateCharts(rec);
+        updateStats(rec);
+      }
+    }
+    if (t < params.ticks) {
+      animFrame = requestAnimationFrame(frame);
+    } else {
+      const last = sim.history[sim.history.length - 1];
+      updateCharts(last);
+      updateStats(last);
+      document.getElementById('statusBar').innerHTML = `Completed ${params.ticks} ticks.`;
+    }
+  }
+  animFrame = requestAnimationFrame(frame);
+}
+
+function togglePause() {
+  if (!sim) return;
+  paused = !paused;
+  if (!paused) {
+    document.getElementById('statusBar').innerHTML = '<span class="running">Running...</span>';
+    const params = getParams();
+    const stepsPerFrame = Math.max(1, Math.floor(params.ticks / 300));
+    let t = sim.tick;
+
+    function frame() {
+      if (paused) return;
+      for (let i = 0; i < stepsPerFrame && t < params.ticks; i++, t++) {
+        const rec = sim.step();
+        if (t % Math.max(1, Math.floor(params.ticks / 150)) === 0 || t === params.ticks - 1) {
+          updateCharts(rec);
+          updateStats(rec);
+        }
+      }
+      if (t < params.ticks) {
+        animFrame = requestAnimationFrame(frame);
+      } else {
+        const last = sim.history[sim.history.length - 1];
+        updateCharts(last);
+        updateStats(last);
+        document.getElementById('statusBar').innerHTML = `Completed ${params.ticks} ticks.`;
+      }
+    }
+    animFrame = requestAnimationFrame(frame);
+  } else {
+    document.getElementById('statusBar').innerHTML = '<span class="paused">Paused at tick ' + sim.tick + '</span>';
+  }
+}
+
+function resetSimulation() {
+  if (animFrame) cancelAnimationFrame(animFrame);
+  sim = null;
+  paused = false;
+  clearCharts();
+  document.getElementById('statusBar').innerHTML = 'Ready. Click Run to start simulation.';
+  document.getElementById('statTick').textContent = '0';
+  document.getElementById('statFirms').textContent = '0';
+  document.getElementById('statMeanFit').textContent = '0';
+  document.getElementById('statBestFit').textContent = '0';
+  document.getElementById('statExploiters').textContent = '0';
+  document.getElementById('statExplorers').textContent = '0';
+  document.getElementById('statAdaptive').textContent = '0';
+  document.getElementById('statExpShare').textContent = '0%';
+  document.getElementById('statExrShare').textContent = '0%';
+  document.getElementById('statAdaShare').textContent = '0%';
+  document.getElementById('statHHI').textContent = '0';
+  document.getElementById('statDiversity').textContent = '0';
+  document.getElementById('statCoverage').textContent = '0%';
+  document.getElementById('statShifts').textContent = '0';
+}
+
+function applyPreset(name) {
+  const presets = {
+    baseline: { numFirms: 30, numTicks: 300, numNiches: 5, shiftRate: 0.05, exploiterFrac: 0.33, explorerFrac: 0.33, mutationRate: 0.1 },
+    stable: { numFirms: 30, numTicks: 300, numNiches: 5, shiftRate: 0.0, exploiterFrac: 0.33, explorerFrac: 0.33, mutationRate: 0.1 },
+    volatile: { numFirms: 30, numTicks: 300, numNiches: 5, shiftRate: 0.2, exploiterFrac: 0.33, explorerFrac: 0.33, mutationRate: 0.1 },
+    allExploiters: { numFirms: 30, numTicks: 300, numNiches: 5, shiftRate: 0.05, exploiterFrac: 1.0, explorerFrac: 0.0, mutationRate: 0.1 },
+    allExplorers: { numFirms: 30, numTicks: 300, numNiches: 5, shiftRate: 0.05, exploiterFrac: 0.0, explorerFrac: 1.0, mutationRate: 0.1 },
+    largeEconomy: { numFirms: 100, numTicks: 300, numNiches: 10, shiftRate: 0.05, exploiterFrac: 0.33, explorerFrac: 0.33, mutationRate: 0.1 },
+  };
+  const p = presets[name];
+  if (!p) return;
+  document.getElementById('numFirms').value = p.numFirms;
+  document.getElementById('numTicks').value = p.numTicks;
+  document.getElementById('numNiches').value = p.numNiches;
+  document.getElementById('shiftRate').value = p.shiftRate;
+  document.getElementById('exploiterFrac').value = p.exploiterFrac;
+  document.getElementById('explorerFrac').value = p.explorerFrac;
+  document.getElementById('mutationRate').value = p.mutationRate;
+  runSimulation();
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', () => {
+  initCharts();
+});
+</script>
+</body>
+</html>

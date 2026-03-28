@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A Journey Through the Economy — Complexity Economics Walkthrough</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #faf9f5;
+    --bg-card: #ffffff;
+    --bg-hover: #f5f3ee;
+    --bg-metric: #f0eeea;
+    --bg-tryit: #edf5ef;
+    --text-primary: #1a1a2e;
+    --text-secondary: #4a4a5a;
+    --text-tertiary: #7a7a8a;
+    --text-light: #9a9aaa;
+    --accent-teal: #2a7f7f;
+    --accent-teal-light: #e8f4f4;
+    --accent-coral: #c96b5a;
+    --accent-coral-light: #fdf0ed;
+    --accent-blue: #3a5a8c;
+    --accent-blue-light: #edf1f7;
+    --accent-green: #4a8a5a;
+    --accent-green-light: #edf5ef;
+    --accent-amber: #b08a3a;
+    --accent-amber-light: #fdf7ea;
+    --border: #e2e0da;
+    --border-light: #edecea;
+    --shadow-sm: 0 1px 3px rgba(26,26,46,0.06);
+    --shadow-md: 0 4px 12px rgba(26,26,46,0.08);
+    --shadow-lg: 0 8px 24px rgba(26,26,46,0.10);
+    --radius: 8px;
+    --radius-lg: 12px;
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-serif: Georgia, 'Times New Roman', serif;
+    --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font-sans);
+    background: var(--bg);
+    color: var(--text-primary);
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* ── PROGRESS BAR ────────────── */
+  .progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent-teal), var(--accent-blue));
+    z-index: 200;
+    transition: width 0.1s linear;
+    width: 0%;
+  }
+
+  /* ── NAV ─────────────────────── */
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(250,249,245,0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border-light);
+    padding: 0 2rem;
+  }
+  .nav-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+  }
+  .nav-logo {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    text-decoration: none;
+    letter-spacing: -0.02em;
+  }
+  .nav-links {
+    display: flex;
+    gap: 1.5rem;
+    list-style: none;
+    align-items: center;
+  }
+  .nav-links a {
+    text-decoration: none;
+    color: var(--text-secondary);
+    font-size: 0.82rem;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--accent-teal); }
+  .reading-time {
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
+    font-family: var(--font-mono);
+    border-left: 1px solid var(--border);
+    padding-left: 1.5rem;
+    margin-left: 0.5rem;
+  }
+
+  /* ── HERO ─────────────────────── */
+  .hero {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 6rem 2rem 4rem;
+    text-align: center;
+  }
+  .hero-overline {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--accent-teal);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 1.5rem;
+  }
+  .hero h1 {
+    font-family: var(--font-serif);
+    font-size: clamp(2.2rem, 5vw, 3.2rem);
+    font-weight: 400;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+  }
+  .hero-subtitle {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    max-width: 560px;
+    margin: 0 auto 2rem;
+  }
+  .hero-meta {
+    font-size: 0.8rem;
+    color: var(--text-tertiary);
+    font-family: var(--font-mono);
+  }
+
+  /* ── ARTICLE BODY ────────────── */
+  .article {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 2rem 6rem;
+  }
+
+  .article p {
+    font-size: 1.05rem;
+    line-height: 1.8;
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+  }
+
+  .article a {
+    color: var(--accent-teal);
+    text-decoration: underline;
+    text-decoration-color: rgba(42,127,127,0.3);
+    text-underline-offset: 3px;
+    transition: text-decoration-color 0.2s;
+  }
+  .article a:hover {
+    text-decoration-color: var(--accent-teal);
+  }
+
+  /* ── ACT HEADERS ─────────────── */
+  .act-header {
+    margin: 5rem 0 3rem;
+    padding-top: 3rem;
+    border-top: 1px solid var(--border);
+  }
+  .act-label {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--accent-teal);
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    margin-bottom: 0.75rem;
+  }
+  .act-title {
+    font-family: var(--font-serif);
+    font-size: clamp(1.6rem, 3.5vw, 2rem);
+    font-weight: 400;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+    color: var(--text-primary);
+    margin-bottom: 0.75rem;
+  }
+  .act-subtitle {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    font-style: italic;
+  }
+
+  /* ── CHAPTER HEADERS ─────────── */
+  .chapter {
+    margin: 4rem 0 2rem;
+    scroll-margin-top: 80px;
+  }
+  .chapter-number {
+    font-family: var(--font-serif);
+    font-size: 3rem;
+    font-weight: 400;
+    color: var(--border);
+    line-height: 1;
+    margin-bottom: 0.25rem;
+  }
+  .chapter-title {
+    font-family: var(--font-sans);
+    font-size: 1.35rem;
+    font-weight: 600;
+    line-height: 1.35;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+    margin-bottom: 0.3rem;
+  }
+  .chapter-sim {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--text-tertiary);
+    margin-bottom: 1.5rem;
+  }
+
+  /* ── PULL QUOTES ─────────────── */
+  .pullquote {
+    margin: 2.5rem 0;
+    padding: 1.5rem 0 1.5rem 2rem;
+    border-left: 3px solid var(--accent-teal);
+  }
+  .pullquote p {
+    font-family: var(--font-serif);
+    font-size: 1.2rem;
+    font-style: italic;
+    line-height: 1.6;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+  }
+  .pullquote cite {
+    font-family: var(--font-sans);
+    font-size: 0.8rem;
+    font-style: normal;
+    color: var(--text-tertiary);
+  }
+
+  /* ── KEY METRIC ──────────────── */
+  .key-metric {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    margin: 1.5rem 0;
+    padding: 1rem 1.5rem;
+    background: var(--bg-metric);
+    border-radius: var(--radius);
+    border: 1px solid var(--border-light);
+  }
+  .key-metric .number {
+    font-family: var(--font-mono);
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--accent-teal);
+    line-height: 1;
+  }
+  .key-metric .label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.3;
+    max-width: 280px;
+  }
+
+  /* ── TRY IT BOX ──────────────── */
+  .try-it {
+    margin: 2rem 0;
+    padding: 1.25rem 1.5rem;
+    background: var(--bg-tryit);
+    border: 1px solid rgba(74,138,90,0.2);
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .try-it-icon {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--accent-green);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: 700;
+  }
+  .try-it-content {
+    flex: 1;
+  }
+  .try-it-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--accent-green);
+    margin-bottom: 0.15rem;
+  }
+  .try-it-text {
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    margin: 0;
+    line-height: 1.5;
+  }
+  .try-it-text a {
+    color: var(--accent-green);
+    font-weight: 600;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(74,138,90,0.3);
+    transition: border-color 0.2s;
+  }
+  .try-it-text a:hover {
+    border-color: var(--accent-green);
+  }
+
+  /* ── COMING SOON ─────────────── */
+  .coming-soon {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent-amber);
+    background: var(--accent-amber-light);
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    vertical-align: middle;
+    margin-left: 0.3rem;
+  }
+
+  /* ── THREAD DIVIDER ──────────── */
+  .thread {
+    margin: 3rem 0;
+    padding: 1.25rem 1.5rem;
+    background: var(--accent-teal-light);
+    border-radius: var(--radius);
+    border-left: 3px solid var(--accent-teal);
+  }
+  .thread-label {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--accent-teal);
+    margin-bottom: 0.4rem;
+  }
+  .thread p {
+    font-size: 0.92rem;
+    color: var(--text-primary);
+    margin: 0;
+    line-height: 1.6;
+    font-weight: 500;
+  }
+
+  /* ── FOOTER ──────────────────── */
+  .footer {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 3rem 2rem;
+    border-top: 1px solid var(--border);
+    text-align: center;
+  }
+  .footer p {
+    font-size: 0.82rem;
+    color: var(--text-tertiary);
+    line-height: 1.6;
+  }
+  .footer a {
+    color: var(--accent-teal);
+    text-decoration: none;
+  }
+  .footer a:hover { text-decoration: underline; }
+
+  /* ── PRINT ───────────────────── */
+  @media print {
+    .nav, .progress-bar { display: none; }
+    .hero { padding-top: 2rem; }
+    .article { padding-bottom: 2rem; }
+    .try-it { border: 1px solid #ccc; }
+    body { font-size: 11pt; }
+    .pullquote { break-inside: avoid; }
+    .chapter { break-before: auto; }
+    .act-header { break-before: page; }
+  }
+
+  /* ── RESPONSIVE ──────────────── */
+  @media (max-width: 768px) {
+    .hero { padding: 4rem 1.25rem 3rem; }
+    .article { padding: 0 1.25rem 4rem; }
+    .nav { padding: 0 1rem; }
+    .nav-links { gap: 1rem; }
+    .reading-time { display: none; }
+    .pullquote { padding-left: 1.25rem; margin-left: 0; margin-right: 0; }
+    .pullquote p { font-size: 1.05rem; }
+    .key-metric { flex-direction: column; gap: 0.25rem; }
+    .key-metric .number { font-size: 1.6rem; }
+    .chapter-number { font-size: 2.2rem; }
+    .try-it { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+  }
+
+  @media (max-width: 480px) {
+    .nav-links a:not(:first-child):not(:nth-child(2)) { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progress"></div>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">Complexity Economics Lab</a>
+    <ul class="nav-links">
+      <li><a href="index.html">Dashboard</a></li>
+      <li><a href="findings.html">Findings</a></li>
+      <li><a href="#prologue">Prologue</a></li>
+      <li><a href="#act-1">Agents</a></li>
+      <li><a href="#act-2">Structures</a></li>
+      <li><a href="#act-3">Dynamics</a></li>
+      <li><a href="#act-4">Evolution</a></li>
+      <li><a href="#act-5">The Whole</a></li>
+      <li><span class="reading-time">~25 min read</span></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════ HERO ═══ -->
+
+<header class="hero">
+  <div class="hero-overline">A Guided Tour of 16 Simulations</div>
+  <h1>A Journey Through the Economy</h1>
+  <p class="hero-subtitle">What happens when you stop assuming the economy is in equilibrium and let it evolve? A narrative walkthrough of the complexity economics simulations inspired by Eric Beinhocker's <em>The Origin of Wealth</em>.</p>
+  <div class="hero-meta">16 interactive models &middot; 96 experiments &middot; One story</div>
+</header>
+
+<!-- ═══════════════════════════════════════ ARTICLE ═══ -->
+
+<article class="article">
+
+<!-- ─── PROLOGUE ─────────────────────────────────────── -->
+
+<div class="act-header" id="prologue">
+  <div class="act-label">Prologue</div>
+  <div class="act-title">The Equilibrium Illusion</div>
+</div>
+
+<p>For over a century, economics has rested on a comforting metaphor: the economy as a machine tending toward balance. Set the interest rates right, correct the market failures, and the system will find its equilibrium -- a stable resting point where supply meets demand, prices reflect information, and rational agents maximize their utility. It is an elegant framework. It has produced Nobel Prizes and shaped policy from Washington to Brussels. There is only one problem: it does not describe the world.</p>
+
+<p>In 2006, Eric Beinhocker published <em>The Origin of Wealth</em>, a sweeping challenge to this vision. His thesis is precise: the economy is not an equilibrium machine but a <strong>complex adaptive system</strong> -- an evolving ecology of strategies, technologies, and institutions that perpetually generates novelty, never settles into rest, and produces its own crises as naturally as it produces its own growth. Financial crashes arise without obvious cause. Business cycles persist despite sophisticated policy. Wealth distributes itself according to power laws, not bell curves. Organizations that look perfectly adapted collapse overnight.</p>
+
+<p>What follows is a journey through 14 computational simulations, each designed to make one of Beinhocker's arguments concrete and measurable. These are not idle abstractions. Each model captures, in miniature, a mechanism that shapes how real economies work. Together, they tell a story -- about agents who reason imperfectly, structures that amplify small causes into large effects, dynamics that never rest, and evolution as the master algorithm of wealth creation.</p>
+
+<p>Every simulation is interactive. You can run them yourself, change the parameters, and watch the complexity unfold. But first, let us walk through them as a connected narrative.</p>
+
+<!-- ═══════════════════════════════════ ACT I ═══ -->
+
+<div class="act-header" id="act-1">
+  <div class="act-label">Act I</div>
+  <div class="act-title">The Agents</div>
+  <div class="act-subtitle">How people really decide</div>
+</div>
+
+<p>Traditional economics begins with a hero: the rational agent. This figure processes all available information, forms correct expectations about the future, and maximizes a well-defined utility function. It is a useful fiction for some purposes, but it is a fiction nonetheless. The first three simulations reveal what happens when we replace this idealized character with something closer to real human cognition.</p>
+
+<!-- ─── Ch 1: El Farol Bar ──────────────────────────── -->
+
+<div class="chapter" id="ch-1">
+  <div class="chapter-number">1</div>
+  <div class="chapter-title">The Bar Problem: When Rationality Has No Answer</div>
+  <div class="chapter-sim">Simulation 10 &mdash; El Farol Bar Problem</div>
+</div>
+
+<p>Every Thursday night in Santa Fe, New Mexico, a bar called El Farol hosts live Irish music. You want to go -- but only if the bar is not too crowded. If you predict it will be crowded, you stay home. But if enough people predict crowding and stay home, the bar is empty and you should have gone. And if everyone reasons that way, they all show up and the bar is packed again.</p>
+
+<p>This thought experiment, conceived by the economist W. Brian Arthur, is a miniature demolition of rational expectations theory. There is no deductively "correct" answer. If a strategy becomes popular, it invalidates itself. The very act of prediction changes the outcome being predicted.</p>
+
+<div class="pullquote">
+  <p>"If there were a rational solution, all agents would use it, and by definition it would be wrong."</p>
+  <cite>-- Beinhocker, on the El Farol problem</cite>
+</div>
+
+<p>In our simulation, 100 agents each maintain a portfolio of heuristic strategies -- trend-followers, contrarians, periodic attenders, randomizers -- and play whichever has worked best recently. The result is striking. Mean attendance self-organizes to hover near the 60-person comfort threshold, even though no one is coordinating. Attendance oscillates above and below the threshold roughly every other week, driven by nothing but the agents' own reactions to each other.</p>
+
+<div class="key-metric">
+  <span class="number">45%</span>
+  <span class="label">average prediction accuracy -- worse than a coin flip, because the system punishes correct predictions</span>
+</div>
+
+<p>The deepest finding is that accuracy itself is self-limiting. No strategy achieves better than 47% accuracy across any of our experiments, because the moment a strategy works, everyone adopts it, and it stops working. The rational expectations framework assumes agents can form correct predictions about the economy. El Farol shows that in a self-referential system, "correct prediction" is a contradiction in terms.</p>
+
+<div class="try-it">
+  <div class="try-it-icon">&#9654;</div>
+  <div class="try-it-content">
+    <div class="try-it-label">Try it yourself</div>
+    <p class="try-it-text">Watch 100 agents decide whether to go to the bar. Adjust the threshold and population to see how coordination fails. <a href="10-el-farol-bar/index.html">Open the El Farol simulation</a></p>
+  </div>
+</div>
+
+<!-- ─── Ch 2: Stock Market ──────────────────────────── -->
+
+<div class="chapter" id="ch-2">
+  <div class="chapter-number">2</div>
+  <div class="chapter-title">The Adaptive Market: Learning Beats Rationality</div>
+  <div class="chapter-sim">Simulation 01 &mdash; SFI Artificial Stock Market</div>
+</div>
+
+<p>If agents cannot be perfectly rational, what happens when we let them <em>learn</em>? The Santa Fe Institute Artificial Stock Market answers this question by populating a market with traders who each maintain a library of forecasting rules that evolve through a genetic algorithm. Successful rules reproduce. Failures are culled. Mutations introduce novelty. A market-clearing mechanism sets the price.</p>
+
+<p>The comparison between rational and learning agents is devastating for the traditional view. The "rational" market -- where each agent uses a single fixed rule -- produces the worst outcomes by every measure: double the volatility, persistent mispricing, near-zero trading volume, and extreme wealth inequality (Gini 0.60). Without heterogeneous beliefs, no one trades because no one disagrees.</p>
+
+<div class="key-metric">
+  <span class="number">2.55</span>
+  <span class="label">Hill tail index of learning market returns -- strikingly close to the empirical cubic law (~3) found in real equity markets</span>
+</div>
+
+<p>The learning market, by contrast, generates every "stylized fact" that characterizes real financial markets: fat-tailed returns (excess kurtosis of 45), volatility clustering (absolute return autocorrelation of 0.49), active trading (volume 100x higher), and moderate wealth inequality. These properties are not fragile artifacts of specific parameters -- every learning configuration we tested, across mutation rates, population sizes, and evolutionary tempos, produces fat tails and clustered volatility. They are the natural signature of adaptive agents co-evolving in a complex system.</p>
+
+<p>The most revealing experiment: when we accelerated the genetic algorithm (evolving strategies every 50 ticks instead of 250), kurtosis tripled to 141. The evolutionary mechanism that allows agents to adapt is the same mechanism that generates systemic tail risk. Adaptation and instability are two sides of the same coin.</p>
+
+<div class="try-it">
+  <div class="try-it-icon">&#9654;</div>
+  <div class="try-it-content">
+    <div class="try-it-label">Try it yourself</div>
+    <p class="try-it-text">Compare rational vs. learning traders. Watch fat tails and volatility clustering emerge from the bottom up. <a href="01-stock-market/index.html">Open the Stock Market simulation</a></p>
+  </div>
+</div>
+
+<!-- ─── Ch 3: Prisoner's Dilemma ────────────────────── -->
+
+<div class="chapter" id="ch-3">
+  <div class="chapter-number">3</div>
+  <div class="chapter-title">The Cooperation Puzzle: Structure Makes the Rules</div>
+  <div class="chapter-sim">Simulation 06 &mdash; Prisoner's Dilemma</div>
+</div>
+
+<p>One of the oldest questions in social science: how does cooperation emerge among self-interested agents? In the Prisoner's Dilemma, mutual cooperation produces the best collective outcome, but each individual benefits from defecting while the other cooperates. Standard game theory predicts universal defection -- and in our well-mixed tournament, that is exactly what happens. AllD (Always Defect) achieves 100% fixation within 50 generations. Every cooperative strategy goes extinct.</p>
+
+<p>But place the same agents on a spatial grid, where they interact only with neighbors, and the outcome inverts completely.</p>
+
+<div class="key-metric">
+  <span class="number">100%</span>
+  <span class="label">cooperation rate on the spatial grid, vs. 0% in the well-mixed tournament -- same agents, same strategies, same payoffs</span>
+</div>
+
+<p>This is the single most important result from the simulation. The same seven strategies, the same payoff matrix, the same initial conditions produce diametrically opposite outcomes depending on population structure. On the grid, cooperative strategies form protective clusters that resist invasion by defectors. Grudger (cooperate until betrayed, then defect forever) dominates at 46%, acting as an immune system that walls off any incursion by defectors.</p>
+
+<p>Add noise -- a 10% chance of accidentally defecting -- and the strategy landscape transforms again. Grudger's "never forgive" policy becomes costly when accidents happen, and Pavlov (Win-Stay, Lose-Shift) rises to 98% dominance. Pavlov self-corrects errors: after an accidental mutual defection, both Pavlov players shift back to cooperation. The environment selects not for the cleverest strategy but for the most robust one.</p>
+
+<div class="pullquote">
+  <p>"The rules of the game -- trust, reciprocity, punishment of defection -- can themselves emerge as adaptive strategies in an evolutionary system."</p>
+  <cite>-- Beinhocker, on emergent institutions</cite>
+</div>
+
+<div class="try-it">
+  <div class="try-it-icon">&#9654;</div>
+  <div class="try-it-content">
+    <div class="try-it-label">Try it yourself</div>
+    <p class="try-it-text">Watch cooperation emerge on the spatial grid, then collapse in the well-mixed tournament. Add noise and watch Pavlov take over. <a href="06-prisoners-dilemma/index.html">Open the Prisoner's Dilemma simulation</a></p>
+  </div>
+</div>
+
+<div class="thread">
+  <div class="thread-label">The thread</div>
+  <p>Agents are inductive reasoners, not rational optimizers. They use heuristics, learn from experience, and their predictions can never be consistently correct. Cooperation, market dynamics, and coordination all depend on <em>structure</em> and <em>adaptation</em>, not on the fiction of perfect rationality.</p>
+</div>
+
+<!-- ═══════════════════════════════════ ACT II ═══ -->
+
+<div class="act-header" id="act-2">
+  <div class="act-label">Act II</div>
+  <div class="act-title">The Structures</div>
+  <div class="act-subtitle">How systems amplify</div>
+</div>
+
+<p>If agents are imperfect, the <em>systems</em> they inhabit make things far more interesting. Simple structures -- chains of suppliers, networks of interacting decisions, food webs -- can amplify tiny perturbations into dramatic emergent behavior. The next three simulations show how.</p>
+
+<!-- ─── Ch 4: Beer Game ─────────────────────────────── -->
+
+<div class="chapter" id="ch-4">
+  <div class="chapter-number">4</div>
+  <div class="chapter-title">The Bullwhip: Delay Creates Chaos from Order</div>
+  <div class="chapter-sim">Simulation 02 &mdash; Beer Distribution Game</div>
+</div>
+
+<p>The Beer Game models a four-echelon supply chain: Retailer, Wholesaler, Distributor, Brewery. Consumer demand changes exactly once -- a step from 4 to 8 cases per week at week 5. After that, demand is constant forever. There are no further shocks, no surprises, no uncertainty.</p>
+
+<p>Yet the supply chain erupts into 35 weeks of wild oscillation. The Wholesaler amplifies order variance by 8x. The Brewery accumulates 95 cases of excess inventory -- 12 weeks of demand sitting on the warehouse floor. Total system cost reaches $3,236, roughly double what a perfectly rational ordering policy would produce.</p>
+
+<p>But the human tax (2x from bounded rationality) is not the story. The story is the <em>structure</em> tax.</p>
+
+<div class="key-metric">
+  <span class="number">44x</span>
+  <span class="label">cost multiplier when shipping delay increases from 2 to 5 ticks -- structure dominates rationality by an order of magnitude</span>
+</div>
+
+<p>Delay is the master variable. Adding one tick of delay (from 4 to 5) nearly quadruples system cost. At 5-tick delay, the Retailer's bullwhip ratio reaches 60x -- meaning its orders bear almost no resemblance to actual consumer demand. The supply chain is not transmitting information; it is generating noise. Upstream agents are responding to the system's own echoes, not to customer behavior.</p>
+
+<p>Information sharing helps: transmitting actual consumer demand to all echelons cuts costs by 43%. But even with perfect information, at 4-tick delay the system still costs 5x the baseline. Beer still takes four weeks to arrive regardless of what you know. Physics beats information.</p>
+
+<div class="pullquote">
+  <p>"Business cycles may be endogenous -- generated by the structure of economic systems -- rather than caused by external shocks."</p>
+  <cite>-- Beinhocker, Chapter 8</cite>
+</div>
+
+<div class="try-it">
+  <div class="try-it-icon">&#9654;</div>
+  <div class="try-it-content">
+    <div class="try-it-label">Try it yourself</div>
+    <p class="try-it-text">Change one demand step, then watch the supply chain amplify it into 35 weeks of chaos. Adjust delays and watch costs explode. <a href="02-beer-game/index.html">Open the Beer Game simulation</a></p>
+  </div>
+</div>
+
+<!-- ─── Ch 5: Boolean Networks ──────────────────────── -->
+
+<div class="chapter" id="ch-5">
+  <div class="chapter-number">5</div>
+  <div class="chapter-title">The Edge of Chaos: Where Organizations Live or Die</div>
+  <div class="chapter-sim">Simulation 03 &mdash; Boolean Networks</div>
+</div>
+
+<p>Stuart Kauffman's Boolean networks are among the simplest models in complexity science and among the most profound. Take N nodes, each holding a binary state. Wire each node to K random inputs. Assign random Boolean functions. Update synchronously. What happens depends almost entirely on K.</p>
+
+<p>At K=1, perturbations die out. Flip one bit, and on average fewer than 3 of 50 nodes are ever affected. The system is frozen: stable but incapable of coordinated response. At K=5, perturbations engulf everything -- 93% of the network is affected by a single bit flip, and no stable configurations can be found at all. The system is chaotic: every change cascades everywhere, making prediction and coordination impossible.</p>
+
+<div class="key-metric">
+  <span class="number">K=2</span>
+  <span class="label">the critical connectivity where Kauffman's networks sit at the "edge of chaos" -- maximally capable of complex computation and adaptation</span>
+</div>
+
+<p>At K=2, the system sits at criticality with remarkable precision (measured Derrida parameter 1.010 vs. theoretical 1.000). Perturbations neither grow nor shrink. Most cascades are small, but occasional large avalanches reach 48% of the network. This is the regime where the system can both remember (small perturbations are contained) and adapt (large perturbations propagate when needed).</p>
+
+<p>The implications for organizations are direct. The same connectivity that works at small scale produces paralysis at large scale: at K=4 with 20 nodes, the system is manageable; at 150 nodes, cascades engulf 90% of the network and no stable configurations exist. This is not a management failure -- it is mathematical inevitability. Hierarchy tames the chaos by creating modular firebreaks, cutting cascade sizes nearly in half at scale.</p>
+
+<div class="try-it">
+  <div class="try-it-icon">&#9654;</div>
+  <div class="try-it-content">
+    <div class="try-it-label">Try it yourself</div>
+    <p class="try-it-text">Flip one node and watch the cascade propagate. Compare ordered, critical, and chaotic regimes. <a href="03-boolean-network/index.html">Open the Boolean Network simulation</a></p>
+  </div>
+</div>
+
+<!-- ─── Ch 6: Predator-Prey ─────────────────────────── -->
+
+<div class="chapter" id="ch-6">
+  <div class="chapter-number">6</div>
+  <div class="chapter-title">The Eternal Cycle: Oscillations from Interaction</div>
+  <div class="chapter-sim">Simulation 12 &mdash; Predator-Prey</div>
+</div>
+
+<p>The Lotka-Volterra predator-prey model is a century old, yet its lesson remains underappreciated in economics. Place prey and predators on a grid with simple rules -- prey eat grass and reproduce, predators eat prey and reproduce, both starve without food. No external forcing, no seasonal cycles, no random shocks. What emerges are sustained oscillations with a period of roughly 56 ticks, purely from the interaction rules.</p>
+
+<p>Prey boom when predators are scarce. Predators boom when prey are abundant. Then prey crash under predation pressure. Predators decline from starvation. The cycle repeats, endlessly, driven by nothing but the lag between population growth and predation. The oscillations are not perfectly periodic -- amplitude and period vary from cycle to cycle due to stochastic effects and spatial heterogeneity -- but the cyclical pattern is inexorable.</p>
+
+<p>The most important finding is the qualitative difference between the mathematical (ODE) and agent-based versions. The ODE guarantees eternal oscillation: populations can approach zero but never reach it. The agent-based model can and does produce extinctions. When predators dropped to just 1 individual in our fast-starvation experiment, one unlucky tick would have ended the species forever. The deterministic equilibrium model misses the most important feature of real systems: they can collapse.</p>
+
+<div class="key-metric">
+  <span class="number">56</span>
+  <span class="label">tick oscillation period, generated entirely by interaction -- no external driver needed</span>
+</div>
+
+<div class="try-it">
+  <div class="try-it-icon">&#9654;</div>
+  <div class="try-it-content">
+    <div class="try-it-label">Try it yourself</div>
+    <p class="try-it-text">Watch prey and predator populations chase each other through boom-bust cycles on the grid. Compare the agent model with the deterministic ODE. <a href="12-predator-prey/index.html">Open the Predator-Prey simulation</a></p>
+  </div>
+</div>
+
+<div class="thread">
+  <div class="thread-label">The thread</div>
+  <p>Simple structures create complex emergent behavior. Delayed feedback amplifies tiny perturbations into system-wide crises. Networks at the edge of chaos balance stability and adaptation. Cycles arise from interaction alone. The architecture of a system constrains its behavior more tightly than the sophistication of its agents.</p>
+</div>
+
+<!-- ═══════════════════════════════════ ACT III ═══ -->
+
+<div class="act-header" id="act-3">
+  <div class="act-label">Act III</div>
+  <div class="act-title">The Dynamics</div>
+  <div class="act-subtitle">How economies evolve</div>
+</div>
+
+<p>We have seen how imperfect agents interact within amplifying structures. Now the story deepens: when such systems run over time, they generate the large-scale patterns that define economic life -- inequality, segregation, catastrophic collapses, and the endless cycling between order and disruption.</p>
+
+<!-- ─── Ch 7: Sugarscape ────────────────────────────── -->
+
+<div class="chapter" id="ch-7">
+  <div class="chapter-number">7</div>
+  <div class="chapter-title">The Wealth Puzzle: Inequality from Identical Rules</div>
+  <div class="chapter-sim">Simulation 07 &mdash; Sugarscape</div>
+</div>
+
+<p>Epstein and Axtell's Sugarscape places agents on a landscape with two peaks of renewable sugar. Agents move, consume, and die according to identical behavioral rules. They differ only in randomly assigned traits: how far they can see (vision) and how much sugar they consume per tick (metabolism). There is no exploitation, no market power, no inheritance of advantage.</p>
+
+<p>Yet inequality emerges immediately and reliably. From an initial Gini coefficient of 0.22 (reflecting only endowment variation), the system settles at 0.375 -- comparable to many real-world pre-industrial economies. The top 10% hold wealth 39 times greater than the bottom 10%. Natural selection operates ruthlessly: no agent with metabolism=4 survives to tick 200. The survivors overwhelmingly have low metabolism (54% at the minimum of 1) and high vision (45% at 5 or 6).</p>
+
+<div class="key-metric">
+  <span class="number">0.375</span>
+  <span class="label">Gini coefficient emerging from agents with identical rules and random starting positions -- inequality is endogenous</span>
+</div>
+
+<p>Enable reproduction and the system transforms further. Over 300 ticks, population explodes from 400 to 1,302 as successful agents breed. Trait evolution is dramatic: 97% of agents converge to the minimum metabolism, and vision shifts strongly upward. But Gini drops to 0.148 because reproduction acts as a wealth-splitting mechanism -- you cannot accumulate runaway wealth when exceeding the reproduction threshold halves your sugar. This is one of the few models that generates both realistic inequality and a natural mechanism to limit it.</p>
+
+<p>The large-grid experiment reveals an even more fundamental insight: geography can dominate genetics. When the grid quadruples in size, 100% of survivors cluster within 18 cells of a sugar peak. Agents with metabolism=3 near a peak survive; agents with metabolism=1 placed in the desert do not. Location matters more than ability.</p>
+
+<div class="pullquote">
+  <p>"Wealth inequality is not imposed externally but emerges endogenously from agent heterogeneity interacting with resource geography."</p>
+  <cite>-- The complexity economics perspective</cite>
+</div>
+
+<div class="try-it">
+  <div class="try-it-icon">&#9654;</div>
+  <div class="try-it-content">
+    <div class="try-it-label">Try it yourself</div>
+    <p class="try-it-text">Watch inequality emerge from identical rules. Enable reproduction and observe trait evolution in real time. <a href="07-sugarscape/index.html">Open the Sugarscape simulation</a></p>
+  </div>
+</div>
+
+<!-- ─── Ch 8: Schelling ─────────────────────────────── -->
+
+<div class="chapter" id="ch-8">
+  <div class="chapter-number">8</div>
+  <div class="chapter-title">The Segregation Paradox: Mild Preferences, Extreme Outcomes</div>
+  <div class="chapter-sim">Simulation 11 &mdash; Schelling Segregation</div>
+</div>
+
+<p>Thomas Schelling's model is perhaps the most elegant demonstration of emergence in all of social science. Place two types of agents on a grid. Each agent has a simple rule: if fewer than X% of my neighbors are like me, move to a random empty cell. That is the entire model.</p>
+
+<p>Set the threshold at 30% -- agents are happy being a 30% minority, tolerating 70% of neighbors being different. This is a mild preference by any standard. Run the simulation.</p>
+
+<div class="key-metric">
+  <span class="number">75%</span>
+  <span class="label">segregation from a 30% tolerance threshold -- the micro-macro disconnect is dramatic and unavoidable</span>
+</div>
+
+<p>The system converges in just 10 ticks with 705 moves, producing neighborhoods that are 75% homogeneous. Nobody wanted this. Nobody coordinated this. Agents who were perfectly happy being a minority collectively produced a world far more segregated than anyone demanded. The largest cluster reaches 670 agents -- nearly 77% of one type in a single contiguous region.</p>
+
+<p>The relationship between threshold and segregation is sharply non-linear. At 10% threshold, amplification is trivial (7%). At 30%, it is major (49%). At 50%, neighborhoods are 90% homogeneous. At 75%, segregation is essentially perfect (99.8%), but at enormous cost: 65,820 moves over 95 ticks of shuffling. The system reaches the outcome eventually, but the path is tortuous.</p>
+
+<div class="try-it">
+  <div class="try-it-icon">&#9654;</div>
+  <div class="try-it-content">
+    <div class="try-it-label">Try it yourself</div>
+    <p class="try-it-text">Set a modest tolerance threshold and watch extreme segregation emerge. Adjust density and thresholds to explore the tipping point. <a href="11-schelling-segregation/index.html">Open the Schelling simulation</a></p>
+  </div>
+</div>
+
+<!-- ─── Ch 9: Sand Pile ─────────────────────────────── -->
+
+<div class="chapter" id="ch-9">
+  <div class="chapter-number">9</div>
+  <div class="chapter-title">The Sand Pile: Self-Organized Criticality</div>
+  <div class="chapter-sim">Simulation 13 &mdash; Sand Pile (BTW Model)</div>
+</div>
+
+<p>Drop one grain of sand at a time onto a pile. Eventually the pile reaches a state where adding a single grain can trigger an avalanche of any size -- from 1 toppling to thousands. This is self-organized criticality, the phenomenon Per Bak described as "how nature works," and it may be the most fundamental insight connecting physics to economics.</p>
+
+<p>In the Bak-Tang-Wiesenfeld sandpile model, grains accumulate on a grid. When a cell reaches threshold (4 grains), it topples, sending one grain to each neighbor. Those neighbors may in turn topple, creating a cascade. The pile naturally evolves to a critical state where 44% of cells sit at height 3 -- one grain below threshold -- creating a "loaded spring" configuration that enables cascade propagation.</p>
+
+<div class="key-metric">
+  <span class="number">1:600</span>
+  <span class="label">ratio of median to maximum avalanche size -- there is no "typical" event in a power-law system</span>
+</div>
+
+<p>The avalanche size distribution follows a power law with exponent ~1.26. The median avalanche involves 22 topplings. The largest involves 6,647. Both extremes, and everything in between, emerge from the same mechanism: one grain, dropped on one cell. There is no characteristic scale, no "normal" event size. This is the core insight of SOC as applied to economics: traditional risk models based on normal distributions systematically underestimate tail risk because they assume a typical event size exists. In power-law systems, extreme events are not outliers -- they are inevitable consequences of the system's dynamics.</p>
+
+<div class="try-it">
+  <div class="try-it-icon">&#9654;</div>
+  <div class="try-it-content">
+    <div class="try-it-label">Try it yourself</div>
+    <p class="try-it-text">Drop grains and watch the pile reach criticality. See how one grain can trigger an avalanche spanning the entire grid. <a href="13-sand-pile/index.html">Open the Sand Pile simulation</a></p>
+  </div>
+</div>
+
+<!-- ─── Ch 10: Punctuated Equilibrium ───────────────── -->
+
+<div class="chapter" id="ch-10">
+  <div class="chapter-number">10</div>
+  <div class="chapter-title">Creative Destruction: The System's Natural Mode</div>
+  <div class="chapter-sim">Simulation 04 &mdash; Punctuated Equilibrium</div>
+</div>
+
+<p>If sand piles demonstrate self-organized criticality in physics, the punctuated equilibrium ecosystem simulation demonstrates it in evolution. Species interact through a directed network of mutualistic and competitive relationships. Fitness is not intrinsic but relational -- you thrive when the species that support you are themselves thriving. Each tick, the least-fit species is replaced, and its neighbors are perturbed.</p>
+
+<p>The result: cascade sizes follow a power law. Over 500 ticks, the baseline ecosystem (100 species) produced 174 cascades with a power-law exponent of approximately 2.0. Most cascades replaced just 1-3 species. But the largest replaced 21 -- a fifth of the ecosystem wiped out in a single event. The system never reaches permanent stability, cycling endlessly between growth and disruption across 24 phase transitions.</p>
+
+<div class="pullquote">
+  <p>"Creative destruction is not an occasional disruption of an otherwise stable system -- it is the system's natural mode of operation."</p>
+  <cite>-- Beinhocker, Chapter 11</cite>
+</div>
+
+<p>Connectivity is the critical variable. Tripling connection density from 0.05 to 0.15 transforms the ecosystem from one with occasional small cascades (mean size 2.5) into a system of perpetual catastrophe (mean size 56.9). Dense networks cannot compartmentalize damage. Each replacement rewires a node with roughly 15 connections, affecting many species simultaneously, and those affected species are themselves highly connected. The shockwave propagates rapidly to most of the network.</p>
+
+<div class="key-metric">
+  <span class="number">23x</span>
+  <span class="label">increase in mean cascade size when connection density triples -- connectivity amplifies fragility dramatically</span>
+</div>
+
+<p>Size creates qualitative differences. Small ecosystems (N=20) undergo frequent, rapid turnover -- 94 phase transitions and 10 punctuation events. Large ecosystems (N=200) are more stable on average but produce rarer, catastrophic tail events: one cascade wiped out 60% of 200 species in a single event. This mirrors the real world: small island ecosystems undergo frequent turnover while continental systems experience rare mass extinctions.</p>
+
+<div class="try-it">
+  <div class="try-it-icon">&#9654;</div>
+  <div class="try-it-content">
+    <div class="try-it-label">Try it yourself</div>
+    <p class="try-it-text">Watch species replace the weakest, triggering cascades of creative destruction. Increase connectivity and observe the phase transition to perpetual catastrophe. <a href="04-punctuated-equilibrium/index.html">Open the Punctuated Equilibrium simulation</a></p>
+  </div>
+</div>
+
+<div class="thread">
+  <div class="thread-label">The thread</div>
+  <p>Power laws, emergence, and the arrow of complexity. Inequality arises from identical rules. Segregation emerges from mild preferences. Sand piles drive themselves to criticality. Ecosystems cycle endlessly between creation and destruction. None of this is designed. None of it is equilibrium. It is the natural behavior of complex adaptive systems.</p>
+</div>
+
+<!-- ═══════════════════════════════════ ACT IV ═══ -->
+
+<div class="act-header" id="act-4">
+  <div class="act-label">Act IV</div>
+  <div class="act-title">The Evolution</div>
+  <div class="act-subtitle">How wealth is created</div>
+</div>
+
+<p>We have seen what agents do, how structures amplify their behavior, and what dynamics emerge over time. Now we arrive at Beinhocker's central question: where does wealth come from? His answer is evolution -- not biological evolution, but a broader process of variation, selection, and amplification that operates on technologies, organizations, and business strategies.</p>
+
+<!-- ─── Ch 11: Technology Evolution ──────────────────── -->
+
+<div class="chapter" id="ch-11">
+  <div class="chapter-number">11</div>
+  <div class="chapter-title">Searching Fitness Landscapes: How Technology Evolves</div>
+  <div class="chapter-sim">Simulation 08 &mdash; Technology Evolution</div>
+</div>
+
+<p>Beinhocker argues that technological innovation is fundamentally combinatorial -- new technologies arise by recombining existing ones. The technology evolution simulation implements this idea using Kauffman's NK fitness landscapes, where firms search a 12-dimensional binary technology space through different strategies: local hill-climbing (incremental improvement), long-jump adaptation (radical leaps), and recombination (combining existing technologies).</p>
+
+<p>The clearest finding: no single search strategy dominates. The mixed-strategy baseline (40% local, 25% long-jump, 20% recombination) outperformed both pure strategies on final mean fitness. All-local-climbers converged fast but stagnated at 0.769, trapped on local optima with no way to escape. All-long-jumpers explored broadly but converged slowly, reaching only 0.764 because they lacked the fine-grained refinement needed to climb to the top of a peak.</p>
+
+<div class="key-metric">
+  <span class="number">0.784</span>
+  <span class="label">mean fitness of mixed-strategy population, beating both pure local (0.769) and pure long-jump (0.764) -- diversity of search wins</span>
+</div>
+
+<p>Landscape ruggedness drives market turbulence. On smooth landscapes (K=1), firms converge quickly to the single peak with low creative destruction (17 exits in 200 ticks). On rugged landscapes (K=8), firms face many local optima separated by deep valleys, producing the highest innovation (182 innovations), the highest destruction (40 exits), and the highest diversity (0.483). This maps directly to the real world: industries with complex, interdependent technologies (software, biotech) experience more Schumpeterian disruption than industries with modular ones (commodities).</p>
+
+<div class="pullquote">
+  <p>"The economy evolves not by firms improving in place, but by better technologies displacing worse ones."</p>
+  <cite>-- Beinhocker, on creative destruction</cite>
+</div>
+
+<div class="try-it">
+  <div class="try-it-icon">&#9654;</div>
+  <div class="try-it-content">
+    <div class="try-it-label">Try it yourself</div>
+    <p class="try-it-text">Watch firms search fitness landscapes with different strategies. Increase landscape ruggedness and observe creative destruction intensify. <a href="08-technology-evolution/index.html">Open the Technology Evolution simulation</a></p>
+  </div>
+</div>
+
+<!-- ─── Ch 12: Rigids vs Flexibles ──────────────────── -->
+
+<div class="chapter" id="ch-12">
+  <div class="chapter-number">12</div>
+  <div class="chapter-title">The Adaptability Trap: When Success Breeds Fragility</div>
+  <div class="chapter-sim">Simulation 05 &mdash; Rigids vs. Flexibles</div>
+</div>
+
+<p>If evolution favors adaptation, why do successful organizations fail? The Rigids vs. Flexibles simulation provides a devastatingly clear answer. In a hierarchy with tournament-based promotion, two types of agents compete: "Rigids" who always play the same strategy (and excel when it matches the environment), and "Flexibles" who observe and adapt (with some noise). During stable periods, the tournament promotes Rigids to the top because they outperform. The organization becomes a monoculture of specialists -- brilliantly adapted to the current environment, catastrophically unprepared for change.</p>
+
+<div class="key-metric">
+  <span class="number">96%</span>
+  <span class="label">rigid composition at the moment of the first environment switch -- the organization had systematically eliminated almost all adaptive capacity</span>
+</div>
+
+<p>In the high-stability experiment (500 ticks without disruption), performance peaked at 1.44 -- the highest of any experiment. The organization was 97.5% rigid, with exactly one Flexible agent remaining. This is the Thatcher Trap: the leader is perfectly matched to the regime, every metric looks excellent, and the evidence for purging flexibility is strongest precisely when the need for flexibility is greatest.</p>
+
+<p>Flip to high volatility (24 environment switches in 500 ticks), and the hierarchy inverts. The top level becomes 100% Flexible. Flexibles outperform Rigids on average (1.18 vs. 0.97). Transition costs are nearly zero. Recovery takes 6 ticks instead of 15. Overall performance is lower (1.04 vs. 1.44), but the organization never experiences a catastrophic crash.</p>
+
+<p>The performance-resilience tradeoff is real and steep. Maintaining diversity costs 25% of peak performance -- but you do not know how volatile the future will be while you are living in the present.</p>
+
+<div class="pullquote">
+  <p>"The key to long-term survival is not being the best adapted to the current environment, but being the most adaptable to environments that haven't arrived yet."</p>
+  <cite>-- Beinhocker, Chapters 12-13</cite>
+</div>
+
+<div class="try-it">
+  <div class="try-it-icon">&#9654;</div>
+  <div class="try-it-content">
+    <div class="try-it-label">Try it yourself</div>
+    <p class="try-it-text">Watch the tournament purge Flexibles during stability, then trigger an environment switch and see the organization struggle. <a href="05-rigids-flexibles/index.html">Open the Rigids vs. Flexibles simulation</a></p>
+  </div>
+</div>
+
+<!-- ─── Ch 13: Business Plans ───────────────────────── -->
+
+<div class="chapter" id="ch-13">
+  <div class="chapter-number">13</div>
+  <div class="chapter-title">Wealth as Fit Order: The Economy's DNA</div>
+  <div class="chapter-sim">Simulation 14 &mdash; Business Plans</div>
+</div>
+
+<p>Beinhocker's most original claim is that the fundamental unit of economic evolution is not the firm, the product, or the technology, but the <em>business plan</em> -- an integrated design that encodes Physical Technology (how to make things), Social Technology (how to organize people), and Strategy (how to match market demand). Wealth, in this framework, is "fit order": the degree to which business plans match the environment.</p>
+
+<p>The simulation makes this concrete. Each business plan lives on three NK fitness landscapes. Total fitness is multiplicative: PT x ST x market_fit. This means the weakest component always drags the whole plan down. A brilliant product (high PT) with poor market fit (low Strategy) generates little wealth -- and this is exactly what the data shows. Mean total fitness (~0.30-0.57) is far below any single component fitness (~0.65-1.0) because all three must work simultaneously.</p>
+
+<div class="key-metric">
+  <span class="number">+81%</span>
+  <span class="label">wealth increase under stable preferences -- but at the cost of diversity collapsing to near-zero (0.006)</span>
+</div>
+
+<p>Stable preferences produced total wealth of 35.93 vs. baseline 19.90 because Strategy fitness converged perfectly to 1.000 with no moving target. But diversity collapsed. Rapid preference shifts created a Red Queen effect: despite generating 37% more innovations, wealth stayed at baseline levels because the target kept moving. The economy ran fast just to stay in place.</p>
+
+<p>The exploration-exploitation tradeoff appeared with precision. Low mutation (0.01) produced higher wealth by preserving good solutions but at the cost of diversity. High mutation (0.15) destroyed accumulated knowledge faster than it could be replaced, dropping PT and ST fitness below baseline despite maximum diversity. Too much exploration is as damaging as too little.</p>
+
+<div class="try-it">
+  <div class="try-it-icon">&#9654;</div>
+  <div class="try-it-content">
+    <div class="try-it-label">Try it yourself</div>
+    <p class="try-it-text">Watch business plans evolve on fitness landscapes. Shift market preferences and watch the Red Queen effect unfold. <a href="14-business-plans/index.html">Open the Business Plans simulation</a></p>
+  </div>
+</div>
+
+<div class="thread">
+  <div class="thread-label">The thread</div>
+  <p>Evolution is the master algorithm. Technologies evolve through combinatorial search. Organizations face an unavoidable tradeoff between current fitness and future adaptability. Wealth is created when physical technology, social technology, and market strategy align. And no amount of optimization within the current paradigm protects against the next disruption.</p>
+</div>
+
+<!-- ═══════════════════════════════════ ACT V ═══ -->
+
+<div class="act-header" id="act-5">
+  <div class="act-label">Act V</div>
+  <div class="act-title">The Whole</div>
+  <div class="act-subtitle">Putting it together</div>
+</div>
+
+<p>We have toured the components: adaptive agents, amplifying structures, emergent dynamics, evolutionary processes. But the real economy is not a collection of separate models. It is all of these things happening simultaneously, interacting with each other, creating feedback loops within feedback loops. The final simulation attempts something ambitious: connecting the pieces.</p>
+
+<!-- ─── Ch 14: Integrated Economy ───────────────────── -->
+
+<div class="chapter" id="ch-14">
+  <div class="chapter-number">14</div>
+  <div class="chapter-title">When Everything Connects: The Integrated Economy</div>
+  <div class="chapter-sim">Simulation 09 &mdash; Integrated Economy</div>
+</div>
+
+<p>The Integrated Economy simulation weaves together four sub-models: a Beer Game supply chain, an SFI-style stock market, a punctuated equilibrium ecosystem of firm dependencies, and the Rigids-vs-Flexibles organizational engine. Each firm has composite health drawn from all four channels. Firms fail when health drops below threshold, and failures propagate through a dependency network.</p>
+
+<p>Under normal operations, the economy is stable but quietly fragile. GDP holds steady (standard deviation of only 0.053 over 200 ticks). But underneath, flexibility drifts to the model's floor of 0.20 within 50 ticks as rigidity dominates in the absence of crisis. The organization is optimizing itself into the Thatcher Trap.</p>
+
+<p>Then the shocks arrive. A 2.5x supply shock alone? Zero failures -- the supply chain buffers absorb it entirely. A technology disruption alone? Zero failures -- composite health stays above threshold. But a market panic following a supply shock? Catastrophic.</p>
+
+<div class="key-metric">
+  <span class="number">28 of 40</span>
+  <span class="label">firms destroyed in a single tick when the market panic hits -- the cascade is catastrophic and concentrated</span>
+</div>
+
+<p>The cascade does not arrive instantly. The panic hits at tick 120, but the major cascade (28 firms) fires at tick 130 -- a 10-tick delay while multiple damage channels compound. This is the most realistic feature of the model: crises build gradually through the interaction of multiple stressors, then break suddenly when a threshold is crossed.</p>
+
+<p>Scale amplifies the catastrophe. At 100 firms (vs. 40), the same supply shock that was harmless triggers total system wipeout at tick 83 -- before the panic even occurs. The denser dependency network (792 edges vs. 125) makes cascades self-sustaining. This is a phase transition in network behavior, and it maps directly to systemic risk in interconnected financial systems.</p>
+
+<p>But the most hopeful finding comes from the stress test. Repeated, well-spaced shocks make the economy <em>more</em> resilient by driving organizational flexibility upward. Each crisis pushes flexibility up rapidly; stability erodes it slowly. The asymmetry creates a ratchet: after three shocks, flexibility reaches 0.80, and the economy survives a market panic that would have destroyed it earlier. Periodic disruption is, paradoxically, the price of resilience.</p>
+
+<div class="try-it">
+  <div class="try-it-icon">&#9654;</div>
+  <div class="try-it-content">
+    <div class="try-it-label">Try it yourself</div>
+    <p class="try-it-text">Run supply shocks, tech disruptions, and market panics on an interconnected economy. Watch cascades propagate through the dependency network. <a href="09-integrated-economy/index.html">Open the Integrated Economy simulation</a></p>
+  </div>
+</div>
+
+<!-- ─── Ch 15: Strategy as Evolution ────────────────── -->
+
+<div class="chapter" id="ch-15">
+  <div class="chapter-number">15</div>
+  <div class="chapter-title">Strategy as Evolution</div>
+  <div class="chapter-sim">Simulation 15 &mdash; Strategy as Evolution</div>
+</div>
+
+<p>If the economy is an evolutionary system, what does that mean for strategy? Beinhocker's answer is radical: strategy is not a plan but a portfolio of experiments. The firm that runs many experiments, learns fast, scales the winners, and cuts the losers will outperform the firm that bets everything on a single vision. The Strategy simulation tests this directly.</p>
+
+<p>Three types of firms compete across shifting market niches. Exploiters concentrate all resources on their best-performing experiment. Explorers spread resources evenly across everything. Adaptive firms dynamically reallocate based on performance feedback &mdash; a portfolio approach that blends the best of both.</p>
+
+<div class="key-metric">
+  <span class="number">63.2%</span>
+  <span class="label">market share captured by adaptive firms in the baseline &mdash; confirming that portfolio strategy outperforms pure exploitation and pure exploration</span>
+</div>
+
+<p>The results are decisive. In the baseline (moderate volatility), adaptive firms dominate with 63.2% market share, exploiters hold 27.6%, and pure explorers are nearly eliminated at 3.1%. The adaptive strategy is never the best at any single moment &mdash; but it performs well enough across all conditions to accumulate the highest long-run share. Robustness beats optimality.</p>
+
+<p>But environment matters enormously. In a perfectly stable market (zero niche shifts), exploiters surge to 67.8% &mdash; when the landscape is frozen, there is nothing to adapt to, and concentration wins. In a volatile market (shift rate 0.2, producing 282 niche shifts over 300 ticks), adaptive firms lead at 50.0% while exploiters hold 40.7%. Pure exploration is a death sentence in every environment: mean fitness of 0.36 versus 0.65 for the baseline. Spreading resources too thin prevents any single initiative from reaching competitive fitness.</p>
+
+<p>The most revealing experiment is the all-exploiter market. It performs well during stability, with mean fitness of 0.63. But when niches shift, every firm that concentrated on a now-mismatched experiment has no fallback. The result is catastrophic synchronized crashes &mdash; fitness collapses into the 0.55-0.58 range before slowly recovering. This is March's competency trap made visible: the very success of exploitation eliminates the diversity needed to survive disruption.</p>
+
+<p>In the large economy (100 firms, 10 niches), individual portfolio diversity drops from 0.79 to 0.47 &mdash; but the market as a whole still covers all 10 niches. This is Beinhocker's core insight about markets: they function as massively parallel search algorithms. Individual firms can specialize while the system as a whole explores broadly. The market does what no individual firm can.</p>
+
+<div class="try-it">
+  <div class="try-it-icon">&#9654;</div>
+  <div class="try-it-content">
+    <div class="try-it-label">Try it yourself</div>
+    <p class="try-it-text">Pit exploiters, explorers, and adaptive firms against each other across shifting niches. Adjust volatility and watch the competency trap unfold. <a href="15-strategy/index.html">Open the Strategy simulation</a></p>
+  </div>
+</div>
+
+<!-- ─── Ch 16: Public Policy ──────────────────────────── -->
+
+<div class="chapter" id="ch-16">
+  <div class="chapter-number">16</div>
+  <div class="chapter-title">Public Policy in a Complex World</div>
+  <div class="chapter-sim">Simulation 16 &mdash; Public Policy</div>
+</div>
+
+<p>If the economy is a complex adaptive system, how should governments govern? Beinhocker's answer: policy should not try to engineer particular outcomes but should shape the fitness environment &mdash; creating the conditions under which evolutionary search can operate most effectively. The Public Policy simulation tests five regimes head to head.</p>
+
+<p>Fifty firms evolve on an NK fitness landscape under different policy levers: entry barriers, compliance costs, mutation rates (innovation subsidies), market share caps, and safety net strength. The regimes range from laissez-faire (minimal intervention) to protectionist (high barriers, shielded incumbents) to adaptive (dynamically adjusting all levers based on economic indicators).</p>
+
+<div class="key-metric">
+  <span class="number">9.83 vs. 4.70</span>
+  <span class="label">mean GDP: adaptive regime vs. protectionist &mdash; a 109% advantage from responsive governance over ideology</span>
+</div>
+
+<p>The adaptive regime dominates on nearly every metric. It produced the highest mean GDP (9.83, 60% above laissez-faire's 6.14), the best long-run growth (nearly flat versus laissez-faire's steady decline), the lowest unemployment (15.3%), and the highest final fitness (0.715). Over 500 ticks, it discovered a specific policy configuration that no preset regime offered: minimum regulation (0.05), low taxes (0.10), high innovation subsidies (0.60), no competition limits (1.00), and a near-maximum safety net (0.90).</p>
+
+<p>Laissez-faire, counter to the simplest "free market" narrative, produced the second-lowest GDP and the highest unemployment (39.4%). With a weak safety net and no subsidies, failed firms rarely re-entered the economy. The economy slowly shrank: 30 firms alive at the end versus 50 at the start. Dead firm slots that stay empty are wasted positions in the fitness landscape search.</p>
+
+<p>Protectionism is the worst regime by far: lowest GDP (4.70), worst long-run growth, lowest fitness. High regulation created entry barriers 2.6x higher than normal, making it expensive for new firms to enter. It achieved the lowest Gini (0.192) &mdash; but only because the economy was uniformly poor. This confirms Beinhocker's argument that protecting incumbents stifles the evolutionary search process. New entrants bring fresh genetic material that the economy needs.</p>
+
+<p>Perhaps the most surprising finding: safety nets are pro-growth, not just pro-equity. Comparing laissez-faire (safety net 0.10) to the adaptive regime's final state (safety net 0.90), stronger safety nets correlate with higher GDP. The mechanism is evolutionary: safety nets increase the respawn probability for failed firms (from 2.8% to 9.2% per tick), maintaining the population size and the rate of landscape search. This reframes the traditional growth-versus-equity debate entirely.</p>
+
+<p>Entry barriers also matter more than tax rates. Social democracy (regulation 0.40, tax 0.45) achieved 62% higher GDP and 42% lower unemployment than protectionism (regulation 0.80, tax 0.35). In an evolutionary economy, the flow of new entrants &mdash; the variation supply &mdash; matters more than the tax burden on incumbents.</p>
+
+<div class="try-it">
+  <div class="try-it-icon">&#9654;</div>
+  <div class="try-it-content">
+    <div class="try-it-label">Try it yourself</div>
+    <p class="try-it-text">Compare policy regimes head to head. Watch how entry barriers, innovation subsidies, and safety nets shape the evolutionary dynamics of a complex economy. <a href="16-public-policy/index.html">Open the Public Policy simulation</a></p>
+  </div>
+</div>
+
+<!-- ─── EPILOGUE ─────────────────────────────────────── -->
+
+<div class="act-header" id="epilogue">
+  <div class="act-label">Epilogue</div>
+  <div class="act-title">A New Economics</div>
+</div>
+
+<p>We have traveled through 16 simulations spanning financial markets, supply chains, organizational networks, ecosystems, social dynamics, evolutionary processes, strategic competition, and public policy. The models are simple -- toy worlds built from a few dozen lines of rules. But their lessons converge on a set of principles that challenge the foundations of traditional economic thinking.</p>
+
+<p><strong>Markets are not in equilibrium.</strong> The rational-expectations benchmark produced the worst market in our simulations: highest volatility, largest mispricing, near-zero liquidity. The perpetually out-of-equilibrium learning market tracked fundamentals better and distributed wealth more equally. Equilibrium is not a useful approximation; it is the opposite of what happens.</p>
+
+<p><strong>Simple rules plus structure produce complex outcomes.</strong> No agent in any simulation is sophisticated. The complexity lives in the interactions -- the feedback loops, delays, dependencies, and evolutionary pressures that turn simple local rules into rich global behavior. Four identical supply chain agents following the same heuristic generate 35 weeks of wild oscillation. Two types of grid agents with a simple "move if unhappy" rule produce dramatic segregation. One grain of sand triggers an avalanche spanning the entire grid.</p>
+
+<p><strong>Power laws are natural.</strong> Heavy-tailed distributions emerged in stock returns (Hill index 2.55), cascade sizes (exponent ~2.0), avalanche sizes (exponent ~1.26), and bullwhip ratios. They are the statistical fingerprint of self-organized criticality -- systems that drive themselves to the boundary between order and chaos.</p>
+
+<p><strong>Diversity is not inefficiency -- it is the source of resilience.</strong> In the stock market, heterogeneous strategies stabilize prices. In ecosystems, moderate connectivity balances richness and resilience. In organizations, maintaining Flexible agents reduces transition costs by half. In technology, mixed search strategies outperform any pure approach. Every model demonstrates that homogeneity is fragility.</p>
+
+<p><strong>Structure trumps intelligence.</strong> In the Beer Game, the structure tax (44x from delay) dwarfs the human tax (2x from bounded rationality). In Boolean networks, topology determines whether perturbations are contained or catastrophic. In hierarchies, depth amplifies the rigidity trap. The architecture of a system constrains its behavior more tightly than the sophistication of its agents.</p>
+
+<div class="pullquote">
+  <p>"The economy is perhaps the most complex adaptive system we know -- more complex than any ecosystem, more dynamic than any organism, more inventive than any individual mind."</p>
+  <cite>-- Eric Beinhocker, The Origin of Wealth</cite>
+</div>
+
+<p>Beinhocker's vision is not a rejection of economics but an expansion of it. The equilibrium framework is not wrong so much as incomplete -- it describes a special case (systems at rest) within a much larger space of possibilities (systems in motion). Complexity economics does not abandon rigor; it trades the closed-form elegance of equilibrium models for the computational richness of agent-based simulation, where the phenomena that actually define economic life -- crashes, cycles, innovation, inequality, adaptation -- can emerge from the bottom up rather than being assumed away from the top down.</p>
+
+<p>These 16 simulations are a starting point, not an endpoint. Each model is vastly simpler than the reality it represents. But together, they form a coherent argument: the economy does not tend toward equilibrium. It tends toward complexity. And understanding that complexity -- measuring it, simulating it, building intuition for how it works -- is the first step toward economic thinking that matches the world as it actually is.</p>
+
+</article>
+
+<!-- ═══════════════════════════════════ FOOTER ═══ -->
+
+<footer class="footer">
+  <p>Based on simulations of models from Eric Beinhocker's <em>The Origin of Wealth</em> (2006).</p>
+  <p style="margin-top: 0.5rem;"><a href="index.html">Dashboard</a> &middot; <a href="findings.html">Research Findings</a></p>
+</footer>
+
+<!-- ═══════════════════════════════ SCRIPT ═══ -->
+
+<script>
+(function() {
+  // ── Progress bar ──
+  const progressBar = document.getElementById('progress');
+  function updateProgress() {
+    const scrollTop = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+    progressBar.style.width = progress + '%';
+  }
+  window.addEventListener('scroll', updateProgress, { passive: true });
+  updateProgress();
+})();
+</script>
+
+</body>
+</html>
