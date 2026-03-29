@@ -14,112 +14,206 @@
 <meta name="description" content="Adaptive firms dominate (63% market share). Exploiters win in stable markets but collapse after niche shifts.">
 <title>Strategy as Evolution: Portfolio-Based Competition</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
+:root {
+  --bg: #faf9f5;
+  --bg-card: #ffffff;
+  --bg-hover: #f5f3ee;
+  --bg-metric: #f0eeea;
+  --text-primary: #1a1a2e;
+  --text-secondary: #4a4a5a;
+  --text-tertiary: #7a7a8a;
+  --accent-teal: #2a7f7f;
+  --accent-teal-light: #e8f4f4;
+  --accent-coral: #c96b5a;
+  --accent-green: #4a8a5a;
+  --accent-amber: #b08a3a;
+  --border: #e2e0da;
+  --border-light: #edecea;
+  --shadow-sm: 0 1px 3px rgba(26,26,46,0.06);
+  --shadow-md: 0 4px 12px rgba(26,26,46,0.08);
+  --radius: 8px;
+  --radius-lg: 12px;
+  --font-sans: 'Inter', -apple-system, sans-serif;
+  --font-serif: Georgia, 'Times New Roman', serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'Courier New', monospace; background: #0a0a0f; color: #e0e0e0; overflow-x: hidden; }
+body {
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--text-primary);
+  overflow-x: hidden;
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
 
-.container { max-width: 1440px; margin: 0 auto; padding: 20px; }
+/* Nav bar */
+.nav-bar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  background: rgba(250,249,245,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-light);
+}
+.nav-bar .nav-title {
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+}
+.nav-bar a {
+  font-size: 0.8rem;
+  color: var(--accent-teal);
+  text-decoration: none;
+  font-weight: 500;
+}
+.nav-bar a:hover { text-decoration: underline; }
 
-h1 { text-align: center; font-size: 1.8em; margin-bottom: 4px; color: #fff;
-     letter-spacing: 3px; text-transform: uppercase; }
-.subtitle { text-align: center; font-size: 0.85em; color: #888; margin-bottom: 24px; }
+.container { max-width: 1440px; margin: 0 auto; padding: 0 20px 20px; }
+
+/* Hero */
+.hero {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 0 1.5rem;
+}
+.hero h1 {
+  font-family: var(--font-serif);
+  font-size: 1.8rem;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+.hero .subtitle {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem;
+}
 
 /* Intro section */
 .intro-section {
-  background: linear-gradient(135deg, #12121a 0%, #0f1a28 100%);
-  border: 1px solid #1a3a5a;
-  border-radius: 12px;
-  padding: 28px 32px;
-  margin-bottom: 24px;
-  position: relative;
-  overflow: hidden;
-}
-.intro-section::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, #e66, #ea6, #4a8, #6ce);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem 2rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow-sm);
 }
 .intro-section h2 {
-  font-size: 1.2em;
-  color: #8cd8ff;
-  margin-bottom: 12px;
-  letter-spacing: 1px;
+  font-family: var(--font-serif);
+  font-size: 1.1rem;
+  color: var(--accent-teal);
+  margin-bottom: 0.75rem;
 }
 .intro-section p {
-  font-size: 0.95em;
+  font-size: 0.88rem;
   line-height: 1.7;
-  color: #bbb;
+  color: var(--text-secondary);
 }
-.intro-section p strong { color: #fff; }
+.intro-section p strong { color: var(--text-primary); font-weight: 600; }
 
-/* Key insight callout */
+/* Key insight */
 .key-insight {
-  background: linear-gradient(135deg, #1a1a10, #22200a);
-  border: 1px solid #554a20;
-  border-left: 4px solid #eea;
-  border-radius: 8px;
-  padding: 20px 24px;
-  margin-bottom: 24px;
+  background: var(--accent-teal-light);
+  border: 1px solid #d0e8e8;
+  border-left: 4px solid var(--accent-teal);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
 }
 .key-insight h3 {
-  font-size: 0.9em;
-  color: #eea;
+  font-size: 0.7rem;
+  color: var(--accent-teal);
   text-transform: uppercase;
-  letter-spacing: 2px;
-  margin-bottom: 8px;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
 }
 .key-insight p {
-  font-size: 0.9em;
+  font-size: 0.85rem;
   line-height: 1.7;
-  color: #bba;
+  color: var(--text-secondary);
 }
-.key-insight p strong { color: #fff; }
+.key-insight p strong { color: var(--text-primary); font-weight: 600; }
 
 /* Controls */
 .controls {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 10px; padding: 16px; background: #12121a; border: 1px solid #2a2a3a;
-  border-radius: 8px; margin-bottom: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 10px;
+  padding: 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 16px;
+  box-shadow: var(--shadow-sm);
 }
 .control-group { display: flex; flex-direction: column; gap: 4px; }
-.control-group label { font-size: 0.75em; color: #aaa; text-transform: uppercase; letter-spacing: 1px; }
+.control-group label {
+  font-size: 0.7rem;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+}
 .control-group input, .control-group select {
-  background: #1a1a2e; border: 1px solid #333; color: #fff; padding: 6px 10px;
-  border-radius: 4px; font-family: inherit; font-size: 0.85em;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
 }
 .control-group input:focus, .control-group select:focus {
-  outline: none; border-color: #4a8;
+  outline: none;
+  border-color: var(--accent-teal);
 }
 
 .btn-row { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
 button {
-  background: linear-gradient(135deg, #2a5a4a, #1a4a3a);
-  border: 1px solid #4a8;
-  color: #fff; padding: 8px 20px; border-radius: 4px;
-  cursor: pointer; font-family: inherit; font-size: 0.85em;
-  transition: all 0.2s;
+  background: var(--accent-teal);
+  border: 1px solid var(--accent-teal);
+  color: #fff;
+  padding: 8px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  font-weight: 600;
+  transition: background 0.15s;
 }
-button:hover { background: linear-gradient(135deg, #3a7a5a, #2a6a4a); }
+button:hover { background: #237070; }
 button.secondary {
-  background: linear-gradient(135deg, #2a2a3e, #1a1a2e);
-  border-color: #555;
+  background: var(--bg-metric);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
 }
-button.secondary:hover { background: linear-gradient(135deg, #3a3a5e, #2a2a4e); }
+button.secondary:hover { background: var(--bg-hover); }
 
 /* Presets */
 .presets {
   display: flex; gap: 8px; flex-wrap: wrap;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 .presets button {
-  font-size: 0.75em; padding: 5px 12px;
-  background: linear-gradient(135deg, #1a2a3a, #122238);
-  border-color: #3a6a8a;
+  font-size: 0.75rem;
+  padding: 5px 12px;
+  background: var(--bg-metric);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
 }
 .presets button:hover {
-  background: linear-gradient(135deg, #2a4a5a, #1a3a4a);
+  background: var(--bg-hover);
+  border-color: var(--accent-teal);
 }
 
 /* Layout */
@@ -136,31 +230,53 @@ button.secondary:hover { background: linear-gradient(135deg, #3a3a5e, #2a2a4e); 
   gap: 16px;
 }
 .chart-panel {
-  background: #12121a;
-  border: 1px solid #2a2a3a;
-  border-radius: 8px;
-  padding: 16px;
-  height: 330px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1rem;
+  height: 280px;
   min-height: 0;
   overflow: hidden;
+  box-shadow: var(--shadow-sm);
 }
 .chart-panel.tall {
-  height: 390px;
+  height: 340px;
 }
 .chart-panel h3 {
-  font-size: 0.8em;
-  color: #8cd8ff;
+  font-size: 0.7rem;
+  color: var(--accent-teal);
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.06em;
   margin-bottom: 12px;
+  font-weight: 600;
 }
 .chart-panel canvas {
   display: block;
   width: 100%;
-  height: 280px;
+  height: calc(100% - 36px);
 }
 .chart-panel.tall canvas {
-  height: 340px;
+  height: calc(100% - 56px);
+}
+
+/* Legend */
+.legend {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.7rem;
+  color: var(--text-tertiary);
+}
+.legend-swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
 }
 
 /* Sidebar */
@@ -170,66 +286,63 @@ button.secondary:hover { background: linear-gradient(135deg, #3a3a5e, #2a2a4e); 
   gap: 16px;
 }
 .stat-card {
-  background: #12121a;
-  border: 1px solid #2a2a3a;
-  border-radius: 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
   padding: 16px;
+  box-shadow: var(--shadow-sm);
 }
 .stat-card h3 {
-  font-size: 0.8em;
-  color: #8cd8ff;
+  font-size: 0.7rem;
+  color: var(--accent-teal);
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.06em;
   margin-bottom: 12px;
+  font-weight: 600;
 }
 .stat-row {
   display: flex;
   justify-content: space-between;
-  font-size: 0.82em;
+  font-size: 0.82rem;
   padding: 4px 0;
-  border-bottom: 1px solid #1a1a2a;
+  border-bottom: 1px solid var(--border-light);
 }
 .stat-row:last-child { border-bottom: none; }
-.stat-label { color: #888; }
-.stat-value { color: #fff; font-weight: bold; }
-.stat-value.green { color: #4a8; }
-.stat-value.yellow { color: #ea6; }
-.stat-value.red { color: #e66; }
-.stat-value.blue { color: #6ce; }
-
-/* Legend */
-.legend {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin-top: 8px;
-}
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 0.72em;
-  color: #aaa;
-}
-.legend-swatch {
-  width: 12px;
-  height: 12px;
-  border-radius: 2px;
-}
+.stat-label { color: var(--text-tertiary); }
+.stat-value { font-family: var(--font-mono); font-weight: 600; color: var(--text-primary); }
+.stat-value.green { color: var(--accent-green); }
+.stat-value.yellow { color: var(--accent-amber); }
+.stat-value.red { color: var(--accent-coral); }
+.stat-value.blue { color: var(--accent-teal); }
 
 /* Status bar */
 .status-bar {
   margin-top: 20px;
   padding: 10px 16px;
-  background: #12121a;
-  border: 1px solid #2a2a3a;
-  border-radius: 8px;
-  font-size: 0.8em;
-  color: #888;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 0.82rem;
+  color: var(--text-tertiary);
   text-align: center;
 }
-.status-bar .running { color: #4a8; }
-.status-bar .paused { color: #ea6; }
+.status-bar .running { color: var(--accent-green); font-weight: 600; }
+.status-bar .paused { color: var(--accent-amber); font-weight: 600; }
+
+/* Footer */
+.footer {
+  text-align: center;
+  padding: 2rem;
+  border-top: 1px solid var(--border-light);
+  margin-top: 1rem;
+}
+.footer a {
+  color: var(--accent-teal);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+.footer a:hover { text-decoration: underline; }
 
 @media (max-width: 1000px) {
   .main-grid { grid-template-columns: 1fr; }
@@ -238,9 +351,18 @@ button.secondary:hover { background: linear-gradient(135deg, #3a3a5e, #2a2a4e); 
 </style>
 </head>
 <body>
+
+<!-- Nav bar -->
+<nav class="nav-bar">
+  <span class="nav-title">Strategy as Evolution -- Portfolio Competition</span>
+  <a href="../index.html">&larr; Dashboard</a>
+</nav>
+
 <div class="container">
-  <h1>Strategy as Evolution</h1>
-  <p class="subtitle">Beinhocker Ch.15 -- Strategy Is a Portfolio of Experiments, Not a Single Plan</p>
+  <div class="hero">
+    <h1>Strategy as Evolution</h1>
+    <p class="subtitle">Beinhocker Ch.15 -- Strategy Is a Portfolio of Experiments, Not a Single Plan</p>
+  </div>
 
   <div class="intro-section">
     <h2>Strategy Is Not Planning</h2>
@@ -317,18 +439,18 @@ button.secondary:hover { background: linear-gradient(135deg, #3a3a5e, #2a2a4e); 
         <h3>Survival by Type</h3>
         <canvas id="chartSurvival"></canvas>
         <div class="legend">
-          <div class="legend-item"><div class="legend-swatch" style="background:#e66"></div> Exploiters</div>
-          <div class="legend-item"><div class="legend-swatch" style="background:#6ce"></div> Explorers</div>
-          <div class="legend-item"><div class="legend-swatch" style="background:#4a8"></div> Adaptive</div>
+          <div class="legend-item"><div class="legend-swatch" style="background:#c96b5a"></div> Exploiters</div>
+          <div class="legend-item"><div class="legend-swatch" style="background:#2a7f7f"></div> Explorers</div>
+          <div class="legend-item"><div class="legend-swatch" style="background:#4a8a5a"></div> Adaptive</div>
         </div>
       </div>
       <div class="chart-panel tall">
         <h3>Market Share Over Time</h3>
         <canvas id="chartShare"></canvas>
         <div class="legend">
-          <div class="legend-item"><div class="legend-swatch" style="background:#e66"></div> Exploiters</div>
-          <div class="legend-item"><div class="legend-swatch" style="background:#6ce"></div> Explorers</div>
-          <div class="legend-item"><div class="legend-swatch" style="background:#4a8"></div> Adaptive</div>
+          <div class="legend-item"><div class="legend-swatch" style="background:#c96b5a"></div> Exploiters</div>
+          <div class="legend-item"><div class="legend-swatch" style="background:#2a7f7f"></div> Explorers</div>
+          <div class="legend-item"><div class="legend-swatch" style="background:#4a8a5a"></div> Adaptive</div>
         </div>
       </div>
       <div class="chart-panel">
@@ -347,8 +469,8 @@ button.secondary:hover { background: linear-gradient(135deg, #3a3a5e, #2a2a4e); 
         <h3>Mean vs Best Fitness</h3>
         <canvas id="chartFitness"></canvas>
         <div class="legend">
-          <div class="legend-item"><div class="legend-swatch" style="background:#ea6"></div> Best</div>
-          <div class="legend-item"><div class="legend-swatch" style="background:#888"></div> Mean</div>
+          <div class="legend-item"><div class="legend-swatch" style="background:#b08a3a"></div> Best</div>
+          <div class="legend-item"><div class="legend-swatch" style="background:#7a7a8a"></div> Mean</div>
         </div>
       </div>
     </div>
@@ -384,6 +506,11 @@ button.secondary:hover { background: linear-gradient(135deg, #3a3a5e, #2a2a4e); 
   </div>
 
   <div class="status-bar" id="statusBar">Ready. Click Run to start simulation.</div>
+</div>
+
+<!-- Footer -->
+<div class="footer">
+  <a href="../index.html">&larr; Back to Dashboard</a>
 </div>
 
 <script>
@@ -667,14 +794,14 @@ let paused = false;
 let charts = {};
 
 const COLORS = {
-  exploiter: '#e66',
-  explorer: '#6ce',
-  adaptive: '#4a8',
-  best: '#ea6',
-  mean: '#888',
-  hhi: '#c8a',
-  diversity: '#8e8',
-  coverage: '#6ce',
+  exploiter: '#c96b5a',
+  explorer: '#2a7f7f',
+  adaptive: '#4a8a5a',
+  best: '#b08a3a',
+  mean: '#7a7a8a',
+  hhi: '#9a6aaa',
+  diversity: '#4a8a5a',
+  coverage: '#2a7f7f',
 };
 
 function initCharts() {
@@ -686,12 +813,11 @@ function initCharts() {
       legend: { display: false },
     },
     scales: {
-      x: { grid: { color: '#1a1a2a' }, ticks: { color: '#555', font: { size: 10 } } },
-      y: { grid: { color: '#1a1a2a' }, ticks: { color: '#555', font: { size: 10 } } },
+      x: { grid: { color: '#edecea' }, ticks: { color: '#7a7a8a', font: { size: 10, family: "'JetBrains Mono', monospace" } } },
+      y: { grid: { color: '#edecea' }, ticks: { color: '#7a7a8a', font: { size: 10, family: "'JetBrains Mono', monospace" } } },
     },
   };
 
-  // Survival by type
   charts.survival = new Chart(document.getElementById('chartSurvival'), {
     type: 'line',
     data: {
@@ -702,41 +828,38 @@ function initCharts() {
         { label: 'Adaptive', data: [], borderColor: COLORS.adaptive, borderWidth: 1.5, pointRadius: 0, tension: 0.2 },
       ],
     },
-    options: { ...commonOpts, scales: { ...commonOpts.scales, y: { ...commonOpts.scales.y, title: { display: true, text: 'Count', color: '#555', font: { size: 10 } } } } },
+    options: { ...commonOpts, scales: { ...commonOpts.scales, y: { ...commonOpts.scales.y, title: { display: true, text: 'Count', color: '#7a7a8a', font: { size: 10 } } } } },
   });
 
-  // Market share
   charts.share = new Chart(document.getElementById('chartShare'), {
     type: 'line',
     data: {
       labels: [],
       datasets: [
-        { label: 'Exploiters', data: [], borderColor: COLORS.exploiter, borderWidth: 1.5, pointRadius: 0, fill: true, backgroundColor: 'rgba(238,102,102,0.08)', tension: 0.2 },
-        { label: 'Explorers', data: [], borderColor: COLORS.explorer, borderWidth: 1.5, pointRadius: 0, fill: true, backgroundColor: 'rgba(102,204,238,0.08)', tension: 0.2 },
-        { label: 'Adaptive', data: [], borderColor: COLORS.adaptive, borderWidth: 1.5, pointRadius: 0, fill: true, backgroundColor: 'rgba(68,170,136,0.08)', tension: 0.2 },
+        { label: 'Exploiters', data: [], borderColor: COLORS.exploiter, borderWidth: 1.5, pointRadius: 0, fill: true, backgroundColor: 'rgba(201,107,90,0.08)', tension: 0.2 },
+        { label: 'Explorers', data: [], borderColor: COLORS.explorer, borderWidth: 1.5, pointRadius: 0, fill: true, backgroundColor: 'rgba(42,127,127,0.08)', tension: 0.2 },
+        { label: 'Adaptive', data: [], borderColor: COLORS.adaptive, borderWidth: 1.5, pointRadius: 0, fill: true, backgroundColor: 'rgba(74,138,90,0.08)', tension: 0.2 },
       ],
     },
-    options: { ...commonOpts, scales: { ...commonOpts.scales, y: { ...commonOpts.scales.y, min: 0, max: 1, title: { display: true, text: 'Share', color: '#555', font: { size: 10 } } } } },
+    options: { ...commonOpts, scales: { ...commonOpts.scales, y: { ...commonOpts.scales.y, min: 0, max: 1, title: { display: true, text: 'Share', color: '#7a7a8a', font: { size: 10 } } } } },
   });
 
-  // Niche landscape (bar chart of niche ideals + attractiveness)
   charts.niche = new Chart(document.getElementById('chartNiche'), {
     type: 'bar',
     data: {
       labels: [],
       datasets: [
-        { label: 'Ideal', data: [], backgroundColor: 'rgba(102,204,238,0.6)', borderColor: '#6ce', borderWidth: 1 },
-        { label: 'Attractiveness', data: [], backgroundColor: 'rgba(234,166,102,0.4)', borderColor: '#ea6', borderWidth: 1 },
+        { label: 'Ideal', data: [], backgroundColor: 'rgba(42,127,127,0.5)', borderColor: '#2a7f7f', borderWidth: 1 },
+        { label: 'Attractiveness', data: [], backgroundColor: 'rgba(176,138,58,0.35)', borderColor: '#b08a3a', borderWidth: 1 },
       ],
     },
     options: {
       ...commonOpts,
-      plugins: { ...commonOpts.plugins, legend: { display: true, labels: { color: '#888', font: { size: 10 } } } },
+      plugins: { ...commonOpts.plugins, legend: { display: true, labels: { color: '#7a7a8a', font: { size: 10 } } } },
       scales: { ...commonOpts.scales, y: { ...commonOpts.scales.y, min: 0, max: 1 } },
     },
   });
 
-  // Portfolio diversity
   charts.diversity = new Chart(document.getElementById('chartDiversity'), {
     type: 'line',
     data: {
@@ -748,24 +871,22 @@ function initCharts() {
     },
     options: {
       ...commonOpts,
-      plugins: { ...commonOpts.plugins, legend: { display: true, labels: { color: '#888', font: { size: 10 } } } },
+      plugins: { ...commonOpts.plugins, legend: { display: true, labels: { color: '#7a7a8a', font: { size: 10 } } } },
       scales: { ...commonOpts.scales, y: { ...commonOpts.scales.y, min: 0, max: 1 } },
     },
   });
 
-  // HHI
   charts.hhi = new Chart(document.getElementById('chartHHI'), {
     type: 'line',
     data: {
       labels: [],
       datasets: [
-        { label: 'HHI', data: [], borderColor: COLORS.hhi, borderWidth: 1.5, pointRadius: 0, fill: true, backgroundColor: 'rgba(204,136,170,0.1)', tension: 0.2 },
+        { label: 'HHI', data: [], borderColor: COLORS.hhi, borderWidth: 1.5, pointRadius: 0, fill: true, backgroundColor: 'rgba(154,106,170,0.08)', tension: 0.2 },
       ],
     },
     options: { ...commonOpts, scales: { ...commonOpts.scales, y: { ...commonOpts.scales.y, min: 0 } } },
   });
 
-  // Mean vs Best fitness
   charts.fitness = new Chart(document.getElementById('chartFitness'), {
     type: 'line',
     data: {
@@ -782,39 +903,33 @@ function initCharts() {
 function updateCharts(rec) {
   const t = rec.tick;
 
-  // Survival
   charts.survival.data.labels.push(t);
   charts.survival.data.datasets[0].data.push(rec.exploiterCount);
   charts.survival.data.datasets[1].data.push(rec.explorerCount);
   charts.survival.data.datasets[2].data.push(rec.adaptiveCount);
   charts.survival.update('none');
 
-  // Share
   charts.share.data.labels.push(t);
   charts.share.data.datasets[0].data.push(rec.exploiterShare);
   charts.share.data.datasets[1].data.push(rec.explorerShare);
   charts.share.data.datasets[2].data.push(rec.adaptiveShare);
   charts.share.update('none');
 
-  // Niche landscape
   const nicheLabels = rec.nicheIdeals.map((_, i) => `N${i}`);
   charts.niche.data.labels = nicheLabels;
   charts.niche.data.datasets[0].data = rec.nicheIdeals;
   charts.niche.data.datasets[1].data = rec.nicheAttract;
   charts.niche.update('none');
 
-  // Diversity
   charts.diversity.data.labels.push(t);
   charts.diversity.data.datasets[0].data.push(rec.portfolioDiversity);
   charts.diversity.data.datasets[1].data.push(rec.nicheCoverage);
   charts.diversity.update('none');
 
-  // HHI
   charts.hhi.data.labels.push(t);
   charts.hhi.data.datasets[0].data.push(rec.hhi);
   charts.hhi.update('none');
 
-  // Fitness
   charts.fitness.data.labels.push(t);
   charts.fitness.data.datasets[0].data.push(rec.bestFitness);
   charts.fitness.data.datasets[1].data.push(rec.meanFitness);

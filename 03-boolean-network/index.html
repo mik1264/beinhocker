@@ -5,934 +5,569 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://beinhocker-mkirsanov.pages.dev/03-boolean-network/index.html">
-<meta property="og:title" content="Boolean Networks — Edge of Chaos">
+<meta property="og:title" content="Boolean Networks -- Edge of Chaos">
 <meta property="og:description" content="Kauffman's complexity catastrophe: K=2 is critical, K=5 produces 93% cascades. The sweet spot between order and chaos.">
-<meta property="og:site_name" content="The Origin of Wealth — Complexity Economics Simulations">
+<meta property="og:site_name" content="The Origin of Wealth -- Complexity Economics Simulations">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Boolean Networks — Edge of Chaos">
+<meta name="twitter:title" content="Boolean Networks -- Edge of Chaos">
 <meta name="twitter:description" content="Kauffman's complexity catastrophe: K=2 is critical, K=5 produces 93% cascades. The sweet spot between order and chaos.">
 <meta name="description" content="Kauffman's complexity catastrophe: K=2 is critical, K=5 produces 93% cascades. The sweet spot between order and chaos.">
 <title>Boolean Network / Complexity Catastrophe Simulation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
+:root {
+  --bg: #faf9f5;
+  --bg-card: #ffffff;
+  --bg-hover: #f5f3ee;
+  --bg-metric: #f0eeea;
+  --text-primary: #1a1a2e;
+  --text-secondary: #4a4a5a;
+  --text-tertiary: #7a7a8a;
+  --accent-teal: #2a7f7f;
+  --accent-teal-light: #e8f4f4;
+  --accent-coral: #c96b5a;
+  --accent-green: #4a8a5a;
+  --accent-amber: #b08a3a;
+  --border: #e2e0da;
+  --border-light: #edecea;
+  --shadow-sm: 0 1px 3px rgba(26,26,46,0.06);
+  --shadow-md: 0 4px 12px rgba(26,26,46,0.08);
+  --radius: 8px;
+  --radius-lg: 12px;
+  --font-sans: 'Inter', -apple-system, sans-serif;
+  --font-serif: Georgia, 'Times New Roman', serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    background: #0a0e17;
-    color: #e0e6f0;
-    overflow-x: hidden;
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--text-primary);
+  overflow-x: hidden;
+  font-size: 0.9rem;
+  line-height: 1.7;
 }
 
-/* Intro Section */
-.intro-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(6, 8, 16, 0.97);
-    z-index: 1000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: opacity 0.6s ease, transform 0.6s ease;
+/* Nav bar */
+.nav-bar {
+  position: sticky; top: 0; z-index: 100; height: 48px;
+  background: rgba(250,249,245,0.92); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-light);
+  display: flex; justify-content: space-between; align-items: center; padding: 0 24px;
 }
-.intro-overlay.hidden {
-    opacity: 0;
-    pointer-events: none;
-    transform: scale(1.05);
-}
-.intro-card {
-    max-width: 720px;
-    padding: 48px 56px;
-    background: linear-gradient(135deg, #141a30 0%, #0d1220 100%);
-    border: 1px solid #2a3060;
-    border-radius: 16px;
-    text-align: center;
-    box-shadow: 0 0 120px rgba(74, 138, 255, 0.08);
-}
-.intro-card h1 {
-    font-size: 28px;
-    font-weight: 700;
-    color: #7eb8ff;
-    margin-bottom: 8px;
-}
-.intro-card .tagline {
-    font-size: 14px;
-    color: #8890a8;
-    margin-bottom: 28px;
-}
-.intro-card .metaphor {
-    font-size: 16px;
-    line-height: 1.7;
-    color: #c0c8e0;
-    margin-bottom: 32px;
-    text-align: left;
-}
-.intro-card .metaphor strong {
-    color: #7eb8ff;
-}
-.intro-card .key-insight {
-    background: linear-gradient(135deg, #1a2a4a 0%, #142040 100%);
-    border-left: 3px solid #ddaa33;
-    border-radius: 8px;
-    padding: 16px 20px;
-    margin-bottom: 32px;
-    text-align: left;
-}
-.intro-card .key-insight h3 {
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    color: #ddaa33;
-    margin-bottom: 8px;
-}
-.intro-card .key-insight p {
-    font-size: 14px;
-    line-height: 1.6;
-    color: #b0b8d0;
-}
-.intro-start-btn {
-    display: inline-block;
-    padding: 14px 40px;
-    background: linear-gradient(135deg, #2a5aaa, #3a6abb);
-    color: #e0e8ff;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
-}
-.intro-start-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 30px rgba(74, 138, 255, 0.25);
-}
+.nav-title { font-size: 0.85rem; font-weight: 700; color: var(--text-primary); }
+.nav-back { font-size: 0.8rem; color: var(--accent-teal); text-decoration: none; font-weight: 500; }
+.nav-back:hover { text-decoration: underline; }
 
-/* Header */
-.header {
-    background: linear-gradient(135deg, #1a1f35 0%, #0d1220 100%);
-    border-bottom: 1px solid #2a3050;
-    padding: 12px 24px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
+/* Hero */
+.hero { max-width: 900px; margin: 0 auto; padding: 2rem; }
+.hero h1 { font-family: var(--font-serif); font-size: 1.8rem; color: var(--text-primary); margin-bottom: 0.25rem; }
+.hero .tagline { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem; }
+.hero p { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 1rem; }
+.hero p strong { color: var(--text-primary); font-weight: 600; }
+.key-insight {
+  padding: 1rem 1.25rem; background: var(--accent-teal-light);
+  border-left: 4px solid var(--accent-teal); border-radius: 0 var(--radius) var(--radius) 0;
+  margin-bottom: 1.5rem;
 }
-.header h1 {
-    font-size: 18px;
-    font-weight: 600;
-    color: #7eb8ff;
+.key-insight h3 {
+  font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--accent-teal); margin-bottom: 0.4rem; font-weight: 700;
 }
-.header .subtitle {
-    font-size: 12px;
-    color: #8890a8;
-}
+.key-insight p { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 0; }
 
 /* Regime Banner */
 .regime-banner {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 32px;
-    padding: 0 24px;
-    height: 48px;
-    background: #0c1019;
-    border-bottom: 1px solid #1e2640;
-    transition: background 0.5s;
+  display: flex; align-items: center; justify-content: center; gap: 32px;
+  padding: 0 24px; height: 48px;
+  background: var(--bg-card); border-bottom: 1px solid var(--border);
+  transition: background 0.5s;
 }
-.regime-banner.regime-ordered {
-    background: linear-gradient(90deg, rgba(74,170,106,0.08) 0%, #0c1019 50%, rgba(74,170,106,0.08) 100%);
-}
-.regime-banner.regime-chaotic {
-    background: linear-gradient(90deg, rgba(204,85,85,0.08) 0%, #0c1019 50%, rgba(204,85,85,0.08) 100%);
-}
-.regime-banner.regime-critical {
-    background: linear-gradient(90deg, rgba(221,170,51,0.08) 0%, #0c1019 50%, rgba(221,170,51,0.08) 100%);
-}
+.regime-banner.regime-ordered { background: rgba(74,138,90,0.06); }
+.regime-banner.regime-chaotic { background: rgba(201,107,90,0.06); }
+.regime-banner.regime-critical { background: rgba(176,138,58,0.06); }
 .regime-indicator {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 13px;
-    color: #5a6a8a;
-    padding: 6px 14px;
-    border-radius: 20px;
-    border: 1px solid transparent;
-    transition: all 0.4s;
+  display: flex; align-items: center; gap: 8px;
+  font-size: 0.8rem; color: var(--text-tertiary);
+  padding: 6px 14px; border-radius: 20px;
+  border: 1px solid transparent; transition: all 0.4s;
 }
-.regime-indicator.active {
-    border-color: currentColor;
-    font-weight: 600;
-}
-.regime-indicator.active-ordered {
-    color: #4aaa6a;
-    background: rgba(74,170,106,0.1);
-    border-color: rgba(74,170,106,0.3);
-}
-.regime-indicator.active-chaotic {
-    color: #cc5555;
-    background: rgba(204,85,85,0.1);
-    border-color: rgba(204,85,85,0.3);
-}
-.regime-indicator.active-critical {
-    color: #ddaa33;
-    background: rgba(221,170,51,0.1);
-    border-color: rgba(221,170,51,0.3);
-}
-.regime-emoji {
-    font-size: 18px;
-}
-.regime-label {
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-}
-.regime-metaphor {
-    font-size: 11px;
-    opacity: 0.7;
-    font-style: italic;
-}
+.regime-indicator.active { border-color: currentColor; font-weight: 600; }
+.regime-indicator.active-ordered { color: var(--accent-green); background: rgba(74,138,90,0.08); border-color: rgba(74,138,90,0.25); }
+.regime-indicator.active-chaotic { color: var(--accent-coral); background: rgba(201,107,90,0.08); border-color: rgba(201,107,90,0.25); }
+.regime-indicator.active-critical { color: var(--accent-amber); background: rgba(176,138,58,0.08); border-color: rgba(176,138,58,0.25); }
+.regime-emoji { font-size: 18px; }
+.regime-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; }
+.regime-metaphor { font-size: 0.7rem; opacity: 0.7; font-style: italic; }
 
 /* Narrative Banner */
 .narrative-bar {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 8px 24px;
-    min-height: 36px;
-    background: #0f1424;
-    border-bottom: 1px solid #1e2640;
-    font-size: 13px;
-    color: #8890a8;
-    transition: color 0.4s, background 0.4s;
-    text-align: center;
+  display: flex; align-items: center; justify-content: center;
+  padding: 8px 24px; min-height: 36px;
+  background: var(--bg-metric); border-bottom: 1px solid var(--border);
+  font-size: 0.8rem; color: var(--text-secondary);
+  transition: color 0.4s, background 0.4s; text-align: center;
 }
-.narrative-bar.narrative-ordered { color: #6ac08a; }
-.narrative-bar.narrative-chaotic { color: #dd7777; }
-.narrative-bar.narrative-critical { color: #ddaa33; }
+.narrative-bar.narrative-ordered { color: var(--accent-green); }
+.narrative-bar.narrative-chaotic { color: var(--accent-coral); }
+.narrative-bar.narrative-critical { color: var(--accent-amber); }
 
+/* Main layout */
 .main {
-    display: grid;
-    grid-template-columns: 300px 1fr 320px;
-    height: calc(100vh - 56px - 48px - 36px);
+  display: grid;
+  grid-template-columns: 260px 1fr 280px;
+  height: calc(100vh - 48px - 48px - 36px);
 }
 
 /* Controls Panel */
 .controls {
-    background: #0f1424;
-    border-right: 1px solid #1e2640;
-    padding: 16px;
-    overflow-y: auto;
+  background: var(--bg-card);
+  border-right: 1px solid var(--border);
+  padding: 16px; overflow-y: auto;
 }
-.control-section {
-    margin-bottom: 20px;
-}
+.control-section { margin-bottom: 20px; }
 .control-section h3 {
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: #5a6a8a;
-    margin-bottom: 10px;
-    padding-bottom: 6px;
-    border-bottom: 1px solid #1e2640;
+  font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--accent-teal); margin-bottom: 10px; padding-bottom: 6px;
+  border-bottom: 1px solid var(--border-light); font-weight: 600;
 }
 .control-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 8px;
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;
 }
-.control-row label {
-    font-size: 13px;
-    color: #a0aab8;
-}
+.control-row label { font-size: 0.8rem; color: var(--text-secondary); }
 .control-row .value {
-    font-size: 13px;
-    color: #7eb8ff;
-    font-weight: 600;
-    min-width: 36px;
-    text-align: right;
+  font-size: 0.8rem; color: var(--accent-teal); font-weight: 600;
+  min-width: 36px; text-align: right;
 }
 input[type="range"] {
-    -webkit-appearance: none;
-    width: 100%;
-    height: 4px;
-    background: #1e2640;
-    border-radius: 2px;
-    margin: 4px 0 8px;
+  -webkit-appearance: none; width: 100%; height: 4px;
+  background: var(--border); border-radius: 2px; margin: 4px 0 8px;
 }
 input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 14px;
-    height: 14px;
-    background: #4a8aff;
-    border-radius: 50%;
-    cursor: pointer;
+  -webkit-appearance: none; width: 14px; height: 14px;
+  background: var(--accent-teal); border-radius: 50%; cursor: pointer;
 }
 select {
-    width: 100%;
-    padding: 6px 8px;
-    background: #1a2035;
-    color: #c0c8d8;
-    border: 1px solid #2a3050;
-    border-radius: 4px;
-    font-size: 13px;
-    margin-top: 4px;
+  width: 100%; padding: 6px 8px; background: var(--bg);
+  color: var(--text-primary); border: 1px solid var(--border);
+  border-radius: 4px; font-size: 0.8rem; margin-top: 4px;
 }
 button {
-    width: 100%;
-    padding: 8px 12px;
-    border: none;
-    border-radius: 4px;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    margin-bottom: 6px;
-    transition: background 0.2s;
+  width: 100%; padding: 8px 12px; border: none; border-radius: 6px;
+  font-size: 0.8rem; font-weight: 500; cursor: pointer; margin-bottom: 6px;
+  transition: background 0.2s; font-family: var(--font-sans);
 }
-.btn-primary {
-    background: #2a5aaa;
-    color: #e0e8ff;
-}
-.btn-primary:hover { background: #3a6abb; }
-.btn-secondary {
-    background: #1e2640;
-    color: #a0aab8;
-    border: 1px solid #2a3050;
-}
-.btn-secondary:hover { background: #2a3450; }
-.btn-danger {
-    background: #5a2020;
-    color: #ffaaaa;
-}
-.btn-danger:hover { background: #6a2a2a; }
-.btn-accent {
-    background: #2a6a3a;
-    color: #aaffbb;
-}
-.btn-accent:hover { background: #3a7a4a; }
+.btn-primary { background: var(--accent-teal); color: #fff; }
+.btn-primary:hover { filter: brightness(1.1); }
+.btn-secondary { background: var(--bg-metric); color: var(--text-secondary); border: 1px solid var(--border); }
+.btn-secondary:hover { background: var(--bg-hover); border-color: var(--accent-teal); }
+.btn-danger { background: #fdf0ee; color: var(--accent-coral); border: 1px solid rgba(201,107,90,0.3); }
+.btn-danger:hover { background: #fce8e4; }
+.btn-accent { background: rgba(74,138,90,0.1); color: var(--accent-green); border: 1px solid rgba(74,138,90,0.25); }
+.btn-accent:hover { background: rgba(74,138,90,0.15); }
 
-/* Explanation hints on controls */
 .control-hint {
-    font-size: 11px;
-    color: #5a6880;
-    line-height: 1.4;
-    margin-bottom: 10px;
-    padding: 6px 8px;
-    background: rgba(74, 138, 255, 0.04);
-    border-radius: 4px;
-    border-left: 2px solid #2a3a60;
+  font-size: 0.72rem; color: var(--text-tertiary); line-height: 1.4;
+  margin-bottom: 10px; padding: 6px 8px;
+  background: var(--accent-teal-light); border-radius: 4px;
+  border-left: 2px solid var(--accent-teal);
 }
 
 /* Bureaucracy Meter */
 .bureaucracy-meter {
-    margin-top: 8px;
-    padding: 10px;
-    background: #141a2e;
-    border: 1px solid #1e2640;
-    border-radius: 6px;
+  margin-top: 8px; padding: 10px;
+  background: var(--bg-metric); border: 1px solid var(--border); border-radius: var(--radius);
 }
 .bureaucracy-meter h4 {
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    color: #5a6a8a;
-    margin-bottom: 6px;
+  font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--text-tertiary); margin-bottom: 6px;
 }
-.bureaucracy-bar-bg {
-    width: 100%;
-    height: 8px;
-    background: #1e2640;
-    border-radius: 4px;
-    overflow: hidden;
-    margin-bottom: 6px;
-}
-.bureaucracy-bar-fill {
-    height: 100%;
-    border-radius: 4px;
-    transition: width 0.4s, background 0.4s;
-}
-.bureaucracy-label {
-    font-size: 12px;
-    color: #8890a8;
-}
-.bureaucracy-meetings {
-    font-size: 18px;
-    font-weight: 700;
-    color: #7eb8ff;
-}
+.bureaucracy-bar-bg { width: 100%; height: 8px; background: var(--border-light); border-radius: 4px; overflow: hidden; margin-bottom: 6px; }
+.bureaucracy-bar-fill { height: 100%; border-radius: 4px; transition: width 0.4s, background 0.4s; }
+.bureaucracy-label { font-size: 0.75rem; color: var(--text-secondary); }
+.bureaucracy-meetings { font-size: 1.1rem; font-weight: 700; color: var(--accent-teal); }
 
-/* Real-world examples panel */
-.examples-panel {
-    margin-top: 12px;
-}
+/* Examples panel */
+.examples-panel { margin-top: 12px; }
 .example-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 8px;
-    margin-bottom: 4px;
-    border-radius: 4px;
-    font-size: 12px;
-    transition: background 0.3s;
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 8px; margin-bottom: 4px; border-radius: 4px;
+  font-size: 0.75rem; transition: background 0.3s; cursor: pointer;
 }
-.example-row.active-example {
-    background: rgba(74, 138, 255, 0.1);
-}
-.example-k {
-    font-weight: 700;
-    color: #7eb8ff;
-    min-width: 32px;
-}
-.example-name {
-    color: #a0aab8;
-}
-.example-emoji {
-    font-size: 14px;
-}
+.example-row:hover { background: var(--bg-hover); }
+.example-row.active-example { background: rgba(42,127,127,0.08); }
+.example-k { font-weight: 700; color: var(--accent-teal); min-width: 32px; }
+.example-name { color: var(--text-secondary); }
+.example-emoji { font-size: 14px; }
 
 /* Preset Experiments */
-.preset-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-}
+.preset-grid { display: flex; flex-direction: column; gap: 5px; }
 .preset-btn {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 7px 10px;
-    background: #141a2e;
-    border: 1px solid #1e2640;
-    border-radius: 6px;
-    color: #a0aab8;
-    font-size: 12px;
-    cursor: pointer;
-    transition: background 0.2s, border-color 0.2s;
-    text-align: left;
-    position: relative;
-    margin-bottom: 0;
+  width: 100%; display: flex; align-items: center; gap: 8px;
+  padding: 7px 10px; background: var(--bg-metric);
+  border: 1px solid var(--border); border-radius: 6px;
+  color: var(--text-secondary); font-size: 0.75rem;
+  cursor: pointer; transition: background 0.2s, border-color 0.2s;
+  text-align: left; position: relative; margin-bottom: 0;
 }
-.preset-btn:hover {
-    background: #1a2240;
-    border-color: #3a4a70;
-}
+.preset-btn:hover { background: var(--bg-hover); border-color: var(--accent-teal); }
 .preset-btn .preset-tag {
-    display: inline-block;
-    font-size: 10px;
-    font-weight: 700;
-    padding: 1px 6px;
-    border-radius: 3px;
-    min-width: 52px;
-    text-align: center;
-    flex-shrink: 0;
+  display: inline-block; font-size: 0.62rem; font-weight: 700;
+  padding: 1px 6px; border-radius: 3px; min-width: 52px; text-align: center; flex-shrink: 0;
 }
-.preset-tag.tag-ordered {
-    background: rgba(74,170,106,0.15);
-    color: #4aaa6a;
-    border: 1px solid rgba(74,170,106,0.3);
-}
-.preset-tag.tag-critical {
-    background: rgba(221,170,51,0.15);
-    color: #ddaa33;
-    border: 1px solid rgba(221,170,51,0.3);
-}
-.preset-tag.tag-chaotic {
-    background: rgba(204,85,85,0.15);
-    color: #cc5555;
-    border: 1px solid rgba(204,85,85,0.3);
-}
-.preset-tag.tag-hierarchy {
-    background: rgba(140,120,220,0.15);
-    color: #9988dd;
-    border: 1px solid rgba(140,120,220,0.3);
-}
-.preset-tag.tag-scale {
-    background: rgba(74,138,255,0.15);
-    color: #7eb8ff;
-    border: 1px solid rgba(74,138,255,0.3);
-}
-.preset-btn .preset-name {
-    color: #c0c8d8;
-    font-weight: 500;
-    white-space: nowrap;
-}
-.preset-btn .preset-detail {
-    color: #5a6880;
-    font-size: 11px;
-    margin-left: auto;
-    white-space: nowrap;
-}
+.preset-tag.tag-ordered { background: rgba(74,138,90,0.1); color: var(--accent-green); border: 1px solid rgba(74,138,90,0.25); }
+.preset-tag.tag-critical { background: rgba(176,138,58,0.1); color: var(--accent-amber); border: 1px solid rgba(176,138,58,0.25); }
+.preset-tag.tag-chaotic { background: rgba(201,107,90,0.1); color: var(--accent-coral); border: 1px solid rgba(201,107,90,0.25); }
+.preset-tag.tag-hierarchy { background: rgba(138,106,170,0.1); color: #8a6aaa; border: 1px solid rgba(138,106,170,0.25); }
+.preset-tag.tag-scale { background: rgba(42,127,127,0.1); color: var(--accent-teal); border: 1px solid rgba(42,127,127,0.25); }
+.preset-btn .preset-name { color: var(--text-primary); font-weight: 500; white-space: nowrap; }
+.preset-btn .preset-detail { color: var(--text-tertiary); font-size: 0.7rem; margin-left: auto; white-space: nowrap; }
 .preset-tooltip {
-    position: fixed;
-    padding: 8px 12px;
-    background: #1a2240;
-    border: 1px solid #3a4a70;
-    border-radius: 6px;
-    color: #c0c8e0;
-    font-size: 12px;
-    line-height: 1.4;
-    max-width: 260px;
-    pointer-events: none;
-    z-index: 999;
-    opacity: 0;
-    transition: opacity 0.2s;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  position: fixed; padding: 8px 12px;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); color: var(--text-secondary);
+  font-size: 0.75rem; line-height: 1.4; max-width: 260px;
+  pointer-events: none; z-index: 999; opacity: 0;
+  transition: opacity 0.2s; box-shadow: var(--shadow-md);
 }
-.preset-tooltip.visible {
-    opacity: 1;
-}
+.preset-tooltip.visible { opacity: 1; }
 
 /* Visualization Area */
 .viz-area {
-    display: flex;
-    flex-direction: column;
-    background: #0c1019;
-    min-height: 0;
-    overflow: hidden;
+  display: flex; flex-direction: column;
+  background: var(--bg-metric); min-height: 0; overflow: hidden;
 }
 .viz-tabs {
-    display: flex;
-    background: #0f1424;
-    border-bottom: 1px solid #1e2640;
+  display: flex; background: var(--bg-card); border-bottom: 1px solid var(--border);
 }
 .viz-tab {
-    padding: 10px 20px;
-    font-size: 13px;
-    color: #6a7a9a;
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    transition: all 0.2s;
+  padding: 10px 20px; font-size: 0.8rem; color: var(--text-tertiary);
+  cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s;
 }
-.viz-tab:hover { color: #a0b0d0; }
-.viz-tab.active {
-    color: #7eb8ff;
-    border-bottom-color: #4a8aff;
-}
-/* Contextual explanation below viz tabs */
+.viz-tab:hover { color: var(--text-primary); }
+.viz-tab.active { color: var(--accent-teal); border-bottom-color: var(--accent-teal); }
 .viz-explanation {
-    padding: 8px 16px;
-    font-size: 12px;
-    color: #6a7a9a;
-    line-height: 1.5;
-    background: rgba(15, 20, 36, 0.6);
-    border-bottom: 1px solid #1a2030;
-    min-height: 38px;
-    transition: opacity 0.3s;
+  padding: 8px 16px; font-size: 0.75rem; color: var(--text-tertiary);
+  line-height: 1.5; background: var(--bg-card);
+  border-bottom: 1px solid var(--border-light); min-height: 38px;
+  transition: opacity 0.3s;
 }
-.viz-content {
-    flex: 1;
-    position: relative;
-    min-height: 0;
-    overflow: hidden;
-}
-canvas {
-    display: block;
-}
+.viz-content { flex: 1; position: relative; min-height: 0; overflow: hidden; }
+canvas { display: block; }
 
 /* Metrics Panel */
 .metrics {
-    background: #0f1424;
-    border-left: 1px solid #1e2640;
-    padding: 16px;
-    overflow-y: auto;
+  background: var(--bg-card); border-left: 1px solid var(--border);
+  padding: 16px; overflow-y: auto;
 }
 .metric-card {
-    background: #141a2e;
-    border: 1px solid #1e2640;
-    border-radius: 6px;
-    padding: 12px;
-    margin-bottom: 10px;
+  background: var(--bg-metric); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 12px; margin-bottom: 10px;
 }
 .metric-card h4 {
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    color: #5a6a8a;
-    margin-bottom: 6px;
+  font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--text-tertiary); margin-bottom: 6px; font-weight: 600;
 }
-.metric-value {
-    font-size: 24px;
-    font-weight: 700;
-    color: #7eb8ff;
-}
-.metric-value.ordered { color: #4aaa6a; }
-.metric-value.chaotic { color: #cc5555; }
-.metric-value.critical { color: #ddaa33; }
-.metric-sub {
-    font-size: 11px;
-    color: #6a7a9a;
-    margin-top: 2px;
-}
-.cascade-bar {
-    display: flex;
-    align-items: center;
-    margin: 2px 0;
-}
-.cascade-bar .bar {
-    height: 6px;
-    background: #4a8aff;
-    border-radius: 3px;
-    margin-left: 8px;
-}
-.cascade-bar .label {
-    font-size: 10px;
-    color: #6a7a9a;
-    min-width: 24px;
-}
+.metric-value { font-size: 1.4rem; font-weight: 700; color: var(--accent-teal); font-family: var(--font-mono); }
+.metric-value.ordered { color: var(--accent-green); }
+.metric-value.chaotic { color: var(--accent-coral); }
+.metric-value.critical { color: var(--accent-amber); }
+.metric-sub { font-size: 0.7rem; color: var(--text-tertiary); margin-top: 2px; }
+.cascade-bar { display: flex; align-items: center; margin: 2px 0; }
+.cascade-bar .bar { height: 6px; background: var(--accent-teal); border-radius: 3px; margin-left: 8px; }
+.cascade-bar .label { font-size: 0.62rem; color: var(--text-tertiary); min-width: 24px; }
 
-/* Phase diagram legend */
-.legend {
-    display: flex;
-    gap: 12px;
-    margin-top: 8px;
-    flex-wrap: wrap;
-}
-.legend-item {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 11px;
-    color: #8890a8;
-}
-.legend-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-}
-.speed-display {
-    font-size: 11px;
-    color: #6a7a9a;
-    text-align: center;
-    margin-top: 4px;
-}
+/* Legend */
+.legend { display: flex; gap: 12px; margin-top: 8px; flex-wrap: wrap; }
+.legend-item { display: flex; align-items: center; gap: 4px; font-size: 0.7rem; color: var(--text-tertiary); }
+.legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+.speed-display { font-size: 0.7rem; color: var(--text-tertiary); text-align: center; margin-top: 4px; }
 
 /* Key insight card in metrics */
 .insight-card {
-    background: linear-gradient(135deg, #1a2a4a 0%, #142040 100%);
-    border: 1px solid #2a3a60;
-    border-left: 3px solid #ddaa33;
-    border-radius: 6px;
-    padding: 12px;
-    margin-bottom: 10px;
+  background: var(--accent-teal-light); border: 1px solid #c0dede;
+  border-left: 3px solid var(--accent-teal);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 12px; margin-bottom: 10px;
 }
 .insight-card h4 {
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    color: #ddaa33;
-    margin-bottom: 6px;
+  font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--accent-teal); margin-bottom: 6px; font-weight: 600;
 }
-.insight-card p {
-    font-size: 12px;
-    line-height: 1.5;
-    color: #a0aac0;
-}
+.insight-card p { font-size: 0.75rem; line-height: 1.5; color: var(--text-secondary); }
 
 /* Cascade ripple animation on canvas overlay */
 @keyframes ripple {
-    0% { transform: scale(0.5); opacity: 0.8; }
-    100% { transform: scale(3); opacity: 0; }
+  0% { transform: scale(0.5); opacity: 0.8; }
+  100% { transform: scale(3); opacity: 0; }
 }
 .ripple-ring {
-    position: absolute;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    border: 2px solid #ff6644;
-    pointer-events: none;
-    animation: ripple 0.8s ease-out forwards;
+  position: absolute; width: 40px; height: 40px; border-radius: 50%;
+  border: 2px solid var(--accent-coral); pointer-events: none;
+  animation: ripple 0.8s ease-out forwards;
+}
+
+/* Responsive */
+@media (max-width: 1100px) {
+  .main { grid-template-columns: 1fr; height: auto; }
+  .controls { border-right: none; border-bottom: 1px solid var(--border); }
+  .metrics { border-left: none; border-top: 1px solid var(--border); }
+  .viz-area { min-height: 500px; }
 }
 </style>
 </head>
 <body>
 
-<!-- Intro Overlay -->
-<div class="intro-overlay" id="intro-overlay">
-    <div class="intro-card">
-        <h1>The Complexity Catastrophe</h1>
-        <div class="tagline">Kauffman NK Model -- Why organizations freeze, melt, or thrive</div>
-        <div class="metaphor">
-            <strong>Imagine your company as a network of Christmas tree lights.</strong> Each person (light) makes decisions based on what their colleagues (neighboring lights) do. When the network is sparse, it's orderly but rigid. When it's dense, tiny changes cascade everywhere -- the "complexity catastrophe." This is why bureaucracy grows, why IBM couldn't respond to Dell, and why hierarchy actually saves meetings.
-        </div>
-        <div class="key-insight">
-            <h3>Key Insight</h3>
-            <p>Stuart Kauffman discovered that networks with 2-4 connections per node sit at the sweet spot between order and chaos -- exactly the size of real-world working groups (5-9 people). Evolution didn't stumble on this by accident. Our ancestors who organized in groups this size survived. Those who tried 30-person decision committees didn't.</p>
-        </div>
-        <button class="intro-start-btn" id="btn-start">Explore the Simulation</button>
-    </div>
+<!-- Nav bar -->
+<div class="nav-bar">
+  <span class="nav-title">Boolean Network / Complexity Catastrophe</span>
+  <a href="../" class="nav-back">&larr; Dashboard</a>
 </div>
 
-<div class="header">
-    <div>
-        <h1>Boolean Network / Complexity Catastrophe</h1>
-        <div class="subtitle">Kauffman NK Model -- Phase Transitions, Cascades & Attractors</div>
-    </div>
+<!-- Hero (inline, no overlay) -->
+<div class="hero">
+  <h1>The Complexity Catastrophe</h1>
+  <div class="tagline">Kauffman NK Model -- Why organizations freeze, melt, or thrive</div>
+  <p>
+    <strong>Imagine your company as a network of Christmas tree lights.</strong> Each person (light) makes decisions based on what their colleagues (neighboring lights) do. When the network is sparse, it's orderly but rigid. When it's dense, tiny changes cascade everywhere -- the "complexity catastrophe." This is why bureaucracy grows, why IBM couldn't respond to Dell, and why hierarchy actually saves meetings.
+  </p>
+  <div class="key-insight">
+    <h3>Beinhocker's Key Insight</h3>
+    <p>Stuart Kauffman discovered that networks with 2-4 connections per node sit at the sweet spot between order and chaos -- exactly the size of real-world working groups (5-9 people). Evolution didn't stumble on this by accident. Our ancestors who organized in groups this size survived. Those who tried 30-person decision committees didn't.</p>
+  </div>
 </div>
 
 <!-- Regime indicators banner -->
 <div class="regime-banner" id="regime-banner">
-    <div class="regime-indicator" id="regime-frozen">
-        <span class="regime-emoji">&#x1F9CA;</span>
-        <div>
-            <div class="regime-label">Frozen</div>
-            <div class="regime-metaphor">like a rigid bureaucracy</div>
-        </div>
+  <div class="regime-indicator" id="regime-frozen">
+    <span class="regime-emoji">&#x1F9CA;</span>
+    <div>
+      <div class="regime-label">Frozen</div>
+      <div class="regime-metaphor">like a rigid bureaucracy</div>
     </div>
-    <div class="regime-indicator" id="regime-edge">
-        <span class="regime-emoji">&#x1F30A;</span>
-        <div>
-            <div class="regime-label">Edge of Chaos</div>
-            <div class="regime-metaphor">like a jazz band</div>
-        </div>
+  </div>
+  <div class="regime-indicator" id="regime-edge">
+    <span class="regime-emoji">&#x1F30A;</span>
+    <div>
+      <div class="regime-label">Edge of Chaos</div>
+      <div class="regime-metaphor">like a jazz band</div>
     </div>
-    <div class="regime-indicator" id="regime-chaotic">
-        <span class="regime-emoji">&#x1F525;</span>
-        <div>
-            <div class="regime-label">Chaotic</div>
-            <div class="regime-metaphor">like a room full of toddlers</div>
-        </div>
+  </div>
+  <div class="regime-indicator" id="regime-chaotic">
+    <span class="regime-emoji">&#x1F525;</span>
+    <div>
+      <div class="regime-label">Chaotic</div>
+      <div class="regime-metaphor">like a room full of toddlers</div>
     </div>
+  </div>
 </div>
 
 <!-- Narrative bar -->
 <div class="narrative-bar" id="narrative-bar">
-    Create a network to begin exploring complexity.
+  Create a network to begin exploring complexity.
 </div>
 
 <div class="main">
-    <!-- Left: Controls -->
-    <div class="controls">
-        <div class="control-section">
-            <h3>Network Parameters</h3>
-            <div class="control-hint">K is the key parameter. Low K = rigid order. High K = chaos. The magic happens around K=2-4.</div>
-            <div class="control-row">
-                <label>Nodes (N)</label>
-                <span class="value" id="val-N">50</span>
-            </div>
-            <input type="range" id="slider-N" min="10" max="200" value="50" step="5">
-
-            <div class="control-row">
-                <label>Connectivity (K)</label>
-                <span class="value" id="val-K">2</span>
-            </div>
-            <input type="range" id="slider-K" min="1" max="10" value="2">
-
-            <div class="control-row">
-                <label>Bias (p)</label>
-                <span class="value" id="val-bias">0.50</span>
-            </div>
-            <input type="range" id="slider-bias" min="5" max="95" value="50">
-
-            <div class="control-row">
-                <label>Topology</label>
-            </div>
-            <select id="sel-topology">
-                <option value="random">Random (Kauffman)</option>
-                <option value="lattice">Ring Lattice</option>
-                <option value="hierarchy">Hierarchical</option>
-                <option value="small-world">Small World</option>
-            </select>
-        </div>
-
-        <div class="control-section">
-            <h3>Simulation</h3>
-            <button class="btn-primary" id="btn-reset">New Network</button>
-            <button class="btn-accent" id="btn-play">Play / Pause</button>
-            <button class="btn-secondary" id="btn-step">Single Step</button>
-            <button class="btn-danger" id="btn-perturb">Perturb Random Node</button>
-            <div class="control-row">
-                <label>Speed</label>
-                <span class="value" id="val-speed">5</span>
-            </div>
-            <input type="range" id="slider-speed" min="1" max="20" value="5">
-            <div class="speed-display" id="speed-display">200ms per step</div>
-        </div>
-
-        <div class="control-section">
-            <h3>Phase Diagram</h3>
-            <button class="btn-primary" id="btn-phase">Compute Phase Diagram</button>
-            <div class="control-row">
-                <label>K range</label>
-                <span class="value">1-8</span>
-            </div>
-            <div class="legend">
-                <div class="legend-item"><div class="legend-dot" style="background:#4aaa6a"></div> Ordered</div>
-                <div class="legend-item"><div class="legend-dot" style="background:#ddaa33"></div> Critical</div>
-                <div class="legend-item"><div class="legend-dot" style="background:#cc5555"></div> Chaotic</div>
-            </div>
-        </div>
-
-        <div class="control-section">
-            <h3>Analysis</h3>
-            <button class="btn-secondary" id="btn-derrida">Derrida Curve</button>
-            <button class="btn-secondary" id="btn-attractor">Find Attractor</button>
-        </div>
-
-        <!-- Bureaucracy Meter -->
-        <div class="control-section">
-            <h3>Bureaucracy Meter</h3>
-            <div class="bureaucracy-meter" id="bureaucracy-meter">
-                <div class="bureaucracy-bar-bg">
-                    <div class="bureaucracy-bar-fill" id="bureaucracy-bar" style="width:0%;background:#4aaa6a"></div>
-                </div>
-                <div style="display:flex;justify-content:space-between;align-items:baseline">
-                    <span class="bureaucracy-label" id="bureaucracy-label">No network yet</span>
-                    <span class="bureaucracy-meetings" id="bureaucracy-meetings">--</span>
-                </div>
-                <div style="font-size:10px;color:#5a6880;margin-top:4px" id="bureaucracy-desc">meetings needed</div>
-            </div>
-        </div>
-
-        <!-- Real-world examples -->
-        <div class="control-section examples-panel">
-            <h3>Real-World Analogies</h3>
-            <div class="example-row" data-k="1" id="ex-k1">
-                <span class="example-emoji">&#x1F3ED;</span>
-                <span class="example-k">K=1</span>
-                <span class="example-name">Assembly line</span>
-            </div>
-            <div class="example-row" data-k="2" id="ex-k2">
-                <span class="example-emoji">&#x1FA96;</span>
-                <span class="example-k">K=2</span>
-                <span class="example-name">Army platoon</span>
-            </div>
-            <div class="example-row" data-k="3" id="ex-k3">
-                <span class="example-emoji">&#x1F3B7;</span>
-                <span class="example-k">K=3</span>
-                <span class="example-name">Jazz quartet</span>
-            </div>
-            <div class="example-row" data-k="4" id="ex-k4">
-                <span class="example-emoji">&#x1F680;</span>
-                <span class="example-k">K=4</span>
-                <span class="example-name">Startup team</span>
-            </div>
-            <div class="example-row" data-k="6" id="ex-k6">
-                <span class="example-emoji">&#x1F4CB;</span>
-                <span class="example-k">K=6</span>
-                <span class="example-name">Corporate board</span>
-            </div>
-            <div class="example-row" data-k="8" id="ex-k8">
-                <span class="example-emoji">&#x1F4A5;</span>
-                <span class="example-k">K=8</span>
-                <span class="example-name">Design committee from hell</span>
-            </div>
-        </div>
-
-        <!-- Preset Experiments -->
-        <div class="control-section">
-            <h3>Preset Experiments</h3>
-            <div class="control-hint">Jump to key scenarios from the findings. Each preset configures the network to reproduce a specific experimental result.</div>
-            <div class="preset-grid">
-                <button class="preset-btn" id="preset-ordered"
-                    data-n="50" data-k="1" data-bias="50" data-topology="random"
-                    data-expect="Frozen dynamics: Derrida 0.445, cascades hit only 5.8% of nodes. Perturbations are absorbed -- stable but rigid.">
-                    <span class="preset-tag tag-ordered">Ordered</span>
-                    <span class="preset-name">K=1 Frozen</span>
-                    <span class="preset-detail">N=50</span>
-                </button>
-                <button class="preset-btn" id="preset-critical"
-                    data-n="50" data-k="2" data-bias="50" data-topology="random"
-                    data-expect="Edge of chaos: Derrida 1.010, cascades range from tiny to 48% of network. The sweet spot for adaptation.">
-                    <span class="preset-tag tag-critical">Critical</span>
-                    <span class="preset-name">K=2 Edge of Chaos</span>
-                    <span class="preset-detail">N=50</span>
-                </button>
-                <button class="preset-btn" id="preset-chaotic"
-                    data-n="50" data-k="5" data-bias="50" data-topology="random"
-                    data-expect="Total chaos: Derrida 2.265, 93% cascade spread, zero attractors found. Every change propagates everywhere.">
-                    <span class="preset-tag tag-chaotic">Chaotic</span>
-                    <span class="preset-name">K=5 Chaotic</span>
-                    <span class="preset-detail">N=50</span>
-                </button>
-                <button class="preset-btn" id="preset-hierarchy"
-                    data-n="50" data-k="3" data-bias="50" data-topology="hierarchy"
-                    data-expect="Hierarchy as firebreak: K=3 is chaotic, but hierarchical wiring constrains cascades. Benefit grows dramatically at larger N.">
-                    <span class="preset-tag tag-hierarchy">Hierarchy</span>
-                    <span class="preset-name">K=3 Tames Chaos</span>
-                    <span class="preset-detail">N=50</span>
-                </button>
-                <button class="preset-btn" id="preset-large"
-                    data-n="200" data-k="2" data-bias="50" data-topology="random"
-                    data-expect="Graceful scaling: K=2 stays critical at N=200. Cascade % drops from 23% (N=20) to 7.2% (N=200). The system scales without breaking.">
-                    <span class="preset-tag tag-scale">Scale</span>
-                    <span class="preset-name">K=2 Large Network</span>
-                    <span class="preset-detail">N=200</span>
-                </button>
-                <button class="preset-btn" id="preset-smallworld"
-                    data-n="50" data-k="2" data-bias="50" data-topology="small-world"
-                    data-expect="Small-world wiring: K=2 with clustered shortcuts. Combines local order with global reach -- like real social networks.">
-                    <span class="preset-tag tag-critical">Critical</span>
-                    <span class="preset-name">K=2 Small World</span>
-                    <span class="preset-detail">N=50</span>
-                </button>
-            </div>
-        </div>
-        <div class="preset-tooltip" id="preset-tooltip"></div>
+  <!-- Left: Controls -->
+  <div class="controls">
+    <div class="control-section">
+      <h3>Network Parameters</h3>
+      <div class="control-hint">K is the key parameter. Low K = rigid order. High K = chaos. The magic happens around K=2-4.</div>
+      <div class="control-row"><label>Nodes (N)</label><span class="value" id="val-N">50</span></div>
+      <input type="range" id="slider-N" min="10" max="200" value="50" step="5">
+      <div class="control-row"><label>Connectivity (K)</label><span class="value" id="val-K">2</span></div>
+      <input type="range" id="slider-K" min="1" max="10" value="2">
+      <div class="control-row"><label>Bias (p)</label><span class="value" id="val-bias">0.50</span></div>
+      <input type="range" id="slider-bias" min="5" max="95" value="50">
+      <div class="control-row"><label>Topology</label></div>
+      <select id="sel-topology">
+        <option value="random">Random (Kauffman)</option>
+        <option value="lattice">Ring Lattice</option>
+        <option value="hierarchy">Hierarchical</option>
+        <option value="small-world">Small World</option>
+      </select>
     </div>
 
-    <!-- Center: Visualization -->
-    <div class="viz-area">
-        <div class="viz-tabs">
-            <div class="viz-tab active" data-tab="network">Network</div>
-            <div class="viz-tab" data-tab="phase">Phase Diagram</div>
-            <div class="viz-tab" data-tab="derrida">Derrida Curve</div>
-            <div class="viz-tab" data-tab="history">State History</div>
-        </div>
-        <div class="viz-explanation" id="viz-explanation">
-            Each node is a decision-maker. Click one to "change their mind" and watch whether the change stays local (ordered) or cascades wildly (chaotic).
-        </div>
-        <div class="viz-content">
-            <canvas id="canvas"></canvas>
-        </div>
+    <div class="control-section">
+      <h3>Simulation</h3>
+      <button class="btn-primary" id="btn-reset">New Network</button>
+      <button class="btn-accent" id="btn-play">Play / Pause</button>
+      <button class="btn-secondary" id="btn-step">Single Step</button>
+      <button class="btn-danger" id="btn-perturb">Perturb Random Node</button>
+      <div class="control-row"><label>Speed</label><span class="value" id="val-speed">5</span></div>
+      <input type="range" id="slider-speed" min="1" max="20" value="5">
+      <div class="speed-display" id="speed-display">200ms per step</div>
     </div>
 
-    <!-- Right: Metrics -->
-    <div class="metrics">
-        <div class="metric-card">
-            <h4>Regime</h4>
-            <div class="metric-value" id="metric-regime">--</div>
-            <div class="metric-sub" id="metric-regime-sub">Create a network to analyze</div>
-        </div>
-
-        <div class="insight-card">
-            <h4>Key Insight</h4>
-            <p>Networks with K=2-4 connections per node sit at the sweet spot between order and chaos. This mirrors real working groups of 5-9 people -- the size evolution selected for.</p>
-        </div>
-
-        <div class="metric-card">
-            <h4>Derrida Parameter (&lambda;)</h4>
-            <div class="metric-value" id="metric-derrida">--</div>
-            <div class="metric-sub" id="metric-derrida-sub">
-                &lambda; &lt; 1: ordered | &lambda; = 1: critical | &lambda; &gt; 1: chaotic
-            </div>
-        </div>
-        <div class="metric-card">
-            <h4>Theoretical &lambda;</h4>
-            <div class="metric-value" id="metric-theory">--</div>
-            <div class="metric-sub">2K &middot; p(1-p)</div>
-        </div>
-        <div class="metric-card">
-            <h4>Tick</h4>
-            <div class="metric-value" id="metric-tick">0</div>
-        </div>
-        <div class="metric-card">
-            <h4>Active Nodes</h4>
-            <div class="metric-value" id="metric-active">--</div>
-            <div class="metric-sub" id="metric-active-sub"></div>
-        </div>
-        <div class="metric-card">
-            <h4>Cycle Length</h4>
-            <div class="metric-value" id="metric-cycle">--</div>
-            <div class="metric-sub" id="metric-cycle-sub">Click "Find Attractor"</div>
-        </div>
-        <div class="metric-card">
-            <h4>Last Cascade</h4>
-            <div class="metric-value" id="metric-cascade">--</div>
-            <div class="metric-sub" id="metric-cascade-sub">Click a node or "Perturb" to measure</div>
-        </div>
-        <div class="metric-card">
-            <h4>Cascade Distribution</h4>
-            <div id="cascade-dist"></div>
-        </div>
+    <div class="control-section">
+      <h3>Phase Diagram</h3>
+      <button class="btn-primary" id="btn-phase">Compute Phase Diagram</button>
+      <div class="control-row"><label>K range</label><span class="value">1-8</span></div>
+      <div class="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--accent-green)"></div> Ordered</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--accent-amber)"></div> Critical</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--accent-coral)"></div> Chaotic</div>
+      </div>
     </div>
+
+    <div class="control-section">
+      <h3>Analysis</h3>
+      <button class="btn-secondary" id="btn-derrida">Derrida Curve</button>
+      <button class="btn-secondary" id="btn-attractor">Find Attractor</button>
+    </div>
+
+    <div class="control-section">
+      <h3>Bureaucracy Meter</h3>
+      <div class="bureaucracy-meter" id="bureaucracy-meter">
+        <div class="bureaucracy-bar-bg">
+          <div class="bureaucracy-bar-fill" id="bureaucracy-bar" style="width:0%;background:var(--accent-green)"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline">
+          <span class="bureaucracy-label" id="bureaucracy-label">No network yet</span>
+          <span class="bureaucracy-meetings" id="bureaucracy-meetings">--</span>
+        </div>
+        <div style="font-size:0.62rem;color:var(--text-tertiary);margin-top:4px" id="bureaucracy-desc">meetings needed</div>
+      </div>
+    </div>
+
+    <div class="control-section examples-panel">
+      <h3>Real-World Analogies</h3>
+      <div class="example-row" data-k="1" id="ex-k1">
+        <span class="example-emoji">&#x1F3ED;</span>
+        <span class="example-k">K=1</span>
+        <span class="example-name">Assembly line</span>
+      </div>
+      <div class="example-row" data-k="2" id="ex-k2">
+        <span class="example-emoji">&#x1FA96;</span>
+        <span class="example-k">K=2</span>
+        <span class="example-name">Army platoon</span>
+      </div>
+      <div class="example-row" data-k="3" id="ex-k3">
+        <span class="example-emoji">&#x1F3B7;</span>
+        <span class="example-k">K=3</span>
+        <span class="example-name">Jazz quartet</span>
+      </div>
+      <div class="example-row" data-k="4" id="ex-k4">
+        <span class="example-emoji">&#x1F680;</span>
+        <span class="example-k">K=4</span>
+        <span class="example-name">Startup team</span>
+      </div>
+      <div class="example-row" data-k="6" id="ex-k6">
+        <span class="example-emoji">&#x1F4CB;</span>
+        <span class="example-k">K=6</span>
+        <span class="example-name">Corporate board</span>
+      </div>
+      <div class="example-row" data-k="8" id="ex-k8">
+        <span class="example-emoji">&#x1F4A5;</span>
+        <span class="example-k">K=8</span>
+        <span class="example-name">Design committee from hell</span>
+      </div>
+    </div>
+
+    <div class="control-section">
+      <h3>Preset Experiments</h3>
+      <div class="control-hint">Jump to key scenarios from the findings. Each preset configures the network to reproduce a specific experimental result.</div>
+      <div class="preset-grid">
+        <button class="preset-btn" id="preset-ordered" data-n="50" data-k="1" data-bias="50" data-topology="random" data-expect="Frozen dynamics: Derrida 0.445, cascades hit only 5.8% of nodes. Perturbations are absorbed -- stable but rigid.">
+          <span class="preset-tag tag-ordered">Ordered</span>
+          <span class="preset-name">K=1 Frozen</span>
+          <span class="preset-detail">N=50</span>
+        </button>
+        <button class="preset-btn" id="preset-critical" data-n="50" data-k="2" data-bias="50" data-topology="random" data-expect="Edge of chaos: Derrida 1.010, cascades range from tiny to 48% of network. The sweet spot for adaptation.">
+          <span class="preset-tag tag-critical">Critical</span>
+          <span class="preset-name">K=2 Edge of Chaos</span>
+          <span class="preset-detail">N=50</span>
+        </button>
+        <button class="preset-btn" id="preset-chaotic" data-n="50" data-k="5" data-bias="50" data-topology="random" data-expect="Total chaos: Derrida 2.265, 93% cascade spread, zero attractors found. Every change propagates everywhere.">
+          <span class="preset-tag tag-chaotic">Chaotic</span>
+          <span class="preset-name">K=5 Chaotic</span>
+          <span class="preset-detail">N=50</span>
+        </button>
+        <button class="preset-btn" id="preset-hierarchy" data-n="50" data-k="3" data-bias="50" data-topology="hierarchy" data-expect="Hierarchy as firebreak: K=3 is chaotic, but hierarchical wiring constrains cascades. Benefit grows dramatically at larger N.">
+          <span class="preset-tag tag-hierarchy">Hierarchy</span>
+          <span class="preset-name">K=3 Tames Chaos</span>
+          <span class="preset-detail">N=50</span>
+        </button>
+        <button class="preset-btn" id="preset-large" data-n="200" data-k="2" data-bias="50" data-topology="random" data-expect="Graceful scaling: K=2 stays critical at N=200. Cascade % drops from 23% (N=20) to 7.2% (N=200). The system scales without breaking.">
+          <span class="preset-tag tag-scale">Scale</span>
+          <span class="preset-name">K=2 Large Network</span>
+          <span class="preset-detail">N=200</span>
+        </button>
+        <button class="preset-btn" id="preset-smallworld" data-n="50" data-k="2" data-bias="50" data-topology="small-world" data-expect="Small-world wiring: K=2 with clustered shortcuts. Combines local order with global reach -- like real social networks.">
+          <span class="preset-tag tag-critical">Critical</span>
+          <span class="preset-name">K=2 Small World</span>
+          <span class="preset-detail">N=50</span>
+        </button>
+      </div>
+    </div>
+    <div class="preset-tooltip" id="preset-tooltip"></div>
+  </div>
+
+  <!-- Center: Visualization -->
+  <div class="viz-area">
+    <div class="viz-tabs">
+      <div class="viz-tab active" data-tab="network">Network</div>
+      <div class="viz-tab" data-tab="phase">Phase Diagram</div>
+      <div class="viz-tab" data-tab="derrida">Derrida Curve</div>
+      <div class="viz-tab" data-tab="history">State History</div>
+    </div>
+    <div class="viz-explanation" id="viz-explanation">
+      Each node is a decision-maker. Click one to "change their mind" and watch whether the change stays local (ordered) or cascades wildly (chaotic).
+    </div>
+    <div class="viz-content">
+      <canvas id="canvas"></canvas>
+    </div>
+  </div>
+
+  <!-- Right: Metrics -->
+  <div class="metrics">
+    <div class="metric-card">
+      <h4>Regime</h4>
+      <div class="metric-value" id="metric-regime">--</div>
+      <div class="metric-sub" id="metric-regime-sub">Create a network to analyze</div>
+    </div>
+
+    <div class="insight-card">
+      <h4>Key Insight</h4>
+      <p>Networks with K=2-4 connections per node sit at the sweet spot between order and chaos. This mirrors real working groups of 5-9 people -- the size evolution selected for.</p>
+    </div>
+
+    <div class="metric-card">
+      <h4>Derrida Parameter (&lambda;)</h4>
+      <div class="metric-value" id="metric-derrida">--</div>
+      <div class="metric-sub" id="metric-derrida-sub">&lambda; &lt; 1: ordered | &lambda; = 1: critical | &lambda; &gt; 1: chaotic</div>
+    </div>
+    <div class="metric-card">
+      <h4>Theoretical &lambda;</h4>
+      <div class="metric-value" id="metric-theory">--</div>
+      <div class="metric-sub">2K &middot; p(1-p)</div>
+    </div>
+    <div class="metric-card">
+      <h4>Tick</h4>
+      <div class="metric-value" id="metric-tick">0</div>
+    </div>
+    <div class="metric-card">
+      <h4>Active Nodes</h4>
+      <div class="metric-value" id="metric-active">--</div>
+      <div class="metric-sub" id="metric-active-sub"></div>
+    </div>
+    <div class="metric-card">
+      <h4>Cycle Length</h4>
+      <div class="metric-value" id="metric-cycle">--</div>
+      <div class="metric-sub" id="metric-cycle-sub">Click "Find Attractor"</div>
+    </div>
+    <div class="metric-card">
+      <h4>Last Cascade</h4>
+      <div class="metric-value" id="metric-cascade">--</div>
+      <div class="metric-sub" id="metric-cascade-sub">Click a node or "Perturb" to measure</div>
+    </div>
+    <div class="metric-card">
+      <h4>Cascade Distribution</h4>
+      <div id="cascade-dist"></div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -1360,10 +995,7 @@ const vizExplanations = {
     history: 'Each row is a moment in time. Each column is a node. Blue = ON, dark = OFF. Look for frozen columns (ordered) vs flickering columns (chaotic).'
 };
 
-// Intro dismiss
-document.getElementById('btn-start').addEventListener('click', () => {
-    document.getElementById('intro-overlay').classList.add('hidden');
-});
+// Intro overlay removed in light theme redesign
 
 function resizeCanvas() {
     const container = canvas.parentElement;
@@ -1641,7 +1273,7 @@ function spawnRipple(x, y, cascadeSize) {
 
         // Color based on cascade size
         if (cascadeSize > net.N * 0.3) {
-            ring.style.borderColor = '#ff4444';
+            ring.style.borderColor = '#c96b5a';
         } else if (cascadeSize > net.N * 0.1) {
             ring.style.borderColor = '#ddaa33';
         } else {
@@ -1747,8 +1379,8 @@ function updateExampleHighlight(K) {
         const rowK = parseInt(row.dataset.k);
         row.classList.toggle('active-example', rowK === K || (rowK === K - 1) || (rowK === K + 1));
         if (rowK === K) {
-            row.style.background = 'rgba(74, 138, 255, 0.15)';
-            row.style.borderLeft = '2px solid #4a8aff';
+            row.style.background = 'rgba(42,127,127,0.12)';
+            row.style.borderLeft = '2px solid #2a7f7f';
         } else {
             row.style.background = '';
             row.style.borderLeft = '';
@@ -1828,7 +1460,7 @@ function updateMetric(id, value) {
 function updateCascadeDist() {
     const container = document.getElementById('cascade-dist');
     if (cascadeHistory.length === 0) {
-        container.innerHTML = '<div style="font-size:11px;color:#6a7a9a">No data yet</div>';
+        container.innerHTML = '<div style="font-size:11px;color:#7a7a8a">No data yet</div>';
         return;
     }
     const counts = {};
@@ -1956,7 +1588,7 @@ function render() {
 
 function renderNetwork(w, h) {
     if (!net) {
-        ctx.fillStyle = '#4a5a7a';
+        ctx.fillStyle = '#7a7a8a';
         ctx.font = '14px sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText('Click "New Network" to begin', w / 2, h / 2);
@@ -1992,7 +1624,7 @@ function renderNetwork(w, h) {
 
     // Draw edges
     ctx.globalAlpha = 0.12;
-    ctx.strokeStyle = '#4a6a9a';
+    ctx.strokeStyle = '#b0b0ba';
     ctx.lineWidth = 0.5;
     for (const node of net.nodes) {
         const nx = ox + net.nodePositions[node.index].x * size;
@@ -2008,7 +1640,7 @@ function renderNetwork(w, h) {
                 ctx.lineWidth = 1.5;
             } else {
                 ctx.globalAlpha = 0.12;
-                ctx.strokeStyle = '#4a6a9a';
+                ctx.strokeStyle = '#b0b0ba';
                 ctx.lineWidth = 0.5;
             }
 
@@ -2022,7 +1654,7 @@ function renderNetwork(w, h) {
     // Highlight edges for hovered node
     if (hoveredNode >= 0) {
         ctx.globalAlpha = 0.6;
-        ctx.strokeStyle = '#7eb8ff';
+        ctx.strokeStyle = '#2a7f7f';
         ctx.lineWidth = 1.5;
         const hnode = net.nodes[hoveredNode];
         const hx = ox + net.nodePositions[hoveredNode].x * size;
@@ -2062,8 +1694,8 @@ function renderNetwork(w, h) {
                 gradient.addColorStop(0, `rgba(255, 102, 68, ${0.5 * glowIntensity})`);
                 gradient.addColorStop(1, `rgba(255, 102, 68, 0)`);
             } else {
-                gradient.addColorStop(0, `rgba(120, 180, 255, ${0.4 * flash})`);
-                gradient.addColorStop(1, `rgba(120, 180, 255, 0)`);
+                gradient.addColorStop(0, `rgba(42, 127, 127, ${0.4 * flash})`);
+                gradient.addColorStop(1, `rgba(42, 127, 127, 0)`);
             }
             ctx.beginPath();
             ctx.arc(nx, ny, glowR, 0, Math.PI * 2);
@@ -2082,11 +1714,11 @@ function renderNetwork(w, h) {
             const b255 = Math.round(50);
             ctx.fillStyle = `rgb(${r255},${g255},${b255})`;
         } else if (perturbedNodes.has(i)) {
-            ctx.fillStyle = net.nodes[i].state ? '#ff6644' : '#662222';
+            ctx.fillStyle = net.nodes[i].state ? '#ff6644' : '#f0d0d0';
         } else if (i === hoveredNode) {
-            ctx.fillStyle = net.nodes[i].state ? '#aaddff' : '#334466';
+            ctx.fillStyle = net.nodes[i].state ? '#1a6a6a' : '#d0d0da';
         } else {
-            ctx.fillStyle = net.nodes[i].state ? '#4a9aff' : '#1a2540';
+            ctx.fillStyle = net.nodes[i].state ? '#2a7f7f' : '#e8e6e0';
         }
         ctx.fill();
 
@@ -2095,14 +1727,14 @@ function renderNetwork(w, h) {
             ctx.strokeStyle = `rgba(255, 150, 80, ${glow})`;
             ctx.lineWidth = 2;
         } else {
-            ctx.strokeStyle = net.nodes[i].state ? '#6ab0ff' : '#2a3a5a';
+            ctx.strokeStyle = net.nodes[i].state ? '#3a8f8f' : '#c0c0ca';
             ctx.lineWidth = i === hoveredNode ? 2 : 1;
         }
         ctx.stroke();
     }
 
     // Info text
-    ctx.fillStyle = '#5a6a8a';
+    ctx.fillStyle = '#7a7a8a';
     ctx.font = '11px sans-serif';
     ctx.textAlign = 'left';
     ctx.fillText(`Tick: ${net.tick}  |  K=${net.K}  |  Click a node to perturb`, 10, h - 10);
@@ -2115,7 +1747,7 @@ function renderNetwork(w, h) {
 
 function renderPhaseDiagram(w, h) {
     if (!phaseData || phaseData.length === 0) {
-        ctx.fillStyle = '#4a5a7a';
+        ctx.fillStyle = '#7a7a8a';
         ctx.font = '14px sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText('Click "Compute Phase Diagram" to generate', w / 2, h / 2);
@@ -2149,7 +1781,7 @@ function renderPhaseDiagram(w, h) {
 
         // Draw lambda value
         if (cellW > 25) {
-            ctx.fillStyle = '#e0e6f0';
+            ctx.fillStyle = '#1a1a2e';
             ctx.font = '9px sans-serif';
             ctx.textAlign = 'center';
             ctx.fillText(d.derrida.toFixed(1), x + cellW / 2, y + cellH / 2 + 3);
@@ -2175,7 +1807,7 @@ function renderPhaseDiagram(w, h) {
     ctx.setLineDash([]);
 
     // Axes
-    ctx.fillStyle = '#8890a8';
+    ctx.fillStyle = '#7a7a8a';
     ctx.font = '12px sans-serif';
     ctx.textAlign = 'center';
 
@@ -2192,18 +1824,18 @@ function renderPhaseDiagram(w, h) {
     }
 
     // Title
-    ctx.fillStyle = '#7eb8ff';
+    ctx.fillStyle = '#2a7f7f';
     ctx.font = '14px sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('Phase Diagram: K vs Bias', w / 2, 25);
-    ctx.fillStyle = '#6a7a9a';
+    ctx.fillStyle = '#7a7a8a';
     ctx.font = '11px sans-serif';
     ctx.fillText('Yellow dashed line: theoretical critical boundary 2Kp(1-p)=1', w / 2, 42);
 }
 
 function renderDerridaCurve(w, h) {
     if (!derridaCurveData) {
-        ctx.fillStyle = '#4a5a7a';
+        ctx.fillStyle = '#7a7a8a';
         ctx.font = '14px sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText('Click "Derrida Curve" to compute', w / 2, h / 2);
@@ -2215,7 +1847,7 @@ function renderDerridaCurve(w, h) {
     const ph = h - margin.top - margin.bottom;
 
     // Draw diagonal (identity line)
-    ctx.strokeStyle = '#3a4a6a';
+    ctx.strokeStyle = '#c0c0ca';
     ctx.lineWidth = 1;
     ctx.setLineDash([5, 5]);
     ctx.beginPath();
@@ -2225,7 +1857,7 @@ function renderDerridaCurve(w, h) {
     ctx.setLineDash([]);
 
     // Label
-    ctx.fillStyle = '#4a5a6a';
+    ctx.fillStyle = '#7a7a8a';
     ctx.font = '10px sans-serif';
     ctx.save();
     ctx.translate(margin.left + pw * 0.75, margin.top + ph * 0.2);
@@ -2259,7 +1891,7 @@ function renderDerridaCurve(w, h) {
     }
 
     // Draw Derrida curve
-    ctx.strokeStyle = '#4a9aff';
+    ctx.strokeStyle = '#2a7f7f';
     ctx.lineWidth = 2.5;
     ctx.beginPath();
     for (let i = 0; i < derridaCurveData.length; i++) {
@@ -2272,7 +1904,7 @@ function renderDerridaCurve(w, h) {
     ctx.stroke();
 
     // Draw points
-    ctx.fillStyle = '#7eb8ff';
+    ctx.fillStyle = '#2a7f7f';
     for (const [dIn, dOut] of derridaCurveData) {
         const x = margin.left + dIn * pw;
         const y = margin.top + ph - dOut * ph;
@@ -2282,7 +1914,7 @@ function renderDerridaCurve(w, h) {
     }
 
     // Axes
-    ctx.fillStyle = '#8890a8';
+    ctx.fillStyle = '#7a7a8a';
     ctx.font = '12px sans-serif';
     ctx.textAlign = 'center';
 
@@ -2302,7 +1934,7 @@ function renderDerridaCurve(w, h) {
     ctx.restore();
 
     // Title
-    ctx.fillStyle = '#7eb8ff';
+    ctx.fillStyle = '#2a7f7f';
     ctx.font = '14px sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('Derrida Curve', w / 2, 25);
@@ -2323,7 +1955,7 @@ function renderDerridaCurve(w, h) {
 
 function renderHistory(w, h) {
     if (!net || stateHistory.length === 0) {
-        ctx.fillStyle = '#4a5a7a';
+        ctx.fillStyle = '#7a7a8a';
         ctx.font = '14px sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText('Run the simulation to see state history', w / 2, h / 2);
@@ -2345,13 +1977,13 @@ function renderHistory(w, h) {
         const y = margin.top + (t - startStep) * cellH;
         for (let i = 0; i < N; i++) {
             const x = margin.left + i * cellW;
-            ctx.fillStyle = stateHistory[t][i] ? '#4a9aff' : '#0c1019';
+            ctx.fillStyle = stateHistory[t][i] ? '#2a7f7f' : '#f0eeea';
             ctx.fillRect(x, y, Math.max(cellW - 0.5, 1), Math.max(cellH - 0.5, 1));
         }
     }
 
     // Axes
-    ctx.fillStyle = '#8890a8';
+    ctx.fillStyle = '#7a7a8a';
     ctx.font = '12px sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('Node index', w / 2, h - 10);
@@ -2363,7 +1995,7 @@ function renderHistory(w, h) {
     ctx.restore();
 
     // Title
-    ctx.fillStyle = '#7eb8ff';
+    ctx.fillStyle = '#2a7f7f';
     ctx.font = '14px sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('State History (blue=ON, dark=OFF)', w / 2, 20);

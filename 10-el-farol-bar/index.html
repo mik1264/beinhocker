@@ -13,195 +13,270 @@
 <meta name="twitter:description" content="No equilibrium exists. Agents' prediction accuracy is worse than random because strategies chase their own tails.">
 <meta name="description" content="No equilibrium exists. Agents' prediction accuracy is worse than random because strategies chase their own tails.">
 <title>El Farol Bar Problem &mdash; Inductive Reasoning</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@400;500;600;700;800;900&display=swap');
+:root {
+  --bg: #faf9f5;
+  --bg-card: #ffffff;
+  --bg-hover: #f5f3ee;
+  --bg-metric: #f0eeea;
+  --text-primary: #1a1a2e;
+  --text-secondary: #4a4a5a;
+  --text-tertiary: #7a7a8a;
+  --accent-teal: #2a7f7f;
+  --accent-teal-light: #e8f4f4;
+  --accent-coral: #c96b5a;
+  --accent-green: #4a8a5a;
+  --accent-amber: #b08a3a;
+  --border: #e2e0da;
+  --border-light: #edecea;
+  --shadow-sm: 0 1px 3px rgba(26,26,46,0.06);
+  --shadow-md: 0 4px 12px rgba(26,26,46,0.08);
+  --radius: 8px;
+  --radius-lg: 12px;
+  --font-sans: 'Inter', -apple-system, sans-serif;
+  --font-serif: Georgia, 'Times New Roman', serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'Inter', system-ui, sans-serif; background: #0a0e17; color: #c8cdd8; overflow-x: hidden; }
-
-/* ===== HERO ===== */
-.hero {
-  background: linear-gradient(135deg, #0d1220 0%, #111b2e 50%, #1a140d 100%);
-  border-bottom: 1px solid #2a1e1a;
-  padding: 40px 32px 32px;
-  position: relative;
-  overflow: hidden;
-}
-.hero::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  right: -20%;
-  width: 600px;
-  height: 600px;
-  background: radial-gradient(circle, rgba(255,160,40,0.04) 0%, transparent 70%);
-  pointer-events: none;
-}
-.hero-content { max-width: 900px; position: relative; z-index: 1; }
-.hero h1 {
-  font-size: 32px;
-  font-weight: 900;
-  letter-spacing: -0.5px;
-  background: linear-gradient(90deg, #ff9944, #ffcc44, #ff6644);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin-bottom: 4px;
-}
-.hero .tagline {
-  font-size: 14px;
-  color: #7a6a5a;
-  font-weight: 500;
-  margin-bottom: 16px;
-  letter-spacing: 0.5px;
-}
-.hero p {
-  font-size: 16px;
+body {
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--text-primary);
+  overflow-x: hidden;
+  font-size: 0.9rem;
   line-height: 1.7;
-  color: #9aa088;
-  max-width: 780px;
 }
-.hero p strong { color: #ffe0b0; font-weight: 600; }
 
-.key-insight {
-  margin: 24px 0 0;
-  padding: 20px 24px;
-  background: linear-gradient(135deg, rgba(255,153,68,0.06), rgba(255,100,50,0.03));
-  border: 1px solid #2a2218;
-  border-left: 4px solid #ff9944;
-  border-radius: 0 8px 8px 0;
-  max-width: 780px;
-}
-.key-insight-label {
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  color: #ff9944;
-  margin-bottom: 8px;
-}
-.key-insight p {
-  font-size: 14px;
-  line-height: 1.65;
-  color: #8a9088;
-}
-.key-insight p strong { color: #ffd0a0; }
-
-/* ===== HEADER BAR ===== */
-.header {
-  background: #0f1520;
-  padding: 12px 24px;
-  border-bottom: 1px solid #1a2030;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+/* ===== NAV BAR ===== */
+.nav-bar {
   position: sticky;
   top: 0;
   z-index: 100;
+  height: 48px;
+  background: rgba(250,249,245,0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
 }
-.header-left { display: flex; align-items: center; gap: 16px; }
-.header-title { font-size: 15px; font-weight: 700; color: #e0e8f0; }
+.nav-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.nav-back {
+  font-size: 0.8rem;
+  color: var(--accent-teal);
+  text-decoration: none;
+  font-weight: 500;
+}
+.nav-back:hover { text-decoration: underline; }
+
+/* ===== HERO ===== */
+.hero {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 2rem 1.5rem;
+}
+.hero h1 {
+  font-family: var(--font-serif);
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+.hero .tagline {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+}
+.hero p {
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  max-width: 780px;
+}
+.hero p strong { color: var(--text-primary); font-weight: 600; }
+
+.key-insight {
+  margin: 1.25rem 0 0;
+  padding: 1rem 1.25rem;
+  background: var(--accent-teal-light);
+  border: 1px solid #c8e8e8;
+  border-left: 4px solid var(--accent-teal);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  max-width: 780px;
+}
+.key-insight-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent-teal);
+  margin-bottom: 0.5rem;
+}
+.key-insight p {
+  font-size: 0.85rem;
+  line-height: 1.65;
+  color: var(--text-secondary);
+}
+.key-insight p strong { color: var(--text-primary); }
+
+/* ===== HEADER BAR ===== */
+.header {
+  background: var(--bg-card);
+  padding: 10px 24px;
+  border-bottom: 1px solid var(--border);
+  border-top: 1px solid var(--border-light);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.header-left { display: flex; align-items: center; gap: 12px; }
+.header-title { font-size: 0.85rem; font-weight: 600; color: var(--text-primary); }
 .tick-display {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 13px;
-  color: #5a6a80;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
 }
 .controls { display: flex; gap: 6px; align-items: center; }
 .controls button {
   padding: 6px 16px;
-  border: 1px solid #1e2a3a;
-  background: #141c28;
-  color: #8090a8;
-  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: var(--bg-metric);
+  color: var(--text-primary);
+  border-radius: var(--radius);
   cursor: pointer;
-  font-size: 13px;
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
   font-weight: 500;
   transition: all 0.15s;
 }
-.controls button:hover { background: #1a2840; border-color: #2a3a50; color: #b0c0d8; }
-.controls button.active { background: #663300; border-color: #ff9944; color: #fff; }
-.controls button.danger { border-color: #3a1a1a; color: #cc4444; }
-.controls button.danger:hover { background: #2a1010; color: #ff5555; }
+.controls button:hover { background: var(--bg-hover); }
+.controls button.active { background: var(--accent-teal); border-color: var(--accent-teal); color: #fff; }
+.controls button.danger { color: var(--accent-coral); border-color: #e0cec8; }
+.controls button.danger:hover { background: #f4ece8; }
+.controls select {
+  padding: 5px 8px;
+  background: var(--bg-metric);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  border-radius: var(--radius);
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  cursor: pointer;
+}
 
 /* ===== MAIN LAYOUT ===== */
-.main { display: grid; grid-template-columns: 300px 1fr; min-height: calc(100vh - 160px); }
+.main { display: grid; grid-template-columns: 260px 1fr; min-height: calc(100vh - 200px); }
 
 /* ===== SIDEBAR ===== */
 .sidebar {
-  background: #0c1018;
+  background: var(--bg-card);
   padding: 16px;
   overflow-y: auto;
-  border-right: 1px solid #1a2030;
+  border-right: 1px solid var(--border);
 }
 .sidebar h3 {
-  font-size: 10px;
+  font-size: 0.7rem;
   text-transform: uppercase;
-  letter-spacing: 1.2px;
-  color: #3a4a5a;
+  letter-spacing: 0.08em;
+  color: var(--accent-teal);
   margin: 18px 0 8px;
-  font-weight: 700;
+  font-weight: 600;
 }
 .sidebar h3:first-child { margin-top: 0; }
+
 .param-group { display: flex; flex-direction: column; gap: 5px; }
 .param { display: flex; justify-content: space-between; align-items: center; }
-.param label { font-size: 12px; color: #6a7a8a; }
+.param label { font-size: 0.75rem; color: var(--text-secondary); }
 .param input, .param select {
   width: 80px;
-  padding: 3px 6px;
-  background: #111820;
-  border: 1px solid #1a2535;
-  color: #b0c0d8;
-  border-radius: 3px;
-  font-size: 12px;
+  padding: 4px 8px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  border-radius: 4px;
+  font-size: 0.75rem;
   text-align: right;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-mono);
 }
 .param select { text-align: left; width: 160px; }
 
 .speed-control { display: flex; align-items: center; gap: 6px; margin-top: 6px; }
-.speed-control label { font-size: 11px; color: #4a5a6a; }
-.speed-control input { flex: 1; accent-color: #ff9944; }
+.speed-control label { font-size: 0.7rem; color: var(--text-tertiary); }
+.speed-control input { flex: 1; accent-color: var(--accent-teal); }
 
 /* Stats box */
 .stats-box {
-  background: #111820;
-  border: 1px solid #1a2535;
-  border-radius: 6px;
+  background: var(--bg-metric);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
   padding: 10px;
   margin-top: 10px;
 }
-.stat-row { display: flex; justify-content: space-between; font-size: 11px; padding: 3px 0; }
-.stat-row .label { color: #4a5a6a; }
-.stat-row .value { color: #8898b0; font-family: 'JetBrains Mono', monospace; font-size: 11px; }
-.stat-row .value.above { color: #ff6644; }
-.stat-row .value.below { color: #44cc88; }
+.stat-row { display: flex; justify-content: space-between; font-size: 0.7rem; padding: 3px 0; }
+.stat-row .label { color: var(--text-tertiary); }
+.stat-row .value { color: var(--text-secondary); font-family: var(--font-mono); font-size: 0.7rem; }
+.stat-row .value.above { color: var(--accent-coral); }
+.stat-row .value.below { color: var(--accent-green); }
 
 /* Narrative */
 .narrative-panel {
-  background: linear-gradient(135deg, #111820, #0f1620);
-  border: 1px solid #1a2535;
-  border-radius: 6px;
+  background: var(--bg-metric);
+  border: 1px solid var(--border-light);
+  border-left: 3px solid var(--accent-teal);
+  border-radius: 0 var(--radius) var(--radius) 0;
   padding: 14px;
   margin-top: 12px;
 }
 .narrative-header {
-  font-size: 10px;
+  font-size: 0.65rem;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  color: #3a4a5a;
-  margin-bottom: 8px;
-  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--accent-teal);
+  margin-bottom: 6px;
+  font-weight: 600;
 }
 .narrative-text {
-  font-size: 13px;
+  font-size: 0.75rem;
   line-height: 1.5;
-  color: #8898b0;
+  color: var(--text-secondary);
+  font-style: italic;
   min-height: 40px;
 }
 
+/* Strategy legend */
+.strat-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+.strat-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.65rem;
+  color: var(--text-tertiary);
+}
+.strat-legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
 /* ===== CHARTS AREA ===== */
-.charts-area { padding: 16px; overflow-y: auto; }
+.charts-area { padding: 16px; overflow-y: auto; background: var(--bg); }
 .charts {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -212,9 +287,9 @@ body { font-family: 'Inter', system-ui, sans-serif; background: #0a0e17; color: 
 
 /* Chart containers */
 .chart-container {
-  background: #111820;
-  border: 1px solid #1a2535;
-  border-radius: 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
   padding: 14px;
   position: relative;
   height: 280px;
@@ -223,14 +298,16 @@ body { font-family: 'Inter', system-ui, sans-serif; background: #0a0e17; color: 
 }
 .chart-container.wide { grid-column: 1 / -1; height: 340px; }
 .chart-container h4 {
-  font-size: 12px;
-  color: #5a6a80;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent-teal);
   margin-bottom: 4px;
   font-weight: 600;
 }
 .chart-annotation {
-  font-size: 11px;
-  color: #3a4a5a;
+  font-size: 0.7rem;
+  color: var(--text-tertiary);
   line-height: 1.4;
   margin-bottom: 8px;
   font-style: italic;
@@ -244,85 +321,89 @@ body { font-family: 'Inter', system-ui, sans-serif; background: #0a0e17; color: 
   right: 10px;
   width: 22px;
   height: 22px;
-  background: #1a2535;
-  border: 1px solid #2a3a50;
+  background: var(--bg-metric);
+  border: 1px solid var(--border);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 11px;
-  color: #5a6a80;
+  font-size: 0.7rem;
+  color: var(--text-tertiary);
   cursor: pointer;
   transition: all 0.2s;
   z-index: 5;
 }
-.fun-fact:hover { background: #2a3a50; color: #b0c0d8; }
+.fun-fact:hover { background: var(--bg-hover); color: var(--text-primary); }
 .fun-fact-tooltip {
   display: none;
   position: absolute;
   top: 32px;
   right: 0;
   width: 280px;
-  background: #1a2535;
-  border: 1px solid #2a3a50;
-  border-radius: 6px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
   padding: 12px;
-  font-size: 11px;
+  font-size: 0.7rem;
   line-height: 1.5;
-  color: #8898b0;
+  color: var(--text-secondary);
   z-index: 10;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  box-shadow: var(--shadow-md);
 }
 .fun-fact:hover .fun-fact-tooltip { display: block; }
-.fun-fact-tooltip strong { color: #b0c0d8; }
+.fun-fact-tooltip strong { color: var(--text-primary); }
 
-/* Strategy legend inline */
-.strat-legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 4px;
+/* ===== FOOTER ===== */
+.footer {
+  text-align: center;
+  padding: 2rem;
+  border-top: 1px solid var(--border-light);
 }
-.strat-legend-item {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 10px;
-  color: #5a6a80;
+.footer a {
+  color: var(--accent-teal);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 500;
 }
-.strat-legend-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 2px;
-  flex-shrink: 0;
+.footer a:hover { text-decoration: underline; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 900px) {
+  .main { grid-template-columns: 1fr; }
+  .sidebar { border-right: none; border-bottom: 1px solid var(--border); }
+  .charts { grid-template-columns: 1fr; }
 }
 </style>
 </head>
 <body>
 
+<!-- ===== NAV BAR ===== -->
+<div class="nav-bar">
+  <div class="nav-title">El Farol Bar Problem</div>
+  <a href="../" class="nav-back">&larr; Dashboard</a>
+</div>
+
 <!-- ===== HERO ===== -->
 <div class="hero">
-  <div class="hero-content">
-    <h1>El Farol Bar Problem</h1>
-    <div class="tagline">Arthur 1994 &bull; Beinhocker Ch. 6 &bull; Inductive Reasoning Under Self-Reference</div>
+  <h1>El Farol Bar Problem</h1>
+  <div class="tagline">Arthur 1994 &bull; Beinhocker Ch. 6 &bull; Inductive Reasoning Under Self-Reference</div>
+  <p>
+    Each Thursday, <strong>100 people</strong> independently decide whether to go to the El Farol bar in Santa Fe.
+    The bar is fun if 60 or fewer show up, but miserable if it's overcrowded. The catch:
+    <strong>there is no deductively rational solution</strong>. If everyone uses the same model to predict
+    attendance, that model invalidates itself. Agents must reason <strong>inductively</strong> &mdash;
+    maintaining a diverse ecology of predictive heuristics and betting on whichever has worked best lately.
+  </p>
+  <div class="key-insight">
+    <div class="key-insight-label">Beinhocker's Key Insight</div>
     <p>
-      Each Thursday, <strong>100 people</strong> independently decide whether to go to the El Farol bar in Santa Fe.
-      The bar is fun if 60 or fewer show up, but miserable if it's overcrowded. The catch:
-      <strong>there is no deductively rational solution</strong>. If everyone uses the same model to predict
-      attendance, that model invalidates itself. Agents must reason <strong>inductively</strong> &mdash;
-      maintaining a diverse ecology of predictive heuristics and betting on whichever has worked best lately.
+      The El Farol problem demonstrates that <strong>complex adaptive systems cannot be solved by
+      deductive equilibrium analysis</strong>. Instead, agents use <strong>inductive reasoning</strong> &mdash;
+      pattern recognition, heuristics, and trial-and-error learning. The resulting ecology of strategies
+      self-organizes so that attendance <strong>fluctuates endogenously around the threshold</strong>,
+      never settling into equilibrium. This is a microcosm of how real economies work:
+      <strong>perpetual adaptation, not static optimization</strong>.
     </p>
-    <div class="key-insight">
-      <div class="key-insight-label">Beinhocker's Key Insight</div>
-      <p>
-        The El Farol problem demonstrates that <strong>complex adaptive systems cannot be solved by
-        deductive equilibrium analysis</strong>. Instead, agents use <strong>inductive reasoning</strong> &mdash;
-        pattern recognition, heuristics, and trial-and-error learning. The resulting ecology of strategies
-        self-organizes so that attendance <strong>fluctuates endogenously around the threshold</strong>,
-        never settling into equilibrium. This is a microcosm of how real economies work:
-        <strong>perpetual adaptation, not static optimization</strong>.
-      </p>
-    </div>
   </div>
 </div>
 
@@ -336,9 +417,7 @@ body { font-family: 'Inter', system-ui, sans-serif; background: #0a0e17; color: 
     <button id="btnPlay" onclick="togglePlay()">Play</button>
     <button id="btnStep" onclick="stepOnce()">Step</button>
     <button class="danger" onclick="resetSim()">Reset</button>
-    <select id="presetSelect" onchange="loadPreset(this.value)" style="
-      padding:5px 8px; background:#141c28; border:1px solid #1e2a3a; color:#8090a8;
-      border-radius:4px; font-size:12px; cursor:pointer;">
+    <select id="presetSelect" onchange="loadPreset(this.value)">
       <option value="">Presets...</option>
       <option value="baseline">Baseline (N=100, T=60)</option>
       <option value="small">Small Population (N=50)</option>
@@ -382,7 +461,7 @@ body { font-family: 'Inter', system-ui, sans-serif; background: #0a0e17; color: 
 
     <h3>Strategy Usage</h3>
     <div id="strategyList" class="stats-box" style="max-height:180px;overflow-y:auto;">
-      <div style="font-size:11px;color:#3a4a5a;font-style:italic;">Run simulation to see strategies...</div>
+      <div style="font-size:0.7rem;color:var(--text-tertiary);font-style:italic;">Run simulation to see strategies...</div>
     </div>
 
     <div class="narrative-panel">
@@ -457,6 +536,11 @@ body { font-family: 'Inter', system-ui, sans-serif; background: #0a0e17; color: 
     </div>
   </div>
 
+</div>
+
+<!-- ===== FOOTER ===== -->
+<div class="footer">
+  <a href="../">&larr; Back to Dashboard</a>
 </div>
 
 <script>
@@ -625,18 +709,15 @@ class BarSimulation {
     this.threshold = threshold;
     this.numStrategies = numStrategies;
 
-    // Seed RNG
     const rng = mulberry32(seed);
     const origRandom = Math.random;
     Math.random = rng;
 
-    // Bootstrap history
     this.history = [];
     for (let i = 0; i < 10; i++) {
       this.history.push(Math.floor(numAgents * 0.3 + Math.random() * numAgents * 0.4));
     }
 
-    // Create agents
     this.agents = [];
     for (let i = 0; i < numAgents; i++) {
       this.agents.push({
@@ -649,7 +730,6 @@ class BarSimulation {
     Math.random = origRandom;
     this.rng = rng;
 
-    // Tracking
     this.simAttendance = [];
     this.strategyUsage = [];
     this.accuracy = [];
@@ -662,7 +742,6 @@ class BarSimulation {
 
     const histSnapshot = [...this.history];
 
-    // Each agent decides
     let attendance = 0;
     for (const agent of this.agents) {
       agent.activeStrategy = agent.strategies.reduce((best, s) => s.score > best.score ? s : best, agent.strategies[0]);
@@ -673,7 +752,6 @@ class BarSimulation {
     this.history.push(attendance);
     this.simAttendance.push(attendance);
 
-    // Score strategies
     const goodToGo = attendance <= this.threshold;
     let correct = 0;
     for (const agent of this.agents) {
@@ -689,7 +767,6 @@ class BarSimulation {
     }
     this.accuracy.push(correct / this.numAgents);
 
-    // Track strategy usage
     const usage = {};
     for (const agent of this.agents) {
       const name = agent.activeStrategy.name;
@@ -705,10 +782,10 @@ class BarSimulation {
 
 // ===== CHARTS =====
 const STRAT_COLORS = [
-  '#ff9944', '#44aaff', '#44cc88', '#ff6688', '#aa88ff',
-  '#ffcc44', '#44ffcc', '#ff44aa', '#88ccff', '#ccff44',
-  '#ff8866', '#66ccaa', '#aa66ff', '#ffaa66', '#66aaff',
-  '#cc88ff', '#88ff66', '#ff6644', '#44ffaa', '#ffdd88'
+  '#2a7f7f', '#c96b5a', '#4a8a5a', '#b08a3a', '#7a6a9a',
+  '#5a8ab0', '#8a6a4a', '#6a9a7a', '#9a5a6a', '#4a7a8a',
+  '#8a8a4a', '#5a6a8a', '#7a9a5a', '#9a7a4a', '#4a6a9a',
+  '#8a5a7a', '#6a8a5a', '#9a6a5a', '#5a9a7a', '#7a5a8a'
 ];
 
 let chartAttendance, chartStrategies, chartHistogram, chartAccuracy;
@@ -723,17 +800,16 @@ function initCharts() {
     },
     scales: {
       x: {
-        grid: { color: '#1a2030' },
-        ticks: { color: '#3a4a5a', font: { size: 10 } }
+        grid: { color: '#edecea' },
+        ticks: { color: '#7a7a8a', font: { family: "'JetBrains Mono', monospace", size: 10 } }
       },
       y: {
-        grid: { color: '#1a2030' },
-        ticks: { color: '#3a4a5a', font: { size: 10 } }
+        grid: { color: '#edecea' },
+        ticks: { color: '#7a7a8a', font: { family: "'JetBrains Mono', monospace", size: 10 } }
       }
     }
   };
 
-  // Attendance chart
   chartAttendance = new Chart(document.getElementById('chartAttendance'), {
     type: 'line',
     data: {
@@ -742,8 +818,8 @@ function initCharts() {
         {
           label: 'Attendance',
           data: [],
-          borderColor: '#ff9944',
-          backgroundColor: 'rgba(255,153,68,0.1)',
+          borderColor: '#b08a3a',
+          backgroundColor: 'rgba(176,138,58,0.1)',
           fill: false,
           borderWidth: 1.5,
           pointRadius: 0,
@@ -752,7 +828,7 @@ function initCharts() {
         {
           label: 'Threshold',
           data: [],
-          borderColor: '#ff4444',
+          borderColor: '#c96b5a',
           borderDash: [8, 4],
           borderWidth: 1.5,
           pointRadius: 0,
@@ -768,12 +844,11 @@ function initCharts() {
       },
       plugins: {
         ...commonOpts.plugins,
-        legend: { display: true, labels: { color: '#5a6a80', font: { size: 10 }, boxWidth: 12, padding: 8 } }
+        legend: { display: true, labels: { color: '#7a7a8a', font: { family: "'Inter', sans-serif", size: 10 }, boxWidth: 12, padding: 8 } }
       }
     }
   });
 
-  // Strategy stacked area
   chartStrategies = new Chart(document.getElementById('chartStrategies'), {
     type: 'line',
     data: { labels: [], datasets: [] },
@@ -785,20 +860,19 @@ function initCharts() {
       },
       plugins: {
         ...commonOpts.plugins,
-        legend: { display: true, position: 'bottom', labels: { color: '#5a6a80', font: { size: 9 }, boxWidth: 10, padding: 6 } }
+        legend: { display: true, position: 'bottom', labels: { color: '#7a7a8a', font: { family: "'Inter', sans-serif", size: 9 }, boxWidth: 10, padding: 6 } }
       }
     }
   });
 
-  // Histogram
   chartHistogram = new Chart(document.getElementById('chartHistogram'), {
     type: 'bar',
     data: {
       labels: [],
       datasets: [{
         data: [],
-        backgroundColor: 'rgba(255,153,68,0.6)',
-        borderColor: '#ff9944',
+        backgroundColor: 'rgba(176,138,58,0.5)',
+        borderColor: '#b08a3a',
         borderWidth: 1
       }]
     },
@@ -811,7 +885,6 @@ function initCharts() {
     }
   });
 
-  // Accuracy chart
   chartAccuracy = new Chart(document.getElementById('chartAccuracy'), {
     type: 'line',
     data: {
@@ -819,8 +892,8 @@ function initCharts() {
       datasets: [{
         label: 'Accuracy',
         data: [],
-        borderColor: '#44cc88',
-        backgroundColor: 'rgba(68,204,136,0.1)',
+        borderColor: '#4a8a5a',
+        backgroundColor: 'rgba(74,138,90,0.1)',
         fill: true,
         borderWidth: 1.5,
         pointRadius: 0,
@@ -843,13 +916,11 @@ function updateCharts() {
   const labels = Array.from({ length: n }, (_, i) => i + 1);
   const threshold = sim.threshold;
 
-  // Attendance
   chartAttendance.data.labels = labels;
   chartAttendance.data.datasets[0].data = sim.simAttendance;
   chartAttendance.data.datasets[1].data = Array(n).fill(threshold);
   chartAttendance.update();
 
-  // Strategy stacked area
   const allNames = new Set();
   sim.strategyUsage.forEach(u => Object.keys(u).forEach(k => allNames.add(k)));
   const names = [...allNames].sort();
@@ -868,7 +939,6 @@ function updateCharts() {
   chartStrategies.options.scales.y.stacked = true;
   chartStrategies.update();
 
-  // Histogram
   if (n > 0) {
     const min = Math.min(...sim.simAttendance);
     const max = Math.max(...sim.simAttendance);
@@ -882,15 +952,13 @@ function updateCharts() {
     chartHistogram.data.labels = sortedBins.map(b => `${b}-${b + binSize - 1}`);
     chartHistogram.data.datasets[0].data = sortedBins.map(b => bins[b]);
 
-    // Color bins above/below threshold
     chartHistogram.data.datasets[0].backgroundColor = sortedBins.map(b =>
-      (b + binSize / 2) > threshold ? 'rgba(255,100,68,0.6)' : 'rgba(68,204,136,0.6)');
+      (b + binSize / 2) > threshold ? 'rgba(201,107,90,0.5)' : 'rgba(74,138,90,0.5)');
     chartHistogram.data.datasets[0].borderColor = sortedBins.map(b =>
-      (b + binSize / 2) > threshold ? '#ff6644' : '#44cc88');
+      (b + binSize / 2) > threshold ? '#c96b5a' : '#4a8a5a');
     chartHistogram.update();
   }
 
-  // Accuracy
   chartAccuracy.data.labels = labels;
   chartAccuracy.data.datasets[0].data = sim.accuracy;
   chartAccuracy.update();
@@ -906,14 +974,12 @@ function updateStats() {
   const aboveCount = att.filter(a => a > sim.threshold).length;
   const pctAbove = (aboveCount / n * 100).toFixed(1);
 
-  // Crossing rate
   let crossings = 0;
   for (let i = 1; i < n; i++) {
     if ((att[i] > sim.threshold) !== (att[i - 1] > sim.threshold)) crossings++;
   }
   const crossRate = n > 1 ? (crossings / (n - 1)).toFixed(3) : '--';
 
-  // Autocorrelation lag-1
   let ac = '--';
   if (n > 2) {
     const mx = mean;
@@ -941,7 +1007,6 @@ function updateStats() {
   document.getElementById('tickNum').textContent = sim.tick;
   document.getElementById('tickTotal').textContent = sim.numTicks;
 
-  // Strategy list
   if (sim.strategyUsage.length > 0) {
     const usage = sim.strategyUsage[sim.strategyUsage.length - 1];
     const sorted = Object.entries(usage).sort((a, b) => b[1] - a[1]);
@@ -949,7 +1014,6 @@ function updateStats() {
     let html = '';
     for (const [name, count] of sorted) {
       const ci = allNames.indexOf(name) % STRAT_COLORS.length;
-      const barW = Math.round(count / sim.numAgents * 100);
       html += `<div class="stat-row">
         <span class="label" style="color:${STRAT_COLORS[ci]}">${name}</span>
         <span class="value">${count}</span>
@@ -958,7 +1022,6 @@ function updateStats() {
     document.getElementById('strategyList').innerHTML = html;
   }
 
-  // Narrative
   updateNarrative(mean, std, pctAbove, crossRate, ac, meanAcc);
 }
 
@@ -1010,7 +1073,7 @@ function resetSim() {
   document.getElementById('tickNum').textContent = '0';
   document.getElementById('tickTotal').textContent = p.ticks;
   document.getElementById('narrative').textContent = 'Simulation reset. Press Play or Step to begin.';
-  document.getElementById('strategyList').innerHTML = '<div style="font-size:11px;color:#3a4a5a;font-style:italic;">Run simulation to see strategies...</div>';
+  document.getElementById('strategyList').innerHTML = '<div style="font-size:0.7rem;color:var(--text-tertiary);font-style:italic;">Run simulation to see strategies...</div>';
 }
 
 function stepOnce() {
@@ -1018,7 +1081,6 @@ function stepOnce() {
   if (sim.tick < sim.numTicks) {
     sim.step();
     updateStats();
-    // Update charts every few steps for performance
     if (sim.tick % 5 === 0 || sim.tick >= sim.numTicks) updateCharts();
   }
 }

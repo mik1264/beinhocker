@@ -13,109 +13,263 @@
 <meta name="twitter:description" content="Lotka-Volterra in ODE and spatial variants. Agent-based models can collapse where the math says they should persist.">
 <meta name="description" content="Lotka-Volterra in ODE and spatial variants. Agent-based models can collapse where the math says they should persist.">
 <title>Predator-Prey: Endogenous Oscillations in Complex Systems</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
+:root {
+  --bg: #faf9f5;
+  --bg-card: #ffffff;
+  --bg-hover: #f5f3ee;
+  --bg-metric: #f0eeea;
+  --text-primary: #1a1a2e;
+  --text-secondary: #4a4a5a;
+  --text-tertiary: #7a7a8a;
+  --accent-teal: #2a7f7f;
+  --accent-teal-light: #e8f4f4;
+  --accent-coral: #c96b5a;
+  --accent-green: #4a8a5a;
+  --accent-amber: #b08a3a;
+  --border: #e2e0da;
+  --border-light: #edecea;
+  --shadow-sm: 0 1px 3px rgba(26,26,46,0.06);
+  --shadow-md: 0 4px 12px rgba(26,26,46,0.08);
+  --radius: 8px;
+  --radius-lg: 12px;
+  --font-sans: 'Inter', -apple-system, sans-serif;
+  --font-serif: Georgia, 'Times New Roman', serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'Courier New', monospace; background: #0a0a0f; color: #e0e0e0; overflow-x: hidden; }
-
-.container { max-width: 1440px; margin: 0 auto; padding: 20px; }
-
-h1 { text-align: center; font-size: 1.8em; margin-bottom: 4px; color: #fff;
-     letter-spacing: 3px; text-transform: uppercase; }
-.subtitle { text-align: center; font-size: 0.85em; color: #888; margin-bottom: 24px; }
-
-/* Intro / Hero section */
-.intro-section {
-  background: linear-gradient(135deg, #12121a 0%, #1a0a0a 100%);
-  border: 1px solid #4a2020;
-  border-radius: 12px;
-  padding: 28px 32px;
-  margin-bottom: 24px;
-  position: relative;
-  overflow: hidden;
-}
-.intro-section::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, #4a4, #c44, #4a4, #c44);
-}
-.intro-section h2 {
-  font-size: 1.2em;
-  color: #afa;
-  margin-bottom: 12px;
-  letter-spacing: 1px;
-}
-.intro-section p {
-  font-size: 0.95em;
+body {
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--text-primary);
+  overflow-x: hidden;
+  font-size: 0.9rem;
   line-height: 1.7;
-  color: #bbb;
 }
-.intro-section p strong { color: #fff; }
 
-/* Key insight callout */
+/* ===== NAV BAR ===== */
+.nav-bar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  height: 48px;
+  background: rgba(250,249,245,0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+}
+.nav-title { font-size: 0.85rem; font-weight: 700; color: var(--text-primary); }
+.nav-back { font-size: 0.8rem; color: var(--accent-teal); text-decoration: none; font-weight: 500; }
+.nav-back:hover { text-decoration: underline; }
+
+/* ===== HERO ===== */
+.hero {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 2rem 1.5rem;
+}
+.hero h1 {
+  font-family: var(--font-serif);
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+.hero .subtitle {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+}
+.hero p {
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+}
+.hero p strong { color: var(--text-primary); font-weight: 600; }
+
 .key-insight {
-  background: linear-gradient(135deg, #1a1a10, #0a1a0a);
-  border: 1px solid #2a4a20;
-  border-left: 4px solid #afa;
-  border-radius: 8px;
-  padding: 20px 24px;
-  margin-bottom: 24px;
+  margin: 1.25rem 0 0;
+  padding: 1rem 1.25rem;
+  background: var(--accent-teal-light);
+  border: 1px solid #c8e8e8;
+  border-left: 4px solid var(--accent-teal);
+  border-radius: 0 var(--radius) var(--radius) 0;
 }
 .key-insight h3 {
-  font-size: 0.9em;
-  color: #afa;
+  font-size: 0.7rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 2px;
-  margin-bottom: 8px;
+  letter-spacing: 0.08em;
+  color: var(--accent-teal);
+  margin-bottom: 0.5rem;
 }
 .key-insight p {
-  font-size: 0.9em;
-  line-height: 1.7;
-  color: #bba;
+  font-size: 0.85rem;
+  line-height: 1.65;
+  color: var(--text-secondary);
 }
-.key-insight p strong { color: #fff; }
+.key-insight p strong { color: var(--text-primary); }
+
+/* ===== MAIN CONTENT ===== */
+.container { max-width: 1200px; margin: 0 auto; padding: 0 20px 20px; }
+
+/* Mode tabs */
+.mode-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 20px;
+}
+.mode-tab {
+  padding: 10px 24px;
+  background: var(--bg-metric);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+.mode-tab:first-child { border-radius: var(--radius) 0 0 var(--radius); }
+.mode-tab:last-child { border-radius: 0 var(--radius) var(--radius) 0; }
+.mode-tab.active {
+  background: var(--accent-teal);
+  border-color: var(--accent-teal);
+  color: #fff;
+}
+
+/* Presets */
+.presets {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.preset-btn {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  padding: 6px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+.preset-btn:hover { border-color: var(--accent-teal); color: var(--accent-teal); }
 
 /* Controls */
 .controls {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 10px; padding: 16px; background: #12121a; border: 1px solid #2a2a3a;
-  border-radius: 8px; margin-bottom: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 10px;
+  padding: 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 20px;
 }
 .control-group { display: flex; flex-direction: column; gap: 4px; }
-.control-group label { font-size: 0.72em; color: #aaa; text-transform: uppercase; letter-spacing: 1px; }
+.control-group label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--accent-teal);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
 .control-group input, .control-group select {
-  background: #1a1a2e; border: 1px solid #333; color: #fff; padding: 6px 10px;
-  border-radius: 4px; font-family: inherit; font-size: 0.85em;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
 }
 .control-group input:focus, .control-group select:focus {
-  outline: none; border-color: #4a4;
+  outline: none;
+  border-color: var(--accent-teal);
 }
 
 .btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
 .btn {
-  background: #1a2a1a; border: 1px solid #4a4; color: #afa; padding: 8px 20px;
-  border-radius: 6px; cursor: pointer; font-family: inherit; font-size: 0.85em;
+  background: var(--bg-metric);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  padding: 8px 20px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  font-weight: 500;
   transition: all 0.2s;
 }
-.btn:hover { background: #2a3a2a; border-color: #6c6; }
-.btn.active { background: #3a4a3a; border-color: #8f8; color: #fff; }
-.btn.danger { background: #2a1a1a; border-color: #a44; color: #faa; }
-.btn.danger:hover { background: #3a2a2a; border-color: #c66; }
+.btn:hover { background: var(--bg-hover); }
+.btn.active { background: var(--accent-teal); border-color: var(--accent-teal); color: #fff; }
+.btn.danger { color: var(--accent-coral); border-color: #e0cec8; }
+.btn.danger:hover { background: #f4ece8; }
 
-/* Presets */
-.presets {
-  display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px;
+/* Stats row */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+  margin-bottom: 20px;
 }
-.preset-btn {
-  background: #16161e; border: 1px solid #3a3a4a; color: #aaa; padding: 6px 14px;
-  border-radius: 20px; cursor: pointer; font-family: inherit; font-size: 0.78em;
-  transition: all 0.2s;
+.stat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 14px;
+  text-align: center;
 }
-.preset-btn:hover { border-color: #6a6; color: #cfc; }
+.stat-card .stat-value {
+  font-family: var(--font-mono);
+  font-size: 1.3rem;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+.stat-card .stat-label {
+  font-size: 0.65rem;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-top: 4px;
+}
+.stat-card.prey .stat-value { color: var(--accent-green); }
+.stat-card.predator .stat-value { color: var(--accent-coral); }
+.stat-card.grass .stat-value { color: #4a8a5a; }
+.stat-card.tick .stat-value { color: var(--accent-teal); }
+.stat-card.period .stat-value { color: var(--accent-amber); }
 
-/* Main layout */
+/* Legend */
+.legend {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin: 12px 0;
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+}
+.legend-item { display: flex; align-items: center; gap: 6px; }
+.legend-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  border: 1px solid var(--border);
+}
+
+/* Main grid */
 .main-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -127,18 +281,19 @@ h1 { text-align: center; font-size: 1.8em; margin-bottom: 4px; color: #fff;
 }
 
 .panel {
-  background: #12121a;
-  border: 1px solid #2a2a3a;
-  border-radius: 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
   padding: 16px;
   min-height: 0;
   overflow: hidden;
 }
 .panel h3 {
-  font-size: 0.85em;
-  color: #888;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--accent-teal);
   text-transform: uppercase;
-  letter-spacing: 2px;
+  letter-spacing: 0.06em;
   margin-bottom: 12px;
 }
 
@@ -146,9 +301,9 @@ h1 { text-align: center; font-size: 1.8em; margin-bottom: 4px; color: #fff;
 #grid-canvas {
   width: 100%;
   aspect-ratio: 1;
-  border-radius: 4px;
+  border-radius: 6px;
   image-rendering: pixelated;
-  background: #000;
+  background: #f0eeea;
 }
 
 /* Chart panels */
@@ -162,96 +317,46 @@ h1 { text-align: center; font-size: 1.8em; margin-bottom: 4px; color: #fff;
   height: 100%;
 }
 
-/* Stats row */
-.stats-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 10px;
-  margin-bottom: 20px;
-}
-.stat-card {
-  background: #12121a;
-  border: 1px solid #2a2a3a;
-  border-radius: 8px;
-  padding: 14px;
-  text-align: center;
-}
-.stat-card .stat-value {
-  font-size: 1.4em;
-  color: #fff;
-  font-weight: bold;
-}
-.stat-card .stat-label {
-  font-size: 0.7em;
-  color: #888;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-top: 4px;
-}
-.stat-card.prey .stat-value { color: #4f4; }
-.stat-card.predator .stat-value { color: #f44; }
-.stat-card.grass .stat-value { color: #292; }
-.stat-card.tick .stat-value { color: #aaf; }
-.stat-card.period .stat-value { color: #fa4; }
-
-/* Legend */
-.legend {
-  display: flex; gap: 20px; justify-content: center; margin: 12px 0;
-  font-size: 0.8em;
-}
-.legend-item { display: flex; align-items: center; gap: 6px; }
-.legend-swatch {
-  width: 14px; height: 14px; border-radius: 3px;
-}
-
-/* Mode tabs */
-.mode-tabs {
-  display: flex; gap: 0; margin-bottom: 20px;
-}
-.mode-tab {
-  padding: 10px 24px;
-  background: #16161e;
-  border: 1px solid #2a2a3a;
-  color: #888;
-  cursor: pointer;
-  font-family: inherit;
-  font-size: 0.85em;
-  transition: all 0.2s;
-}
-.mode-tab:first-child { border-radius: 8px 0 0 8px; }
-.mode-tab:last-child { border-radius: 0 8px 8px 0; }
-.mode-tab.active {
-  background: #1a2a1a;
-  border-color: #4a4;
-  color: #afa;
-}
-
 /* ODE section */
 .ode-section { display: none; }
-.ode-section.visible { display: block; }
+.ode-section.visible { display: grid; }
 .spatial-section.hidden { display: none; }
+
+/* ===== FOOTER ===== */
+.footer {
+  text-align: center;
+  padding: 2rem;
+  border-top: 1px solid var(--border-light);
+}
+.footer a { color: var(--accent-teal); text-decoration: none; font-size: 0.85rem; font-weight: 500; }
+.footer a:hover { text-decoration: underline; }
 </style>
 </head>
 <body>
-<div class="container">
-  <h1>Predator -- Prey</h1>
+
+<!-- ===== NAV BAR ===== -->
+<div class="nav-bar">
+  <div class="nav-title">Predator-Prey</div>
+  <a href="../" class="nav-back">&larr; Dashboard</a>
+</div>
+
+<!-- ===== HERO ===== -->
+<div class="hero">
+  <h1>Predator-Prey</h1>
   <p class="subtitle">Lotka-Volterra dynamics / Beinhocker Ch 8 p.168</p>
 
-  <div class="intro-section">
-    <h2>Endogenous Oscillations in Complex Adaptive Systems</h2>
-    <p>
-      The predator-prey system is one of the most fundamental examples of <strong>endogenous dynamics</strong>
-      in complex systems. No external force drives the population cycles -- they arise purely from the
-      internal logic of the interactions: prey reproduce, predators eat prey, predators starve when
-      prey are scarce, prey rebound when predators decline.
-    </p>
-    <p style="margin-top:10px;">
-      Beinhocker uses Lotka-Volterra as a stepping stone toward the broader argument that
-      <strong>economic systems are far-from-equilibrium</strong> -- they do not settle into a static
-      optimum but continually oscillate, adapt, and restructure. The "invisible hand" is not a
-      force toward equilibrium but a driver of perpetual motion through fitness landscapes.
-    </p>
-  </div>
+  <p>
+    The predator-prey system is one of the most fundamental examples of <strong>endogenous dynamics</strong>
+    in complex systems. No external force drives the population cycles -- they arise purely from the
+    internal logic of the interactions: prey reproduce, predators eat prey, predators starve when
+    prey are scarce, prey rebound when predators decline.
+  </p>
+  <p style="margin-top:10px;">
+    Beinhocker uses Lotka-Volterra as a stepping stone toward the broader argument that
+    <strong>economic systems are far-from-equilibrium</strong> -- they do not settle into a static
+    optimum but continually oscillate, adapt, and restructure. The "invisible hand" is not a
+    force toward equilibrium but a driver of perpetual motion through fitness landscapes.
+  </p>
 
   <div class="key-insight">
     <h3>Key Insight</h3>
@@ -264,6 +369,9 @@ h1 { text-align: center; font-size: 1.8em; margin-bottom: 4px; color: #fff;
       of traditional equilibrium economics.
     </p>
   </div>
+</div>
+
+<div class="container">
 
   <!-- Mode selector -->
   <div class="mode-tabs">
@@ -386,10 +494,10 @@ h1 { text-align: center; font-size: 1.8em; margin-bottom: 4px; color: #fff;
     <div class="panel spatial-section" id="panel-grid">
       <h3>Spatial Grid</h3>
       <div class="legend">
-        <div class="legend-item"><div class="legend-swatch" style="background:#1a3a1a"></div> Grass</div>
-        <div class="legend-item"><div class="legend-swatch" style="background:#4f4"></div> Prey</div>
-        <div class="legend-item"><div class="legend-swatch" style="background:#f44"></div> Predator</div>
-        <div class="legend-item"><div class="legend-swatch" style="background:#111"></div> Bare</div>
+        <div class="legend-item"><div class="legend-swatch" style="background:#c8dcc8"></div> Grass</div>
+        <div class="legend-item"><div class="legend-swatch" style="background:#4a8a5a"></div> Prey</div>
+        <div class="legend-item"><div class="legend-swatch" style="background:#c96b5a"></div> Predator</div>
+        <div class="legend-item"><div class="legend-swatch" style="background:#f0eeea"></div> Bare</div>
       </div>
       <canvas id="grid-canvas"></canvas>
     </div>
@@ -420,18 +528,23 @@ h1 { text-align: center; font-size: 1.8em; margin-bottom: 4px; color: #fff;
   </div>
 </div>
 
+<!-- ===== FOOTER ===== -->
+<div class="footer">
+  <a href="../">&larr; Back to Dashboard</a>
+</div>
+
 <script>
 // =========================================================================
 //  State
 // =========================================================================
-let mode = 'spatial'; // 'spatial' or 'ode'
+let mode = 'spatial';
 let running = false;
 let timer = null;
 let tick = 0;
 
 // Spatial state
 let gridSize = 50;
-let grass = [];       // 2D: 0 = alive, >0 = regrow countdown
+let grass = [];
 let preyAgents = [];
 let predatorAgents = [];
 let nextId = 0;
@@ -535,7 +648,7 @@ function initSpatial() {
   gridSize = cfg.gridSize;
   grass = [];
   for (let r = 0; r < gridSize; r++) {
-    grass[r] = new Int16Array(gridSize); // 0 = alive
+    grass[r] = new Int16Array(gridSize);
   }
   preyAgents = [];
   predatorAgents = [];
@@ -572,17 +685,14 @@ function stepSpatial() {
   shuffle(preyAgents);
   const newPrey = [];
   for (const p of preyAgents) {
-    // Move random
     const d = DIRS[Math.floor(Math.random() * DIRS.length)];
     p.x = wrap(p.x + d[0], gridSize);
     p.y = wrap(p.y + d[1], gridSize);
     p.energy--;
-    // Eat grass
     if (grass[p.y][p.x] === 0) {
       p.energy += 5;
       grass[p.y][p.x] = cfg.grassRegrow;
     }
-    // Reproduce
     if (Math.random() < cfg.preyReproduce) {
       p.energy = Math.floor(p.energy / 2);
       newPrey.push({ id: nextId++, x: p.x, y: p.y, energy: p.energy });
@@ -604,7 +714,6 @@ function stepSpatial() {
   const newPred = [];
   const eatenIds = new Set();
   for (const pred of predatorAgents) {
-    // Move toward nearest prey (limited search)
     let bestDist = Infinity, bestDx = 0, bestDy = 0, found = false;
     for (const prey of preyAgents) {
       let dx = prey.x - pred.x;
@@ -627,7 +736,6 @@ function stepSpatial() {
     }
     pred.energy--;
 
-    // Eat prey
     const k = pred.x + ',' + pred.y;
     if (preyMap[k] && preyMap[k].length > 0) {
       const victim = preyMap[k].pop();
@@ -635,7 +743,6 @@ function stepSpatial() {
       pred.energy += 5;
     }
 
-    // Reproduce
     if (Math.random() < cfg.predatorReproduce) {
       pred.energy = Math.floor(pred.energy / 2);
       newPred.push({ id: nextId++, x: pred.x, y: pred.y, energy: pred.energy });
@@ -690,24 +797,24 @@ function drawGrid() {
     for (let c = 0; c < gridSize; c++) {
       const idx = (r * gridSize + c) * 4;
       if (grass[r][c] === 0) {
-        // Live grass
-        d[idx] = 26; d[idx+1] = 58; d[idx+2] = 26; d[idx+3] = 255;
+        // Live grass - light green on cream
+        d[idx] = 200; d[idx+1] = 220; d[idx+2] = 200; d[idx+3] = 255;
       } else {
-        // Bare
-        d[idx] = 17; d[idx+1] = 17; d[idx+2] = 17; d[idx+3] = 255;
+        // Bare - warm cream
+        d[idx] = 240; d[idx+1] = 238; d[idx+2] = 234; d[idx+3] = 255;
       }
     }
   }
 
-  // Prey
+  // Prey - green
   for (const p of preyAgents) {
     const idx = (p.y * gridSize + p.x) * 4;
-    d[idx] = 68; d[idx+1] = 255; d[idx+2] = 68; d[idx+3] = 255;
+    d[idx] = 74; d[idx+1] = 138; d[idx+2] = 90; d[idx+3] = 255;
   }
-  // Predators
+  // Predators - coral
   for (const p of predatorAgents) {
     const idx = (p.y * gridSize + p.x) * 4;
-    d[idx] = 255; d[idx+1] = 68; d[idx+2] = 68; d[idx+3] = 255;
+    d[idx] = 201; d[idx+1] = 107; d[idx+2] = 90; d[idx+3] = 255;
   }
 
   gridCtx.putImageData(img, 0, 0);
@@ -717,33 +824,31 @@ function drawGrid() {
 //  Charts
 // =========================================================================
 function initCharts() {
-  const darkGrid = { color: 'rgba(255,255,255,0.06)' };
-  const darkTick = { color: '#666' };
+  const lightGrid = { color: '#edecea' };
+  const lightTick = { color: '#7a7a8a', font: { family: "'JetBrains Mono', monospace", size: 10 } };
 
-  // Population over time
   const popCtx = document.getElementById('pop-chart').getContext('2d');
   popChart = new Chart(popCtx, {
     type: 'line',
     data: {
       labels: [],
       datasets: [
-        { label: 'Prey', data: [], borderColor: '#4f4', backgroundColor: 'rgba(68,255,68,0.08)',
+        { label: 'Prey', data: [], borderColor: '#4a8a5a', backgroundColor: 'rgba(74,138,90,0.08)',
           borderWidth: 1.5, pointRadius: 0, tension: 0.2, fill: true },
-        { label: 'Predators', data: [], borderColor: '#f44', backgroundColor: 'rgba(255,68,68,0.08)',
+        { label: 'Predators', data: [], borderColor: '#c96b5a', backgroundColor: 'rgba(201,107,90,0.08)',
           borderWidth: 1.5, pointRadius: 0, tension: 0.2, fill: true },
       ],
     },
     options: {
       responsive: true, maintainAspectRatio: false, animation: false,
       scales: {
-        x: { grid: darkGrid, ticks: darkTick, title: { display: true, text: 'Tick', color: '#888' } },
-        y: { grid: darkGrid, ticks: darkTick, title: { display: true, text: 'Population', color: '#888' }, beginAtZero: true },
+        x: { grid: lightGrid, ticks: lightTick, title: { display: true, text: 'Tick', color: '#7a7a8a', font: { family: "'Inter', sans-serif", size: 10 } } },
+        y: { grid: lightGrid, ticks: lightTick, title: { display: true, text: 'Population', color: '#7a7a8a', font: { family: "'Inter', sans-serif", size: 10 } }, beginAtZero: true },
       },
-      plugins: { legend: { labels: { color: '#ccc', font: { size: 11 } } } },
+      plugins: { legend: { labels: { color: '#4a4a5a', font: { family: "'Inter', sans-serif", size: 11 } } } },
     },
   });
 
-  // Phase space
   const phaseCtx = document.getElementById('phase-chart').getContext('2d');
   phaseChart = new Chart(phaseCtx, {
     type: 'scatter',
@@ -751,10 +856,10 @@ function initCharts() {
       datasets: [{
         label: 'Phase trajectory',
         data: [],
-        borderColor: 'rgba(170,136,255,0.5)',
-        backgroundColor: 'rgba(170,136,255,0.15)',
+        borderColor: 'rgba(122,106,154,0.5)',
+        backgroundColor: 'rgba(122,106,154,0.15)',
         pointRadius: 1.5,
-        pointBackgroundColor: 'rgba(170,136,255,0.5)',
+        pointBackgroundColor: 'rgba(122,106,154,0.5)',
         showLine: true,
         borderWidth: 1,
         tension: 0.1,
@@ -764,14 +869,13 @@ function initCharts() {
     options: {
       responsive: true, maintainAspectRatio: false, animation: false,
       scales: {
-        x: { grid: darkGrid, ticks: darkTick, title: { display: true, text: 'Prey', color: '#888' }, beginAtZero: true },
-        y: { grid: darkGrid, ticks: darkTick, title: { display: true, text: 'Predators', color: '#888' }, beginAtZero: true },
+        x: { grid: lightGrid, ticks: lightTick, title: { display: true, text: 'Prey', color: '#7a7a8a', font: { family: "'Inter', sans-serif", size: 10 } }, beginAtZero: true },
+        y: { grid: lightGrid, ticks: lightTick, title: { display: true, text: 'Predators', color: '#7a7a8a', font: { family: "'Inter', sans-serif", size: 10 } }, beginAtZero: true },
       },
       plugins: { legend: { display: false } },
     },
   });
 
-  // Grass coverage
   const grassCtx = document.getElementById('grass-chart').getContext('2d');
   grassChart = new Chart(grassCtx, {
     type: 'line',
@@ -780,8 +884,8 @@ function initCharts() {
       datasets: [{
         label: 'Grass %',
         data: [],
-        borderColor: '#292',
-        backgroundColor: 'rgba(34,153,34,0.12)',
+        borderColor: '#4a8a5a',
+        backgroundColor: 'rgba(74,138,90,0.12)',
         borderWidth: 1.5,
         pointRadius: 0,
         tension: 0.2,
@@ -791,8 +895,8 @@ function initCharts() {
     options: {
       responsive: true, maintainAspectRatio: false, animation: false,
       scales: {
-        x: { grid: darkGrid, ticks: darkTick, title: { display: true, text: 'Tick', color: '#888' } },
-        y: { grid: darkGrid, ticks: darkTick, title: { display: true, text: 'Coverage %', color: '#888' },
+        x: { grid: lightGrid, ticks: lightTick, title: { display: true, text: 'Tick', color: '#7a7a8a', font: { family: "'Inter', sans-serif", size: 10 } } },
+        y: { grid: lightGrid, ticks: lightTick, title: { display: true, text: 'Coverage %', color: '#7a7a8a', font: { family: "'Inter', sans-serif", size: 10 } },
              min: 0, max: 100 },
       },
       plugins: { legend: { display: false } },
@@ -801,7 +905,6 @@ function initCharts() {
 }
 
 function updateCharts() {
-  // Trim to max history
   const maxPts = MAX_HISTORY;
   if (histTick.length > maxPts) {
     const trim = histTick.length - maxPts;
@@ -816,7 +919,6 @@ function updateCharts() {
   popChart.data.datasets[1].data = histPred;
   popChart.update('none');
 
-  // Phase: last 500 points
   const n = Math.min(histPrey.length, 500);
   const phaseData = [];
   for (let i = histPrey.length - n; i < histPrey.length; i++) {
@@ -851,7 +953,6 @@ function updateStats() {
     document.getElementById('stat-grass').textContent = '--';
   }
 
-  // Estimate period from prey peaks
   if (histPrey.length > 30) {
     const vals = histPrey;
     const peaks = [];

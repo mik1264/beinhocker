@@ -13,117 +13,156 @@
 <meta name="twitter:description" content="Supply chains, markets, ecosystems, and organizations linked together. Scale creates a phase transition to total wipeout.">
 <meta name="description" content="Supply chains, markets, ecosystems, and organizations linked together. Scale creates a phase transition to total wipeout.">
 <title>The Integrated Economy — When Models Collide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@400;500;600;700;800;900&display=swap');
+:root {
+  --bg: #faf9f5;
+  --bg-card: #ffffff;
+  --bg-hover: #f5f3ee;
+  --bg-metric: #f0eeea;
+  --text-primary: #1a1a2e;
+  --text-secondary: #4a4a5a;
+  --text-tertiary: #7a7a8a;
+  --accent-teal: #2a7f7f;
+  --accent-teal-light: #e8f4f4;
+  --accent-coral: #c96b5a;
+  --accent-green: #4a8a5a;
+  --accent-amber: #b08a3a;
+  --border: #e2e0da;
+  --border-light: #edecea;
+  --shadow-sm: 0 1px 3px rgba(26,26,46,0.06);
+  --shadow-md: 0 4px 12px rgba(26,26,46,0.08);
+  --radius: 8px;
+  --radius-lg: 12px;
+  --font-sans: 'Inter', -apple-system, sans-serif;
+  --font-serif: Georgia, 'Times New Roman', serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'Inter', system-ui, sans-serif; background: #0a0e17; color: #c8cdd8; overflow-x: hidden; }
+body {
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--text-primary);
+  overflow-x: hidden;
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
 
-/* ===== HERO INTRO ===== */
+/* ===== NAV BAR ===== */
+.nav-bar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  height: 48px;
+  background: rgba(250,249,245,0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+}
+.nav-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.nav-back {
+  font-size: 0.8rem;
+  color: var(--accent-teal);
+  text-decoration: none;
+  font-weight: 500;
+}
+.nav-back:hover { text-decoration: underline; }
+
+/* ===== HERO ===== */
 .hero {
-  background: linear-gradient(135deg, #0d1220 0%, #151020 40%, #0d1a14 100%);
-  border-bottom: 1px solid #1e2a3a;
-  padding: 40px 32px 32px;
-  position: relative;
-  overflow: hidden;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 2rem 1.5rem;
 }
-.hero::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  right: -20%;
-  width: 600px;
-  height: 600px;
-  background: radial-gradient(circle, rgba(100,100,255,0.03) 0%, transparent 70%);
-  pointer-events: none;
-}
-.hero-content { max-width: 960px; position: relative; z-index: 1; }
 .hero h1 {
-  font-size: 32px;
-  font-weight: 900;
-  letter-spacing: -0.5px;
-  background: linear-gradient(90deg, #6688ff, #44ccff, #44ffaa);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin-bottom: 4px;
+  font-family: var(--font-serif);
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
 }
 .hero .tagline {
-  font-size: 14px;
-  color: #5a6a8a;
-  font-weight: 500;
-  margin-bottom: 16px;
-  letter-spacing: 0.5px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
 }
 .hero p {
-  font-size: 15px;
+  font-size: 0.9rem;
   line-height: 1.7;
-  color: #8a9ab0;
+  color: var(--text-secondary);
   max-width: 820px;
 }
-.hero p strong { color: #b0d0ff; font-weight: 600; }
+.hero p strong { color: var(--text-primary); font-weight: 600; }
 
 .model-tags {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
-  margin-top: 16px;
+  margin-top: 1rem;
 }
 .model-tag {
   padding: 4px 12px;
   border-radius: 12px;
-  font-size: 11px;
+  font-size: 0.7rem;
   font-weight: 600;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.03em;
 }
-.model-tag.market { background: #1a2a1a; color: #44dd88; border: 1px solid #2a3a2a; }
-.model-tag.supply { background: #2a1a0a; color: #ddaa44; border: 1px solid #3a2a1a; }
-.model-tag.ecosystem { background: #1a1a2a; color: #8888ff; border: 1px solid #2a2a3a; }
-.model-tag.org { background: #2a1a2a; color: #dd66aa; border: 1px solid #3a2a3a; }
+.model-tag.market { background: var(--accent-teal-light); color: var(--accent-teal); border: 1px solid #c8e8e8; }
+.model-tag.supply { background: #f5f0e4; color: var(--accent-amber); border: 1px solid #e8dfc8; }
+.model-tag.ecosystem { background: #e8f0ea; color: var(--accent-green); border: 1px solid #c8dcc8; }
+.model-tag.org { background: #f4ece8; color: var(--accent-coral); border: 1px solid #e0cec8; }
 
 .key-insight {
-  margin: 20px 0 0;
-  padding: 18px 22px;
-  background: linear-gradient(135deg, rgba(100,100,255,0.05), rgba(60,180,120,0.03));
-  border: 1px solid #1a2a3a;
-  border-left: 4px solid #6688ff;
-  border-radius: 0 8px 8px 0;
+  margin: 1.25rem 0 0;
+  padding: 1rem 1.25rem;
+  background: var(--accent-teal-light);
+  border: 1px solid #c8e8e8;
+  border-left: 4px solid var(--accent-teal);
+  border-radius: 0 var(--radius) var(--radius) 0;
   max-width: 820px;
 }
 .key-insight-label {
-  font-size: 11px;
+  font-size: 0.7rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 1.5px;
-  color: #6688ff;
-  margin-bottom: 8px;
+  letter-spacing: 0.08em;
+  color: var(--accent-teal);
+  margin-bottom: 0.5rem;
 }
 .key-insight p {
-  font-size: 13px;
+  font-size: 0.85rem;
   line-height: 1.65;
-  color: #7a8a9a;
+  color: var(--text-secondary);
 }
-.key-insight p strong { color: #a0c0ff; }
+.key-insight p strong { color: var(--text-primary); }
 
 /* ===== HEADER BAR ===== */
 .header {
-  background: #0f1520;
-  padding: 12px 24px;
-  border-bottom: 1px solid #1a2030;
+  background: var(--bg-card);
+  padding: 10px 24px;
+  border-bottom: 1px solid var(--border);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  position: sticky;
-  top: 0;
-  z-index: 100;
 }
-.header-left { display: flex; align-items: center; gap: 16px; }
-.header-title { font-size: 15px; font-weight: 700; color: #e0e8f0; }
+.header-left { display: flex; align-items: center; gap: 12px; }
+.header-title { font-size: 0.85rem; font-weight: 600; color: var(--text-primary); }
 .tick-display {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 13px;
-  color: #5a6a80;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
 }
 .phase-badge {
   display: inline-flex;
@@ -131,115 +170,104 @@ body { font-family: 'Inter', system-ui, sans-serif; background: #0a0e17; color: 
   gap: 5px;
   padding: 3px 10px;
   border-radius: 4px;
-  font-size: 11px;
+  font-size: 0.65rem;
   font-weight: 600;
+  letter-spacing: 0.04em;
 }
-.phase-badge.normal { background: #0d2a1a; color: #44dd88; border: 1px solid #1a3a28; }
-.phase-badge.supply_shock { background: #2a1a0a; color: #ddaa44; border: 1px solid #3a2a1a; }
-.phase-badge.tech_disruption { background: #1a1a2a; color: #8888ff; border: 1px solid #2a2a3a; }
-.phase-badge.market_crash { background: #2a0a0a; color: #ff4444; border: 1px solid #3a1a1a; }
-.phase-badge.recovery { background: #1a2a1a; color: #88ccaa; border: 1px solid #2a3a2a; }
+.phase-badge.normal { background: #e8f4ea; color: var(--accent-green); border: 1px solid #c8dcc8; }
+.phase-badge.supply_shock { background: #f5f0e4; color: var(--accent-amber); border: 1px solid #e8dfc8; }
+.phase-badge.tech_disruption { background: var(--accent-teal-light); color: var(--accent-teal); border: 1px solid #c8e8e8; }
+.phase-badge.market_crash { background: #f4ece8; color: var(--accent-coral); border: 1px solid #e0cec8; }
+.phase-badge.recovery { background: #e8f4ea; color: var(--accent-green); border: 1px solid #c8dcc8; }
 
 .controls { display: flex; gap: 6px; align-items: center; }
 .controls button {
   padding: 6px 16px;
-  border: 1px solid #1e2a3a;
-  background: #141c28;
-  color: #8090a8;
-  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: var(--bg-metric);
+  color: var(--text-primary);
+  border-radius: var(--radius);
   cursor: pointer;
-  font-size: 13px;
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
   font-weight: 500;
   transition: all 0.15s;
 }
-.controls button:hover { background: #1a2840; border-color: #2a3a50; color: #b0c0d8; }
-.controls button.active { background: #00994d; border-color: #00cc66; color: #fff; }
-.controls button.danger { border-color: #3a1a1a; color: #cc4444; }
-.controls button.danger:hover { background: #2a1010; color: #ff5555; }
+.controls button:hover { background: var(--bg-hover); border-color: var(--border); }
+.controls button.active { background: var(--accent-teal); border-color: var(--accent-teal); color: #fff; }
+.controls button.danger { color: var(--accent-coral); border-color: #e0cec8; }
+.controls button.danger:hover { background: #f4ece8; }
 
 /* ===== MAIN LAYOUT ===== */
-.main { display: grid; grid-template-columns: 280px 1fr; min-height: calc(100vh - 200px); }
+.main { display: grid; grid-template-columns: 260px 1fr; min-height: calc(100vh - 200px); }
 
 /* ===== SIDEBAR ===== */
 .sidebar {
-  background: #0c1018;
+  background: var(--bg-card);
   padding: 16px;
   overflow-y: auto;
-  border-right: 1px solid #1a2030;
+  border-right: 1px solid var(--border);
 }
 .sidebar h3 {
-  font-size: 10px;
+  font-size: 0.7rem;
   text-transform: uppercase;
-  letter-spacing: 1.2px;
-  color: #3a4a5a;
+  letter-spacing: 0.08em;
+  color: var(--accent-teal);
   margin: 18px 0 8px;
-  font-weight: 700;
+  font-weight: 600;
 }
 .sidebar h3:first-child { margin-top: 0; }
 
 .param-group { display: flex; flex-direction: column; gap: 5px; }
 .param { display: flex; justify-content: space-between; align-items: center; }
-.param label { font-size: 12px; color: #6a7a8a; }
+.param label { font-size: 0.75rem; color: var(--text-secondary); }
 .param select, .param input {
   width: 100px;
-  padding: 3px 6px;
-  background: #111820;
-  border: 1px solid #1a2535;
-  color: #b0c0d8;
-  border-radius: 3px;
-  font-size: 12px;
+  padding: 4px 8px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  border-radius: 4px;
+  font-size: 0.75rem;
   text-align: right;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-mono);
 }
 .param select { text-align: left; }
 
 .speed-control { display: flex; align-items: center; gap: 6px; margin-top: 6px; }
-.speed-control label { font-size: 11px; color: #4a5a6a; }
-.speed-control input { flex: 1; accent-color: #6688ff; }
-
-/* Stats box */
-.stats-box {
-  background: #111820;
-  border: 1px solid #1a2535;
-  border-radius: 6px;
-  padding: 10px;
-  margin-top: 10px;
-}
-.stat-row { display: flex; justify-content: space-between; font-size: 11px; padding: 3px 0; }
-.stat-row .label { color: #4a5a6a; }
-.stat-row .value { color: #8898b0; font-family: 'JetBrains Mono', monospace; font-size: 11px; }
-.stat-row .value.positive { color: #44dd88; }
-.stat-row .value.negative { color: #ff4444; }
+.speed-control label { font-size: 0.7rem; color: var(--text-tertiary); }
+.speed-control input { flex: 1; accent-color: var(--accent-teal); }
 
 /* Scenario buttons */
 .scenario-buttons { display: flex; flex-direction: column; gap: 4px; margin-top: 8px; }
 .scenario-btn {
   padding: 8px 10px;
-  background: #111820;
-  border: 1px solid #1a2535;
-  border-radius: 5px;
-  color: #7a8a9a;
-  font-size: 11px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
   cursor: pointer;
   transition: all 0.15s;
   text-align: left;
 }
-.scenario-btn:hover { background: #1a2535; border-color: #2a3a50; color: #b0c0d8; }
-.scenario-btn.active { background: #1a2040; border-color: #4466aa; color: #88aaff; }
-.scenario-btn .scenario-name { font-weight: 600; display: block; margin-bottom: 2px; }
-.scenario-btn .scenario-desc { font-size: 10px; color: #4a5a6a; }
+.scenario-btn:hover { background: var(--bg-hover); border-color: var(--border); }
+.scenario-btn.active { background: var(--accent-teal-light); border-color: var(--accent-teal); color: var(--accent-teal); }
+.scenario-btn .scenario-name { font-weight: 600; display: block; margin-bottom: 2px; color: var(--text-primary); }
+.scenario-btn .scenario-desc { font-size: 0.65rem; color: var(--text-tertiary); }
 .scenario-finding {
   margin-top: 8px;
   padding: 8px 10px;
-  background: linear-gradient(135deg, rgba(100,100,255,0.05), rgba(60,180,120,0.03));
-  border: 1px solid #1a2a3a;
-  border-left: 3px solid #6688ff;
+  background: var(--accent-teal-light);
+  border: 1px solid #c8e8e8;
+  border-left: 3px solid var(--accent-teal);
   border-radius: 0 5px 5px 0;
-  font-size: 10px;
+  font-size: 0.65rem;
   line-height: 1.5;
-  color: #6a7a8a;
+  color: var(--text-secondary);
 }
-.scenario-finding strong { color: #8aa0c0; font-weight: 600; }
+.scenario-finding strong { color: var(--text-primary); font-weight: 600; }
 
 /* Dashboard indicators */
 .dashboard-row {
@@ -249,34 +277,48 @@ body { font-family: 'Inter', system-ui, sans-serif; background: #0a0e17; color: 
   margin-top: 8px;
 }
 .indicator {
-  background: #111820;
-  border: 1px solid #1a2535;
-  border-radius: 6px;
+  background: var(--bg-metric);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
   padding: 10px;
   text-align: center;
 }
 .indicator .ind-label {
-  font-size: 9px;
+  font-size: 0.6rem;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  color: #3a4a5a;
+  letter-spacing: 0.06em;
+  color: var(--text-tertiary);
   margin-bottom: 4px;
 }
 .indicator .ind-value {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 16px;
-  font-weight: 700;
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  font-weight: 600;
 }
 .indicator .ind-sub {
-  font-size: 9px;
-  color: #3a4a5a;
+  font-size: 0.6rem;
+  color: var(--text-tertiary);
   margin-top: 2px;
 }
+
+/* Stats box */
+.stats-box {
+  background: var(--bg-metric);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  padding: 10px;
+  margin-top: 10px;
+}
+.stat-row { display: flex; justify-content: space-between; font-size: 0.7rem; padding: 3px 0; }
+.stat-row .label { color: var(--text-tertiary); }
+.stat-row .value { color: var(--text-secondary); font-family: var(--font-mono); font-size: 0.7rem; }
+.stat-row .value.positive { color: var(--accent-green); }
+.stat-row .value.negative { color: var(--accent-coral); }
 
 /* Health bar */
 .health-bar-track {
   height: 6px;
-  background: #1a2030;
+  background: var(--border-light);
   border-radius: 3px;
   margin-top: 6px;
   overflow: hidden;
@@ -289,35 +331,37 @@ body { font-family: 'Inter', system-ui, sans-serif; background: #0a0e17; color: 
 
 /* Narrative panel */
 .narrative-panel {
-  background: linear-gradient(135deg, #111820, #0f1620);
-  border: 1px solid #1a2535;
-  border-radius: 6px;
+  background: var(--bg-metric);
+  border: 1px solid var(--border-light);
+  border-left: 3px solid var(--accent-teal);
+  border-radius: 0 var(--radius) var(--radius) 0;
   padding: 14px;
   margin-top: 12px;
 }
 .narrative-header {
-  font-size: 10px;
+  font-size: 0.65rem;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  color: #3a4a5a;
-  margin-bottom: 8px;
-  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--accent-teal);
+  margin-bottom: 6px;
+  font-weight: 600;
 }
 .narrative-text {
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.5;
-  color: #7a8a9a;
+  color: var(--text-secondary);
+  font-style: italic;
   min-height: 40px;
 }
 
 /* ===== CHARTS AREA ===== */
-.charts-area { padding: 16px; overflow-y: auto; }
+.charts-area { padding: 16px; overflow-y: auto; background: var(--bg); }
 
 /* Network canvas */
 .network-section {
-  background: #111820;
-  border: 1px solid #1a2535;
-  border-radius: 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
   padding: 14px;
   margin-bottom: 12px;
   height: 340px;
@@ -326,14 +370,16 @@ body { font-family: 'Inter', system-ui, sans-serif; background: #0a0e17; color: 
   overflow: hidden;
 }
 .network-section h4 {
-  font-size: 12px;
-  color: #5a6a80;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent-teal);
   margin-bottom: 4px;
   font-weight: 600;
 }
 .network-section .chart-annotation {
-  font-size: 11px;
-  color: #3a4a5a;
+  font-size: 0.7rem;
+  color: var(--text-tertiary);
   line-height: 1.4;
   margin-bottom: 8px;
   font-style: italic;
@@ -351,9 +397,9 @@ body { font-family: 'Inter', system-ui, sans-serif; background: #0a0e17; color: 
   gap: 12px;
 }
 .chart-container {
-  background: #111820;
-  border: 1px solid #1a2535;
-  border-radius: 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
   padding: 14px;
   position: relative;
   height: 280px;
@@ -362,57 +408,78 @@ body { font-family: 'Inter', system-ui, sans-serif; background: #0a0e17; color: 
 }
 .chart-container.wide { grid-column: 1 / -1; height: 340px; }
 .chart-container h4 {
-  font-size: 12px;
-  color: #5a6a80;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent-teal);
   margin-bottom: 4px;
   font-weight: 600;
 }
 .chart-annotation {
-  font-size: 11px;
-  color: #3a4a5a;
+  font-size: 0.7rem;
+  color: var(--text-tertiary);
   line-height: 1.4;
   margin-bottom: 8px;
   font-style: italic;
 }
 .chart-container canvas { width: 100%; height: calc(100% - 50px); }
 
-/* Scrollbar */
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: #0a0e17; }
-::-webkit-scrollbar-thumb { background: #1a2535; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #2a3a50; }
+/* ===== FOOTER ===== */
+.footer {
+  text-align: center;
+  padding: 2rem;
+  border-top: 1px solid var(--border-light);
+}
+.footer a {
+  color: var(--accent-teal);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+.footer a:hover { text-decoration: underline; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 900px) {
+  .main { grid-template-columns: 1fr; }
+  .sidebar { border-right: none; border-bottom: 1px solid var(--border); }
+  .charts { grid-template-columns: 1fr; }
+}
 </style>
 </head>
 <body>
 
+<!-- ===== NAV BAR ===== -->
+<div class="nav-bar">
+  <div class="nav-title">The Integrated Economy</div>
+  <a href="../" class="nav-back">&larr; Dashboard</a>
+</div>
+
 <!-- ===== HERO SECTION ===== -->
 <div class="hero">
-  <div class="hero-content">
-    <h1>The Integrated Economy</h1>
-    <div class="tagline">When Models Collide &mdash; Cross-Model Complexity Economics Simulation</div>
+  <h1>The Integrated Economy</h1>
+  <div class="tagline">When Models Collide &mdash; Cross-Model Complexity Economics Simulation</div>
+  <p>
+    Real economies are not just stock markets, not just supply chains, not just ecosystems of competing firms.
+    They are <strong>all of these at once</strong>, woven together into a fabric where a supply chain disruption
+    can trigger a market crash, which cascades through a dependency network, and where
+    <strong>organizational rigidity</strong> determines which firms adapt and which ones die.
+    This simulation links four foundational models from complexity economics into a single coherent system.
+  </p>
+  <div class="model-tags">
+    <span class="model-tag market">SFI Stock Market</span>
+    <span class="model-tag supply">Beer Game Supply Chain</span>
+    <span class="model-tag ecosystem">Punctuated Equilibrium</span>
+    <span class="model-tag org">Rigids vs Flexibles</span>
+  </div>
+  <div class="key-insight">
+    <div class="key-insight-label">Integration Insight</div>
     <p>
-      Real economies are not just stock markets, not just supply chains, not just ecosystems of competing firms.
-      They are <strong>all of these at once</strong>, woven together into a fabric where a supply chain disruption
-      can trigger a market crash, which cascades through a dependency network, and where
-      <strong>organizational rigidity</strong> determines which firms adapt and which ones die.
-      This simulation links four foundational models from complexity economics into a single coherent system.
+      In isolation, each model produces its own emergent phenomena. <strong>When linked together</strong>,
+      new dynamics appear that none of the individual models can generate alone: supply chain shocks amplify
+      through financial contagion, technology disruptions trigger cascading firm failures, and
+      <strong>organizational flexibility becomes the key determinant of systemic resilience</strong>.
+      The economy's response to crisis is path-dependent and non-linear, just like real macroeconomic dynamics.
     </p>
-    <div class="model-tags">
-      <span class="model-tag market">SFI Stock Market</span>
-      <span class="model-tag supply">Beer Game Supply Chain</span>
-      <span class="model-tag ecosystem">Punctuated Equilibrium</span>
-      <span class="model-tag org">Rigids vs Flexibles</span>
-    </div>
-    <div class="key-insight">
-      <div class="key-insight-label">Integration Insight</div>
-      <p>
-        In isolation, each model produces its own emergent phenomena. <strong>When linked together</strong>,
-        new dynamics appear that none of the individual models can generate alone: supply chain shocks amplify
-        through financial contagion, technology disruptions trigger cascading firm failures, and
-        <strong>organizational flexibility becomes the key determinant of systemic resilience</strong>.
-        The economy's response to crisis is path-dependent and non-linear, just like real macroeconomic dynamics.
-      </p>
-    </div>
   </div>
 </div>
 
@@ -492,37 +559,37 @@ body { font-family: 'Inter', system-ui, sans-serif; background: #0a0e17; color: 
     <div class="dashboard-row">
       <div class="indicator">
         <div class="ind-label">GDP</div>
-        <div class="ind-value" id="indGDP" style="color: #44dd88;">--</div>
+        <div class="ind-value" id="indGDP" style="color: var(--accent-green);">--</div>
       </div>
       <div class="indicator">
         <div class="ind-label">Market Index</div>
-        <div class="ind-value" id="indIndex" style="color: #44ccff;">--</div>
+        <div class="ind-value" id="indIndex" style="color: var(--accent-teal);">--</div>
       </div>
     </div>
     <div class="dashboard-row">
       <div class="indicator">
         <div class="ind-label">Unemployment</div>
-        <div class="ind-value" id="indUnemployment" style="color: #ffaa44;">--</div>
+        <div class="ind-value" id="indUnemployment" style="color: var(--accent-amber);">--</div>
       </div>
       <div class="indicator">
         <div class="ind-label">Gini</div>
-        <div class="ind-value" id="indGini" style="color: #dd66aa;">--</div>
+        <div class="ind-value" id="indGini" style="color: var(--accent-coral);">--</div>
       </div>
     </div>
 
     <h3>Supply Chain Stress</h3>
     <div class="health-bar-track">
-      <div class="health-bar-fill" id="stressBar" style="width: 0%; background: #44dd88;"></div>
+      <div class="health-bar-fill" id="stressBar" style="width: 0%; background: var(--accent-green);"></div>
     </div>
-    <div style="display: flex; justify-content: space-between; font-size: 9px; color: #3a4a5a; margin-top: 3px;">
+    <div style="display: flex; justify-content: space-between; font-size: 0.6rem; color: var(--text-tertiary); margin-top: 3px;">
       <span>Low</span><span>High</span>
     </div>
 
     <h3>Ecosystem Health</h3>
     <div class="health-bar-track">
-      <div class="health-bar-fill" id="healthBar" style="width: 70%; background: #44dd88;"></div>
+      <div class="health-bar-fill" id="healthBar" style="width: 70%; background: var(--accent-green);"></div>
     </div>
-    <div style="display: flex; justify-content: space-between; font-size: 9px; color: #3a4a5a; margin-top: 3px;">
+    <div style="display: flex; justify-content: space-between; font-size: 0.6rem; color: var(--text-tertiary); margin-top: 3px;">
       <span>Critical</span><span>Thriving</span>
     </div>
 
@@ -614,6 +681,11 @@ body { font-family: 'Inter', system-ui, sans-serif; background: #0a0e17; color: 
   </div>
 </div>
 
+<!-- ===== FOOTER ===== -->
+<div class="footer">
+  <a href="../">&larr; Back to Dashboard</a>
+</div>
+
 <script>
 // =========================================================================
 // Integrated Economy Simulation (JavaScript port of core mechanics)
@@ -659,7 +731,6 @@ class IntegratedEconomy {
   }
 
   _makePRNG(seed) {
-    // Simple seeded PRNG (Mulberry32)
     let s = seed | 0;
     return () => {
       s |= 0; s = s + 0x6D2B79F5 | 0;
@@ -676,7 +747,6 @@ class IntegratedEconomy {
   }
 
   _init() {
-    // Create firms
     this.firmsPerEchelon = Math.max(this.numFirms / this.chainLength, 1);
     this.perFirmDemand = this.baseDemand / this.firmsPerEchelon;
     this.firms = [];
@@ -700,13 +770,11 @@ class IntegratedEconomy {
         health: 0.7,
         output: this.perFirmDemand,
         age: 0,
-        // For network layout
         x: 0, y: 0,
         vx: 0, vy: 0,
       });
     }
 
-    // Build dependency network
     this.edges = [];
     this.adjList = {};
     this.revList = {};
@@ -724,7 +792,6 @@ class IntegratedEconomy {
       }
     }
 
-    // Position nodes in a circle by supply chain position
     for (let i = 0; i < this.numFirms; i++) {
       const angle = (i / this.numFirms) * Math.PI * 2 - Math.PI / 2;
       const radius = 0.35 + (this.firms[i].supplyChainPos / this.chainLength) * 0.1;
@@ -805,16 +872,10 @@ class IntegratedEconomy {
     const avgHealth = alive.reduce((s, f) => s + f.health, 0) / nAlive;
     const isCrisis = avgHealth < 0.45 || ['market_crash', 'tech_disruption', 'supply_shock'].includes(this.phase);
 
-    // 1. Supply chain
     this._stepSupplyChain();
-
-    // 2. Technology
     this._stepTechnology();
-
-    // 3. Organization
     this._stepOrganization(isCrisis);
 
-    // 4. Update health
     for (const f of this.firms) {
       if (f.alive) {
         f.health = this._computeHealth(f);
@@ -822,25 +883,18 @@ class IntegratedEconomy {
       }
     }
 
-    // 5. Cascades
     const cascadeSize = this._stepCascades();
-
-    // 6. Market
     const cascadeStress = cascadeSize / Math.max(nAlive, 1);
     const supplyStress = this.history.length > 0 ? this.history[this.history.length - 1].supplyChainStress : 0;
     this._stepMarket(Math.min(1, cascadeStress + supplyStress * 0.5));
 
-    // 7. Respawn
     for (const f of this.firms) {
       if (!f.alive && this.rng() < 0.02) {
         this._respawn(f);
       }
     }
 
-    // 8. Phase detection
     this._detectPhase();
-
-    // 9. Record
     this._record(cascadeSize);
   }
 
@@ -1014,7 +1068,6 @@ class IntegratedEconomy {
 
     const stressRec = this.history.length > 0 ? this.history[this.history.length - 1].supplyChainStress : 0;
 
-    // Don't override phase within 20 ticks of a triggered event
     if (this.events.length > 0) {
       const lastEventTick = Math.max(...this.events.map(e => e.tick));
       if (this.tick - lastEventTick < 20) {
@@ -1042,14 +1095,12 @@ class IntegratedEconomy {
     const avgTech = n > 0 ? alive.reduce((s, f) => s + f.techFitness, 0) / n : 0;
     const avgFlex = n > 0 ? alive.reduce((s, f) => s + f.flexFraction, 0) / n : 0;
 
-    // Stress: fraction of alive firms with backlog
     let stressed = 0;
     for (const f of alive) {
       if (f.backlog > f.expectedDemand * 0.5) stressed++;
     }
     const stress = n > 0 ? stressed / n : 0;
 
-    // Gini
     const prices = alive.map(f => Math.max(f.stockPrice, 0)).sort((a, b) => a - b);
     let gini = 0;
     if (prices.length > 1) {
@@ -1096,11 +1147,11 @@ const chartDefaults = {
   maintainAspectRatio: false,
   animation: { duration: 0 },
   plugins: {
-    legend: { display: true, position: 'top', labels: { color: '#5a6a80', font: { size: 10 }, boxWidth: 12, padding: 8 } },
+    legend: { display: true, position: 'top', labels: { color: '#7a7a8a', font: { family: "'Inter', sans-serif", size: 10 }, boxWidth: 12, padding: 8 } },
   },
   scales: {
-    x: { grid: { color: '#141c28' }, ticks: { color: '#3a4a5a', font: { size: 9 }, maxTicksLimit: 8 } },
-    y: { grid: { color: '#141c28' }, ticks: { color: '#3a4a5a', font: { size: 9 } } },
+    x: { grid: { color: '#edecea' }, ticks: { color: '#7a7a8a', font: { family: "'JetBrains Mono', monospace", size: 9 }, maxTicksLimit: 8 } },
+    y: { grid: { color: '#edecea' }, ticks: { color: '#7a7a8a', font: { family: "'JetBrains Mono', monospace", size: 9 } } },
   },
 };
 
@@ -1136,74 +1187,74 @@ function makeChart(canvasId, label, color, opts = {}) {
 }
 
 function initCharts() {
-  charts.gdp = makeChart('chartGDP', 'GDP', '#44dd88', {
+  charts.gdp = makeChart('chartGDP', 'GDP', '#4a8a5a', {
     datasets: [
-      { label: 'GDP', data: [], borderColor: '#44dd88', backgroundColor: '#44dd8818', borderWidth: 1.5, pointRadius: 0, fill: true, tension: 0.3, yAxisID: 'y' },
-      { label: 'Market Index', data: [], borderColor: '#44ccff', backgroundColor: '#44ccff18', borderWidth: 1.5, pointRadius: 0, fill: false, tension: 0.3, yAxisID: 'y1' },
+      { label: 'GDP', data: [], borderColor: '#4a8a5a', backgroundColor: '#4a8a5a18', borderWidth: 1.5, pointRadius: 0, fill: true, tension: 0.3, yAxisID: 'y' },
+      { label: 'Market Index', data: [], borderColor: '#2a7f7f', backgroundColor: '#2a7f7f18', borderWidth: 1.5, pointRadius: 0, fill: false, tension: 0.3, yAxisID: 'y1' },
     ],
     options: {
       scales: {
-        x: { grid: { color: '#141c28' }, ticks: { color: '#3a4a5a', font: { size: 9 }, maxTicksLimit: 10 } },
-        y: { position: 'left', grid: { color: '#141c28' }, ticks: { color: '#44dd88', font: { size: 9 } }, title: { display: true, text: 'GDP', color: '#44dd88', font: { size: 10 } } },
-        y1: { position: 'right', grid: { drawOnChartArea: false }, ticks: { color: '#44ccff', font: { size: 9 } }, title: { display: true, text: 'Index', color: '#44ccff', font: { size: 10 } } },
+        x: { grid: { color: '#edecea' }, ticks: { color: '#7a7a8a', font: { family: "'JetBrains Mono', monospace", size: 9 }, maxTicksLimit: 10 } },
+        y: { position: 'left', grid: { color: '#edecea' }, ticks: { color: '#4a8a5a', font: { family: "'JetBrains Mono', monospace", size: 9 } }, title: { display: true, text: 'GDP', color: '#4a8a5a', font: { size: 10 } } },
+        y1: { position: 'right', grid: { drawOnChartArea: false }, ticks: { color: '#2a7f7f', font: { family: "'JetBrains Mono', monospace", size: 9 } }, title: { display: true, text: 'Index', color: '#2a7f7f', font: { size: 10 } } },
       },
     },
   });
 
-  charts.stress = makeChart('chartStress', 'Supply Chain Stress', '#ddaa44', {
+  charts.stress = makeChart('chartStress', 'Supply Chain Stress', '#b08a3a', {
     fill: true,
     options: {
       scales: {
-        x: { grid: { color: '#141c28' }, ticks: { color: '#3a4a5a', font: { size: 9 }, maxTicksLimit: 6 } },
-        y: { min: 0, max: 1, grid: { color: '#141c28' }, ticks: { color: '#3a4a5a', font: { size: 9 } } },
+        x: { grid: { color: '#edecea' }, ticks: { color: '#7a7a8a', font: { family: "'JetBrains Mono', monospace", size: 9 }, maxTicksLimit: 6 } },
+        y: { min: 0, max: 1, grid: { color: '#edecea' }, ticks: { color: '#7a7a8a', font: { family: "'JetBrains Mono', monospace", size: 9 } } },
       },
     },
   });
 
-  charts.gini = makeChart('chartGini', 'Gini', '#dd66aa', {
+  charts.gini = makeChart('chartGini', 'Gini', '#c96b5a', {
     fill: true,
     options: {
       scales: {
-        x: { grid: { color: '#141c28' }, ticks: { color: '#3a4a5a', font: { size: 9 }, maxTicksLimit: 6 } },
-        y: { min: 0, max: 0.6, grid: { color: '#141c28' }, ticks: { color: '#3a4a5a', font: { size: 9 } } },
+        x: { grid: { color: '#edecea' }, ticks: { color: '#7a7a8a', font: { family: "'JetBrains Mono', monospace", size: 9 }, maxTicksLimit: 6 } },
+        y: { min: 0, max: 0.6, grid: { color: '#edecea' }, ticks: { color: '#7a7a8a', font: { family: "'JetBrains Mono', monospace", size: 9 } } },
       },
     },
   });
 
-  charts.org = makeChart('chartOrg', 'Flexible', '#88aaff', {
+  charts.org = makeChart('chartOrg', 'Flexible', '#2a7f7f', {
     datasets: [
-      { label: 'Flexible %', data: [], borderColor: '#88aaff', backgroundColor: '#88aaff18', borderWidth: 1.5, pointRadius: 0, fill: true, tension: 0.3 },
-      { label: 'Org Fitness', data: [], borderColor: '#ffaa88', backgroundColor: '#ffaa8818', borderWidth: 1.5, pointRadius: 0, fill: false, tension: 0.3 },
+      { label: 'Flexible %', data: [], borderColor: '#2a7f7f', backgroundColor: '#2a7f7f18', borderWidth: 1.5, pointRadius: 0, fill: true, tension: 0.3 },
+      { label: 'Org Fitness', data: [], borderColor: '#c96b5a', backgroundColor: '#c96b5a18', borderWidth: 1.5, pointRadius: 0, fill: false, tension: 0.3 },
     ],
     options: {
       scales: {
-        x: { grid: { color: '#141c28' }, ticks: { color: '#3a4a5a', font: { size: 9 }, maxTicksLimit: 6 } },
-        y: { min: 0, max: 1, grid: { color: '#141c28' }, ticks: { color: '#3a4a5a', font: { size: 9 } } },
+        x: { grid: { color: '#edecea' }, ticks: { color: '#7a7a8a', font: { family: "'JetBrains Mono', monospace", size: 9 }, maxTicksLimit: 6 } },
+        y: { min: 0, max: 1, grid: { color: '#edecea' }, ticks: { color: '#7a7a8a', font: { family: "'JetBrains Mono', monospace", size: 9 } } },
       },
     },
   });
 
-  charts.cascades = makeChart('chartCascades', 'Cascade Size', '#ff5555', {
+  charts.cascades = makeChart('chartCascades', 'Cascade Size', '#c96b5a', {
     type: 'bar',
     fill: false,
     options: {
       plugins: { legend: { display: false } },
       scales: {
-        x: { grid: { color: '#141c28' }, ticks: { color: '#3a4a5a', font: { size: 9 }, maxTicksLimit: 8 } },
-        y: { min: 0, grid: { color: '#141c28' }, ticks: { color: '#3a4a5a', font: { size: 9 }, stepSize: 1 } },
+        x: { grid: { color: '#edecea' }, ticks: { color: '#7a7a8a', font: { family: "'JetBrains Mono', monospace", size: 9 }, maxTicksLimit: 8 } },
+        y: { min: 0, grid: { color: '#edecea' }, ticks: { color: '#7a7a8a', font: { family: "'JetBrains Mono', monospace", size: 9 }, stepSize: 1 } },
       },
     },
   });
 
-  charts.techHealth = makeChart('chartTechHealth', 'Tech Fitness', '#8888ff', {
+  charts.techHealth = makeChart('chartTechHealth', 'Tech Fitness', '#2a7f7f', {
     datasets: [
-      { label: 'Tech Fitness', data: [], borderColor: '#8888ff', backgroundColor: '#8888ff18', borderWidth: 1.5, pointRadius: 0, fill: true, tension: 0.3 },
-      { label: 'Ecosystem Health', data: [], borderColor: '#44dd88', backgroundColor: '#44dd8818', borderWidth: 1.5, pointRadius: 0, fill: false, tension: 0.3 },
+      { label: 'Tech Fitness', data: [], borderColor: '#2a7f7f', backgroundColor: '#2a7f7f18', borderWidth: 1.5, pointRadius: 0, fill: true, tension: 0.3 },
+      { label: 'Ecosystem Health', data: [], borderColor: '#4a8a5a', backgroundColor: '#4a8a5a18', borderWidth: 1.5, pointRadius: 0, fill: false, tension: 0.3 },
     ],
     options: {
       scales: {
-        x: { grid: { color: '#141c28' }, ticks: { color: '#3a4a5a', font: { size: 9 }, maxTicksLimit: 10 } },
-        y: { min: 0, max: 1, grid: { color: '#141c28' }, ticks: { color: '#3a4a5a', font: { size: 9 } } },
+        x: { grid: { color: '#edecea' }, ticks: { color: '#7a7a8a', font: { family: "'JetBrains Mono', monospace", size: 9 }, maxTicksLimit: 10 } },
+        y: { min: 0, max: 1, grid: { color: '#edecea' }, ticks: { color: '#7a7a8a', font: { family: "'JetBrains Mono', monospace", size: 9 } } },
       },
     },
   });
@@ -1219,41 +1270,29 @@ function updateCharts() {
 
   const ticks = h.map(r => r.tick);
 
-  // GDP & Index
   charts.gdp.data.labels = ticks;
   charts.gdp.data.datasets[0].data = h.map(r => r.gdp);
   charts.gdp.data.datasets[1].data = h.map(r => r.marketIndex);
   charts.gdp.update('none');
 
-  // Supply Chain Stress
   charts.stress.data.labels = ticks;
   charts.stress.data.datasets[0].data = h.map(r => r.supplyChainStress);
   charts.stress.update('none');
 
-  // Gini
   charts.gini.data.labels = ticks;
   charts.gini.data.datasets[0].data = h.map(r => r.gini);
   charts.gini.update('none');
 
-  // Org composition
   charts.org.data.labels = ticks;
   charts.org.data.datasets[0].data = h.map(r => r.meanFlexFraction);
-  // Compute avg org fitness from alive firms
-  const orgFitnessData = h.map(r => {
-    const alive = sim.firms.filter(f => f.alive);
-    return alive.length > 0 ? alive.reduce((s, f) => s + f.orgFitness, 0) / alive.length : 0;
-  });
-  // We only have current org fitness, approximate with health * 1.2
   charts.org.data.datasets[1].data = h.map(r => Math.min(1, r.meanHealth * 1.2));
   charts.org.update('none');
 
-  // Cascades
   charts.cascades.data.labels = ticks;
   charts.cascades.data.datasets[0].data = h.map(r => r.cascadeSize);
-  charts.cascades.data.datasets[0].backgroundColor = h.map(r => r.cascadeSize > 2 ? '#ff5555' : r.cascadeSize > 0 ? '#ffaa44' : '#1a2535');
+  charts.cascades.data.datasets[0].backgroundColor = h.map(r => r.cascadeSize > 2 ? '#c96b5a' : r.cascadeSize > 0 ? '#b08a3a' : '#edecea');
   charts.cascades.update('none');
 
-  // Tech & Health
   charts.techHealth.data.labels = ticks;
   charts.techHealth.data.datasets[0].data = h.map(r => r.meanTechFitness);
   charts.techHealth.data.datasets[1].data = h.map(r => r.meanHealth);
@@ -1268,21 +1307,23 @@ function drawNetwork() {
   const canvas = document.getElementById('networkCanvas');
   const ctx = canvas.getContext('2d');
   const rect = canvas.parentElement.getBoundingClientRect();
-  const w = rect.width - 28;  // padding
-  const h = rect.height - 72;  // header + annotation
+  const w = rect.width - 28;
+  const h = rect.height - 72;
   canvas.width = w * window.devicePixelRatio;
   canvas.height = h * window.devicePixelRatio;
   canvas.style.width = w + 'px';
   canvas.style.height = h + 'px';
   ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
 
-  ctx.clearRect(0, 0, w, h);
+  // Light background for canvas
+  ctx.fillStyle = '#f0eeea';
+  ctx.fillRect(0, 0, w, h);
 
   if (!sim) return;
 
-  // Draw edges
-  ctx.globalAlpha = 0.08;
-  ctx.strokeStyle = '#4466aa';
+  // Draw edges (subtle)
+  ctx.globalAlpha = 0.12;
+  ctx.strokeStyle = '#2a7f7f';
   ctx.lineWidth = 0.5;
   for (const edge of sim.edges) {
     const s = sim.firms[edge.source];
@@ -1296,8 +1337,8 @@ function drawNetwork() {
   ctx.globalAlpha = 1;
 
   // Draw active edges more visible
-  ctx.globalAlpha = 0.2;
-  ctx.strokeStyle = '#6688cc';
+  ctx.globalAlpha = 0.25;
+  ctx.strokeStyle = '#2a7f7f';
   ctx.lineWidth = 0.8;
   for (const edge of sim.edges) {
     const s = sim.firms[edge.source];
@@ -1319,23 +1360,15 @@ function drawNetwork() {
 
     let color;
     if (!f.alive) {
-      color = '#332222';
+      color = '#d4c4b8';
     } else if (f.health > 0.7) {
-      color = '#44dd88';
+      color = '#4a8a5a';
     } else if (f.health > 0.5) {
-      color = '#aacc44';
+      color = '#b08a3a';
     } else if (f.health > 0.35) {
-      color = '#ddaa44';
+      color = '#c96b5a';
     } else {
-      color = '#ff5555';
-    }
-
-    // Glow for alive firms
-    if (f.alive && f.health > 0.5) {
-      ctx.beginPath();
-      ctx.arc(x, y, r + 3, 0, Math.PI * 2);
-      ctx.fillStyle = color + '22';
-      ctx.fill();
+      color = '#c96b5a';
     }
 
     ctx.beginPath();
@@ -1343,22 +1376,21 @@ function drawNetwork() {
     ctx.fillStyle = color;
     ctx.fill();
 
-    // Border
+    // White border
     ctx.beginPath();
     ctx.arc(x, y, r, 0, Math.PI * 2);
-    ctx.strokeStyle = f.alive ? '#ffffff18' : '#ffffff08';
-    ctx.lineWidth = 0.5;
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 1;
     ctx.stroke();
   }
 
   // Legend
   ctx.font = '9px Inter, sans-serif';
-  ctx.fillStyle = '#3a4a5a';
   const legendItems = [
-    { color: '#44dd88', label: 'Healthy' },
-    { color: '#ddaa44', label: 'Stressed' },
-    { color: '#ff5555', label: 'Critical' },
-    { color: '#332222', label: 'Failed' },
+    { color: '#4a8a5a', label: 'Healthy' },
+    { color: '#b08a3a', label: 'Stressed' },
+    { color: '#c96b5a', label: 'Critical' },
+    { color: '#d4c4b8', label: 'Failed' },
   ];
   let lx = 8;
   for (const item of legendItems) {
@@ -1366,7 +1398,7 @@ function drawNetwork() {
     ctx.arc(lx + 4, h - 10, 3, 0, Math.PI * 2);
     ctx.fillStyle = item.color;
     ctx.fill();
-    ctx.fillStyle = '#3a4a5a';
+    ctx.fillStyle = '#7a7a8a';
     ctx.fillText(item.label, lx + 10, h - 7);
     lx += ctx.measureText(item.label).width + 22;
   }
@@ -1382,7 +1414,6 @@ function updateDashboard() {
 
   document.getElementById('tickDisplay').textContent = `Tick: ${r.tick} / ${sim.maxTicks}`;
 
-  // Phase badge
   const badge = document.getElementById('phaseBadge');
   const phaseLabels = {
     normal: 'NORMAL', supply_shock: 'SUPPLY SHOCK',
@@ -1392,35 +1423,31 @@ function updateDashboard() {
   badge.textContent = phaseLabels[r.phase] || r.phase.toUpperCase();
   badge.className = 'phase-badge ' + r.phase;
 
-  // Indicators
   document.getElementById('indGDP').textContent = r.gdp.toFixed(1);
-  document.getElementById('indGDP').style.color = r.gdp > sim.baseDemand * sim.numFirms * 0.3 ? '#44dd88' : '#ff5555';
+  document.getElementById('indGDP').style.color = r.gdp > sim.baseDemand * sim.numFirms * 0.3 ? '#4a8a5a' : '#c96b5a';
   document.getElementById('indIndex').textContent = r.marketIndex.toFixed(1);
-  document.getElementById('indIndex').style.color = r.marketIndex > sim.initialPrice * 0.5 ? '#44ccff' : '#ff5555';
+  document.getElementById('indIndex').style.color = r.marketIndex > sim.initialPrice * 0.5 ? '#2a7f7f' : '#c96b5a';
   document.getElementById('indUnemployment').textContent = (r.unemployment * 100).toFixed(1) + '%';
-  document.getElementById('indUnemployment').style.color = r.unemployment < 0.1 ? '#44dd88' : r.unemployment < 0.25 ? '#ddaa44' : '#ff5555';
+  document.getElementById('indUnemployment').style.color = r.unemployment < 0.1 ? '#4a8a5a' : r.unemployment < 0.25 ? '#b08a3a' : '#c96b5a';
   document.getElementById('indGini').textContent = r.gini.toFixed(3);
-  document.getElementById('indGini').style.color = r.gini < 0.3 ? '#44dd88' : r.gini < 0.5 ? '#ddaa44' : '#ff5555';
+  document.getElementById('indGini').style.color = r.gini < 0.3 ? '#4a8a5a' : r.gini < 0.5 ? '#b08a3a' : '#c96b5a';
 
-  // Bars
   const stressBar = document.getElementById('stressBar');
   const stressPct = r.supplyChainStress * 100;
   stressBar.style.width = stressPct + '%';
-  stressBar.style.background = stressPct < 20 ? '#44dd88' : stressPct < 50 ? '#ddaa44' : '#ff5555';
+  stressBar.style.background = stressPct < 20 ? '#4a8a5a' : stressPct < 50 ? '#b08a3a' : '#c96b5a';
 
   const healthBar = document.getElementById('healthBar');
   const healthPct = r.meanHealth * 100;
   healthBar.style.width = healthPct + '%';
-  healthBar.style.background = healthPct > 60 ? '#44dd88' : healthPct > 40 ? '#ddaa44' : '#ff5555';
+  healthBar.style.background = healthPct > 60 ? '#4a8a5a' : healthPct > 40 ? '#b08a3a' : '#c96b5a';
 
-  // Stats
   document.getElementById('statFlex').textContent = (r.meanFlexFraction * 100).toFixed(1) + '%';
   document.getElementById('statRigid').textContent = ((1 - r.meanFlexFraction) * 100).toFixed(1) + '%';
   document.getElementById('statTechGen').textContent = r.techGeneration;
   document.getElementById('statAlive').textContent = r.numAlive + ' / ' + sim.numFirms;
   document.getElementById('statCascades').textContent = sim.totalCascades;
 
-  // Narrative
   updateNarrative(r);
 }
 
@@ -1531,7 +1558,6 @@ function resetSim() {
 
   createSim();
 
-  // Clear charts
   for (const key in charts) {
     charts[key].data.labels = [];
     for (const ds of charts[key].data.datasets) {
@@ -1594,7 +1620,6 @@ function runLoop() {
     sim.step();
   }
 
-  // Update visuals every frame
   updateCharts();
   drawNetwork();
   updateDashboard();

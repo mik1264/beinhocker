@@ -14,327 +14,138 @@
 <meta name="description" content="Inequality emerges from identical rules. Metabolism matters more than vision. Reproduction drives cumulative trait evolution.">
 <title>Sugarscape: Growing Artificial Societies</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
+:root {
+  --bg: #faf9f5; --bg-card: #ffffff; --bg-hover: #f5f3ee; --bg-metric: #f0eeea;
+  --text-primary: #1a1a2e; --text-secondary: #4a4a5a; --text-tertiary: #7a7a8a;
+  --accent-teal: #2a7f7f; --accent-teal-light: #e8f4f4; --accent-coral: #c96b5a;
+  --accent-green: #4a8a5a; --accent-amber: #b08a3a;
+  --border: #e2e0da; --border-light: #edecea;
+  --shadow-sm: 0 1px 3px rgba(26,26,46,0.06); --shadow-md: 0 4px 12px rgba(26,26,46,0.08);
+  --radius: 8px; --radius-lg: 12px;
+  --font-sans: 'Inter', -apple-system, sans-serif; --font-serif: Georgia, 'Times New Roman', serif; --font-mono: 'JetBrains Mono', monospace;
+}
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'Courier New', monospace; background: #0a0a0f; color: #e0e0e0; overflow-x: hidden; }
+body { font-family: var(--font-sans); background: var(--bg); color: var(--text-primary); font-size: 0.9rem; line-height: 1.7; overflow-x: hidden; }
 
-.container { max-width: 1440px; margin: 0 auto; padding: 20px; }
+.nav-bar { position: sticky; top: 0; z-index: 100; height: 48px; background: rgba(250,249,245,0.92); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-light); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; }
+.nav-title { font-size: 15px; font-weight: 700; color: var(--text-primary); }
+.nav-back { font-size: 13px; color: var(--accent-teal); text-decoration: none; font-weight: 500; }
+.nav-back:hover { text-decoration: underline; }
 
-h1 { text-align: center; font-size: 1.8em; margin-bottom: 4px; color: #fff;
-     letter-spacing: 3px; text-transform: uppercase; }
-.subtitle { text-align: center; font-size: 0.85em; color: #888; margin-bottom: 24px; }
+.hero { max-width: 900px; margin: 0 auto; padding: 2rem 24px; }
+.hero h1 { font-family: var(--font-serif); font-size: 1.8rem; color: var(--text-primary); margin-bottom: 6px; }
+.hero .subtitle { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 16px; }
+.hero .description { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.7; max-width: 780px; margin-bottom: 20px; }
+.hero .description strong { color: var(--text-primary); }
 
-/* Intro section */
-.intro-section {
-  background: linear-gradient(135deg, #12121a 0%, #1a1a10 100%);
-  border: 1px solid #4a4a20;
-  border-radius: 12px;
-  padding: 28px 32px;
-  margin-bottom: 24px;
-  position: relative;
-  overflow: hidden;
-}
-.intro-section::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, #a80, #ec0, #a80, #ec0);
-}
-.intro-section h2 {
-  font-size: 1.2em;
-  color: #eea;
-  margin-bottom: 12px;
-  letter-spacing: 1px;
-}
-.intro-section p {
-  font-size: 0.95em;
-  line-height: 1.7;
-  color: #bbb;
-}
-.intro-section p strong { color: #fff; }
+.key-insight { padding: 16px 20px; background: var(--accent-teal-light); border-left: 4px solid var(--accent-teal); border-radius: 0 var(--radius) var(--radius) 0; max-width: 780px; margin-bottom: 20px; }
+.key-insight-label { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent-teal); margin-bottom: 6px; }
+.key-insight p { font-size: 0.85rem; line-height: 1.65; color: var(--text-secondary); }
+.key-insight p strong { color: var(--text-primary); }
 
-/* Key insight callout */
-.key-insight {
-  background: linear-gradient(135deg, #1a1a10, #22200a);
-  border: 1px solid #554a20;
-  border-left: 4px solid #eea;
-  border-radius: 8px;
-  padding: 20px 24px;
-  margin-bottom: 24px;
-}
-.key-insight h3 {
-  font-size: 0.9em;
-  color: #eea;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  margin-bottom: 8px;
-}
-.key-insight p {
-  font-size: 0.9em;
-  line-height: 1.7;
-  color: #bba;
-}
-.key-insight p strong { color: #fff; }
+.container { max-width: 1440px; margin: 0 auto; padding: 0 24px 40px; }
 
 /* Controls */
-.controls {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 10px; padding: 16px; background: #12121a; border: 1px solid #2a2a3a;
-  border-radius: 8px; margin-bottom: 20px;
-}
+.controls { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; padding: 16px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); margin-bottom: 16px; }
 .control-group { display: flex; flex-direction: column; gap: 4px; }
-.control-group label { font-size: 0.72em; color: #aaa; text-transform: uppercase; letter-spacing: 1px; }
-.control-group input, .control-group select {
-  background: #1a1a2e; border: 1px solid #333; color: #fff; padding: 6px 10px;
-  border-radius: 4px; font-family: inherit; font-size: 0.85em;
-}
-.control-group input[type="range"] { padding: 2px; }
-.range-value { font-size: 0.8em; color: #da0; text-align: right; }
-
+.control-group label { font-size: 0.72rem; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 500; }
+.control-group input, .control-group select { background: var(--bg); border: 1px solid var(--border); color: var(--text-primary); padding: 6px 10px; border-radius: 4px; font-family: var(--font-mono); font-size: 0.82rem; }
+.control-group input[type="range"] { padding: 2px; accent-color: var(--accent-teal); }
+.range-value { font-size: 0.78rem; font-family: var(--font-mono); color: var(--accent-teal); text-align: right; }
 .buttons { display: flex; gap: 10px; align-items: end; flex-wrap: wrap; }
-button {
-  background: #2a2a4a; border: 1px solid #444; color: #fff; padding: 8px 18px;
-  border-radius: 4px; cursor: pointer; font-family: inherit; font-size: 0.85em;
-  transition: background 0.2s;
-}
-button:hover { background: #3a3a5a; }
-button.active { background: #4a3a1a; border-color: #aa8a3a; }
-button.reset { background: #4a2a2a; border-color: #6a3a3a; }
+button { background: var(--bg-metric); border: 1px solid var(--border); color: var(--text-primary); padding: 8px 18px; border-radius: 6px; cursor: pointer; font-family: var(--font-sans); font-size: 0.82rem; font-weight: 500; transition: background 0.15s; }
+button:hover { background: var(--bg-hover); }
+button.active { background: var(--accent-teal); border-color: var(--accent-teal); color: #fff; }
+button.reset { color: var(--accent-coral); border-color: var(--accent-coral); }
 
-/* Preset experiments */
-.preset-section {
-  display: flex; gap: 10px; align-items: center; padding: 10px 16px;
-  background: #12121a; border: 1px solid #2a2a3a; border-radius: 8px; margin-bottom: 16px;
-}
-.preset-section label { font-size: 0.72em; color: #aaa; text-transform: uppercase; letter-spacing: 1px; white-space: nowrap; }
-.preset-select {
-  background: #1a1a2e; border: 1px solid #333; color: #fff; padding: 6px 10px;
-  border-radius: 4px; font-family: inherit; font-size: 0.8em; cursor: pointer;
-}
-.preset-select:hover { border-color: #aa8a3a; }
-.preset-tooltip {
-  font-size: 0.75em; color: #998; line-height: 1.4; display: none; flex: 2; min-width: 0;
-}
+/* Presets */
+.preset-section { display: flex; gap: 10px; align-items: center; padding: 10px 16px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 16px; }
+.preset-section label { font-size: 0.72rem; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 500; white-space: nowrap; }
+.preset-select { background: var(--bg); border: 1px solid var(--border); color: var(--text-primary); padding: 6px 10px; border-radius: 4px; font-family: var(--font-sans); font-size: 0.78rem; cursor: pointer; }
+.preset-select:hover { border-color: var(--accent-teal); }
+.preset-tooltip { font-size: 0.72rem; color: var(--text-tertiary); line-height: 1.4; display: none; flex: 2; min-width: 0; }
 .preset-tooltip.visible { display: block; }
 
-/* Layout: sidebar + main */
-.main-layout {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  margin-bottom: 20px;
-}
+/* Stats bar */
+.stats-bar { display: flex; gap: 16px; flex-wrap: wrap; padding: 12px 16px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 16px; align-items: center; }
+.stat { text-align: center; min-width: 80px; }
+.stat-value { font-size: 1.1em; font-weight: 700; font-family: var(--font-mono); color: var(--accent-teal); }
+.stat-label { font-size: 0.66rem; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.04em; }
+
+/* Narrative */
+.narrative-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 18px; margin-bottom: 16px; border-left: 3px solid var(--accent-teal); min-height: 46px; }
+.narrative-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent-teal); font-weight: 600; margin-bottom: 6px; }
+.narrative-text { font-size: 0.85rem; line-height: 1.5; color: var(--text-secondary); font-style: italic; }
+.narrative-text .hl { color: var(--accent-coral); font-weight: 600; font-style: normal; }
+
+/* Main layout */
+.main-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
 @media (max-width: 1000px) { .main-layout { grid-template-columns: 1fr; } }
 
-.panel {
-  background: #12121a; border: 1px solid #2a2a3a; border-radius: 8px;
-  padding: 16px; position: relative; min-height: 0; overflow: hidden;
-}
-.panel-title {
-  font-size: 0.8em; text-transform: uppercase; letter-spacing: 1px;
-  color: #888; margin-bottom: 8px; border-bottom: 1px solid #2a2a3a;
-  padding-bottom: 6px;
-}
-.panel-explanation {
-  font-size: 0.78em;
-  color: #777;
-  line-height: 1.5;
-  margin-bottom: 10px;
-  padding: 6px 8px;
-  background: rgba(255,255,255,0.02);
-  border-radius: 4px;
-  border-left: 2px solid #3a3a2a;
-}
+.panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px; position: relative; min-height: 0; overflow: hidden; }
+.panel-title { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent-teal); margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--border-light); }
+.panel-explanation { font-size: 0.76rem; color: var(--text-tertiary); line-height: 1.5; margin-bottom: 10px; padding: 6px 8px; background: var(--bg-metric); border-radius: 4px; border-left: 2px solid var(--accent-teal); }
 .panel.full-width { grid-column: 1 / -1; }
 
-/* Stats bar */
-.stats-bar {
-  display: flex; gap: 16px; flex-wrap: wrap; padding: 12px 16px;
-  background: #12121a; border: 1px solid #2a2a3a; border-radius: 8px;
-  margin-bottom: 16px; align-items: center;
-}
-.stat { text-align: center; min-width: 80px; }
-.stat-value { font-size: 1.2em; font-weight: bold; color: #da0; }
-.stat-label { font-size: 0.68em; color: #888; text-transform: uppercase; }
+#grid-canvas { display: block; width: 100%; image-rendering: pixelated; border-radius: 4px; cursor: crosshair; }
 
-/* Narrative box */
-.narrative-box {
-  background: linear-gradient(135deg, #0e0e1a, #141414);
-  border: 1px solid #2a2a3a;
-  border-radius: 8px;
-  padding: 14px 18px;
-  margin-bottom: 16px;
-  min-height: 46px;
-}
-.narrative-label {
-  font-size: 0.7em;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: #666;
-  margin-bottom: 6px;
-}
-.narrative-text {
-  font-size: 0.88em;
-  line-height: 1.5;
-  color: #ccc;
-}
-.narrative-text .hl { color: #eea; font-weight: bold; }
+.chart-container { height: 280px; position: relative; min-height: 0; overflow: hidden; }
+.chart-container.wide { height: 340px; }
+.chart-container canvas { display: block; }
 
-/* Grid canvas */
-#grid-canvas {
-  display: block;
-  width: 100%;
-  image-rendering: pixelated;
-  border-radius: 4px;
-  cursor: crosshair;
-}
-
-/* Chart containers */
-.chart-container {
-  height: 280px;
-  position: relative;
-  min-height: 0;
-  overflow: hidden;
-}
-.chart-container.wide {
-  height: 340px;
-}
-.chart-container canvas {
-  display: block;
-}
-
-/* Dashboard grid */
-.dashboard {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;
-}
+.dashboard { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
 @media (max-width: 900px) { .dashboard { grid-template-columns: 1fr; } }
 
-/* Fun facts */
-.fun-facts {
-  background: linear-gradient(135deg, #0e0e1a, #12121a);
-  border: 1px solid #2a2a3a;
-  border-radius: 8px;
-  padding: 20px 24px;
-  margin-bottom: 24px;
-}
-.fun-facts h3 {
-  font-size: 0.9em;
-  color: #da0;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  margin-bottom: 14px;
-}
-.fun-facts ul {
-  list-style: none;
-  padding: 0;
-}
-.fun-facts li {
-  font-size: 0.85em;
-  line-height: 1.6;
-  color: #aaa;
-  padding: 6px 0;
-  border-bottom: 1px solid #1a1a2a;
-}
-.fun-facts li:last-child { border-bottom: none; }
-.fun-facts li strong { color: #ddd; }
-.fact-bullet { color: #da0; margin-right: 8px; }
-
 /* Legend */
-.legend {
-  display: flex; gap: 16px; flex-wrap: wrap; margin-top: 8px;
-  font-size: 0.75em; color: #888;
-}
+.legend { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 8px; font-size: 0.75em; color: var(--text-tertiary); }
 .legend-item { display: flex; align-items: center; gap: 6px; }
-.legend-swatch { width: 14px; height: 14px; border-radius: 3px; border: 1px solid #444; }
+.legend-swatch { width: 14px; height: 14px; border-radius: 3px; border: 1px solid var(--border); }
 
 /* Tooltip */
-.grid-tooltip {
-  position: absolute;
-  background: #1a1a2e;
-  border: 1px solid #444;
-  border-radius: 6px;
-  padding: 8px 12px;
-  font-size: 0.78em;
-  color: #ddd;
-  pointer-events: none;
-  display: none;
-  z-index: 10;
-  white-space: nowrap;
-}
+.grid-tooltip { position: absolute; background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; font-size: 0.76rem; color: var(--text-primary); pointer-events: none; display: none; z-index: 10; white-space: nowrap; box-shadow: var(--shadow-md); }
+
+/* Fun facts */
+.fun-facts { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px 24px; margin-bottom: 24px; }
+.fun-facts h3 { font-size: 0.7rem; color: var(--accent-amber); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; margin-bottom: 14px; }
+.fun-facts ul { list-style: none; padding: 0; }
+.fun-facts li { font-size: 0.82rem; line-height: 1.6; color: var(--text-secondary); padding: 6px 0; border-bottom: 1px solid var(--border-light); }
+.fun-facts li:last-child { border-bottom: none; }
+.fun-facts li strong { color: var(--text-primary); }
+.fact-bullet { color: var(--accent-amber); margin-right: 8px; }
+
+.footer { text-align: center; padding: 2rem; border-top: 1px solid var(--border-light); }
+.footer a { color: var(--accent-teal); text-decoration: none; font-weight: 500; font-size: 0.9rem; }
+.footer a:hover { text-decoration: underline; }
 </style>
 </head>
 <body>
-<div class="container">
+
+<nav class="nav-bar">
+  <span class="nav-title">Sugarscape</span>
+  <a href="../" class="nav-back">&larr; Dashboard</a>
+</nav>
+
+<div class="hero">
   <h1>Sugarscape</h1>
-  <p class="subtitle">Growing Artificial Societies &mdash; Epstein & Axtell (1996) / Beinhocker Ch. 5</p>
+  <p class="subtitle">Growing Artificial Societies &mdash; Epstein &amp; Axtell (1996) / Beinhocker Ch. 5</p>
+  <p class="description">Start with a landscape of "sugar" &mdash; a renewable resource distributed in two mountain peaks. Drop hundreds of agents onto this world, each with slightly different abilities: some can see farther, some burn less energy. Give them one simple rule: <strong>look around, move to the richest empty spot you can see, eat.</strong> That's it. No exploitation, no institutions, no cunning. Yet within a few dozen ticks, the egalitarian utopia collapses into <strong>staggering inequality</strong>. This is the profound lesson of Sugarscape: <strong>inequality is not a bug &mdash; it is an emergent property of heterogeneous agents on an uneven landscape.</strong></p>
+</div>
 
-  <!-- Intro -->
-  <div class="intro-section">
-    <h2>Where Does Inequality Come From?</h2>
-    <p>Start with a landscape of "sugar" &mdash; a renewable resource distributed in two mountain peaks. Drop hundreds of agents onto this world, each with slightly different abilities: some can see farther, some burn less energy. Give them one simple rule: <strong>look around, move to the richest empty spot you can see, eat.</strong> That's it. No exploitation, no institutions, no cunning. Yet within a few dozen ticks, the egalitarian utopia collapses into <strong>staggering inequality</strong>. A Gini coefficient rivaling the most unequal nations on Earth emerges from the simplest possible rules. This is the profound lesson of Sugarscape: <strong>inequality is not a bug &mdash; it is an emergent property of heterogeneous agents on an uneven landscape.</strong></p>
-  </div>
-
-  <!-- Controls -->
+<div class="container">
   <div class="controls">
-    <div class="control-group">
-      <label>Grid Size</label>
-      <input type="number" id="ctrl-grid-size" value="50" min="20" max="80" step="5">
-    </div>
-    <div class="control-group">
-      <label>Num Agents</label>
-      <input type="number" id="ctrl-agents" value="400" min="50" max="1500" step="50">
-    </div>
-    <div class="control-group">
-      <label>Vision Range</label>
-      <select id="ctrl-vision">
-        <option value="1,4">1-4 (low)</option>
-        <option value="1,6" selected>1-6 (standard)</option>
-        <option value="3,6">3-6 (high)</option>
-        <option value="1,10">1-10 (extreme)</option>
-        <option value="1,1">1 (equal)</option>
-        <option value="6,6">6 (equal high)</option>
-      </select>
-    </div>
-    <div class="control-group">
-      <label>Metabolism Range</label>
-      <select id="ctrl-metabolism">
-        <option value="1,4" selected>1-4 (standard)</option>
-        <option value="1,2">1-2 (low)</option>
-        <option value="2,4">2-4 (high)</option>
-        <option value="1,6">1-6 (extreme)</option>
-        <option value="2,2">2 (equal)</option>
-      </select>
-    </div>
-    <div class="control-group">
-      <label>Regrowth Rate</label>
-      <select id="ctrl-regrowth">
-        <option value="0">Instant</option>
-        <option value="0.25">0.25/tick (slow)</option>
-        <option value="1" selected>1/tick (gradual)</option>
-        <option value="2">2/tick (fast)</option>
-      </select>
-    </div>
-    <div class="control-group">
-      <label>Reproduction</label>
-      <select id="ctrl-reproduction">
-        <option value="off" selected>Off</option>
-        <option value="on">On (threshold=50)</option>
-      </select>
-    </div>
-    <div class="control-group">
-      <label>Speed</label>
-      <input type="range" id="ctrl-speed" value="50" min="10" max="500" step="10">
-      <span class="range-value" id="val-speed">50ms</span>
-    </div>
-    <div class="buttons">
-      <button id="btn-start">Start</button>
-      <button id="btn-step">Step</button>
-      <button id="btn-reset" class="reset">Reset</button>
-    </div>
+    <div class="control-group"><label>Grid Size</label><input type="number" id="ctrl-grid-size" value="50" min="20" max="80" step="5"></div>
+    <div class="control-group"><label>Num Agents</label><input type="number" id="ctrl-agents" value="400" min="50" max="1500" step="50"></div>
+    <div class="control-group"><label>Vision Range</label><select id="ctrl-vision"><option value="1,4">1-4 (low)</option><option value="1,6" selected>1-6 (standard)</option><option value="3,6">3-6 (high)</option><option value="1,10">1-10 (extreme)</option><option value="1,1">1 (equal)</option><option value="6,6">6 (equal high)</option></select></div>
+    <div class="control-group"><label>Metabolism Range</label><select id="ctrl-metabolism"><option value="1,4" selected>1-4 (standard)</option><option value="1,2">1-2 (low)</option><option value="2,4">2-4 (high)</option><option value="1,6">1-6 (extreme)</option><option value="2,2">2 (equal)</option></select></div>
+    <div class="control-group"><label>Regrowth Rate</label><select id="ctrl-regrowth"><option value="0">Instant</option><option value="0.25">0.25/tick (slow)</option><option value="1" selected>1/tick (gradual)</option><option value="2">2/tick (fast)</option></select></div>
+    <div class="control-group"><label>Reproduction</label><select id="ctrl-reproduction"><option value="off" selected>Off</option><option value="on">On (threshold=50)</option></select></div>
+    <div class="control-group"><label>Speed</label><input type="range" id="ctrl-speed" value="50" min="10" max="500" step="10"><span class="range-value" id="val-speed">50ms</span></div>
+    <div class="buttons"><button id="btn-start">Start</button><button id="btn-step">Step</button><button id="btn-reset" class="reset">Reset</button></div>
   </div>
 
-  <!-- Preset experiments -->
   <div class="preset-section">
     <label>Preset Experiments</label>
     <select class="preset-select" id="preset-select" onchange="applyPreset(this.value)">
@@ -348,588 +159,265 @@ button.reset { background: #4a2a2a; border-color: #6a3a3a; }
     <div class="preset-tooltip" id="preset-tooltip"></div>
   </div>
 
-  <!-- Stats bar -->
   <div class="stats-bar">
-    <div class="stat">
-      <div class="stat-value" id="stat-tick">0</div>
-      <div class="stat-label">Tick</div>
-    </div>
-    <div class="stat">
-      <div class="stat-value" id="stat-pop">0</div>
-      <div class="stat-label">Population</div>
-    </div>
-    <div class="stat">
-      <div class="stat-value" id="stat-gini">0.00</div>
-      <div class="stat-label">Gini</div>
-    </div>
-    <div class="stat">
-      <div class="stat-value" id="stat-mean-wealth">0</div>
-      <div class="stat-label">Mean Wealth</div>
-    </div>
-    <div class="stat">
-      <div class="stat-value" id="stat-median-wealth">0</div>
-      <div class="stat-label">Median Wealth</div>
-    </div>
-    <div class="stat">
-      <div class="stat-value" id="stat-deaths">0</div>
-      <div class="stat-label">Deaths</div>
-    </div>
-    <div class="stat">
-      <div class="stat-value" id="stat-mean-vision">0</div>
-      <div class="stat-label">Mean Vision</div>
-    </div>
-    <div class="stat">
-      <div class="stat-value" id="stat-mean-metab">0</div>
-      <div class="stat-label">Mean Metab</div>
-    </div>
+    <div class="stat"><div class="stat-value" id="stat-tick">0</div><div class="stat-label">Tick</div></div>
+    <div class="stat"><div class="stat-value" id="stat-pop">0</div><div class="stat-label">Population</div></div>
+    <div class="stat"><div class="stat-value" id="stat-gini">0.00</div><div class="stat-label">Gini</div></div>
+    <div class="stat"><div class="stat-value" id="stat-mean-wealth">0</div><div class="stat-label">Mean Wealth</div></div>
+    <div class="stat"><div class="stat-value" id="stat-median-wealth">0</div><div class="stat-label">Median Wealth</div></div>
+    <div class="stat"><div class="stat-value" id="stat-deaths">0</div><div class="stat-label">Deaths</div></div>
+    <div class="stat"><div class="stat-value" id="stat-mean-vision">0</div><div class="stat-label">Mean Vision</div></div>
+    <div class="stat"><div class="stat-value" id="stat-mean-metab">0</div><div class="stat-label">Mean Metab</div></div>
   </div>
 
-  <!-- Narrative -->
   <div class="narrative-box">
     <div class="narrative-label">What's Happening</div>
-    <div class="narrative-text" id="narrative-text">
-      Press <span class="hl">Start</span> to watch agents forage on the sugar landscape. Each dot is an agent; brighter cells have more sugar. Watch inequality emerge from simple rules.
-    </div>
+    <div class="narrative-text" id="narrative-text">Press <span class="hl">Start</span> to watch agents forage on the sugar landscape. Each dot is an agent; warmer cells have more sugar. Watch inequality emerge from simple rules.</div>
   </div>
 
-  <!-- Main grid + charts -->
   <div class="main-layout">
-    <!-- Sugar grid -->
     <div class="panel">
       <div class="panel-title">Sugar Landscape</div>
-      <div class="panel-explanation">
-        Gold/yellow intensity shows sugar levels. Colored dots are agents &mdash;
-        <span style="color:#4f4;">green</span> for wealthy,
-        <span style="color:#f44;">red</span> for poor.
-        Agents gravitate toward the two sugar mountains.
-      </div>
+      <div class="panel-explanation">Amber intensity shows sugar levels. Colored dots are agents &mdash; <span style="color:var(--accent-green);">green</span> for wealthy, <span style="color:var(--accent-coral);">coral</span> for poor. Agents gravitate toward the two sugar mountains.</div>
       <div style="position:relative;">
         <canvas id="grid-canvas" width="500" height="500"></canvas>
         <div class="grid-tooltip" id="grid-tooltip"></div>
       </div>
       <div class="legend">
-        <div class="legend-item"><div class="legend-swatch" style="background:#553800;"></div> Low Sugar</div>
-        <div class="legend-item"><div class="legend-swatch" style="background:#aa7700;"></div> Med Sugar</div>
-        <div class="legend-item"><div class="legend-swatch" style="background:#ffcc00;"></div> High Sugar</div>
-        <div class="legend-item"><div class="legend-swatch" style="background:#4f4; border-color:#4f4;"></div> Rich Agent</div>
-        <div class="legend-item"><div class="legend-swatch" style="background:#f44; border-color:#f44;"></div> Poor Agent</div>
+        <div class="legend-item"><div class="legend-swatch" style="background:#d4b06a;"></div> Low Sugar</div>
+        <div class="legend-item"><div class="legend-swatch" style="background:#c99030;"></div> Med Sugar</div>
+        <div class="legend-item"><div class="legend-swatch" style="background:#b07818;"></div> High Sugar</div>
+        <div class="legend-item"><div class="legend-swatch" style="background:var(--accent-green);"></div> Rich Agent</div>
+        <div class="legend-item"><div class="legend-swatch" style="background:var(--accent-coral);"></div> Poor Agent</div>
       </div>
     </div>
 
-    <!-- Population + Gini -->
     <div class="panel" style="display:flex; flex-direction:column; gap:12px; min-height:0; overflow:hidden;">
       <div>
         <div class="panel-title">Population Over Time</div>
-        <div class="panel-explanation">
-          As agents with high metabolism and low vision starve, the population drops rapidly at first, then stabilizes. Epstein and Axtell called this the "carrying capacity" of the landscape.
-        </div>
-        <div class="chart-container">
-          <canvas id="chart-population"></canvas>
-        </div>
+        <div class="panel-explanation">As agents with high metabolism and low vision starve, the population drops rapidly at first, then stabilizes at the landscape's "carrying capacity."</div>
+        <div class="chart-container"><canvas id="chart-population"></canvas></div>
       </div>
       <div>
         <div class="panel-title">Gini Coefficient Over Time</div>
-        <div class="panel-explanation">
-          The Gini coefficient measures inequality from 0 (perfect equality) to 1 (one agent has everything). Watch how quickly it rises even though no agent is "exploiting" another.
-        </div>
-        <div class="chart-container">
-          <canvas id="chart-gini"></canvas>
-        </div>
+        <div class="panel-explanation">The Gini coefficient measures inequality from 0 (perfect equality) to 1 (one agent has everything). Watch how quickly it rises.</div>
+        <div class="chart-container"><canvas id="chart-gini"></canvas></div>
       </div>
     </div>
   </div>
 
-  <!-- Second row of charts -->
   <div class="dashboard">
-    <!-- Wealth distribution histogram -->
     <div class="panel">
       <div class="panel-title">Wealth Distribution</div>
-      <div class="panel-explanation">
-        The wealth distribution is highly right-skewed &mdash; a long tail of wealthy agents and a large mass of poor ones. This closely resembles real-world wealth distributions.
-      </div>
-      <div class="chart-container">
-        <canvas id="chart-wealth-dist"></canvas>
-      </div>
+      <div class="panel-explanation">The wealth distribution is highly right-skewed &mdash; a long tail of wealthy agents and a large mass of poor ones, closely resembling real-world wealth distributions.</div>
+      <div class="chart-container"><canvas id="chart-wealth-dist"></canvas></div>
     </div>
-
-    <!-- Mean wealth over time -->
     <div class="panel">
-      <div class="panel-title">Wealth Over Time (Mean & Median)</div>
-      <div class="panel-explanation">
-        The growing gap between mean and median wealth is a signature of skewed distribution. When the mean far exceeds the median, a few agents hold most of the sugar.
-      </div>
-      <div class="chart-container">
-        <canvas id="chart-wealth-time"></canvas>
-      </div>
+      <div class="panel-title">Wealth Over Time (Mean &amp; Median)</div>
+      <div class="panel-explanation">The growing gap between mean and median wealth is a signature of skewed distribution. When the mean far exceeds the median, a few agents hold most of the sugar.</div>
+      <div class="chart-container"><canvas id="chart-wealth-time"></canvas></div>
     </div>
   </div>
 
-  <!-- Key insight -->
   <div class="key-insight">
-    <h3>Beinhocker's Key Insight</h3>
-    <p>In <em>The Origin of Wealth</em>, Beinhocker uses Sugarscape to demolish a common misconception: that inequality requires exploitation, corruption, or unfair institutions. <strong>Even in a world of perfectly simple, identical rules &mdash; where no agent can cheat, steal, or collude &mdash; heterogeneity alone produces inequality.</strong> Agents with slightly better vision find sugar faster; agents with lower metabolism keep more of what they find. These tiny differences compound over time, producing a wealth distribution that looks startlingly like the real world. The lesson: <strong>inequality is the default emergent state of any system with heterogeneous agents and uneven resources.</strong> Reducing it requires deliberate, sustained intervention &mdash; it will not happen on its own.</p>
+    <div class="key-insight-label">Beinhocker's Key Insight</div>
+    <p>In <em>The Origin of Wealth</em>, Beinhocker uses Sugarscape to demolish a common misconception: that inequality requires exploitation, corruption, or unfair institutions. <strong>Even in a world of perfectly simple, identical rules &mdash; where no agent can cheat, steal, or collude &mdash; heterogeneity alone produces inequality.</strong> The lesson: <strong>inequality is the default emergent state of any system with heterogeneous agents and uneven resources.</strong> Reducing it requires deliberate, sustained intervention.</p>
   </div>
 
-  <!-- Fun facts -->
   <div class="fun-facts">
     <h3>Fun Facts About Sugarscape</h3>
     <ul>
       <li><span class="fact-bullet">&gt;</span> <strong>Published in 1996</strong>, Sugarscape was one of the first large-scale agent-based models. Epstein and Axtell ran it on hardware with less computing power than a modern smartwatch.</li>
-      <li><span class="fact-bullet">&gt;</span> <strong>The "two mountains" landscape</strong> was inspired by geographic resource distribution. The agents' migration toward the peaks mirrors real human settlement patterns around fertile land and water.</li>
-      <li><span class="fact-bullet">&gt;</span> <strong>Adding just two rules</strong> &mdash; trade and reproduction &mdash; produces emergent phenomena including market prices, cultural transmission, warfare between "tribes," disease epidemics, and economic cycles.</li>
-      <li><span class="fact-bullet">&gt;</span> <strong>The Gini coefficient</strong> in a standard Sugarscape run typically stabilizes between 0.4 and 0.6, comparable to many real-world economies. The US Gini was ~0.49 in 2023.</li>
-      <li><span class="fact-bullet">&gt;</span> <strong>Epstein later coined the term "generative social science"</strong> &mdash; the idea that if you haven't grown it from simple rules, you haven't fully explained it. Sugarscape was the manifesto.</li>
+      <li><span class="fact-bullet">&gt;</span> <strong>The "two mountains" landscape</strong> was inspired by geographic resource distribution. The agents' migration toward the peaks mirrors real human settlement patterns.</li>
+      <li><span class="fact-bullet">&gt;</span> <strong>Adding just two rules</strong> &mdash; trade and reproduction &mdash; produces emergent phenomena including market prices, cultural transmission, warfare, disease epidemics, and economic cycles.</li>
+      <li><span class="fact-bullet">&gt;</span> <strong>The Gini coefficient</strong> in a standard Sugarscape run typically stabilizes between 0.4 and 0.6, comparable to many real-world economies.</li>
+      <li><span class="fact-bullet">&gt;</span> <strong>Epstein later coined the term "generative social science"</strong> &mdash; if you haven't grown it from simple rules, you haven't fully explained it.</li>
       <li><span class="fact-bullet">&gt;</span> <strong>Natural selection in Sugarscape</strong> favors high-vision, low-metabolism agents. Over time, the surviving population's average traits shift &mdash; evolution without any genetic algorithm.</li>
     </ul>
   </div>
 </div>
 
+<div class="footer"><a href="../">&larr; Back to Dashboard</a></div>
+
 <script>
 // =========================================================================
-// SUGARSCAPE SIMULATION ENGINE (JavaScript port)
+// SUGARSCAPE SIMULATION ENGINE
 // =========================================================================
 
 class SugarGrid {
   constructor(size, config) {
-    this.size = size;
-    this.config = config;
-    this.sugar = [];
-    this.capacity = [];
-    this.pollution = [];
-    for (let i = 0; i < size * size; i++) {
-      this.sugar.push(0);
-      this.capacity.push(0);
-      this.pollution.push(0);
-    }
+    this.size = size; this.config = config;
+    this.sugar = []; this.capacity = []; this.pollution = [];
+    for (let i = 0; i < size * size; i++) { this.sugar.push(0); this.capacity.push(0); this.pollution.push(0); }
     this._initLandscape();
   }
-
   _initLandscape() {
-    const c = this.config;
-    const s = this.size;
-    for (let y = 0; y < s; y++) {
-      for (let x = 0; x < s; x++) {
-        const d1 = Math.sqrt((x - c.peak1X) ** 2 + (y - c.peak1Y) ** 2);
-        const d2 = Math.sqrt((x - c.peak2X) ** 2 + (y - c.peak2Y) ** 2);
-        const r1 = c.peak1Radius / 2.5;
-        const r2 = c.peak2Radius / 2.5;
-        const s1 = c.peak1Height * Math.exp(-(d1 * d1) / (2 * r1 * r1));
-        const s2 = c.peak2Height * Math.exp(-(d2 * d2) / (2 * r2 * r2));
-        const cap = Math.min(Math.max(Math.round(s1 + s2), 0), c.maxSugarLevel);
-        const idx = y * s + x;
-        this.capacity[idx] = cap;
-        this.sugar[idx] = cap;
-      }
-    }
+    const c = this.config, s = this.size;
+    for (let y = 0; y < s; y++) { for (let x = 0; x < s; x++) {
+      const d1 = Math.sqrt((x - c.peak1X)**2 + (y - c.peak1Y)**2);
+      const d2 = Math.sqrt((x - c.peak2X)**2 + (y - c.peak2Y)**2);
+      const r1 = c.peak1Radius / 2.5, r2 = c.peak2Radius / 2.5;
+      const s1 = c.peak1Height * Math.exp(-(d1*d1)/(2*r1*r1));
+      const s2 = c.peak2Height * Math.exp(-(d2*d2)/(2*r2*r2));
+      const cap = Math.min(Math.max(Math.round(s1 + s2), 0), c.maxSugarLevel);
+      const idx = y * s + x; this.capacity[idx] = cap; this.sugar[idx] = cap;
+    }}
   }
-
   idx(x, y) { return ((y % this.size + this.size) % this.size) * this.size + ((x % this.size + this.size) % this.size); }
-
-  regrow(rate) {
-    for (let i = 0; i < this.sugar.length; i++) {
-      if (rate === 0) {
-        this.sugar[i] = this.capacity[i];
-      } else {
-        this.sugar[i] = Math.min(this.sugar[i] + rate, this.capacity[i]);
-      }
-    }
-  }
+  regrow(rate) { for (let i = 0; i < this.sugar.length; i++) { if (rate === 0) this.sugar[i] = this.capacity[i]; else this.sugar[i] = Math.min(this.sugar[i] + rate, this.capacity[i]); } }
 }
 
 class SAgent {
   constructor(id, x, y, vision, metabolism, sugar) {
-    this.id = id;
-    this.x = x;
-    this.y = y;
-    this.vision = vision;
-    this.metabolism = metabolism;
-    this.sugar = sugar;
-    this.age = 0;
-    this.alive = true;
+    this.id = id; this.x = x; this.y = y; this.vision = vision; this.metabolism = metabolism; this.sugar = sugar; this.age = 0; this.alive = true;
   }
 }
 
 class SugarscapeSim {
   constructor(config) {
-    this.config = config;
-    this.gridSize = config.gridSize;
+    this.config = config; this.gridSize = config.gridSize;
     this.grid = new SugarGrid(config.gridSize, config);
-    this.agents = [];
-    this.agentMap = new Map(); // "x,y" -> agent
-    this.nextId = 0;
-    this.tick = 0;
-    this.totalDeaths = 0;
-    this.totalBirths = 0;
-    this.deathsThisTick = 0;
-    this.birthsThisTick = 0;
-
-    // History
-    this.popHistory = [];
-    this.giniHistory = [];
-    this.meanWealthHistory = [];
-    this.medianWealthHistory = [];
-    this.meanVisionHistory = [];
-    this.meanMetabHistory = [];
-
-    this._placeAgents();
-    this._recordMetrics();
+    this.agents = []; this.agentMap = new Map(); this.nextId = 0; this.tick = 0;
+    this.totalDeaths = 0; this.totalBirths = 0; this.deathsThisTick = 0; this.birthsThisTick = 0;
+    this.popHistory = []; this.giniHistory = []; this.meanWealthHistory = []; this.medianWealthHistory = [];
+    this.meanVisionHistory = []; this.meanMetabHistory = [];
+    this._placeAgents(); this._recordMetrics();
   }
-
   _placeAgents() {
     const available = [];
-    for (let y = 0; y < this.gridSize; y++) {
-      for (let x = 0; x < this.gridSize; x++) {
-        available.push([x, y]);
-      }
-    }
-    // Fisher-Yates shuffle
-    for (let i = available.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [available[i], available[j]] = [available[j], available[i]];
-    }
-
-    const c = this.config;
-    const num = Math.min(c.numAgents, available.length);
+    for (let y = 0; y < this.gridSize; y++) for (let x = 0; x < this.gridSize; x++) available.push([x, y]);
+    for (let i = available.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [available[i], available[j]] = [available[j], available[i]]; }
+    const c = this.config, num = Math.min(c.numAgents, available.length);
     for (let i = 0; i < num; i++) {
       const [x, y] = available[i];
-      const vision = randInt(c.visionMin, c.visionMax);
-      const metabolism = randInt(c.metabolismMin, c.metabolismMax);
-      const sugar = randInt(c.endowmentMin, c.endowmentMax);
+      const vision = randInt(c.visionMin, c.visionMax), metabolism = randInt(c.metabolismMin, c.metabolismMax), sugar = randInt(c.endowmentMin, c.endowmentMax);
       const agent = new SAgent(this.nextId++, x, y, vision, metabolism, sugar);
-      this.agents.push(agent);
-      this.agentMap.set(x + ',' + y, agent);
+      this.agents.push(agent); this.agentMap.set(x + ',' + y, agent);
     }
   }
-
   step() {
-    this.deathsThisTick = 0;
-    this.birthsThisTick = 0;
-
-    // Shuffle agent order
-    for (let i = this.agents.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [this.agents[i], this.agents[j]] = [this.agents[j], this.agents[i]];
-    }
-
-    // Move and gather
-    for (const agent of this.agents) {
-      if (!agent.alive) continue;
-      this._moveAndGather(agent);
-    }
-
-    // Consume and death check
-    for (const agent of this.agents) {
-      if (!agent.alive) continue;
-      agent.sugar -= agent.metabolism;
-      agent.age++;
-      if (agent.sugar <= 0) {
-        agent.alive = false;
-        this.agentMap.delete(agent.x + ',' + agent.y);
-        this.deathsThisTick++;
-        this.totalDeaths++;
-      }
-    }
-
-    // Reproduction
-    if (this.config.reproduction) {
-      this._reproductionStep();
-    }
-
-    // Remove dead
+    this.deathsThisTick = 0; this.birthsThisTick = 0;
+    for (let i = this.agents.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [this.agents[i], this.agents[j]] = [this.agents[j], this.agents[i]]; }
+    for (const agent of this.agents) { if (!agent.alive) continue; this._moveAndGather(agent); }
+    for (const agent of this.agents) { if (!agent.alive) continue; agent.sugar -= agent.metabolism; agent.age++; if (agent.sugar <= 0) { agent.alive = false; this.agentMap.delete(agent.x+','+agent.y); this.deathsThisTick++; this.totalDeaths++; } }
+    if (this.config.reproduction) this._reproductionStep();
     this.agents = this.agents.filter(a => a.alive);
-
-    // Regrow sugar
-    this.grid.regrow(this.config.regrowthRate);
-
-    this.tick++;
-    this._recordMetrics();
+    this.grid.regrow(this.config.regrowthRate); this.tick++; this._recordMetrics();
   }
-
   _moveAndGather(agent) {
-    const gs = this.gridSize;
-    let bestX = agent.x, bestY = agent.y;
-    let bestSugar = -1;
-    let bestDist = 0;
-
-    const dirs = [[0, 1], [0, -1], [1, 0], [-1, 0]];
-    for (const [dx, dy] of dirs) {
-      for (let dist = 1; dist <= agent.vision; dist++) {
-        const nx = ((agent.x + dx * dist) % gs + gs) % gs;
-        const ny = ((agent.y + dy * dist) % gs + gs) % gs;
-        const key = nx + ',' + ny;
-        if (this.agentMap.has(key) && this.agentMap.get(key) !== agent) continue;
-
-        const s = this.grid.sugar[this.grid.idx(nx, ny)];
-        if (s > bestSugar || (s === bestSugar && dist < bestDist)) {
-          bestSugar = s;
-          bestX = nx;
-          bestY = ny;
-          bestDist = dist;
-        }
-      }
-    }
-
-    // Move
-    this.agentMap.delete(agent.x + ',' + agent.y);
-    agent.x = bestX;
-    agent.y = bestY;
-    this.agentMap.set(bestX + ',' + bestY, agent);
-
-    // Gather
-    const idx = this.grid.idx(bestX, bestY);
-    agent.sugar += this.grid.sugar[idx];
-    this.grid.sugar[idx] = 0;
+    const gs = this.gridSize; let bestX = agent.x, bestY = agent.y, bestSugar = -1, bestDist = 0;
+    const dirs = [[0,1],[0,-1],[1,0],[-1,0]];
+    for (const [dx, dy] of dirs) { for (let dist = 1; dist <= agent.vision; dist++) {
+      const nx = ((agent.x + dx*dist) % gs + gs) % gs, ny = ((agent.y + dy*dist) % gs + gs) % gs;
+      const key = nx+','+ny;
+      if (this.agentMap.has(key) && this.agentMap.get(key) !== agent) continue;
+      const s = this.grid.sugar[this.grid.idx(nx, ny)];
+      if (s > bestSugar || (s === bestSugar && dist < bestDist)) { bestSugar = s; bestX = nx; bestY = ny; bestDist = dist; }
+    }}
+    this.agentMap.delete(agent.x+','+agent.y); agent.x = bestX; agent.y = bestY; this.agentMap.set(bestX+','+bestY, agent);
+    const idx = this.grid.idx(bestX, bestY); agent.sugar += this.grid.sugar[idx]; this.grid.sugar[idx] = 0;
   }
-
   _reproductionStep() {
-    const newAgents = [];
-    const c = this.config;
+    const newAgents = [], c = this.config;
     for (const agent of this.agents) {
       if (!agent.alive || agent.sugar < c.reproductionThreshold) continue;
-
-      // Find empty neighbor
       const dirs = [[0,1],[0,-1],[1,0],[-1,0]];
-      // Shuffle
-      for (let i = dirs.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [dirs[i], dirs[j]] = [dirs[j], dirs[i]];
-      }
-      let placed = false;
+      for (let i = dirs.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i+1)); [dirs[i], dirs[j]] = [dirs[j], dirs[i]]; }
       for (const [dx, dy] of dirs) {
-        const nx = ((agent.x + dx) % this.gridSize + this.gridSize) % this.gridSize;
-        const ny = ((agent.y + dy) % this.gridSize + this.gridSize) % this.gridSize;
-        const key = nx + ',' + ny;
-        if (this.agentMap.has(key)) continue;
-
-        const childSugar = agent.sugar / 2;
-        agent.sugar /= 2;
-        const vision = Math.max(1, Math.min(c.visionMax, agent.vision + randChoice([-1, 0, 0, 1])));
-        const metabolism = Math.max(1, Math.min(c.metabolismMax, agent.metabolism + randChoice([-1, 0, 0, 1])));
+        const nx = ((agent.x+dx)%this.gridSize+this.gridSize)%this.gridSize, ny = ((agent.y+dy)%this.gridSize+this.gridSize)%this.gridSize;
+        if (this.agentMap.has(nx+','+ny)) continue;
+        const childSugar = agent.sugar / 2; agent.sugar /= 2;
+        const vision = Math.max(1, Math.min(c.visionMax, agent.vision + randChoice([-1,0,0,1])));
+        const metabolism = Math.max(1, Math.min(c.metabolismMax, agent.metabolism + randChoice([-1,0,0,1])));
         const child = new SAgent(this.nextId++, nx, ny, vision, metabolism, childSugar);
-        newAgents.push(child);
-        this.agentMap.set(key, child);
-        this.birthsThisTick++;
-        this.totalBirths++;
-        placed = true;
-        break;
+        newAgents.push(child); this.agentMap.set(nx+','+ny, child); this.birthsThisTick++; this.totalBirths++; break;
       }
     }
     this.agents.push(...newAgents);
   }
-
   _recordMetrics() {
     const living = this.agents.filter(a => a.alive);
-    this.popHistory.push(living.length);
-    this.giniHistory.push(this._computeGini(living));
-
+    this.popHistory.push(living.length); this.giniHistory.push(this._computeGini(living));
     if (living.length > 0) {
       const wealths = living.map(a => a.sugar);
-      this.meanWealthHistory.push(wealths.reduce((a, b) => a + b, 0) / wealths.length);
-      const sorted = [...wealths].sort((a, b) => a - b);
-      const mid = Math.floor(sorted.length / 2);
-      this.medianWealthHistory.push(sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2);
-      this.meanVisionHistory.push(living.reduce((s, a) => s + a.vision, 0) / living.length);
-      this.meanMetabHistory.push(living.reduce((s, a) => s + a.metabolism, 0) / living.length);
-    } else {
-      this.meanWealthHistory.push(0);
-      this.medianWealthHistory.push(0);
-      this.meanVisionHistory.push(0);
-      this.meanMetabHistory.push(0);
-    }
+      this.meanWealthHistory.push(wealths.reduce((a,b)=>a+b,0)/wealths.length);
+      const sorted = [...wealths].sort((a,b)=>a-b); const mid = Math.floor(sorted.length/2);
+      this.medianWealthHistory.push(sorted.length%2 ? sorted[mid] : (sorted[mid-1]+sorted[mid])/2);
+      this.meanVisionHistory.push(living.reduce((s,a)=>s+a.vision,0)/living.length);
+      this.meanMetabHistory.push(living.reduce((s,a)=>s+a.metabolism,0)/living.length);
+    } else { this.meanWealthHistory.push(0); this.medianWealthHistory.push(0); this.meanVisionHistory.push(0); this.meanMetabHistory.push(0); }
   }
-
   _computeGini(agents) {
     if (agents.length === 0) return 0;
-    const wealths = agents.map(a => a.sugar).sort((a, b) => a - b);
-    const n = wealths.length;
-    const total = wealths.reduce((a, b) => a + b, 0);
-    if (total <= 0) return 0;
-    let weightedSum = 0;
-    for (let i = 0; i < n; i++) {
-      weightedSum += (2 * (i + 1) - n - 1) * wealths[i];
-    }
+    const wealths = agents.map(a => a.sugar).sort((a,b)=>a-b); const n = wealths.length;
+    const total = wealths.reduce((a,b)=>a+b,0); if (total <= 0) return 0;
+    let weightedSum = 0; for (let i = 0; i < n; i++) weightedSum += (2*(i+1)-n-1)*wealths[i];
     return Math.max(0, Math.min(1, weightedSum / (n * total)));
   }
-
   getWealthHistogram(bins = 20) {
     const living = this.agents.filter(a => a.alive);
     if (living.length === 0) return { centers: [], counts: [] };
-    const wealths = living.map(a => a.sugar);
-    const minW = Math.min(...wealths);
-    const maxW = Math.max(...wealths);
+    const wealths = living.map(a => a.sugar); const minW = Math.min(...wealths); const maxW = Math.max(...wealths);
     if (maxW <= minW) return { centers: [minW], counts: [living.length] };
-
-    const binWidth = (maxW - minW) / bins;
-    const counts = new Array(bins).fill(0);
-    const centers = [];
-    for (let i = 0; i < bins; i++) {
-      centers.push(minW + (i + 0.5) * binWidth);
-    }
-    for (const w of wealths) {
-      let idx = Math.floor((w - minW) / binWidth);
-      if (idx >= bins) idx = bins - 1;
-      counts[idx]++;
-    }
+    const binWidth = (maxW - minW) / bins; const counts = new Array(bins).fill(0); const centers = [];
+    for (let i = 0; i < bins; i++) centers.push(minW + (i+0.5)*binWidth);
+    for (const w of wealths) { let idx = Math.floor((w-minW)/binWidth); if (idx >= bins) idx = bins-1; counts[idx]++; }
     return { centers, counts };
   }
 }
 
-function randInt(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-function randChoice(arr) {
-  return arr[Math.floor(Math.random() * arr.length)];
-}
+function randInt(min, max) { return Math.floor(Math.random()*(max-min+1))+min; }
+function randChoice(arr) { return arr[Math.floor(Math.random()*arr.length)]; }
 
 // =========================================================================
 // UI STATE
 // =========================================================================
-
-let sim = null;
-let running = false;
-let timer = null;
-let totalDeathsAccum = 0;
-
-// Charts
-let chartPop = null;
-let chartGini = null;
-let chartWealthDist = null;
-let chartWealthTime = null;
+let sim = null, running = false, timer = null, totalDeathsAccum = 0;
+let chartPop = null, chartGini = null, chartWealthDist = null, chartWealthTime = null;
 
 function getConfig() {
   const visionParts = document.getElementById('ctrl-vision').value.split(',');
   const metabParts = document.getElementById('ctrl-metabolism').value.split(',');
   const gs = parseInt(document.getElementById('ctrl-grid-size').value);
-  return {
-    gridSize: gs,
-    numAgents: parseInt(document.getElementById('ctrl-agents').value),
-    visionMin: parseInt(visionParts[0]),
-    visionMax: parseInt(visionParts[1]),
-    metabolismMin: parseInt(metabParts[0]),
-    metabolismMax: parseInt(metabParts[1]),
-    endowmentMin: 5,
-    endowmentMax: 25,
-    regrowthRate: parseFloat(document.getElementById('ctrl-regrowth').value),
-    maxSugarLevel: 4,
-    reproduction: document.getElementById('ctrl-reproduction').value === 'on',
-    reproductionThreshold: 50,
-    // Peaks
-    peak1X: gs * 0.3,
-    peak1Y: gs * 0.3,
-    peak1Height: 4,
-    peak1Radius: gs * 0.4,
-    peak2X: gs * 0.7,
-    peak2Y: gs * 0.7,
-    peak2Height: 4,
-    peak2Radius: gs * 0.4,
-  };
+  return { gridSize: gs, numAgents: parseInt(document.getElementById('ctrl-agents').value), visionMin: parseInt(visionParts[0]), visionMax: parseInt(visionParts[1]), metabolismMin: parseInt(metabParts[0]), metabolismMax: parseInt(metabParts[1]), endowmentMin: 5, endowmentMax: 25, regrowthRate: parseFloat(document.getElementById('ctrl-regrowth').value), maxSugarLevel: 4, reproduction: document.getElementById('ctrl-reproduction').value === 'on', reproductionThreshold: 50, peak1X: gs*0.3, peak1Y: gs*0.3, peak1Height: 4, peak1Radius: gs*0.4, peak2X: gs*0.7, peak2Y: gs*0.7, peak2Height: 4, peak2Radius: gs*0.4 };
 }
-
-function getSpeed() {
-  return parseInt(document.getElementById('ctrl-speed').value);
-}
-
-// =========================================================================
-// PRESET EXPERIMENTS
-// =========================================================================
+function getSpeed() { return parseInt(document.getElementById('ctrl-speed').value); }
 
 function applyPreset(key) {
   const presets = {
-    baseline: { agents: 400, gridSize: 50, vision: '1,6', metabolism: '1,4', regrowth: '1', reproduction: 'off', tooltip: 'Standard Sugarscape: 400 agents, 50x50 grid. Population crashes to ~175 in first 10 ticks as high-metabolism agents die. Gini rises from 0.22 to 0.375 -- moderate inequality from identical rules.' },
-    overcrowded: { agents: 800, gridSize: 50, vision: '1,6', metabolism: '1,4', regrowth: '1', reproduction: 'off', tooltip: 'Violent initial crash: 53 agents die in a single tick. Harsher selection (mean metabolism drops to 1.35). Final pop 289 -- more survive but each is 28% poorer due to competition.' },
-    scarcity: { agents: 400, gridSize: 50, vision: '1,6', metabolism: '1,4', regrowth: '0.25', reproduction: 'off', tooltip: 'The equalizer: 0.25 regrowth means only 28% survive. Extreme metabolic selection (mean=1.15). Lowest Gini (0.26) -- scarcity prevents anyone from accumulating surplus. Median exceeds mean.' },
-    reproduction: { agents: 400, gridSize: 50, vision: '1,6', metabolism: '1,4', regrowth: '1', reproduction: 'on', tooltip: 'Population explosion: from 400 to 1,302 by tick 300. Dramatic trait evolution -- 97.3% converge to metabolism=1. Lowest Gini (0.15) because reproduction splits wealth. Malthusian equilibrium emerges.' },
-    extreme: { agents: 400, gridSize: 50, vision: '1,10', metabolism: '1,6', regrowth: '1', reproduction: 'off', tooltip: 'Extreme trait ranges: vision 1-10, metabolism 1-6. Brutal selection -- no agent with metabolism>3 survives. Paradoxically lower Gini (0.31) because the poor die rather than persist. Metabolism correlation r=-0.83.' },
+    baseline: { agents: 400, gridSize: 50, vision: '1,6', metabolism: '1,4', regrowth: '1', reproduction: 'off', tooltip: 'Standard Sugarscape: 400 agents, 50x50 grid. Population crashes then stabilizes. Gini rises from 0.22 to 0.375.' },
+    overcrowded: { agents: 800, gridSize: 50, vision: '1,6', metabolism: '1,4', regrowth: '1', reproduction: 'off', tooltip: 'Violent initial crash: agents die in waves. Harsher selection. Final pop 289 -- more survive but each is 28% poorer.' },
+    scarcity: { agents: 400, gridSize: 50, vision: '1,6', metabolism: '1,4', regrowth: '0.25', reproduction: 'off', tooltip: 'The equalizer: 0.25 regrowth means only 28% survive. Extreme metabolic selection. Lowest Gini (0.26).' },
+    reproduction: { agents: 400, gridSize: 50, vision: '1,6', metabolism: '1,4', regrowth: '1', reproduction: 'on', tooltip: 'Population explosion: from 400 to 1,302 by tick 300. Dramatic trait evolution -- 97.3% converge to metabolism=1.' },
+    extreme: { agents: 400, gridSize: 50, vision: '1,10', metabolism: '1,6', regrowth: '1', reproduction: 'off', tooltip: 'Extreme trait ranges: brutal selection. No agent with metabolism>3 survives. Paradoxically lower Gini (0.31).' },
   };
   const p = presets[key];
   if (!p) { document.getElementById('preset-tooltip').classList.remove('visible'); return; }
-  document.getElementById('ctrl-agents').value = p.agents;
-  document.getElementById('ctrl-grid-size').value = p.gridSize;
-  document.getElementById('ctrl-vision').value = p.vision;
-  document.getElementById('ctrl-metabolism').value = p.metabolism;
-  document.getElementById('ctrl-regrowth').value = p.regrowth;
-  document.getElementById('ctrl-reproduction').value = p.reproduction;
-  document.getElementById('preset-tooltip').textContent = p.tooltip;
-  document.getElementById('preset-tooltip').classList.add('visible');
+  document.getElementById('ctrl-agents').value = p.agents; document.getElementById('ctrl-grid-size').value = p.gridSize;
+  document.getElementById('ctrl-vision').value = p.vision; document.getElementById('ctrl-metabolism').value = p.metabolism;
+  document.getElementById('ctrl-regrowth').value = p.regrowth; document.getElementById('ctrl-reproduction').value = p.reproduction;
+  document.getElementById('preset-tooltip').textContent = p.tooltip; document.getElementById('preset-tooltip').classList.add('visible');
   init();
 }
 
-// =========================================================================
-// INITIALIZATION
-// =========================================================================
-
 function init() {
-  stop();
-  const config = getConfig();
-  sim = new SugarscapeSim(config);
-  totalDeathsAccum = 0;
-  updateDisplay();
-  updateNarrative('init');
-  initCharts();
-  updateCharts();
+  stop(); const config = getConfig(); sim = new SugarscapeSim(config); totalDeathsAccum = 0;
+  updateDisplay(); updateNarrative('init'); initCharts(); updateCharts();
 }
-
-function start() {
-  if (running) return;
-  if (!sim) init();
-  running = true;
-  document.getElementById('btn-start').textContent = 'Pause';
-  document.getElementById('btn-start').classList.add('active');
-  scheduleStep();
-}
-
-function stop() {
-  running = false;
-  if (timer) { clearTimeout(timer); timer = null; }
-  document.getElementById('btn-start').textContent = 'Start';
-  document.getElementById('btn-start').classList.remove('active');
-}
-
-function toggle() {
-  if (running) stop(); else start();
-}
-
-function stepOnce() {
-  if (!sim) init();
-  stop();
-  sim.step();
-  totalDeathsAccum += sim.deathsThisTick;
-  updateDisplay();
-  updateNarrative('step');
-  updateCharts();
-}
-
-function scheduleStep() {
-  if (!running) return;
-  timer = setTimeout(() => {
-    sim.step();
-    totalDeathsAccum += sim.deathsThisTick;
-    updateDisplay();
-    if (sim.tick % 5 === 0) updateNarrative('step');
-    updateCharts();
-    if (sim.agents.length === 0) {
-      stop();
-      updateNarrative('extinction');
-    } else {
-      scheduleStep();
-    }
-  }, getSpeed());
-}
-
-// =========================================================================
-// DISPLAY
-// =========================================================================
+function start() { if (running) return; if (!sim) init(); running = true; document.getElementById('btn-start').textContent = 'Pause'; document.getElementById('btn-start').classList.add('active'); scheduleStep(); }
+function stop() { running = false; if (timer) { clearTimeout(timer); timer = null; } document.getElementById('btn-start').textContent = 'Start'; document.getElementById('btn-start').classList.remove('active'); }
+function toggle() { if (running) stop(); else start(); }
+function stepOnce() { if (!sim) init(); stop(); sim.step(); totalDeathsAccum += sim.deathsThisTick; updateDisplay(); updateNarrative('step'); updateCharts(); }
+function scheduleStep() { if (!running) return; timer = setTimeout(() => { sim.step(); totalDeathsAccum += sim.deathsThisTick; updateDisplay(); if (sim.tick % 5 === 0) updateNarrative('step'); updateCharts(); if (sim.agents.length === 0) { stop(); updateNarrative('extinction'); } else scheduleStep(); }, getSpeed()); }
 
 function updateDisplay() {
-  if (!sim) return;
-  drawGrid();
+  if (!sim) return; drawGrid();
   const living = sim.agents.filter(a => a.alive);
-  const gini = sim.giniHistory[sim.giniHistory.length - 1] || 0;
-  const meanW = sim.meanWealthHistory[sim.meanWealthHistory.length - 1] || 0;
-  const medianW = sim.medianWealthHistory[sim.medianWealthHistory.length - 1] || 0;
-  const meanV = sim.meanVisionHistory[sim.meanVisionHistory.length - 1] || 0;
-  const meanM = sim.meanMetabHistory[sim.meanMetabHistory.length - 1] || 0;
-
+  const gini = sim.giniHistory[sim.giniHistory.length-1]||0;
+  const meanW = sim.meanWealthHistory[sim.meanWealthHistory.length-1]||0;
+  const medianW = sim.medianWealthHistory[sim.medianWealthHistory.length-1]||0;
+  const meanV = sim.meanVisionHistory[sim.meanVisionHistory.length-1]||0;
+  const meanM = sim.meanMetabHistory[sim.meanMetabHistory.length-1]||0;
   document.getElementById('stat-tick').textContent = sim.tick;
   document.getElementById('stat-pop').textContent = living.length;
   document.getElementById('stat-gini').textContent = gini.toFixed(3);
@@ -938,356 +426,117 @@ function updateDisplay() {
   document.getElementById('stat-deaths').textContent = totalDeathsAccum;
   document.getElementById('stat-mean-vision').textContent = meanV.toFixed(2);
   document.getElementById('stat-mean-metab').textContent = meanM.toFixed(2);
-
-  // Color Gini based on value
   const giniEl = document.getElementById('stat-gini');
-  if (gini > 0.5) giniEl.style.color = '#f66';
-  else if (gini > 0.3) giniEl.style.color = '#da0';
-  else giniEl.style.color = '#4f4';
+  if (gini > 0.5) giniEl.style.color = 'var(--accent-coral)';
+  else if (gini > 0.3) giniEl.style.color = 'var(--accent-amber)';
+  else giniEl.style.color = 'var(--accent-green)';
 }
 
 function drawGrid() {
   const canvas = document.getElementById('grid-canvas');
-  const ctx = canvas.getContext('2d');
-  const gs = sim.gridSize;
-  const cellSize = Math.max(Math.floor(500 / gs), 2);
-  const canvasSize = cellSize * gs;
-  canvas.width = canvasSize;
-  canvas.height = canvasSize;
+  const ctx = canvas.getContext('2d'); const gs = sim.gridSize;
+  const cellSize = Math.max(Math.floor(500/gs), 2); const canvasSize = cellSize*gs;
+  canvas.width = canvasSize; canvas.height = canvasSize;
 
-  // Draw sugar landscape
-  for (let y = 0; y < gs; y++) {
-    for (let x = 0; x < gs; x++) {
-      const idx = sim.grid.idx(x, y);
-      const s = sim.grid.sugar[idx];
-      const cap = sim.grid.capacity[idx];
-
-      // Background: dark base with sugar glow
-      const brightness = cap > 0 ? (s / 4) : 0;
-      const r = Math.floor(40 + brightness * 150);
-      const g = Math.floor(30 + brightness * 120);
-      const b = Math.floor(5 + brightness * 10);
-      ctx.fillStyle = `rgb(${r},${g},${b})`;
-      ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
-
-      // Show capacity as subtle border if sugar is depleted
-      if (cap > 0 && s === 0) {
-        ctx.fillStyle = 'rgba(100,70,0,0.3)';
-        ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
-      }
-    }
-  }
+  // Draw sugar landscape with warm amber tones on light bg
+  for (let y = 0; y < gs; y++) { for (let x = 0; x < gs; x++) {
+    const idx = sim.grid.idx(x, y); const s = sim.grid.sugar[idx]; const cap = sim.grid.capacity[idx];
+    const brightness = cap > 0 ? (s / 4) : 0;
+    // Light background with warm amber sugar gradient
+    const r = Math.floor(240 - brightness * 40);
+    const g = Math.floor(238 - brightness * 70);
+    const b = Math.floor(234 - brightness * 130);
+    ctx.fillStyle = `rgb(${r},${g},${b})`;
+    ctx.fillRect(x*cellSize, y*cellSize, cellSize, cellSize);
+    if (cap > 0 && s === 0) { ctx.fillStyle = 'rgba(176,138,58,0.15)'; ctx.fillRect(x*cellSize, y*cellSize, cellSize, cellSize); }
+  }}
 
   // Draw agents
   const living = sim.agents.filter(a => a.alive);
   if (living.length === 0) return;
-
   const maxWealth = Math.max(...living.map(a => a.sugar), 1);
   const minWealth = Math.min(...living.map(a => a.sugar), 0);
   const wealthRange = maxWealth - minWealth || 1;
 
   for (const agent of living) {
-    const cx = agent.x * cellSize + cellSize / 2;
-    const cy = agent.y * cellSize + cellSize / 2;
-    const radius = Math.max(cellSize * 0.35, 1.5);
-
-    // Color by wealth: poor=red, rich=green
+    const cx = agent.x*cellSize + cellSize/2, cy = agent.y*cellSize + cellSize/2;
+    const radius = Math.max(cellSize * 0.4, 1.5);
     const t = (agent.sugar - minWealth) / wealthRange;
-    const r = Math.floor(255 * (1 - t));
-    const g = Math.floor(255 * t);
-    const b = 50;
-
-    ctx.beginPath();
-    ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-    ctx.fillStyle = `rgb(${r},${g},${b})`;
-    ctx.fill();
-
-    // Bright outline for very wealthy agents
-    if (t > 0.8) {
-      ctx.strokeStyle = 'rgba(255,255,100,0.5)';
-      ctx.lineWidth = 1;
-      ctx.stroke();
-    }
+    // Poor=coral, Rich=green
+    const ar = Math.floor(201 - t * 127);
+    const ag = Math.floor(107 + t * 31);
+    const ab = Math.floor(90 - t * 0);
+    ctx.beginPath(); ctx.arc(cx, cy, radius, 0, Math.PI*2);
+    ctx.fillStyle = `rgb(${ar},${ag},${ab})`; ctx.fill();
+    if (t > 0.8) { ctx.strokeStyle = 'rgba(176,138,58,0.6)'; ctx.lineWidth = 1; ctx.stroke(); }
   }
 }
 
-// =========================================================================
-// GRID TOOLTIP
-// =========================================================================
-
+// Grid tooltip
 (function() {
-  const canvas = document.getElementById('grid-canvas');
-  const tooltip = document.getElementById('grid-tooltip');
-
+  const canvas = document.getElementById('grid-canvas'); const tooltip = document.getElementById('grid-tooltip');
   canvas.addEventListener('mousemove', function(e) {
     if (!sim) return;
-    const rect = canvas.getBoundingClientRect();
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
-    const px = (e.clientX - rect.left) * scaleX;
-    const py = (e.clientY - rect.top) * scaleY;
-    const cellSize = canvas.width / sim.gridSize;
-    const gx = Math.floor(px / cellSize);
-    const gy = Math.floor(py / cellSize);
-
-    if (gx < 0 || gx >= sim.gridSize || gy < 0 || gy >= sim.gridSize) {
-      tooltip.style.display = 'none';
-      return;
-    }
-
-    const idx = sim.grid.idx(gx, gy);
-    const sugar = sim.grid.sugar[idx];
-    const cap = sim.grid.capacity[idx];
-    const key = gx + ',' + gy;
-    const agent = sim.agentMap.get(key);
-
+    const rect = canvas.getBoundingClientRect(); const scaleX = canvas.width/rect.width; const scaleY = canvas.height/rect.height;
+    const px = (e.clientX-rect.left)*scaleX, py = (e.clientY-rect.top)*scaleY;
+    const cellSize = canvas.width/sim.gridSize; const gx = Math.floor(px/cellSize), gy = Math.floor(py/cellSize);
+    if (gx<0||gx>=sim.gridSize||gy<0||gy>=sim.gridSize) { tooltip.style.display='none'; return; }
+    const idx = sim.grid.idx(gx,gy); const sugar = sim.grid.sugar[idx]; const cap = sim.grid.capacity[idx];
+    const agent = sim.agentMap.get(gx+','+gy);
     let html = `Cell (${gx}, ${gy})<br>Sugar: ${sugar}/${cap}`;
-    if (agent) {
-      html += `<br>---<br>Agent #${agent.id}<br>Wealth: ${agent.sugar.toFixed(1)}<br>Vision: ${agent.vision} | Metab: ${agent.metabolism}<br>Age: ${agent.age}`;
-    }
-
-    tooltip.innerHTML = html;
-    tooltip.style.display = 'block';
+    if (agent) html += `<br>---<br>Agent #${agent.id}<br>Wealth: ${agent.sugar.toFixed(1)}<br>Vision: ${agent.vision} | Metab: ${agent.metabolism}<br>Age: ${agent.age}`;
+    tooltip.innerHTML = html; tooltip.style.display = 'block';
     tooltip.style.left = (e.clientX - canvas.parentElement.getBoundingClientRect().left + 14) + 'px';
     tooltip.style.top = (e.clientY - canvas.parentElement.getBoundingClientRect().top + 14) + 'px';
   });
-
-  canvas.addEventListener('mouseleave', function() {
-    tooltip.style.display = 'none';
-  });
+  canvas.addEventListener('mouseleave', function() { tooltip.style.display = 'none'; });
 })();
 
-// =========================================================================
-// NARRATIVE
-// =========================================================================
-
 function updateNarrative(event) {
-  const el = document.getElementById('narrative-text');
-  if (!sim) return;
-
-  const living = sim.agents.filter(a => a.alive);
-  const pop = living.length;
-  const gini = sim.giniHistory[sim.giniHistory.length - 1] || 0;
-  const tick = sim.tick;
-
-  if (event === 'init') {
-    el.innerHTML = `Press <span class="hl">Start</span> to watch agents forage on the sugar landscape. Each dot is an agent; brighter cells have more sugar. Watch inequality emerge from simple rules.`;
-    return;
-  }
-
-  if (event === 'extinction') {
-    el.innerHTML = `<span class="hl">Extinction!</span> All agents have perished by tick ${tick}. The landscape couldn't sustain the population. Try reducing the number of agents or increasing the regrowth rate.`;
-    return;
-  }
-
-  // Dynamic narratives based on state
-  const initialPop = sim.config.numAgents;
-  const popPct = (pop / initialPop * 100).toFixed(0);
-  const meanV = sim.meanVisionHistory[sim.meanVisionHistory.length - 1] || 0;
-  const meanM = sim.meanMetabHistory[sim.meanMetabHistory.length - 1] || 0;
-
-  if (tick < 5) {
-    el.innerHTML = `Tick ${tick}: <span class="hl">${pop} agents</span> are exploring the landscape. The two sugar mountains glow brightest &mdash; agents near the peaks have an immediate advantage.`;
-  } else if (tick < 20) {
-    el.innerHTML = `Tick ${tick}: The die-off has begun. <span class="hl">${totalDeathsAccum} agents</span> have already starved. Those with high metabolism and low vision are the first to go. Gini is rising: <span class="hl">${gini.toFixed(3)}</span>.`;
-  } else if (tick < 50) {
-    el.innerHTML = `Tick ${tick}: Population settling at <span class="hl">${pop}</span> (${popPct}% of initial). Natural selection is at work &mdash; average vision is ${meanV.toFixed(2)}, average metabolism is ${meanM.toFixed(2)}. The wealthy cluster near the mountain peaks.`;
-  } else if (gini > 0.6) {
-    el.innerHTML = `Tick ${tick}: <span class="hl">Extreme inequality</span> &mdash; Gini at ${gini.toFixed(3)}. A small elite controls most of the sugar. No one is cheating; the rules are identical for everyone. This is pure emergent stratification from heterogeneous abilities on an uneven landscape.`;
-  } else if (gini > 0.4) {
-    el.innerHTML = `Tick ${tick}: <span class="hl">Significant inequality</span> &mdash; Gini at ${gini.toFixed(3)}. The wealth distribution has become heavily right-skewed. High-vision, low-metabolism agents dominate the sugar mountains. Population: ${pop}.`;
-  } else if (pop < initialPop * 0.5) {
-    el.innerHTML = `Tick ${tick}: Only <span class="hl">${pop} agents</span> remain (${popPct}%). The landscape's carrying capacity has been found. Survivors are the fittest foragers with vision ${meanV.toFixed(1)} and metabolism ${meanM.toFixed(1)}.`;
-  } else {
-    el.innerHTML = `Tick ${tick}: <span class="hl">${pop} agents</span> persist. Gini: ${gini.toFixed(3)}. The landscape is in dynamic equilibrium &mdash; sugar regrows, agents forage, the weakest occasionally perish.`;
-  }
+  const el = document.getElementById('narrative-text'); if (!sim) return;
+  const living = sim.agents.filter(a => a.alive); const pop = living.length;
+  const gini = sim.giniHistory[sim.giniHistory.length-1]||0; const tick = sim.tick;
+  if (event === 'init') { el.innerHTML = `Press <span class="hl">Start</span> to watch agents forage on the sugar landscape.`; return; }
+  if (event === 'extinction') { el.innerHTML = `<span class="hl">Extinction!</span> All agents have perished by tick ${tick}.`; return; }
+  const initialPop = sim.config.numAgents; const popPct = (pop/initialPop*100).toFixed(0);
+  const meanV = sim.meanVisionHistory[sim.meanVisionHistory.length-1]||0;
+  const meanM = sim.meanMetabHistory[sim.meanMetabHistory.length-1]||0;
+  if (tick < 5) el.innerHTML = `Tick ${tick}: <span class="hl">${pop} agents</span> are exploring the landscape.`;
+  else if (tick < 20) el.innerHTML = `Tick ${tick}: The die-off has begun. <span class="hl">${totalDeathsAccum} agents</span> have starved. Gini: <span class="hl">${gini.toFixed(3)}</span>.`;
+  else if (tick < 50) el.innerHTML = `Tick ${tick}: Population settling at <span class="hl">${pop}</span> (${popPct}% of initial). Avg vision ${meanV.toFixed(2)}, metabolism ${meanM.toFixed(2)}.`;
+  else if (gini > 0.6) el.innerHTML = `Tick ${tick}: <span class="hl">Extreme inequality</span> -- Gini ${gini.toFixed(3)}. A small elite controls most sugar.`;
+  else if (gini > 0.4) el.innerHTML = `Tick ${tick}: <span class="hl">Significant inequality</span> -- Gini ${gini.toFixed(3)}. High-vision, low-metabolism agents dominate.`;
+  else if (pop < initialPop*0.5) el.innerHTML = `Tick ${tick}: Only <span class="hl">${pop} agents</span> remain (${popPct}%). Survivors have vision ${meanV.toFixed(1)}, metabolism ${meanM.toFixed(1)}.`;
+  else el.innerHTML = `Tick ${tick}: <span class="hl">${pop} agents</span> persist. Gini: ${gini.toFixed(3)}. Dynamic equilibrium.`;
 }
 
 // =========================================================================
 // CHARTS
 // =========================================================================
-
-const chartColors = {
-  population: '#da0',
-  gini: '#f66',
-  meanWealth: '#4f4',
-  medianWealth: '#4af',
-  wealthDist: 'rgba(218, 170, 0, 0.7)',
-};
-
 function initCharts() {
-  // Destroy existing
-  if (chartPop) chartPop.destroy();
-  if (chartGini) chartGini.destroy();
-  if (chartWealthDist) chartWealthDist.destroy();
-  if (chartWealthTime) chartWealthTime.destroy();
-
-  const baseOpts = {
-    responsive: true,
-    maintainAspectRatio: false,
-    animation: { duration: 0 },
-    plugins: {
-      legend: { labels: { color: '#aaa', font: { family: 'Courier New', size: 10 } } },
-    },
-    scales: {
-      x: { ticks: { color: '#666', font: { size: 9 } }, grid: { color: '#1a1a2e' } },
-      y: { ticks: { color: '#666', font: { size: 9 } }, grid: { color: '#1a1a2e' } },
-    },
-  };
-
-  // Population chart
-  chartPop = new Chart(document.getElementById('chart-population'), {
-    type: 'line',
-    data: {
-      labels: [],
-      datasets: [{
-        label: 'Population',
-        data: [],
-        borderColor: chartColors.population,
-        backgroundColor: 'rgba(218,170,0,0.1)',
-        fill: true,
-        borderWidth: 1.5,
-        pointRadius: 0,
-        tension: 0.2,
-      }]
-    },
-    options: { ...baseOpts,
-      plugins: { ...baseOpts.plugins, legend: { display: false } },
-      scales: {
-        ...baseOpts.scales,
-        y: { ...baseOpts.scales.y, beginAtZero: true, title: { display: true, text: 'Agents', color: '#666', font: { size: 9 } } },
-        x: { ...baseOpts.scales.x, title: { display: true, text: 'Tick', color: '#666', font: { size: 9 } } },
-      }
-    }
-  });
-
-  // Gini chart
-  chartGini = new Chart(document.getElementById('chart-gini'), {
-    type: 'line',
-    data: {
-      labels: [],
-      datasets: [{
-        label: 'Gini',
-        data: [],
-        borderColor: chartColors.gini,
-        backgroundColor: 'rgba(255,100,100,0.1)',
-        fill: true,
-        borderWidth: 1.5,
-        pointRadius: 0,
-        tension: 0.2,
-      }]
-    },
-    options: { ...baseOpts,
-      plugins: { ...baseOpts.plugins, legend: { display: false } },
-      scales: {
-        ...baseOpts.scales,
-        y: { ...baseOpts.scales.y, min: 0, max: 1, title: { display: true, text: 'Gini', color: '#666', font: { size: 9 } } },
-        x: { ...baseOpts.scales.x, title: { display: true, text: 'Tick', color: '#666', font: { size: 9 } } },
-      }
-    }
-  });
-
-  // Wealth distribution histogram
-  chartWealthDist = new Chart(document.getElementById('chart-wealth-dist'), {
-    type: 'bar',
-    data: {
-      labels: [],
-      datasets: [{
-        label: 'Agents',
-        data: [],
-        backgroundColor: chartColors.wealthDist,
-        borderColor: 'rgba(218,170,0,0.9)',
-        borderWidth: 1,
-      }]
-    },
-    options: { ...baseOpts,
-      plugins: { ...baseOpts.plugins, legend: { display: false } },
-      scales: {
-        ...baseOpts.scales,
-        x: { ...baseOpts.scales.x, title: { display: true, text: 'Sugar Wealth', color: '#666', font: { size: 9 } } },
-        y: { ...baseOpts.scales.y, beginAtZero: true, title: { display: true, text: 'Count', color: '#666', font: { size: 9 } } },
-      }
-    }
-  });
-
-  // Wealth over time
-  chartWealthTime = new Chart(document.getElementById('chart-wealth-time'), {
-    type: 'line',
-    data: {
-      labels: [],
-      datasets: [
-        {
-          label: 'Mean',
-          data: [],
-          borderColor: chartColors.meanWealth,
-          borderWidth: 1.5,
-          pointRadius: 0,
-          tension: 0.2,
-        },
-        {
-          label: 'Median',
-          data: [],
-          borderColor: chartColors.medianWealth,
-          borderWidth: 1.5,
-          pointRadius: 0,
-          tension: 0.2,
-          borderDash: [5, 3],
-        }
-      ]
-    },
-    options: { ...baseOpts,
-      scales: {
-        ...baseOpts.scales,
-        y: { ...baseOpts.scales.y, beginAtZero: true, title: { display: true, text: 'Sugar', color: '#666', font: { size: 9 } } },
-        x: { ...baseOpts.scales.x, title: { display: true, text: 'Tick', color: '#666', font: { size: 9 } } },
-      }
-    }
-  });
+  if (chartPop) chartPop.destroy(); if (chartGini) chartGini.destroy(); if (chartWealthDist) chartWealthDist.destroy(); if (chartWealthTime) chartWealthTime.destroy();
+  const baseOpts = { responsive: true, maintainAspectRatio: false, animation: { duration: 0 }, plugins: { legend: { labels: { color: '#7a7a8a', font: { family: 'JetBrains Mono', size: 10 } } } }, scales: { x: { ticks: { color: '#7a7a8a', font: { size: 9 } }, grid: { color: '#edecea' } }, y: { ticks: { color: '#7a7a8a', font: { size: 9 } }, grid: { color: '#edecea' } } } };
+  chartPop = new Chart(document.getElementById('chart-population'), { type: 'line', data: { labels: [], datasets: [{ label: 'Population', data: [], borderColor: '#b08a3a', backgroundColor: 'rgba(176,138,58,0.1)', fill: true, borderWidth: 1.5, pointRadius: 0, tension: 0.2 }] }, options: { ...baseOpts, plugins: { ...baseOpts.plugins, legend: { display: false } }, scales: { ...baseOpts.scales, y: { ...baseOpts.scales.y, beginAtZero: true, title: { display: true, text: 'Agents', color: '#7a7a8a', font: { size: 9 } } }, x: { ...baseOpts.scales.x, title: { display: true, text: 'Tick', color: '#7a7a8a', font: { size: 9 } } } } } });
+  chartGini = new Chart(document.getElementById('chart-gini'), { type: 'line', data: { labels: [], datasets: [{ label: 'Gini', data: [], borderColor: '#c96b5a', backgroundColor: 'rgba(201,107,90,0.1)', fill: true, borderWidth: 1.5, pointRadius: 0, tension: 0.2 }] }, options: { ...baseOpts, plugins: { ...baseOpts.plugins, legend: { display: false } }, scales: { ...baseOpts.scales, y: { ...baseOpts.scales.y, min: 0, max: 1, title: { display: true, text: 'Gini', color: '#7a7a8a', font: { size: 9 } } }, x: { ...baseOpts.scales.x, title: { display: true, text: 'Tick', color: '#7a7a8a', font: { size: 9 } } } } } });
+  chartWealthDist = new Chart(document.getElementById('chart-wealth-dist'), { type: 'bar', data: { labels: [], datasets: [{ label: 'Agents', data: [], backgroundColor: 'rgba(176,138,58,0.6)', borderColor: '#b08a3a', borderWidth: 1 }] }, options: { ...baseOpts, plugins: { ...baseOpts.plugins, legend: { display: false } }, scales: { ...baseOpts.scales, x: { ...baseOpts.scales.x, title: { display: true, text: 'Sugar Wealth', color: '#7a7a8a', font: { size: 9 } } }, y: { ...baseOpts.scales.y, beginAtZero: true, title: { display: true, text: 'Count', color: '#7a7a8a', font: { size: 9 } } } } } });
+  chartWealthTime = new Chart(document.getElementById('chart-wealth-time'), { type: 'line', data: { labels: [], datasets: [{ label: 'Mean', data: [], borderColor: '#4a8a5a', borderWidth: 1.5, pointRadius: 0, tension: 0.2 }, { label: 'Median', data: [], borderColor: '#2a7f7f', borderWidth: 1.5, pointRadius: 0, tension: 0.2, borderDash: [5, 3] }] }, options: { ...baseOpts, scales: { ...baseOpts.scales, y: { ...baseOpts.scales.y, beginAtZero: true, title: { display: true, text: 'Sugar', color: '#7a7a8a', font: { size: 9 } } }, x: { ...baseOpts.scales.x, title: { display: true, text: 'Tick', color: '#7a7a8a', font: { size: 9 } } } } } });
 }
-
 function updateCharts() {
-  if (!sim) return;
-
-  const labels = Array.from({ length: sim.popHistory.length }, (_, i) => i);
-
-  // Population
-  chartPop.data.labels = labels;
-  chartPop.data.datasets[0].data = sim.popHistory;
-  chartPop.update('none');
-
-  // Gini
-  chartGini.data.labels = labels;
-  chartGini.data.datasets[0].data = sim.giniHistory;
-  chartGini.update('none');
-
-  // Wealth histogram
+  if (!sim) return; const labels = Array.from({ length: sim.popHistory.length }, (_, i) => i);
+  chartPop.data.labels = labels; chartPop.data.datasets[0].data = sim.popHistory; chartPop.update('none');
+  chartGini.data.labels = labels; chartGini.data.datasets[0].data = sim.giniHistory; chartGini.update('none');
   const hist = sim.getWealthHistogram(25);
-  chartWealthDist.data.labels = hist.centers.map(c => c.toFixed(0));
-  chartWealthDist.data.datasets[0].data = hist.counts;
-  chartWealthDist.update('none');
-
-  // Wealth over time
-  chartWealthTime.data.labels = labels;
-  chartWealthTime.data.datasets[0].data = sim.meanWealthHistory;
-  chartWealthTime.data.datasets[1].data = sim.medianWealthHistory;
-  chartWealthTime.update('none');
+  chartWealthDist.data.labels = hist.centers.map(c => c.toFixed(0)); chartWealthDist.data.datasets[0].data = hist.counts; chartWealthDist.update('none');
+  chartWealthTime.data.labels = labels; chartWealthTime.data.datasets[0].data = sim.meanWealthHistory; chartWealthTime.data.datasets[1].data = sim.medianWealthHistory; chartWealthTime.update('none');
 }
 
 // =========================================================================
 // EVENT HANDLERS
 // =========================================================================
-
 document.getElementById('btn-start').addEventListener('click', toggle);
 document.getElementById('btn-step').addEventListener('click', stepOnce);
 document.getElementById('btn-reset').addEventListener('click', init);
-
-document.getElementById('ctrl-speed').addEventListener('input', function() {
-  document.getElementById('val-speed').textContent = this.value + 'ms';
-});
-
-// =========================================================================
-// BOOT
-// =========================================================================
+document.getElementById('ctrl-speed').addEventListener('input', function() { document.getElementById('val-speed').textContent = this.value + 'ms'; });
 
 init();
 </script>

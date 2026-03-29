@@ -13,112 +13,206 @@
 <meta name="twitter:description" content="Business Plans as economic DNA. Wealth emerges from co-evolution of Physical Technology, Social Technology, and Strategy.">
 <meta name="description" content="Business Plans as economic DNA. Wealth emerges from co-evolution of Physical Technology, Social Technology, and Strategy.">
 <title>Business Plan Evolution: Wealth as Fit Order</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
+:root {
+  --bg: #faf9f5;
+  --bg-card: #ffffff;
+  --bg-hover: #f5f3ee;
+  --bg-metric: #f0eeea;
+  --text-primary: #1a1a2e;
+  --text-secondary: #4a4a5a;
+  --text-tertiary: #7a7a8a;
+  --accent-teal: #2a7f7f;
+  --accent-teal-light: #e8f4f4;
+  --accent-coral: #c96b5a;
+  --accent-green: #4a8a5a;
+  --accent-amber: #b08a3a;
+  --border: #e2e0da;
+  --border-light: #edecea;
+  --shadow-sm: 0 1px 3px rgba(26,26,46,0.06);
+  --shadow-md: 0 4px 12px rgba(26,26,46,0.08);
+  --radius: 8px;
+  --radius-lg: 12px;
+  --font-sans: 'Inter', -apple-system, sans-serif;
+  --font-serif: Georgia, 'Times New Roman', serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'Courier New', monospace; background: #0a0a0f; color: #e0e0e0; overflow-x: hidden; }
+body {
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--text-primary);
+  overflow-x: hidden;
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
 
-.container { max-width: 1440px; margin: 0 auto; padding: 20px; }
+/* Nav bar */
+.nav-bar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  background: rgba(250,249,245,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-light);
+}
+.nav-bar .nav-title {
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+}
+.nav-bar a {
+  font-size: 0.8rem;
+  color: var(--accent-teal);
+  text-decoration: none;
+  font-weight: 500;
+}
+.nav-bar a:hover { text-decoration: underline; }
 
-h1 { text-align: center; font-size: 1.8em; margin-bottom: 4px; color: #fff;
-     letter-spacing: 3px; text-transform: uppercase; }
-.subtitle { text-align: center; font-size: 0.85em; color: #888; margin-bottom: 24px; }
+.container { max-width: 1440px; margin: 0 auto; padding: 0 20px 20px; }
+
+/* Hero section */
+.hero {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 0 1.5rem;
+}
+.hero h1 {
+  font-family: var(--font-serif);
+  font-size: 1.8rem;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+.hero .subtitle {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem;
+}
 
 /* Intro section */
 .intro-section {
-  background: linear-gradient(135deg, #12121a 0%, #0f1a28 100%);
-  border: 1px solid #1a3a5a;
-  border-radius: 12px;
-  padding: 28px 32px;
-  margin-bottom: 24px;
-  position: relative;
-  overflow: hidden;
-}
-.intro-section::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, #4a8, #6ce, #ea6, #e66);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem 2rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow-sm);
 }
 .intro-section h2 {
-  font-size: 1.2em;
-  color: #8cd8ff;
-  margin-bottom: 12px;
-  letter-spacing: 1px;
+  font-family: var(--font-serif);
+  font-size: 1.1rem;
+  color: var(--accent-teal);
+  margin-bottom: 0.75rem;
 }
 .intro-section p {
-  font-size: 0.95em;
+  font-size: 0.88rem;
   line-height: 1.7;
-  color: #bbb;
+  color: var(--text-secondary);
 }
-.intro-section p strong { color: #fff; }
+.intro-section p strong { color: var(--text-primary); font-weight: 600; }
 
-/* Key insight callout */
+/* Key insight */
 .key-insight {
-  background: linear-gradient(135deg, #1a1a10, #22200a);
-  border: 1px solid #554a20;
-  border-left: 4px solid #eea;
-  border-radius: 8px;
-  padding: 20px 24px;
-  margin-bottom: 24px;
+  background: var(--accent-teal-light);
+  border: 1px solid #d0e8e8;
+  border-left: 4px solid var(--accent-teal);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
 }
 .key-insight h3 {
-  font-size: 0.9em;
-  color: #eea;
+  font-size: 0.7rem;
+  color: var(--accent-teal);
   text-transform: uppercase;
-  letter-spacing: 2px;
-  margin-bottom: 8px;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
 }
 .key-insight p {
-  font-size: 0.9em;
+  font-size: 0.85rem;
   line-height: 1.7;
-  color: #bba;
+  color: var(--text-secondary);
 }
-.key-insight p strong { color: #fff; }
+.key-insight p strong { color: var(--text-primary); font-weight: 600; }
 
 /* Controls */
 .controls {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 10px; padding: 16px; background: #12121a; border: 1px solid #2a2a3a;
-  border-radius: 8px; margin-bottom: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+  padding: 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 16px;
+  box-shadow: var(--shadow-sm);
 }
 .control-group { display: flex; flex-direction: column; gap: 4px; }
-.control-group label { font-size: 0.75em; color: #aaa; text-transform: uppercase; letter-spacing: 1px; }
+.control-group label {
+  font-size: 0.7rem;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+}
 .control-group input, .control-group select {
-  background: #1a1a2e; border: 1px solid #333; color: #fff; padding: 6px 10px;
-  border-radius: 4px; font-family: inherit; font-size: 0.85em;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
 }
 .control-group input:focus, .control-group select:focus {
-  outline: none; border-color: #4a8;
+  outline: none;
+  border-color: var(--accent-teal);
 }
 
 .btn-row { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
 button {
-  background: linear-gradient(135deg, #2a5a4a, #1a4a3a);
-  border: 1px solid #4a8;
-  color: #fff; padding: 8px 20px; border-radius: 4px;
-  cursor: pointer; font-family: inherit; font-size: 0.85em;
-  transition: all 0.2s;
+  background: var(--accent-teal);
+  border: 1px solid var(--accent-teal);
+  color: #fff;
+  padding: 8px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  font-weight: 600;
+  transition: background 0.15s;
 }
-button:hover { background: linear-gradient(135deg, #3a7a5a, #2a6a4a); }
+button:hover { background: #237070; }
 button.secondary {
-  background: linear-gradient(135deg, #2a2a3e, #1a1a2e);
-  border-color: #555;
+  background: var(--bg-metric);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
 }
-button.secondary:hover { background: linear-gradient(135deg, #3a3a5e, #2a2a4e); }
+button.secondary:hover { background: var(--bg-hover); }
 
 /* Presets */
 .presets {
   display: flex; gap: 8px; flex-wrap: wrap;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 .presets button {
-  font-size: 0.75em; padding: 5px 12px;
-  background: linear-gradient(135deg, #1a2a3a, #122238);
-  border-color: #3a6a8a;
+  font-size: 0.75rem;
+  padding: 5px 12px;
+  background: var(--bg-metric);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
 }
 .presets button:hover {
-  background: linear-gradient(135deg, #2a4a5a, #1a3a4a);
+  background: var(--bg-hover);
+  border-color: var(--accent-teal);
 }
 
 /* Layout */
@@ -135,27 +229,50 @@ button.secondary:hover { background: linear-gradient(135deg, #3a3a5e, #2a2a4e); 
   gap: 16px;
 }
 .chart-panel {
-  background: #12121a;
-  border: 1px solid #2a2a3a;
-  border-radius: 8px;
-  padding: 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1rem;
+  height: 280px;
   min-height: 0;
   overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+.chart-panel.tall {
+  height: 340px;
 }
 .chart-panel h3 {
-  font-size: 0.8em;
-  color: #8cd8ff;
+  font-size: 0.7rem;
+  color: var(--accent-teal);
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.06em;
   margin-bottom: 12px;
+  font-weight: 600;
 }
 .chart-panel canvas {
   display: block;
   width: 100%;
-  height: 220px;
+  height: calc(100% - 36px);
 }
-.chart-panel.tall canvas {
-  height: 280px;
+
+/* Legend */
+.legend {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.7rem;
+  color: var(--text-tertiary);
+}
+.legend-swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
 }
 
 /* Sidebar */
@@ -165,32 +282,34 @@ button.secondary:hover { background: linear-gradient(135deg, #3a3a5e, #2a2a4e); 
   gap: 16px;
 }
 .stat-card {
-  background: #12121a;
-  border: 1px solid #2a2a3a;
-  border-radius: 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
   padding: 16px;
+  box-shadow: var(--shadow-sm);
 }
 .stat-card h3 {
-  font-size: 0.8em;
-  color: #8cd8ff;
+  font-size: 0.7rem;
+  color: var(--accent-teal);
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.06em;
   margin-bottom: 12px;
+  font-weight: 600;
 }
 .stat-row {
   display: flex;
   justify-content: space-between;
-  font-size: 0.82em;
+  font-size: 0.82rem;
   padding: 4px 0;
-  border-bottom: 1px solid #1a1a2a;
+  border-bottom: 1px solid var(--border-light);
 }
 .stat-row:last-child { border-bottom: none; }
-.stat-label { color: #888; }
-.stat-value { color: #fff; font-weight: bold; }
-.stat-value.green { color: #4a8; }
-.stat-value.yellow { color: #ea6; }
-.stat-value.red { color: #e66; }
-.stat-value.blue { color: #6ce; }
+.stat-label { color: var(--text-tertiary); }
+.stat-value { font-family: var(--font-mono); font-weight: 600; color: var(--text-primary); }
+.stat-value.green { color: var(--accent-green); }
+.stat-value.yellow { color: var(--accent-amber); }
+.stat-value.red { color: var(--accent-coral); }
+.stat-value.blue { color: var(--accent-teal); }
 
 /* BP genome visualization */
 .genome-display {
@@ -205,10 +324,11 @@ button.secondary:hover { background: linear-gradient(135deg, #3a3a5e, #2a2a4e); 
   gap: 6px;
 }
 .genome-label {
-  font-size: 0.7em;
-  color: #888;
+  font-size: 0.7rem;
+  color: var(--text-tertiary);
   width: 50px;
   text-align: right;
+  font-family: var(--font-mono);
 }
 .genome-bits {
   display: flex;
@@ -219,61 +339,57 @@ button.secondary:hover { background: linear-gradient(135deg, #3a3a5e, #2a2a4e); 
   height: 10px;
   border-radius: 2px;
 }
-.genome-bit.on { background: #4a8; }
-.genome-bit.off { background: #1a2a2a; border: 1px solid #2a3a3a; }
-
-/* Legend */
-.legend {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin-top: 8px;
-}
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 0.72em;
-  color: #aaa;
-}
-.legend-swatch {
-  width: 12px;
-  height: 12px;
-  border-radius: 2px;
-}
+.genome-bit.on { background: var(--accent-green); }
+.genome-bit.off { background: var(--bg-metric); border: 1px solid var(--border); }
 
 /* Events log */
 .events-log {
   max-height: 200px;
   overflow-y: auto;
-  font-size: 0.72em;
-  color: #888;
+  font-size: 0.7rem;
+  color: var(--text-tertiary);
   padding: 8px;
-  background: #0a0a12;
+  background: var(--bg);
   border-radius: 4px;
   margin-top: 8px;
+  font-family: var(--font-mono);
 }
 .events-log .event {
   padding: 2px 0;
-  border-bottom: 1px solid #151520;
+  border-bottom: 1px solid var(--border-light);
 }
-.events-log .event-tick { color: #555; }
-.events-log .event-destroy { color: #e66; }
-.events-log .event-entry { color: #6ce; }
+.events-log .event-tick { color: var(--text-tertiary); }
+.events-log .event-destroy { color: var(--accent-coral); }
+.events-log .event-entry { color: var(--accent-teal); }
 
 /* Status bar */
 .status-bar {
   margin-top: 20px;
   padding: 10px 16px;
-  background: #12121a;
-  border: 1px solid #2a2a3a;
-  border-radius: 8px;
-  font-size: 0.8em;
-  color: #888;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 0.82rem;
+  color: var(--text-tertiary);
   text-align: center;
 }
-.status-bar .running { color: #4a8; }
-.status-bar .paused { color: #ea6; }
+.status-bar .running { color: var(--accent-green); font-weight: 600; }
+.status-bar .paused { color: var(--accent-amber); font-weight: 600; }
+
+/* Footer */
+.footer {
+  text-align: center;
+  padding: 2rem;
+  border-top: 1px solid var(--border-light);
+  margin-top: 1rem;
+}
+.footer a {
+  color: var(--accent-teal);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+.footer a:hover { text-decoration: underline; }
 
 @media (max-width: 1000px) {
   .main-grid { grid-template-columns: 1fr; }
@@ -282,9 +398,19 @@ button.secondary:hover { background: linear-gradient(135deg, #3a3a5e, #2a2a4e); 
 </style>
 </head>
 <body>
+
+<!-- Nav bar -->
+<nav class="nav-bar">
+  <span class="nav-title">Business Plan Evolution -- Wealth as Fit Order</span>
+  <a href="../index.html">&larr; Dashboard</a>
+</nav>
+
 <div class="container">
-  <h1>Business Plan Evolution</h1>
-  <p class="subtitle">Beinhocker Ch.14 -- Business Plans as the DNA of the Economy</p>
+  <!-- Hero -->
+  <div class="hero">
+    <h1>Business Plan Evolution</h1>
+    <p class="subtitle">Beinhocker Ch.14 -- Business Plans as the DNA of the Economy</p>
+  </div>
 
   <div class="intro-section">
     <h2>Wealth is Fit Order</h2>
@@ -373,10 +499,10 @@ button.secondary:hover { background: linear-gradient(135deg, #3a3a5e, #2a2a4e); 
         <h3>Average Fitness by Component</h3>
         <canvas id="chartComponents"></canvas>
         <div class="legend">
-          <div class="legend-item"><div class="legend-swatch" style="background:#4a8"></div> Physical Tech</div>
-          <div class="legend-item"><div class="legend-swatch" style="background:#6ce"></div> Social Tech</div>
-          <div class="legend-item"><div class="legend-swatch" style="background:#ea6"></div> Strategy</div>
-          <div class="legend-item"><div class="legend-swatch" style="background:#fff"></div> Total (mean)</div>
+          <div class="legend-item"><div class="legend-swatch" style="background:#4a8a5a"></div> Physical Tech</div>
+          <div class="legend-item"><div class="legend-swatch" style="background:#2a7f7f"></div> Social Tech</div>
+          <div class="legend-item"><div class="legend-swatch" style="background:#b08a3a"></div> Strategy</div>
+          <div class="legend-item"><div class="legend-swatch" style="background:#1a1a2e"></div> Total (mean)</div>
         </div>
       </div>
       <div class="chart-panel">
@@ -395,8 +521,8 @@ button.secondary:hover { background: linear-gradient(135deg, #3a3a5e, #2a2a4e); 
         <h3>Best vs Mean Fitness</h3>
         <canvas id="chartBestMean"></canvas>
         <div class="legend">
-          <div class="legend-item"><div class="legend-swatch" style="background:#e66"></div> Best</div>
-          <div class="legend-item"><div class="legend-swatch" style="background:#888"></div> Mean</div>
+          <div class="legend-item"><div class="legend-swatch" style="background:#c96b5a"></div> Best</div>
+          <div class="legend-item"><div class="legend-swatch" style="background:#7a7a8a"></div> Mean</div>
         </div>
       </div>
     </div>
@@ -440,6 +566,11 @@ button.secondary:hover { background: linear-gradient(135deg, #3a3a5e, #2a2a4e); 
   </div>
 
   <div class="status-bar" id="statusBar">Ready. Configure parameters and click Run.</div>
+</div>
+
+<!-- Footer -->
+<div class="footer">
+  <a href="../index.html">&larr; Back to Dashboard</a>
 </div>
 
 <script>
@@ -777,8 +908,8 @@ function drawChart(ctx, data, options = {}) {
   const plotW = w - pad.left - pad.right;
   const plotH = h - pad.top - pad.bottom;
 
-  // Grid
-  ctx.strokeStyle = '#1a1a2a';
+  // Grid lines - light theme
+  ctx.strokeStyle = '#edecea';
   ctx.lineWidth = 1;
   for (let i = 0; i <= 4; i++) {
     const y = pad.top + plotH * i / 4;
@@ -791,7 +922,7 @@ function drawChart(ctx, data, options = {}) {
   if (!data || data.length === 0) return;
 
   const series = Array.isArray(data[0]) ? data : [data];
-  const colors = options.colors || ['#4a8', '#6ce', '#ea6', '#e66', '#fff', '#c8f'];
+  const colors = options.colors || ['#4a8a5a', '#2a7f7f', '#b08a3a', '#c96b5a', '#1a1a2e', '#9a6aaa'];
 
   // Compute y range
   let yMin = options.yMin !== undefined ? options.yMin : Infinity;
@@ -808,8 +939,8 @@ function drawChart(ctx, data, options = {}) {
   const yRange = yMax - yMin;
 
   // Y axis labels
-  ctx.fillStyle = '#555';
-  ctx.font = '10px monospace';
+  ctx.fillStyle = '#7a7a8a';
+  ctx.font = '10px "JetBrains Mono", monospace';
   ctx.textAlign = 'right';
   for (let i = 0; i <= 4; i++) {
     const val = yMax - yRange * i / 4;
@@ -844,7 +975,7 @@ function drawChart(ctx, data, options = {}) {
   // Fill for single series
   if (series.length === 1 && options.fill) {
     const s = series[0];
-    ctx.fillStyle = options.fillColor || 'rgba(68, 170, 136, 0.15)';
+    ctx.fillStyle = options.fillColor || 'rgba(42, 127, 127, 0.1)';
     ctx.beginPath();
     for (let i = 0; i < s.length; i++) {
       const x = pad.left + (i / Math.max(s.length - 1, 1)) * plotW;
@@ -880,7 +1011,7 @@ function drawBarChart(ctx, data, options = {}) {
   const maxVal = Math.max(...data, 1);
 
   // Grid
-  ctx.strokeStyle = '#1a1a2a';
+  ctx.strokeStyle = '#edecea';
   ctx.lineWidth = 1;
   for (let i = 0; i <= 4; i++) {
     const y = pad.top + plotH * i / 4;
@@ -891,8 +1022,8 @@ function drawBarChart(ctx, data, options = {}) {
   }
 
   // Y labels
-  ctx.fillStyle = '#555';
-  ctx.font = '10px monospace';
+  ctx.fillStyle = '#7a7a8a';
+  ctx.font = '10px "JetBrains Mono", monospace';
   ctx.textAlign = 'right';
   for (let i = 0; i <= 4; i++) {
     const val = maxVal - maxVal * i / 4;
@@ -915,7 +1046,7 @@ function drawBarChart(ctx, data, options = {}) {
 
   const barW = Math.max(2, plotW / bins.length - 1);
   const binMax = Math.max(...bins, 1);
-  ctx.fillStyle = options.color || '#e66';
+  ctx.fillStyle = options.color || '#c96b5a';
   for (let i = 0; i < bins.length; i++) {
     const x = pad.left + (i / bins.length) * plotW;
     const barH = (bins[i] / binMax) * plotH;
@@ -946,9 +1077,9 @@ function updateUI(record) {
     container.innerHTML = '';
 
     const rows = [
-      { label: 'PT', bits: best.ptBits, color: '#4a8' },
-      { label: 'ST', bits: best.stBits, color: '#6ce' },
-      { label: 'Strat', bits: best.strategyBits, color: '#ea6' },
+      { label: 'PT', bits: best.ptBits, color: '#4a8a5a' },
+      { label: 'ST', bits: best.stBits, color: '#2a7f7f' },
+      { label: 'Strat', bits: best.strategyBits, color: '#b08a3a' },
     ];
 
     for (const row of rows) {
@@ -962,7 +1093,7 @@ function updateUI(record) {
     }
 
     const info = document.createElement('div');
-    info.style.cssText = 'font-size:0.7em; color:#888; margin-top:4px;';
+    info.style.cssText = 'font-size:0.7rem; color:#7a7a8a; margin-top:4px; font-family: var(--font-mono);';
     info.textContent = `BP#${best.id} f=${best.totalFitness.toFixed(4)} age=${best.age}`;
     container.appendChild(info);
   }
@@ -989,13 +1120,13 @@ function updateCharts() {
   const destData = history.map(r => r.destructions);
   const bestData = history.map(r => r.bestFitness);
 
-  drawChart(getCtx('chartWealth'), [wealth], { colors: ['#4a8'], fill: true, yMin: 0 });
+  drawChart(getCtx('chartWealth'), [wealth], { colors: ['#4a8a5a'], fill: true, yMin: 0, fillColor: 'rgba(74,138,90,0.1)' });
   drawChart(getCtx('chartComponents'), [meanPT, meanST, meanStrat, meanFit],
-    { colors: ['#4a8', '#6ce', '#ea6', '#fff'], yMin: 0, yMax: 1 });
-  drawChart(getCtx('chartDiversity'), [divData], { colors: ['#c8f'], fill: true, fillColor: 'rgba(200,136,255,0.12)', yMin: 0, yMax: 1 });
-  drawChart(getCtx('chartGini'), [giniData], { colors: ['#ea6'], fill: true, fillColor: 'rgba(238,170,102,0.12)', yMin: 0, yMax: 1 });
-  drawBarChart(getCtx('chartDestruction'), destData, { color: '#e66' });
-  drawChart(getCtx('chartBestMean'), [bestData, meanFit], { colors: ['#e66', '#888'], yMin: 0 });
+    { colors: ['#4a8a5a', '#2a7f7f', '#b08a3a', '#1a1a2e'], yMin: 0, yMax: 1 });
+  drawChart(getCtx('chartDiversity'), [divData], { colors: ['#9a6aaa'], fill: true, fillColor: 'rgba(154,106,170,0.1)', yMin: 0, yMax: 1 });
+  drawChart(getCtx('chartGini'), [giniData], { colors: ['#b08a3a'], fill: true, fillColor: 'rgba(176,138,58,0.1)', yMin: 0, yMax: 1 });
+  drawBarChart(getCtx('chartDestruction'), destData, { color: '#c96b5a' });
+  drawChart(getCtx('chartBestMean'), [bestData, meanFit], { colors: ['#c96b5a', '#7a7a8a'], yMin: 0 });
 }
 
 // ==================== Simulation Control ====================

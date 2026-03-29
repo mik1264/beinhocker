@@ -5,630 +5,442 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://beinhocker-mkirsanov.pages.dev/02-beer-game/index.html">
-<meta property="og:title" content="The Beer Game — Supply Chain Dynamics">
+<meta property="og:title" content="The Beer Game -- Supply Chain Dynamics">
 <meta property="og:description" content="A tiny demand shock creates 44x cost amplification through endogenous bullwhip oscillations. No external shocks needed.">
-<meta property="og:site_name" content="The Origin of Wealth — Complexity Economics Simulations">
+<meta property="og:site_name" content="The Origin of Wealth -- Complexity Economics Simulations">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="The Beer Game — Supply Chain Dynamics">
+<meta name="twitter:title" content="The Beer Game -- Supply Chain Dynamics">
 <meta name="twitter:description" content="A tiny demand shock creates 44x cost amplification through endogenous bullwhip oscillations. No external shocks needed.">
 <meta name="description" content="A tiny demand shock creates 44x cost amplification through endogenous bullwhip oscillations. No external shocks needed.">
-<title>The Beer Game — Why Supply Chains Go Haywire</title>
+<title>The Beer Game -- Why Supply Chains Go Haywire</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
+:root {
+  --bg: #faf9f5;
+  --bg-card: #ffffff;
+  --bg-hover: #f5f3ee;
+  --bg-metric: #f0eeea;
+  --text-primary: #1a1a2e;
+  --text-secondary: #4a4a5a;
+  --text-tertiary: #7a7a8a;
+  --accent-teal: #2a7f7f;
+  --accent-teal-light: #e8f4f4;
+  --accent-coral: #c96b5a;
+  --accent-green: #4a8a5a;
+  --accent-amber: #b08a3a;
+  --border: #e2e0da;
+  --border-light: #edecea;
+  --shadow-sm: 0 1px 3px rgba(26,26,46,0.06);
+  --shadow-md: 0 4px 12px rgba(26,26,46,0.08);
+  --radius: 8px;
+  --radius-lg: 12px;
+  --font-sans: 'Inter', -apple-system, sans-serif;
+  --font-serif: Georgia, 'Times New Roman', serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --retailer: #b08a3a;
+  --wholesaler: #4a6a9a;
+  --distributor: #4a8a5a;
+  --brewery: #8a6aaa;
+}
 
-  :root {
-    --bg: #1a1008;
-    --bg2: #231808;
-    --surface: #2a1e10;
-    --surface2: #352814;
-    --surface3: #3f3018;
-    --border: #4a3820;
-    --border-light: #5a4828;
-    --text: #f0e8d8;
-    --text-dim: #a09080;
-    --text-muted: #706050;
-    --amber: #f0a030;
-    --amber-light: #ffc060;
-    --amber-dark: #c08020;
-    --gold: #e8c050;
-    --foam: #fff8e0;
-    --red: #f06050;
-    --red-glow: #ff705040;
-    --green: #50c878;
-    --green-glow: #50c87840;
-    --blue: #60b0f0;
-    --purple: #b080e0;
-    --retailer: #f0a030;
-    --wholesaler: #60b0f0;
-    --distributor: #50c878;
-    --brewery: #b080e0;
-  }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+/* ===== NAV BAR ===== */
+.nav-bar {
+  position: sticky; top: 0; z-index: 100; height: 48px;
+  background: rgba(250,249,245,0.92); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-light);
+  display: flex; justify-content: space-between; align-items: center; padding: 0 24px;
+}
+.nav-title { font-size: 0.85rem; font-weight: 700; color: var(--text-primary); }
+.nav-back { font-size: 0.8rem; color: var(--accent-teal); text-decoration: none; font-weight: 500; }
+.nav-back:hover { text-decoration: underline; }
 
-  body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    overflow-x: hidden;
-    background-image:
-      radial-gradient(ellipse at 20% 0%, #3a280810 0%, transparent 60%),
-      radial-gradient(ellipse at 80% 100%, #2a180810 0%, transparent 60%);
-  }
+/* ===== HERO ===== */
+.hero {
+  text-align: center;
+  padding: 2.5rem 1.5rem 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+.hero h1 {
+  font-family: var(--font-serif);
+  font-size: 1.8rem;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+.hero .tagline {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem;
+}
+.hero-story {
+  max-width: 720px;
+  margin: 0 auto;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  text-align: left;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 1.5rem;
+  position: relative;
+}
+.hero-story::before {
+  content: '\201C';
+  position: absolute; top: 8px; left: 12px;
+  font-size: 3em; color: var(--accent-amber); opacity: 0.2;
+  font-family: var(--font-serif); line-height: 1;
+}
+.hero-story strong { color: var(--text-primary); font-weight: 600; }
 
-  /* ===== HERO INTRO ===== */
-  .hero {
-    text-align: center;
-    padding: 48px 24px 40px;
-    background: linear-gradient(180deg, #2a1e1060 0%, transparent 100%);
-    border-bottom: 1px solid var(--border);
-    position: relative;
-    overflow: hidden;
-  }
-  .hero::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 600px;
-    height: 600px;
-    background: radial-gradient(circle, #f0a03008 0%, transparent 70%);
-    pointer-events: none;
-  }
-  .hero-beer {
-    font-size: 3em;
-    margin-bottom: 12px;
-    display: block;
-    animation: beerFloat 3s ease-in-out infinite;
-  }
-  @keyframes beerFloat {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-8px); }
-  }
-  .hero h1 {
-    font-size: 2.2em;
-    font-weight: 900;
-    letter-spacing: -0.5px;
-    color: var(--amber-light);
-    text-shadow: 0 2px 20px #f0a03040;
-    margin-bottom: 8px;
-  }
-  .hero .tagline {
-    font-size: 1em;
-    color: var(--text-dim);
-    font-weight: 500;
-    margin-bottom: 24px;
-  }
-  .hero-story {
-    max-width: 720px;
-    margin: 0 auto;
-    font-size: 1.05em;
-    line-height: 1.7;
-    color: var(--text);
-    text-align: left;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 24px 28px;
-    position: relative;
-  }
-  .hero-story::before {
-    content: '\201C';
-    position: absolute;
-    top: 8px;
-    left: 12px;
-    font-size: 3em;
-    color: var(--amber-dark);
-    opacity: 0.3;
-    font-family: Georgia, serif;
-    line-height: 1;
-  }
-  .hero-story strong { color: var(--amber-light); font-weight: 600; }
+/* ===== CONTROLS ===== */
+.controls-bar {
+  display: flex; flex-wrap: wrap; gap: 12px;
+  padding: 12px 20px;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  border-top: 1px solid var(--border);
+  align-items: center;
+  justify-content: center;
+}
+.control-group {
+  display: flex; align-items: center; gap: 6px;
+}
+.control-group label {
+  font-size: 0.7rem; color: var(--text-tertiary); text-transform: uppercase;
+  letter-spacing: 0.04em; font-weight: 600;
+}
+.control-group input, .control-group select {
+  background: var(--bg); border: 1px solid var(--border);
+  color: var(--text-primary); padding: 5px 8px; border-radius: 6px;
+  font-family: var(--font-mono); font-size: 0.75rem; width: 70px;
+}
+.control-group select { width: auto; }
+.control-group input[type="checkbox"] { width: auto; accent-color: var(--accent-teal); }
+.control-group input[type="range"] { accent-color: var(--accent-teal); }
 
-  /* ===== CONTROLS ===== */
-  .controls {
-    display: flex; flex-wrap: wrap; gap: 12px;
-    padding: 14px 20px;
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    align-items: center;
-    justify-content: center;
-  }
-  .control-group {
-    display: flex; align-items: center; gap: 6px;
-  }
-  .control-group label {
-    font-size: 0.72em; color: var(--text-dim); text-transform: uppercase;
-    letter-spacing: 0.5px; font-weight: 600;
-  }
-  .control-group input, .control-group select {
-    background: var(--surface2); border: 1px solid var(--border);
-    color: var(--text); padding: 5px 8px; border-radius: 6px;
-    font-family: 'JetBrains Mono', monospace; font-size: 0.75em; width: 70px;
-  }
-  .control-group select { width: auto; }
-  .control-group input[type="checkbox"] { width: auto; accent-color: var(--amber); }
-  .control-group input[type="range"] { accent-color: var(--amber); }
+.btn {
+  background: var(--bg-metric); border: 1px solid var(--border);
+  color: var(--text-primary); padding: 6px 16px; border-radius: 6px;
+  font-family: var(--font-sans); font-size: 0.75rem; cursor: pointer;
+  transition: all 0.2s; font-weight: 600;
+}
+.btn:hover { border-color: var(--accent-teal); color: var(--accent-teal); background: var(--bg-hover); }
+.btn.active, .btn.primary {
+  background: var(--accent-teal); color: #fff; border-color: var(--accent-teal);
+}
+.btn.primary:hover { filter: brightness(1.1); }
 
-  .btn {
-    background: var(--surface2); border: 1px solid var(--border);
-    color: var(--text); padding: 7px 18px; border-radius: 6px;
-    font-family: 'Inter', sans-serif; font-size: 0.78em; cursor: pointer;
-    transition: all 0.2s; font-weight: 600;
-  }
-  .btn:hover { border-color: var(--amber); color: var(--amber); background: var(--surface3); }
-  .btn.active, .btn.primary {
-    background: linear-gradient(135deg, var(--amber), var(--amber-dark));
-    color: #1a1008; border-color: var(--amber);
-  }
-  .btn.primary:hover { filter: brightness(1.1); }
+/* ===== SUPPLY CHAIN ===== */
+.supply-chain-section {
+  padding: 20px 20px 24px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-card);
+}
+.supply-chain-section h2 {
+  text-align: center;
+  font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--accent-teal); margin-bottom: 16px; font-weight: 600;
+}
+.supply-chain-viz {
+  display: flex; align-items: stretch; justify-content: center;
+  gap: 6px; min-height: 180px; overflow-x: auto; padding: 0 10px;
+}
 
-  /* ===== SUPPLY CHAIN DIAGRAM ===== */
-  .supply-chain-section {
-    padding: 20px 20px 24px;
-    border-bottom: 1px solid var(--border);
-    background: var(--bg2);
-  }
-  .supply-chain-section h2 {
-    text-align: center;
-    font-size: 0.75em;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    color: var(--text-dim);
-    margin-bottom: 16px;
-    font-weight: 600;
-  }
-  .supply-chain-viz {
-    display: flex;
-    align-items: stretch;
-    justify-content: center;
-    gap: 6px;
-    min-height: 180px;
-    overflow-x: auto;
-    padding: 0 10px;
-  }
+.agent-node {
+  display: flex; flex-direction: column; align-items: center;
+  min-width: 130px; padding: 12px 14px;
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-lg);
+  position: relative; transition: all 0.3s;
+}
+.agent-node:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.agent-node.retailer { border-color: var(--retailer); }
+.agent-node.wholesaler { border-color: var(--wholesaler); }
+.agent-node.distributor { border-color: var(--distributor); }
+.agent-node.brewery { border-color: var(--brewery); }
 
-  .agent-node {
-    display: flex; flex-direction: column; align-items: center;
-    min-width: 130px; padding: 12px 14px;
-    background: var(--surface);
-    border: 2px solid var(--border);
-    border-radius: 12px;
-    position: relative;
-    transition: all 0.3s;
-  }
-  .agent-node:hover { transform: translateY(-2px); }
-  .agent-node.retailer { border-color: var(--retailer); box-shadow: 0 0 20px #f0a03015; }
-  .agent-node.wholesaler { border-color: var(--wholesaler); box-shadow: 0 0 20px #60b0f015; }
-  .agent-node.distributor { border-color: var(--distributor); box-shadow: 0 0 20px #50c87815; }
-  .agent-node.brewery { border-color: var(--brewery); box-shadow: 0 0 20px #b080e015; }
+.agent-icon { font-size: 1.8em; margin-bottom: 4px; }
+.agent-name {
+  font-size: 0.68rem; text-transform: uppercase;
+  letter-spacing: 0.08em; margin-bottom: 6px; font-weight: 700;
+}
+.agent-node.retailer .agent-name { color: var(--retailer); }
+.agent-node.wholesaler .agent-name { color: var(--wholesaler); }
+.agent-node.distributor .agent-name { color: var(--distributor); }
+.agent-node.brewery .agent-name { color: var(--brewery); }
 
-  .agent-icon { font-size: 1.8em; margin-bottom: 4px; }
-  .agent-name {
-    font-size: 0.68em; text-transform: uppercase;
-    letter-spacing: 1.5px; margin-bottom: 6px; font-weight: 700;
-  }
-  .agent-node.retailer .agent-name { color: var(--retailer); }
-  .agent-node.wholesaler .agent-name { color: var(--wholesaler); }
-  .agent-node.distributor .agent-name { color: var(--distributor); }
-  .agent-node.brewery .agent-name { color: var(--brewery); }
+.agent-stats {
+  font-size: 0.72rem; text-align: center; line-height: 1.7;
+  font-family: var(--font-mono);
+}
+.agent-stats .val { font-weight: 600; }
+.agent-stats .neg { color: var(--accent-coral); }
+.agent-stats .pos { color: var(--accent-green); }
 
-  .agent-stats {
-    font-size: 0.72em; text-align: center; line-height: 1.7;
-    font-family: 'JetBrains Mono', monospace;
-  }
-  .agent-stats .val { font-weight: 600; }
-  .agent-stats .neg { color: var(--red); }
-  .agent-stats .pos { color: var(--green); }
+/* Beer mug visual inventory */
+.beer-mug-container { width: 44px; height: 52px; margin: 8px 0 4px; position: relative; }
+.beer-mug {
+  width: 100%; height: 100%;
+  border: 2.5px solid var(--text-tertiary);
+  border-radius: 0 0 6px 6px;
+  position: relative; overflow: hidden;
+  background: var(--bg);
+}
+.beer-mug-handle {
+  position: absolute; right: -10px; top: 8px;
+  width: 10px; height: 24px;
+  border: 2.5px solid var(--text-tertiary);
+  border-left: none; border-radius: 0 6px 6px 0;
+}
+.beer-fill {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  background: linear-gradient(180deg, var(--accent-amber) 0%, #a07828 100%);
+  transition: height 0.4s ease; border-radius: 0 0 4px 4px;
+}
+.beer-foam {
+  position: absolute; top: -4px; left: -1px; right: -1px;
+  height: 6px; background: #f5f0e0; border-radius: 3px;
+  opacity: 0; transition: opacity 0.3s;
+}
+.beer-fill.has-foam .beer-foam { opacity: 1; }
+.backlog-indicator {
+  position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%);
+  font-size: 0.55rem; font-weight: 700; color: var(--accent-coral);
+  background: rgba(201,107,90,0.1); padding: 1px 5px; border-radius: 3px; white-space: nowrap;
+}
 
-  /* Beer mug visual inventory */
-  .beer-mug-container {
-    width: 44px;
-    height: 52px;
-    margin: 8px 0 4px;
-    position: relative;
-  }
-  .beer-mug {
-    width: 100%;
-    height: 100%;
-    border: 2.5px solid var(--text-dim);
-    border-radius: 0 0 6px 6px;
-    position: relative;
-    overflow: hidden;
-    background: var(--bg);
-  }
-  .beer-mug-handle {
-    position: absolute;
-    right: -10px;
-    top: 8px;
-    width: 10px;
-    height: 24px;
-    border: 2.5px solid var(--text-dim);
-    border-left: none;
-    border-radius: 0 6px 6px 0;
-  }
-  .beer-fill {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: linear-gradient(180deg, var(--gold) 0%, var(--amber-dark) 100%);
-    transition: height 0.4s ease;
-    border-radius: 0 0 4px 4px;
-  }
-  .beer-foam {
-    position: absolute;
-    top: -4px;
-    left: -1px;
-    right: -1px;
-    height: 6px;
-    background: var(--foam);
-    border-radius: 3px;
-    opacity: 0;
-    transition: opacity 0.3s;
-  }
-  .beer-fill.has-foam .beer-foam { opacity: 1; }
-  .backlog-indicator {
-    position: absolute;
-    bottom: 2px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 0.55em;
-    font-weight: 700;
-    color: var(--red);
-    background: #f0605020;
-    padding: 1px 5px;
-    border-radius: 3px;
-    white-space: nowrap;
-  }
+/* Panic meter */
+.panic-meter { width: 100%; margin-top: 6px; }
+.panic-meter-label {
+  font-size: 0.55rem; text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--text-tertiary); margin-bottom: 2px; text-align: center; font-weight: 600;
+}
+.panic-meter-bar {
+  width: 100%; height: 6px; background: var(--bg-metric);
+  border-radius: 3px; overflow: hidden; border: 1px solid var(--border);
+}
+.panic-meter-fill {
+  height: 100%; border-radius: 3px;
+  transition: width 0.4s, background 0.4s;
+  background: var(--accent-green);
+}
+.panic-emoji { font-size: 1.2em; text-align: center; min-height: 1.4em; margin-top: 2px; transition: all 0.2s; }
 
-  /* Panic meter */
-  .panic-meter {
-    width: 100%;
-    margin-top: 6px;
-  }
-  .panic-meter-label {
-    font-size: 0.55em;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--text-muted);
-    margin-bottom: 2px;
-    text-align: center;
-    font-weight: 600;
-  }
-  .panic-meter-bar {
-    width: 100%;
-    height: 6px;
-    background: var(--bg);
-    border-radius: 3px;
-    overflow: hidden;
-    border: 1px solid var(--border);
-  }
-  .panic-meter-fill {
-    height: 100%;
-    border-radius: 3px;
-    transition: width 0.4s, background 0.4s;
-    background: var(--green);
-  }
-  .panic-emoji {
-    font-size: 1.2em;
-    text-align: center;
-    min-height: 1.4em;
-    margin-top: 2px;
-    transition: all 0.2s;
-  }
+.flow-arrow {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center;
+  font-size: 0.62rem; color: var(--text-tertiary); min-width: 56px; gap: 6px;
+  position: relative;
+}
+.flow-arrow .beer-flow {
+  color: var(--accent-amber);
+  display: flex; align-items: center; gap: 3px; font-weight: 600;
+}
+.flow-arrow .order-flow {
+  color: var(--wholesaler);
+  display: flex; align-items: center; gap: 3px; font-weight: 600;
+}
+.flow-arrow .arrow { font-size: 1.3em; }
 
-  .flow-arrow {
-    display: flex; flex-direction: column; align-items: center;
-    justify-content: center;
-    font-size: 0.62em; color: var(--text-dim); min-width: 56px;
-    gap: 6px;
-    position: relative;
-  }
-  .flow-arrow .beer-flow {
-    color: var(--amber);
-    display: flex; align-items: center; gap: 3px;
-    font-weight: 600;
-  }
-  .flow-arrow .order-flow {
-    color: var(--blue);
-    display: flex; align-items: center; gap: 3px;
-    font-weight: 600;
-  }
-  .flow-arrow .arrow { font-size: 1.3em; }
-  .flow-beer-anim {
-    position: absolute;
-    font-size: 1em;
-    opacity: 0;
-    pointer-events: none;
-  }
+.consumer-node {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center;
+  min-width: 90px; padding: 12px 14px;
+  background: var(--bg-card); border: 2px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+.consumer-node .agent-icon { font-size: 1.8em; }
+.consumer-node .agent-name { color: var(--text-tertiary); font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
 
-  .consumer-node {
-    display: flex; flex-direction: column; align-items: center;
-    justify-content: center;
-    min-width: 90px; padding: 12px 14px;
-    background: var(--surface); border: 2px solid var(--text-muted);
-    border-radius: 12px;
-  }
-  .consumer-node .agent-icon { font-size: 1.8em; }
-  .consumer-node .agent-name { color: var(--text-dim); font-size: 0.68em; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; }
+/* ===== NARRATIVE ===== */
+.narrative-section {
+  padding: 14px 20px;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+}
+.narrative-box {
+  max-width: 900px; margin: 0 auto;
+  display: flex; align-items: flex-start; gap: 12px; min-height: 48px;
+}
+.narrative-icon { font-size: 1.4em; flex-shrink: 0; margin-top: 2px; }
+.narrative-text {
+  font-size: 0.85rem; line-height: 1.6;
+  color: var(--text-secondary); font-style: italic;
+}
+.narrative-text strong { color: var(--text-primary); font-style: normal; }
 
-  /* ===== LIVE NARRATIVE ===== */
-  .narrative-section {
-    padding: 14px 20px;
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-  }
-  .narrative-box {
-    max-width: 900px;
-    margin: 0 auto;
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    min-height: 48px;
-  }
-  .narrative-icon {
-    font-size: 1.4em;
-    flex-shrink: 0;
-    margin-top: 2px;
-  }
-  .narrative-text {
-    font-size: 0.88em;
-    line-height: 1.6;
-    color: var(--text);
-    font-style: italic;
-  }
-  .narrative-text strong { color: var(--amber-light); font-style: normal; }
+/* ===== HUMAN TAX BANNER ===== */
+.human-tax-banner {
+  display: flex; justify-content: center; align-items: center;
+  gap: 40px; padding: 14px 20px;
+  background: var(--bg-metric);
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.tax-item { text-align: center; }
+.tax-item .label {
+  font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--text-tertiary); font-weight: 600; margin-bottom: 2px;
+}
+.tax-item .value {
+  font-size: 1.4rem; font-weight: 800;
+  font-family: var(--font-mono);
+}
+.tax-item .value.behavioral { color: var(--accent-coral); }
+.tax-item .value.rational { color: var(--accent-green); }
+.tax-item .value.multiplier { color: var(--accent-amber); }
+.tax-item .value.tick-val { color: var(--accent-teal); }
+.bw-values { display: flex; gap: 12px; }
+.bw-chip {
+  font-size: 0.7rem; padding: 3px 8px; border-radius: 4px;
+  background: var(--bg-card); border: 1px solid var(--border);
+  font-family: var(--font-mono); font-weight: 600;
+}
 
-  /* ===== HUMAN TAX BANNER ===== */
-  .human-tax-banner {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 40px;
-    padding: 16px 20px;
-    background: linear-gradient(90deg, var(--surface) 0%, var(--surface2) 50%, var(--surface) 100%);
-    border-bottom: 1px solid var(--border);
-    flex-wrap: wrap;
-  }
-  .tax-item {
-    text-align: center;
-  }
-  .tax-item .label {
-    font-size: 0.62em;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    color: var(--text-muted);
-    font-weight: 600;
-    margin-bottom: 2px;
-  }
-  .tax-item .value {
-    font-size: 1.6em;
-    font-weight: 800;
-    font-family: 'JetBrains Mono', monospace;
-  }
-  .tax-item .value.behavioral { color: var(--red); }
-  .tax-item .value.rational { color: var(--green); }
-  .tax-item .value.multiplier { color: var(--amber-light); }
-  .tax-item .value.tick-val { color: var(--blue); }
-  .bw-values {
-    display: flex;
-    gap: 12px;
-  }
-  .bw-chip {
-    font-size: 0.7em;
-    padding: 3px 8px;
-    border-radius: 4px;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    font-family: 'JetBrains Mono', monospace;
-    font-weight: 600;
-  }
+/* ===== CHARTS ===== */
+.charts-section { padding: 0; }
+.charts-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+}
+.chart-panel {
+  padding: 18px 20px;
+  border: 1px solid var(--border);
+  height: 280px; min-height: 0; overflow: hidden;
+  background: var(--bg-card);
+}
+.chart-header {
+  display: flex; align-items: flex-start;
+  justify-content: space-between; margin-bottom: 4px;
+}
+.chart-panel h3 {
+  font-size: 0.7rem; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--accent-teal);
+  font-weight: 600;
+  display: flex; align-items: center; gap: 6px;
+}
+.chart-panel h3 .chart-icon { font-size: 1.2em; }
+.chart-explanation {
+  font-size: 0.72rem; color: var(--text-tertiary);
+  line-height: 1.5; margin-bottom: 10px; font-style: italic;
+  border-left: 2px solid var(--border); padding-left: 10px;
+}
+.chart-canvas { width: 100%; height: 180px; }
+.chart-legend { display: flex; gap: 12px; margin-top: 6px; flex-wrap: wrap; }
+.legend-item {
+  display: flex; align-items: center; gap: 4px;
+  font-size: 0.62rem; color: var(--text-tertiary); font-weight: 500;
+}
+.legend-swatch { width: 14px; height: 3px; border-radius: 2px; }
+.legend-swatch.dashed {
+  background: repeating-linear-gradient(90deg, currentColor 0, currentColor 4px, transparent 4px, transparent 7px);
+  height: 2px;
+}
 
-  /* ===== CHARTS ===== */
-  .charts-section {
-    padding: 0;
-  }
-  .charts-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0;
-  }
-  .chart-panel {
-    padding: 18px 20px;
-    border: 1px solid var(--border);
-    height: 260px;
-    min-height: 0;
-    overflow: hidden;
-    background: var(--bg2);
-  }
-  .chart-header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    margin-bottom: 4px;
-  }
-  .chart-panel h3 {
-    font-size: 0.72em; text-transform: uppercase;
-    letter-spacing: 1px; color: var(--text-dim);
-    font-weight: 700;
-    display: flex; align-items: center; gap: 6px;
-  }
-  .chart-panel h3 .chart-icon { font-size: 1.2em; }
-  .chart-explanation {
-    font-size: 0.78em;
-    color: var(--text-muted);
-    line-height: 1.5;
-    margin-bottom: 10px;
-    font-style: italic;
-    padding-left: 2px;
-    border-left: 2px solid var(--border);
-    padding-left: 10px;
-  }
-  .chart-canvas {
-    width: 100%; height: 180px;
-  }
-  .chart-legend {
-    display: flex;
-    gap: 12px;
-    margin-top: 6px;
-    flex-wrap: wrap;
-  }
-  .legend-item {
-    display: flex; align-items: center; gap: 4px;
-    font-size: 0.62em; color: var(--text-dim); font-weight: 500;
-  }
-  .legend-swatch {
-    width: 14px; height: 3px; border-radius: 2px;
-  }
-  .legend-swatch.dashed {
-    background: repeating-linear-gradient(90deg, currentColor 0, currentColor 4px, transparent 4px, transparent 7px);
-    height: 2px;
-  }
+/* ===== INSIGHT BOX ===== */
+.insight-section { padding: 24px; display: flex; justify-content: center; }
+.insight-box {
+  max-width: 760px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent-teal);
+  border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+  padding: 1.25rem 1.5rem;
+  position: relative;
+}
+.insight-label {
+  font-size: 0.7rem; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--accent-teal);
+  font-weight: 700; margin-bottom: 8px;
+}
+.insight-text { font-size: 0.9rem; line-height: 1.7; color: var(--text-secondary); }
+.insight-text strong { color: var(--text-primary); }
 
-  /* ===== INSIGHT BOX ===== */
-  .insight-section {
-    padding: 24px;
-    display: flex;
-    justify-content: center;
-  }
-  .insight-box {
-    max-width: 760px;
-    background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%);
-    border: 1px solid var(--amber-dark);
-    border-radius: 12px;
-    padding: 24px 28px;
-    position: relative;
-    box-shadow: 0 0 30px #f0a03010;
-  }
-  .insight-box::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, var(--amber-dark), var(--amber), var(--amber-dark));
-    border-radius: 12px 12px 0 0;
-  }
-  .insight-label {
-    font-size: 0.68em;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    color: var(--amber);
-    font-weight: 700;
-    margin-bottom: 10px;
-    display: flex; align-items: center; gap: 8px;
-  }
-  .insight-text {
-    font-size: 0.95em;
-    line-height: 1.7;
-    color: var(--text);
-  }
-  .insight-text strong { color: var(--amber-light); }
+/* ===== FUN FACT ===== */
+.fun-fact-box {
+  max-width: 760px; margin: 0 auto 24px;
+  padding: 14px 20px;
+  background: var(--accent-teal-light);
+  border: 1px solid #c0dede;
+  border-radius: var(--radius);
+  font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6;
+  text-align: center;
+}
+.fun-fact-box strong { color: var(--text-primary); font-weight: 600; }
 
-  /* ===== FUN FACT ===== */
-  .fun-fact {
-    max-width: 760px;
-    margin: 0 auto 24px;
-    padding: 16px 24px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    font-size: 0.85em;
-    color: var(--text-dim);
-    line-height: 1.6;
-    text-align: center;
-  }
-  .fun-fact strong { color: var(--amber-light); font-weight: 600; }
+/* ===== FOOTER ===== */
+.footer {
+  text-align: center; padding: 2rem;
+  border-top: 1px solid var(--border-light);
+}
+.footer a { color: var(--accent-teal); text-decoration: none; font-size: 0.85rem; font-weight: 500; }
+.footer a:hover { text-decoration: underline; }
 
-  /* ===== FOOTER ===== */
-  .footer {
-    text-align: center;
-    padding: 20px;
-    font-size: 0.7em;
-    color: var(--text-muted);
-    border-top: 1px solid var(--border);
-  }
-  .footer a { color: var(--amber-dark); text-decoration: none; }
+/* ===== PRESETS ===== */
+.presets-bar {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 20px; background: var(--bg-metric);
+  border-bottom: 1px solid var(--border); flex-wrap: wrap;
+}
+.presets-label {
+  font-size: 0.68rem; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--text-tertiary);
+  font-weight: 700; margin-right: 4px; white-space: nowrap;
+}
+.preset-btn {
+  background: var(--bg-card); border: 1px solid var(--border);
+  color: var(--text-secondary); padding: 5px 12px; border-radius: 6px;
+  font-family: var(--font-sans); font-size: 0.72rem; cursor: pointer;
+  transition: all 0.2s; font-weight: 600; white-space: nowrap;
+}
+.preset-btn:hover { border-color: var(--accent-teal); color: var(--accent-teal); background: var(--bg-hover); }
+.preset-btn.active { border-color: var(--accent-teal); color: var(--accent-teal); background: var(--accent-teal-light); }
+.preset-desc {
+  width: 100%; font-size: 0.75rem; color: var(--text-secondary);
+  font-style: italic; padding: 6px 0 0; line-height: 1.5; display: none;
+}
+.preset-desc strong { color: var(--text-primary); font-style: normal; }
 
-  /* ===== PRESET EXPERIMENTS ===== */
-  .presets-bar {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 20px;
-    background: var(--bg2);
-    border-bottom: 1px solid var(--border);
-    flex-wrap: wrap;
-  }
-  .presets-label {
-    font-size: 0.68em;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    color: var(--text-muted);
-    font-weight: 700;
-    margin-right: 4px;
-    white-space: nowrap;
-  }
-  .preset-btn {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    color: var(--text-dim);
-    padding: 5px 12px;
-    border-radius: 6px;
-    font-family: 'Inter', sans-serif;
-    font-size: 0.72em;
-    cursor: pointer;
-    transition: all 0.2s;
-    font-weight: 600;
-    white-space: nowrap;
-  }
-  .preset-btn:hover {
-    border-color: var(--amber);
-    color: var(--amber);
-    background: var(--surface2);
-  }
-  .preset-btn.active {
-    border-color: var(--amber);
-    color: var(--amber);
-    background: var(--surface2);
-    box-shadow: 0 0 8px #f0a03020;
-  }
-  .preset-desc {
-    width: 100%;
-    font-size: 0.78em;
-    color: var(--text-dim);
-    font-style: italic;
-    padding: 6px 0 0;
-    line-height: 1.5;
-    display: none;
-  }
-  .preset-desc strong { color: var(--amber-light); font-style: normal; }
-
-  @media (max-width: 800px) {
-    .charts-grid { grid-template-columns: 1fr; }
-    .supply-chain-viz { flex-wrap: wrap; gap: 8px; }
-    .hero h1 { font-size: 1.6em; }
-    .hero-story { font-size: 0.92em; padding: 18px 20px; }
-    .human-tax-banner { gap: 20px; }
-  }
+@media (max-width: 800px) {
+  .charts-grid { grid-template-columns: 1fr; }
+  .supply-chain-viz { flex-wrap: wrap; gap: 8px; }
+  .hero h1 { font-size: 1.5rem; }
+  .human-tax-banner { gap: 20px; }
+}
 </style>
 </head>
 <body>
 
-<!-- ===== HERO INTRO ===== -->
+<!-- NAV BAR -->
+<div class="nav-bar">
+  <span class="nav-title">The Beer Game</span>
+  <a href="../" class="nav-back">&larr; Dashboard</a>
+</div>
+
+<!-- HERO -->
 <div class="hero">
-  <span class="hero-beer">&#127866;</span>
-  <h1>THE BEER GAME</h1>
+  <h1>The Beer Game</h1>
   <div class="tagline">Why a tiny change in demand creates total chaos</div>
   <div class="hero-story">
     In the 1950s, MIT professor <strong>Jay Forrester</strong> invented this deceptively simple game. Four players manage a beer supply chain&mdash;a retailer, a wholesaler, a distributor, and a brewery. Consumer demand makes <strong>ONE small change</strong>&mdash;and the entire system goes haywire. MBA students, CEOs, and even professional inventory managers all produce the same wild oscillations. <strong>Why?</strong>
   </div>
 </div>
 
-<!-- ===== CONTROLS ===== -->
-<div class="controls">
+<!-- CONTROLS -->
+<div class="controls-bar">
   <div class="control-group">
     <label>Speed</label>
     <input type="range" id="speed" min="1" max="20" value="5" style="width:80px">
@@ -674,13 +486,13 @@
     <label for="compareMode">vs. Rational</label>
   </div>
   <div style="display:flex;gap:6px">
-    <button class="btn primary" id="btnStart">&#9654; Play</button>
-    <button class="btn" id="btnPause">&#10074;&#10074; Pause</button>
-    <button class="btn" id="btnReset">&#8634; Reset</button>
+    <button class="btn primary" id="btnStart">Play</button>
+    <button class="btn" id="btnPause">Pause</button>
+    <button class="btn" id="btnReset">Reset</button>
   </div>
 </div>
 
-<!-- ===== PRESET EXPERIMENTS ===== -->
+<!-- PRESETS -->
 <div class="presets-bar">
   <span class="presets-label">Presets</span>
   <button class="preset-btn active" data-preset="baseline">Baseline</button>
@@ -692,13 +504,13 @@
   <div class="preset-desc" id="presetDesc"></div>
 </div>
 
-<!-- ===== SUPPLY CHAIN DIAGRAM ===== -->
+<!-- SUPPLY CHAIN DIAGRAM -->
 <div class="supply-chain-section">
-  <h2>&#127866; The Supply Chain &#127866;</h2>
+  <h2>The Supply Chain</h2>
   <div class="supply-chain-viz" id="supplyChainViz"></div>
 </div>
 
-<!-- ===== LIVE NARRATIVE ===== -->
+<!-- NARRATIVE -->
 <div class="narrative-section">
   <div class="narrative-box" id="narrativeBox">
     <span class="narrative-icon">&#128172;</span>
@@ -708,22 +520,22 @@
   </div>
 </div>
 
-<!-- ===== HUMAN TAX BANNER ===== -->
+<!-- HUMAN TAX BANNER -->
 <div class="human-tax-banner" id="humanTaxBanner">
   <div class="tax-item">
-    <div class="label">&#128338; Week</div>
+    <div class="label">Week</div>
     <div class="value tick-val" id="m-tick">0</div>
   </div>
   <div class="tax-item">
-    <div class="label">&#129324; Behavioral Cost</div>
+    <div class="label">Behavioral Cost</div>
     <div class="value behavioral" id="m-cost">$0</div>
   </div>
   <div class="tax-item">
-    <div class="label">&#129302; Rational Cost</div>
+    <div class="label">Rational Cost</div>
     <div class="value rational" id="m-rcost">$0</div>
   </div>
   <div class="tax-item">
-    <div class="label">&#128176; Human Tax</div>
+    <div class="label">Human Tax</div>
     <div class="value multiplier" id="m-tax">1.0x</div>
   </div>
   <div class="tax-item">
@@ -737,29 +549,29 @@
   </div>
 </div>
 
-<!-- ===== CHARTS ===== -->
+<!-- CHARTS -->
 <div class="charts-section">
   <div class="charts-grid" id="chartsGrid"></div>
 </div>
 
-<!-- ===== KEY INSIGHT ===== -->
+<!-- KEY INSIGHT -->
 <div class="insight-section">
   <div class="insight-box">
-    <div class="insight-label">&#128161; Key Insight</div>
+    <div class="insight-label">Key Insight</div>
     <div class="insight-text">
       The oscillations are <strong>NOT</strong> caused by the demand change. They're caused by the <strong>feedback loop</strong> between human decision-making and time delays. The demand changes once and stays there&mdash;but the system never settles down. This is why Beinhocker argues that <strong>business cycles might be endogenous</strong>, not caused by external shocks.
     </div>
   </div>
 </div>
 
-<!-- ===== FUN FACT ===== -->
-<div class="fun-fact">
-  &#127891; <strong>Real result:</strong> When MIT tested this with professional supply chain managers, they did just as badly as random MBA students! The bullwhip effect isn't about skill or experience&mdash;it's a structural property of the system itself.
+<!-- FUN FACT -->
+<div class="fun-fact-box">
+  <strong>Real result:</strong> When MIT tested this with professional supply chain managers, they did just as badly as random MBA students! The bullwhip effect isn't about skill or experience&mdash;it's a structural property of the system itself.
 </div>
 
-<!-- ===== FOOTER ===== -->
+<!-- FOOTER -->
 <div class="footer">
-  Based on Forrester (1961) &amp; Sterman (1989) &mdash; Visualizing ideas from Beinhocker's <em>The Origin of Wealth</em>
+  <a href="../">&larr; Back to Dashboard</a>
 </div>
 
 <script>
@@ -952,7 +764,7 @@ function drawChart(canvas, datasets, maxTick) {
   function toY(v) { return pad.top + plotH - ((v - yMin) / (yMax - yMin)) * plotH; }
 
   // Grid
-  ctx.strokeStyle = '#2a1e1040';
+  ctx.strokeStyle = '#edecea';
   ctx.lineWidth = 1;
   const ySteps = 5;
   for (let i = 0; i <= ySteps; i++) {
@@ -962,7 +774,7 @@ function drawChart(canvas, datasets, maxTick) {
 
   // Zero line
   if (yMin < 0 && yMax > 0) {
-    ctx.strokeStyle = '#5a4828';
+    ctx.strokeStyle = '#d0cec8';
     ctx.setLineDash([4,4]);
     const y0 = toY(0);
     ctx.beginPath(); ctx.moveTo(pad.left, y0); ctx.lineTo(W-pad.right, y0); ctx.stroke();
@@ -987,7 +799,7 @@ function drawChart(canvas, datasets, maxTick) {
   }
 
   // Axes labels
-  ctx.fillStyle = '#706050';
+  ctx.fillStyle = '#7a7a8a';
   ctx.font = '10px "JetBrains Mono", monospace';
   ctx.textAlign = 'center';
   for (let t = 0; t <= xMax; t += Math.max(1, Math.floor(xMax/8))) {
@@ -1002,15 +814,15 @@ function drawChart(canvas, datasets, maxTick) {
 
 // ===== UI STATE =====
 
-const COLORS = ['#f0a030','#60b0f0','#50c878','#b080e0'];
+const COLORS = ['#b08a3a','#4a6a9a','#4a8a5a','#8a6aaa'];
 const NAMES = ['Retailer','Wholesaler','Distributor','Brewery'];
 const CLASSES = ['retailer','wholesaler','distributor','brewery'];
 const ICONS = ['\uD83D\uDED2', '\uD83D\uDCE6', '\uD83D\uDE9A', '\uD83C\uDFED'];
 const PANIC_EMOJIS = [
-  ['\u{1F60C}', '\u{1F610}', '\u{1F623}', '\u{1F630}', '\u{1F631}'],  // Retailer
-  ['\u{1F60C}', '\u{1F914}', '\u{1F628}', '\u{1F4A2}', '\u{1F92F}'],  // Wholesaler
-  ['\u{1F60C}', '\u{1F615}', '\u{1F62C}', '\u{1F525}', '\u{1F4A5}'],  // Distributor
-  ['\u{1F60C}', '\u{1F914}', '\u{1F62B}', '\u{1F6A8}', '\u{1F92F}'],  // Brewery
+  ['\u{1F60C}', '\u{1F610}', '\u{1F623}', '\u{1F630}', '\u{1F631}'],
+  ['\u{1F60C}', '\u{1F914}', '\u{1F628}', '\u{1F4A2}', '\u{1F92F}'],
+  ['\u{1F60C}', '\u{1F615}', '\u{1F62C}', '\u{1F525}', '\u{1F4A5}'],
+  ['\u{1F60C}', '\u{1F914}', '\u{1F62B}', '\u{1F6A8}', '\u{1F92F}'],
 ];
 
 let sim = null, simR = null;
@@ -1046,7 +858,6 @@ function buildSupplyChainViz() {
   const viz = document.getElementById('supplyChainViz');
   viz.innerHTML = '';
 
-  // Consumer
   const consumer = document.createElement('div');
   consumer.className = 'consumer-node';
   consumer.innerHTML = `
@@ -1058,7 +869,6 @@ function buildSupplyChainViz() {
   viz.appendChild(consumer);
 
   for (let i = 0; i < 4; i++) {
-    // Flow arrow
     const arrow = document.createElement('div');
     arrow.className = 'flow-arrow';
     arrow.id = `flow-${i}`;
@@ -1068,7 +878,6 @@ function buildSupplyChainViz() {
     `;
     viz.appendChild(arrow);
 
-    // Agent node
     const node = document.createElement('div');
     node.className = `agent-node ${CLASSES[i]}`;
     node.id = `node-${i}`;
@@ -1107,30 +916,10 @@ function buildCharts() {
   grid.innerHTML = '';
 
   const panels = [
-    {
-      id: 'chart-inv',
-      icon: '\u{1F4CA}',
-      title: 'Effective Inventory',
-      explanation: 'Watch how a tiny demand increase at the retail end gets amplified into massive swings upstream. This is the "bullwhip effect" \u2014 the further you are from the customer, the wilder the ride.'
-    },
-    {
-      id: 'chart-orders',
-      icon: '\u{1F4E6}',
-      title: 'Orders Placed',
-      explanation: 'See the panic ordering? When inventory drops, everyone overreacts. Then when the beer finally arrives, they slam orders to zero. Rinse and repeat.'
-    },
-    {
-      id: 'chart-backlog',
-      icon: '\u{26A0}\u{FE0F}',
-      title: 'Backlog (Unfilled Orders)',
-      explanation: 'Backlogs cascade upstream. The brewery gets slammed with orders it cannot fill, creating a vicious cycle of shortages and overstock.'
-    },
-    {
-      id: 'chart-cost',
-      icon: '\u{1F4B8}',
-      title: 'Cumulative Cost ($)',
-      explanation: 'The behavioral strategy costs roughly 10x more than the rational optimum. That gap is the price of being human.'
-    },
+    { id: 'chart-inv', title: 'Effective Inventory', explanation: 'Watch how a tiny demand increase at the retail end gets amplified into massive swings upstream. This is the "bullwhip effect" -- the further you are from the customer, the wilder the ride.' },
+    { id: 'chart-orders', title: 'Orders Placed', explanation: 'See the panic ordering? When inventory drops, everyone overreacts. Then when the beer finally arrives, they slam orders to zero. Rinse and repeat.' },
+    { id: 'chart-backlog', title: 'Backlog (Unfilled Orders)', explanation: 'Backlogs cascade upstream. The brewery gets slammed with orders it cannot fill, creating a vicious cycle of shortages and overstock.' },
+    { id: 'chart-cost', title: 'Cumulative Cost ($)', explanation: 'The behavioral strategy costs roughly 10x more than the rational optimum. That gap is the price of being human.' },
   ];
 
   for (const p of panels) {
@@ -1141,14 +930,14 @@ function buildCharts() {
       `<div class="legend-item"><div class="legend-swatch" style="background:${COLORS[i]}"></div>${n}</div>`
     ).join('');
     const dashedLegend = compareMode
-      ? `<div class="legend-item"><div class="legend-swatch dashed" style="color:#888"></div>Rational</div>`
+      ? `<div class="legend-item"><div class="legend-swatch dashed" style="color:#999"></div>Rational</div>`
       : '';
     const demandLegend = p.id === 'chart-orders'
-      ? `<div class="legend-item"><div class="legend-swatch dashed" style="color:#fff"></div>Demand</div>`
+      ? `<div class="legend-item"><div class="legend-swatch dashed" style="color:#333"></div>Demand</div>`
       : '';
 
     div.innerHTML = `
-      <h3><span class="chart-icon">${p.icon}</span> ${p.title}</h3>
+      <h3>${p.title}</h3>
       <div class="chart-explanation">${p.explanation}</div>
       <canvas id="${p.id}" class="chart-canvas" style="width:100%;height:180px"></canvas>
       <div class="chart-legend">${legendItems}${dashedLegend}${demandLegend}</div>
@@ -1167,7 +956,6 @@ function generateNarrative(sim, simR) {
   const demand = sim.demandHistory[t-1];
   const stepTick = parseInt(document.getElementById('stepTick').value);
 
-  // Find the agent in the worst shape
   let worstAgent = 0, worstEffInv = agents[0].effectiveInventory;
   for (let i = 1; i < 4; i++) {
     if (agents[i].effectiveInventory < worstEffInv) {
@@ -1176,7 +964,6 @@ function generateNarrative(sim, simR) {
     }
   }
 
-  // Find max order
   let maxOrderAgent = 0, maxOrder = agents[0].lastOrder;
   for (let i = 1; i < 4; i++) {
     if (agents[i].lastOrder > maxOrder) {
@@ -1188,45 +975,45 @@ function generateNarrative(sim, simR) {
   const narratives = [];
 
   if (t === stepTick && sim.config.demandPattern === 'step') {
-    narratives.push(`\u{26A1} <strong>Demand just jumped from 4 to 8!</strong> The retailer sees it first. Everyone else is still clueless\u2026`);
+    narratives.push(`<strong>Demand just jumped from 4 to 8!</strong> The retailer sees it first. Everyone else is still clueless\u2026`);
   } else if (t === stepTick + 1 && sim.config.demandPattern === 'step') {
     narratives.push(`The retailer's inventory just took a hit. They're starting to order more\u2026 but the wholesaler doesn't know why yet.`);
   } else if (t > stepTick + 1 && t <= stepTick + 4 && sim.config.demandPattern === 'step') {
     if (agents[0].backlog > 0) {
-      narratives.push(`\u{1F630} The retailer has run out of stock! Backlog: <strong>${agents[0].backlog}</strong> cases. Panic ordering begins\u2026`);
+      narratives.push(`The retailer has run out of stock! Backlog: <strong>${agents[0].backlog}</strong> cases. Panic ordering begins\u2026`);
     } else {
       narratives.push(`The demand ripple is traveling upstream. The wholesaler is starting to feel the squeeze\u2026`);
     }
   } else if (t > stepTick + 4 && t <= stepTick + 10) {
     if (agents[3].lastOrder > 12) {
-      narratives.push(`\u{1F92F} The brewery just ordered <strong>${agents[3].lastOrder}</strong> cases! That's ${(agents[3].lastOrder/demand).toFixed(1)}x actual consumer demand. The bullwhip is cracking!`);
+      narratives.push(`The brewery just ordered <strong>${agents[3].lastOrder}</strong> cases! That's ${(agents[3].lastOrder/demand).toFixed(1)}x actual consumer demand. The bullwhip is cracking!`);
     } else if (worstEffInv < 0) {
-      narratives.push(`\u{1F525} ${NAMES[worstAgent]} is drowning in unfilled orders (effective inventory: <strong>${worstEffInv}</strong>). The whole chain is backing up.`);
+      narratives.push(`${NAMES[worstAgent]} is drowning in unfilled orders (effective inventory: <strong>${worstEffInv}</strong>). The whole chain is backing up.`);
     } else {
       narratives.push(`Orders are amplifying as they travel upstream. Watch the brewery\u2014it's about to get slammed.`);
     }
   } else if (t > stepTick + 10 && t <= stepTick + 20) {
     if (maxOrder <= 2 && maxOrderAgent >= 2) {
-      narratives.push(`\u{1F61F} Now the pendulum swings back\u2014${NAMES[maxOrderAgent]} has <strong>slammed orders to near zero</strong>. All that beer they panic-ordered? It's finally arriving. Warehouses are flooding.`);
+      narratives.push(`Now the pendulum swings back\u2014${NAMES[maxOrderAgent]} has <strong>slammed orders to near zero</strong>. All that beer they panic-ordered? It's finally arriving. Warehouses are flooding.`);
     } else if (agents[3].inventory > 30) {
-      narratives.push(`\u{1F3ED} The brewery is swimming in beer\u2014<strong>${agents[3].inventory}</strong> cases sitting in inventory. Nobody wants it now. The classic overshoot.`);
+      narratives.push(`The brewery is swimming in beer\u2014<strong>${agents[3].inventory}</strong> cases sitting in inventory. Nobody wants it now. The classic overshoot.`);
     } else {
       const totalCost = agents.reduce((s,a) => s + a.cumulativeCost, 0);
       const rCost = simR ? simR.agents.reduce((s,a) => s + a.cumulativeCost, 0) : totalCost;
       if (rCost > 0) {
-        narratives.push(`\u{1F4B8} The human tax is mounting: behavioral cost is <strong>${(totalCost/Math.max(1,rCost)).toFixed(1)}x</strong> the rational optimum. All from one small demand change!`);
+        narratives.push(`The human tax is mounting: behavioral cost is <strong>${(totalCost/Math.max(1,rCost)).toFixed(1)}x</strong> the rational optimum. All from one small demand change!`);
       } else {
         narratives.push(`The oscillations continue as delayed shipments create waves of overstock and shortage throughout the chain.`);
       }
     }
   } else if (t > stepTick + 20) {
     if (agents.some(a => Math.abs(a.lastOrder - demand) > demand * 0.3)) {
-      narratives.push(`\u{1F300} Week ${t}: The system <strong>still</strong> hasn't settled! Demand changed once, ${t - stepTick} weeks ago, yet orders are still oscillating. This is the core lesson.`);
+      narratives.push(`Week ${t}: The system <strong>still</strong> hasn't settled! Demand changed once, ${t - stepTick} weeks ago, yet orders are still oscillating. This is the core lesson.`);
     } else {
       narratives.push(`The system is finally starting to dampen. But look at the total cost\u2014all that chaos from one small step change in demand.`);
     }
   } else if (t < stepTick) {
-    narratives.push(`\u{23F3} Week ${t}: Everything is calm. Steady demand of 4 cases/week. Everyone orders 4. But at week ${stepTick}, demand will double\u2026`);
+    narratives.push(`Week ${t}: Everything is calm. Steady demand of 4 cases/week. Everyone orders 4. But at week ${stepTick}, demand will double\u2026`);
   } else {
     const totalCost = agents.reduce((s,a) => s + a.cumulativeCost, 0);
     narratives.push(`Week ${t}: Total behavioral cost so far: <strong>$${totalCost.toFixed(0)}</strong>. The bullwhip keeps cracking.`);
@@ -1238,7 +1025,6 @@ function generateNarrative(sim, simR) {
 // ===== PANIC CALCULATION =====
 
 function calcPanicLevel(agent, simR) {
-  // Panic = how far from rational behavior (0-100)
   if (!simR || agent.histOrders.length === 0) return 0;
   const rAgent = simR.agents[agent.position];
   if (rAgent.histOrders.length === 0) return 0;
@@ -1257,10 +1043,8 @@ function updateViz() {
   const t = sim.tick - 1;
   if (t < 0) return;
 
-  // Demand
   document.getElementById('viz-demand').textContent = sim.demandHistory[t];
 
-  // Agent nodes
   for (let i = 0; i < 4; i++) {
     const a = sim.agents[i];
     const invEl = document.getElementById(`inv-${i}`);
@@ -1270,14 +1054,12 @@ function updateViz() {
     invEl.className = a.effectiveInventory >= 0 ? 'val pos' : 'val neg';
     ordEl.textContent = a.lastOrder;
 
-    // Beer mug fill level
     const maxInv = 30;
     const fillPct = Math.max(0, Math.min(100, (a.inventory / maxInv) * 100));
     const fillEl = document.getElementById(`fill-${i}`);
     fillEl.style.height = fillPct + '%';
     fillEl.className = fillPct > 60 ? 'beer-fill has-foam' : 'beer-fill';
 
-    // Backlog indicator
     const blInd = document.getElementById(`bl-ind-${i}`);
     if (a.backlog > 0) {
       blInd.style.display = 'block';
@@ -1286,24 +1068,20 @@ function updateViz() {
       blInd.style.display = 'none';
     }
 
-    // Panic meter
     const panic = calcPanicLevel(a, simR);
     const panicFill = document.getElementById(`panic-fill-${i}`);
     panicFill.style.width = panic + '%';
-    if (panic < 20) panicFill.style.background = 'var(--green)';
-    else if (panic < 50) panicFill.style.background = 'var(--amber)';
-    else if (panic < 80) panicFill.style.background = '#f08040';
-    else panicFill.style.background = 'var(--red)';
+    if (panic < 20) panicFill.style.background = 'var(--accent-green)';
+    else if (panic < 50) panicFill.style.background = 'var(--accent-amber)';
+    else if (panic < 80) panicFill.style.background = '#c07050';
+    else panicFill.style.background = 'var(--accent-coral)';
 
-    // Panic emoji
     const emojiIdx = Math.min(4, Math.floor(panic / 22));
     document.getElementById(`panic-emoji-${i}`).textContent = PANIC_EMOJIS[i][emojiIdx];
   }
 
-  // Charts
   const maxTick = getMaxTicks();
 
-  // Effective inventory
   const invData = sim.agents.map((a,i) => ({data: a.histEffInv, color: COLORS[i]}));
   if (compareMode && simR) {
     for (let i = 0; i < 4; i++) {
@@ -1312,9 +1090,8 @@ function updateViz() {
   }
   drawChart(document.getElementById('chart-inv'), invData, maxTick);
 
-  // Orders
   const ordData = sim.agents.map((a,i) => ({data: a.histOrders, color: COLORS[i]}));
-  ordData.push({data: sim.demandHistory, color: '#ffffff', dashed: true});
+  ordData.push({data: sim.demandHistory, color: '#1a1a2e', dashed: true});
   if (compareMode && simR) {
     for (let i = 0; i < 4; i++) {
       ordData.push({data: simR.agents[i].histOrders, color: COLORS[i], dashed: true});
@@ -1322,7 +1099,6 @@ function updateViz() {
   }
   drawChart(document.getElementById('chart-orders'), ordData, maxTick);
 
-  // Backlog
   const blData = sim.agents.map((a,i) => ({data: a.histBacklog, color: COLORS[i]}));
   if (compareMode && simR) {
     for (let i = 0; i < 4; i++) {
@@ -1331,7 +1107,6 @@ function updateViz() {
   }
   drawChart(document.getElementById('chart-backlog'), blData, maxTick);
 
-  // Cost
   const costData = sim.agents.map((a,i) => ({data: a.histCost, color: COLORS[i]}));
   if (compareMode && simR) {
     for (let i = 0; i < 4; i++) {
@@ -1340,7 +1115,6 @@ function updateViz() {
   }
   drawChart(document.getElementById('chart-cost'), costData, maxTick);
 
-  // Metrics
   const totalCost = sim.agents.reduce((s,a) => s + a.cumulativeCost, 0);
   document.getElementById('m-tick').textContent = sim.tick;
   document.getElementById('m-cost').textContent = '$' + totalCost.toFixed(0);
@@ -1351,12 +1125,11 @@ function updateViz() {
     const tax = rCost > 0 ? (totalCost / rCost) : 1;
     const taxEl = document.getElementById('m-tax');
     taxEl.textContent = tax.toFixed(1) + 'x';
-    if (tax > 5) taxEl.style.color = 'var(--red)';
-    else if (tax > 2) taxEl.style.color = 'var(--amber-light)';
-    else taxEl.style.color = 'var(--green)';
+    if (tax > 5) taxEl.style.color = 'var(--accent-coral)';
+    else if (tax > 2) taxEl.style.color = 'var(--accent-amber)';
+    else taxEl.style.color = 'var(--accent-green)';
   }
 
-  // Bullwhip ratios
   const bwContainer = document.getElementById('bw-values');
   const bwLabels = ['R','W','D','B'];
   const chips = bwContainer.querySelectorAll('.bw-chip');
@@ -1368,7 +1141,6 @@ function updateViz() {
     chips[i].textContent = `${bwLabels[i]}: ${bw}`;
   }
 
-  // Narrative
   document.getElementById('narrativeText').innerHTML = generateNarrative(sim, simR);
 }
 
@@ -1387,12 +1159,11 @@ function reset() {
   buildCharts();
   document.getElementById('narrativeText').innerHTML = generateNarrative(sim, simR);
 
-  // Reset metrics display
   document.getElementById('m-tick').textContent = '0';
   document.getElementById('m-cost').textContent = '$0';
   document.getElementById('m-rcost').textContent = '$0';
   document.getElementById('m-tax').textContent = '1.0x';
-  document.getElementById('m-tax').style.color = 'var(--green)';
+  document.getElementById('m-tax').style.color = 'var(--accent-green)';
 
   updateViz();
 }
@@ -1431,16 +1202,12 @@ function pause() {
   if (animId) cancelAnimationFrame(animId);
 }
 
-// Event listeners
 document.getElementById('btnStart').addEventListener('click', start);
 document.getElementById('btnPause').addEventListener('click', pause);
 document.getElementById('btnReset').addEventListener('click', reset);
 document.getElementById('compareMode').addEventListener('change', reset);
 
-// Handle canvas resize
-function resizeCanvases() {
-  updateViz();
-}
+function resizeCanvases() { updateViz(); }
 window.addEventListener('resize', resizeCanvases);
 
 // ===== PRESET EXPERIMENTS =====
@@ -1492,12 +1259,10 @@ function applyPreset(name) {
   document.getElementById('infoSharing').checked = p.infoSharing;
   document.getElementById('compareMode').checked = p.compareMode;
 
-  // Update active button
   document.querySelectorAll('.preset-btn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.preset === name);
   });
 
-  // Show description
   const descEl = document.getElementById('presetDesc');
   descEl.innerHTML = p.desc;
   descEl.style.display = 'block';

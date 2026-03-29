@@ -6,205 +6,231 @@
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://beinhocker-mkirsanov.pages.dev/01-stock-market/index.html">
 <meta property="og:title" content="SFI Artificial Stock Market">
-<meta property="og:description" content="Learning agents produce fat-tailed returns and volatility clustering — just like real markets. Based on Arthur, Holland, LeBaron et al. (1997).">
-<meta property="og:site_name" content="The Origin of Wealth — Complexity Economics Simulations">
+<meta property="og:description" content="Learning agents produce fat-tailed returns and volatility clustering -- just like real markets. Based on Arthur, Holland, LeBaron et al. (1997).">
+<meta property="og:site_name" content="The Origin of Wealth -- Complexity Economics Simulations">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="SFI Artificial Stock Market">
-<meta name="twitter:description" content="Learning agents produce fat-tailed returns and volatility clustering — just like real markets. Based on Arthur, Holland, LeBaron et al. (1997).">
-<meta name="description" content="Learning agents produce fat-tailed returns and volatility clustering — just like real markets. Based on Arthur, Holland, LeBaron et al. (1997).">
-<title>SFI Artificial Stock Market — Complexity Economics in Action</title>
+<meta name="twitter:description" content="Learning agents produce fat-tailed returns and volatility clustering -- just like real markets. Based on Arthur, Holland, LeBaron et al. (1997).">
+<meta name="description" content="Learning agents produce fat-tailed returns and volatility clustering -- just like real markets. Based on Arthur, Holland, LeBaron et al. (1997).">
+<title>SFI Artificial Stock Market -- Complexity Economics in Action</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@400;500;600;700;800;900&display=swap');
+:root {
+  --bg: #faf9f5;
+  --bg-card: #ffffff;
+  --bg-hover: #f5f3ee;
+  --bg-metric: #f0eeea;
+  --text-primary: #1a1a2e;
+  --text-secondary: #4a4a5a;
+  --text-tertiary: #7a7a8a;
+  --accent-teal: #2a7f7f;
+  --accent-teal-light: #e8f4f4;
+  --accent-coral: #c96b5a;
+  --accent-green: #4a8a5a;
+  --accent-amber: #b08a3a;
+  --border: #e2e0da;
+  --border-light: #edecea;
+  --shadow-sm: 0 1px 3px rgba(26,26,46,0.06);
+  --shadow-md: 0 4px 12px rgba(26,26,46,0.08);
+  --radius: 8px;
+  --radius-lg: 12px;
+  --font-sans: 'Inter', -apple-system, sans-serif;
+  --font-serif: Georgia, 'Times New Roman', serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'Inter', system-ui, sans-serif; background: #0a0e17; color: #c8cdd8; overflow-x: hidden; }
-
-/* ===== HERO INTRO ===== */
-.hero {
-  background: linear-gradient(135deg, #0d1220 0%, #111b2e 50%, #0d1a14 100%);
-  border-bottom: 1px solid #1e3a2a;
-  padding: 40px 32px 32px;
-  position: relative;
-  overflow: hidden;
-}
-.hero::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  right: -20%;
-  width: 600px;
-  height: 600px;
-  background: radial-gradient(circle, rgba(0,255,100,0.03) 0%, transparent 70%);
-  pointer-events: none;
-}
-.hero-content { max-width: 900px; position: relative; z-index: 1; }
-.hero h1 {
-  font-size: 32px;
-  font-weight: 900;
-  letter-spacing: -0.5px;
-  background: linear-gradient(90deg, #00ff88, #00cc66, #44ffaa);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin-bottom: 4px;
-}
-.hero .tagline {
-  font-size: 14px;
-  color: #5a7a6a;
-  font-weight: 500;
-  margin-bottom: 16px;
-  letter-spacing: 0.5px;
-}
-.hero p {
-  font-size: 16px;
+body {
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--text-primary);
+  font-size: 0.9rem;
   line-height: 1.7;
-  color: #9ab0a8;
-  max-width: 780px;
+  overflow-x: hidden;
 }
-.hero p strong { color: #c0ffe0; font-weight: 600; }
 
-/* Key insight callout */
-.key-insight {
-  margin: 24px 0 0;
-  padding: 20px 24px;
-  background: linear-gradient(135deg, rgba(0,255,100,0.06), rgba(0,180,80,0.03));
-  border: 1px solid #1a3a28;
-  border-left: 4px solid #00cc66;
-  border-radius: 0 8px 8px 0;
-  max-width: 780px;
-}
-.key-insight-label {
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  color: #00cc66;
-  margin-bottom: 8px;
-}
-.key-insight p {
-  font-size: 14px;
-  line-height: 1.65;
-  color: #8aaa98;
-}
-.key-insight p strong { color: #b0ffd0; }
-
-/* ===== HEADER BAR ===== */
-.header {
-  background: #0f1520;
-  padding: 12px 24px;
-  border-bottom: 1px solid #1a2030;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+/* ===== NAV BAR ===== */
+.nav-bar {
   position: sticky;
   top: 0;
   z-index: 100;
+  height: 48px;
+  background: rgba(250,249,245,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-light);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 24px;
 }
-.header-left { display: flex; align-items: center; gap: 16px; }
-.header-title { font-size: 15px; font-weight: 700; color: #e0e8f0; }
+.nav-title { font-size: 0.85rem; font-weight: 700; color: var(--text-primary); }
+.nav-back { font-size: 0.8rem; color: var(--accent-teal); text-decoration: none; font-weight: 500; }
+.nav-back:hover { text-decoration: underline; }
+
+/* ===== HERO ===== */
+.hero {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 2rem 1.5rem;
+}
+.hero h1 {
+  font-family: var(--font-serif);
+  font-size: 1.8rem;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+.hero .tagline {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+}
+.hero p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  max-width: 780px;
+}
+.hero p strong { color: var(--text-primary); font-weight: 600; }
+.key-insight {
+  margin: 1.25rem 0 0;
+  padding: 1rem 1.25rem;
+  background: var(--accent-teal-light);
+  border-left: 4px solid var(--accent-teal);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  max-width: 780px;
+}
+.key-insight-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent-teal);
+  margin-bottom: 0.4rem;
+}
+.key-insight p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+}
+.key-insight p strong { color: var(--text-primary); }
+
+/* ===== CONTROLS HEADER ===== */
+.header {
+  background: var(--bg-card);
+  padding: 10px 24px;
+  border-bottom: 1px solid var(--border);
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.header-left { display: flex; align-items: center; gap: 12px; }
+.header-title { font-size: 0.8rem; font-weight: 600; color: var(--text-primary); }
 .tick-display {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 13px;
-  color: #5a6a80;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
 }
 .controls { display: flex; gap: 6px; align-items: center; }
 .controls button {
-  padding: 6px 16px;
-  border: 1px solid #1e2a3a;
-  background: #141c28;
-  color: #8090a8;
-  border-radius: 4px;
+  padding: 5px 14px;
+  border: 1px solid var(--border);
+  background: var(--bg-metric);
+  color: var(--text-secondary);
+  border-radius: 6px;
   cursor: pointer;
-  font-size: 13px;
+  font-size: 0.75rem;
   font-weight: 500;
+  font-family: var(--font-sans);
   transition: all 0.15s;
 }
-.controls button:hover { background: #1a2840; border-color: #2a3a50; color: #b0c0d8; }
-.controls button.active { background: #00994d; border-color: #00cc66; color: #fff; }
-.controls button.danger { border-color: #3a1a1a; color: #cc4444; }
-.controls button.danger:hover { background: #2a1010; color: #ff5555; }
+.controls button:hover { background: var(--bg-hover); border-color: var(--accent-teal); color: var(--text-primary); }
+.controls button.active { background: var(--accent-teal); border-color: var(--accent-teal); color: #fff; }
+.controls button.danger { border-color: var(--accent-coral); color: var(--accent-coral); }
+.controls button.danger:hover { background: #fdf0ee; }
 .sound-toggle {
   display: flex; align-items: center; gap: 6px;
-  font-size: 12px; color: #5a6a80; cursor: pointer;
+  font-size: 0.7rem; color: var(--text-tertiary); cursor: pointer;
   margin-left: 8px;
   padding: 4px 10px;
-  border: 1px solid #1e2a3a;
-  border-radius: 4px;
-  background: #141c28;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-metric);
   transition: all 0.15s;
 }
-.sound-toggle:hover { border-color: #2a3a50; color: #8090a8; }
-.sound-toggle.on { border-color: #00884d; color: #00cc66; }
+.sound-toggle:hover { border-color: var(--accent-teal); color: var(--text-secondary); }
+.sound-toggle.on { border-color: var(--accent-teal); color: var(--accent-teal); }
 
 /* ===== MAIN LAYOUT ===== */
-.main { display: grid; grid-template-columns: 280px 1fr; min-height: calc(100vh - 160px); }
+.main { display: grid; grid-template-columns: 260px 1fr; min-height: calc(100vh - 200px); }
 
 /* ===== SIDEBAR ===== */
 .sidebar {
-  background: #0c1018;
+  background: var(--bg-card);
+  border-right: 1px solid var(--border);
   padding: 16px;
   overflow-y: auto;
-  border-right: 1px solid #1a2030;
 }
 .sidebar h3 {
-  font-size: 10px;
+  font-size: 0.7rem;
   text-transform: uppercase;
-  letter-spacing: 1.2px;
-  color: #3a4a5a;
-  margin: 18px 0 8px;
-  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--accent-teal);
+  margin: 16px 0 8px;
+  font-weight: 600;
 }
 .sidebar h3:first-child { margin-top: 0; }
 .param-group { display: flex; flex-direction: column; gap: 5px; }
 .param { display: flex; justify-content: space-between; align-items: center; }
-.param label { font-size: 12px; color: #6a7a8a; }
+.param label { font-size: 0.75rem; color: var(--text-secondary); }
 .param input, .param select {
   width: 80px;
   padding: 3px 6px;
-  background: #111820;
-  border: 1px solid #1a2535;
-  color: #b0c0d8;
-  border-radius: 3px;
-  font-size: 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  border-radius: 4px;
+  font-size: 0.75rem;
   text-align: right;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-mono);
 }
 .param select { text-align: left; }
 
 .speed-control { display: flex; align-items: center; gap: 6px; margin-top: 6px; }
-.speed-control label { font-size: 11px; color: #4a5a6a; }
-.speed-control input { flex: 1; accent-color: #00cc66; }
+.speed-control label { font-size: 0.7rem; color: var(--text-tertiary); }
+.speed-control input { flex: 1; accent-color: var(--accent-teal); }
 
 /* Stats box */
 .stats-box {
-  background: #111820;
-  border: 1px solid #1a2535;
-  border-radius: 6px;
+  background: var(--bg-metric);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
   padding: 10px;
   margin-top: 10px;
 }
-.stat-row { display: flex; justify-content: space-between; font-size: 11px; padding: 3px 0; }
-.stat-row .label { color: #4a5a6a; }
-.stat-row .value { color: #8898b0; font-family: 'JetBrains Mono', monospace; font-size: 11px; }
-.stat-row .value.positive { color: #00ff88; }
-.stat-row .value.negative { color: #ff4444; }
+.stat-row { display: flex; justify-content: space-between; font-size: 0.7rem; padding: 3px 0; }
+.stat-row .label { color: var(--text-tertiary); }
+.stat-row .value { color: var(--text-secondary); font-family: var(--font-mono); font-size: 0.7rem; }
+.stat-row .value.positive { color: var(--accent-green); }
+.stat-row .value.negative { color: var(--accent-coral); }
 
-/* ===== MARKET MOOD GAUGE ===== */
+/* ===== MARKET MOOD ===== */
 .mood-section { margin-top: 16px; }
 .mood-gauge {
-  background: #111820;
-  border: 1px solid #1a2535;
-  border-radius: 6px;
+  background: var(--bg-metric);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
   padding: 12px;
   text-align: center;
 }
-.mood-label-top { font-size: 10px; color: #3a4a5a; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
-.mood-emoji { font-size: 28px; margin-bottom: 4px; }
-.mood-text { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+.mood-label-top { font-size: 0.65rem; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+.mood-emoji { font-size: 24px; margin-bottom: 4px; }
+.mood-text { font-size: 0.85rem; font-weight: 700; margin-bottom: 6px; }
 .mood-bar-track {
   height: 6px;
-  background: linear-gradient(90deg, #ff4444, #ff8844, #cccc44, #44cc44, #00ff88);
+  background: linear-gradient(90deg, var(--accent-coral), var(--accent-amber), #ccc, var(--accent-green), var(--accent-teal));
   border-radius: 3px;
   position: relative;
   margin: 8px 0 4px;
@@ -216,76 +242,79 @@ body { font-family: 'Inter', system-ui, sans-serif; background: #0a0e17; color: 
   height: 14px;
   background: #fff;
   border-radius: 50%;
-  border: 2px solid #0a0e17;
+  border: 2px solid var(--text-primary);
   transform: translateX(-50%);
   transition: left 0.5s ease;
 }
 .mood-extremes {
   display: flex;
   justify-content: space-between;
-  font-size: 9px;
-  color: #3a4a5a;
+  font-size: 0.6rem;
+  color: var(--text-tertiary);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.04em;
 }
 
 /* ===== LEADERBOARD ===== */
 .leaderboard {
-  background: #111820;
-  border: 1px solid #1a2535;
-  border-radius: 6px;
+  background: var(--bg-metric);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
   padding: 10px;
   margin-top: 10px;
 }
 .leaderboard-title {
-  font-size: 10px;
+  font-size: 0.65rem;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  color: #3a4a5a;
+  letter-spacing: 0.06em;
+  color: var(--text-tertiary);
   margin-bottom: 6px;
-  font-weight: 700;
+  font-weight: 600;
 }
 .lb-section-label {
-  font-size: 9px;
-  color: #2a3a4a;
+  font-size: 0.6rem;
+  color: var(--text-tertiary);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.04em;
   margin: 6px 0 3px;
 }
 .lb-row {
   display: flex;
   justify-content: space-between;
-  font-size: 10px;
+  font-size: 0.65rem;
   padding: 2px 0;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-mono);
 }
-.lb-row .lb-name { color: #5a6a7a; }
-.lb-row .lb-val.winner { color: #00ff88; }
-.lb-row .lb-val.loser { color: #ff4444; }
+.lb-row .lb-name { color: var(--text-tertiary); }
+.lb-row .lb-val.winner { color: var(--accent-green); }
+.lb-row .lb-val.loser { color: var(--accent-coral); }
 
-/* ===== WHAT'S HAPPENING PANEL ===== */
+/* ===== NARRATIVE PANEL ===== */
 .narrative-panel {
-  background: linear-gradient(135deg, #111820, #0f1620);
-  border: 1px solid #1a2535;
-  border-radius: 6px;
-  padding: 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent-teal);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 12px 14px;
   margin-top: 12px;
 }
 .narrative-header {
-  font-size: 10px;
+  font-size: 0.65rem;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  color: #3a4a5a;
-  margin-bottom: 8px;
-  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--accent-teal);
+  margin-bottom: 6px;
+  font-weight: 600;
 }
 .narrative-text {
-  font-size: 13px;
+  font-size: 0.8rem;
   line-height: 1.5;
-  color: #8898b0;
+  color: var(--text-secondary);
+  font-style: italic;
   min-height: 40px;
 }
-.narrative-icon { font-size: 18px; margin-bottom: 4px; }
+.narrative-text strong { color: var(--text-primary); font-style: normal; }
+.narrative-icon { font-size: 16px; margin-bottom: 4px; }
 
 /* ===== CHARTS AREA ===== */
 .charts-area { padding: 16px; overflow-y: auto; }
@@ -301,25 +330,25 @@ body { font-family: 'Inter', system-ui, sans-serif; background: #0a0e17; color: 
 .comp-label {
   text-align: center;
   padding: 10px;
-  border-radius: 6px;
-  font-weight: 800;
-  font-size: 15px;
-  letter-spacing: 1px;
+  border-radius: var(--radius);
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
 }
 .comp-label.boring {
-  background: linear-gradient(135deg, #1a1510, #201a10);
-  border: 1px solid #3a3020;
-  color: #aa8844;
+  background: #fdf8f0;
+  border: 1px solid #e8d8c0;
+  color: var(--accent-amber);
 }
 .comp-label.alive {
-  background: linear-gradient(135deg, #0d1a14, #102018);
-  border: 1px solid #1a3a28;
-  color: #00ff88;
+  background: var(--accent-teal-light);
+  border: 1px solid #c0dede;
+  color: var(--accent-teal);
 }
 .comp-sublabel {
-  font-size: 11px;
+  font-size: 0.7rem;
   font-weight: 400;
-  opacity: 0.6;
+  opacity: 0.7;
   margin-top: 2px;
 }
 
@@ -327,13 +356,13 @@ body { font-family: 'Inter', system-ui, sans-serif; background: #0a0e17; color: 
 .charts {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: 16px;
 }
 .chart-container {
-  background: #111820;
-  border: 1px solid #1a2535;
-  border-radius: 8px;
-  padding: 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1rem;
   position: relative;
   height: 280px;
   min-height: 0;
@@ -341,14 +370,16 @@ body { font-family: 'Inter', system-ui, sans-serif; background: #0a0e17; color: 
 }
 .chart-container.wide { grid-column: 1 / -1; height: 340px; }
 .chart-container h4 {
-  font-size: 12px;
-  color: #5a6a80;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent-teal);
   margin-bottom: 4px;
   font-weight: 600;
 }
 .chart-annotation {
-  font-size: 11px;
-  color: #3a4a5a;
+  font-size: 0.72rem;
+  color: var(--text-tertiary);
   line-height: 1.4;
   margin-bottom: 8px;
   font-style: italic;
@@ -362,120 +393,133 @@ body { font-family: 'Inter', system-ui, sans-serif; background: #0a0e17; color: 
   right: 10px;
   width: 22px;
   height: 22px;
-  background: #1a2535;
-  border: 1px solid #2a3a50;
+  background: var(--bg-metric);
+  border: 1px solid var(--border);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 11px;
-  color: #5a6a80;
+  font-size: 0.7rem;
+  color: var(--text-tertiary);
   cursor: pointer;
   transition: all 0.2s;
   z-index: 5;
 }
-.fun-fact:hover { background: #2a3a50; color: #b0c0d8; }
+.fun-fact:hover { background: var(--bg-hover); color: var(--text-primary); }
 .fun-fact-tooltip {
   display: none;
   position: absolute;
   top: 32px;
   right: 0;
   width: 260px;
-  background: #1a2535;
-  border: 1px solid #2a3a50;
-  border-radius: 6px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
   padding: 12px;
-  font-size: 11px;
+  font-size: 0.7rem;
   line-height: 1.5;
-  color: #8898b0;
+  color: var(--text-secondary);
   z-index: 10;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  box-shadow: var(--shadow-md);
 }
 .fun-fact:hover .fun-fact-tooltip { display: block; }
-.fun-fact-tooltip strong { color: #b0c0d8; }
+.fun-fact-tooltip strong { color: var(--text-primary); }
 
-/* Mode indicator in header */
+/* Mode badge */
 .mode-badge {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   padding: 3px 10px;
   border-radius: 4px;
-  font-size: 11px;
+  font-size: 0.7rem;
   font-weight: 600;
 }
-.mode-badge.learning { background: #0d2a1a; color: #00ff88; border: 1px solid #1a3a28; }
-.mode-badge.rational { background: #2a1a0d; color: #ffaa44; border: 1px solid #3a2810; }
-.mode-badge.compare { background: #0d1a2a; color: #44aaff; border: 1px solid #102a3a; }
+.mode-badge.learning { background: var(--accent-teal-light); color: var(--accent-teal); border: 1px solid #c0dede; }
+.mode-badge.rational { background: #fdf8f0; color: var(--accent-amber); border: 1px solid #e8d8c0; }
+.mode-badge.compare { background: #eef2fa; color: #4a6a9a; border: 1px solid #c8d8ea; }
 
 /* ===== PRESET EXPERIMENTS ===== */
 .preset-group { margin-bottom: 4px; }
 .preset-group select {
   width: 100%;
   padding: 6px 8px;
-  background: #111820;
-  border: 1px solid #1a2535;
-  color: #b0c0d8;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
   border-radius: 4px;
-  font-size: 12px;
-  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-family: var(--font-sans);
   cursor: pointer;
   appearance: none;
   -webkit-appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%235a6a80'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%237a7a8a'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 8px center;
   padding-right: 24px;
 }
-.preset-group select:hover { border-color: #2a3a50; }
-.preset-group select:focus { border-color: #00cc66; outline: none; }
+.preset-group select:hover { border-color: var(--accent-teal); }
+.preset-group select:focus { border-color: var(--accent-teal); outline: none; }
 .preset-toast {
   margin-top: 6px;
   padding: 8px 10px;
-  background: linear-gradient(135deg, rgba(0,255,100,0.06), rgba(0,180,80,0.03));
-  border: 1px solid #1a3a28;
-  border-left: 3px solid #00cc66;
+  background: var(--accent-teal-light);
+  border: 1px solid #c0dede;
+  border-left: 3px solid var(--accent-teal);
   border-radius: 0 4px 4px 0;
-  font-size: 11px;
+  font-size: 0.7rem;
   line-height: 1.45;
-  color: #8aaa98;
+  color: var(--text-secondary);
   display: none;
   animation: presetFadeIn 0.25s ease;
 }
 .preset-toast.visible { display: block; }
-.preset-toast strong { color: #b0ffd0; font-weight: 600; }
+.preset-toast strong { color: var(--text-primary); font-weight: 600; }
 @keyframes presetFadeIn {
   from { opacity: 0; transform: translateY(-4px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Scrollbar */
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: #0a0e17; }
-::-webkit-scrollbar-thumb { background: #1a2535; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #2a3a50; }
+/* ===== FOOTER ===== */
+.footer {
+  text-align: center;
+  padding: 2rem;
+  border-top: 1px solid var(--border-light);
+}
+.footer a { color: var(--accent-teal); text-decoration: none; font-size: 0.85rem; font-weight: 500; }
+.footer a:hover { text-decoration: underline; }
+
+/* Responsive */
+@media (max-width: 900px) {
+  .main { grid-template-columns: 1fr; }
+  .charts { grid-template-columns: 1fr; }
+}
 </style>
 </head>
 <body>
 
-<!-- ===== HERO SECTION ===== -->
+<!-- NAV BAR -->
+<div class="nav-bar">
+  <span class="nav-title">SFI Artificial Stock Market</span>
+  <a href="../" class="nav-back">&larr; Dashboard</a>
+</div>
+
+<!-- HERO SECTION -->
 <div class="hero">
-  <div class="hero-content">
-    <h1>The Santa Fe Artificial Stock Market</h1>
-    <div class="tagline">Arthur, Holland, LeBaron, Palmer & Tayler (1997) &mdash; Complexity Economics in Action</div>
+  <h1>The Santa Fe Artificial Stock Market</h1>
+  <div class="tagline">Arthur, Holland, LeBaron, Palmer &amp; Tayler (1997) &mdash; Complexity Economics in Action</div>
+  <p>
+    This is one of the most famous models in complexity economics. <strong>Agents with evolving strategies</strong> compete to buy and sell a single stock. Each trader uses a genetic algorithm to breed better prediction rules over time &mdash; learning from the market they collectively create. Watch what happens when agents stop being perfectly rational and start <strong>adapting</strong>: bubbles inflate, crashes cascade, and fat-tailed returns emerge &mdash; just like real markets.
+  </p>
+  <div class="key-insight">
+    <div class="key-insight-label">Beinhocker's Key Insight</div>
     <p>
-      This is one of the most famous models in complexity economics. <strong>Agents with evolving strategies</strong> compete to buy and sell a single stock. Each trader uses a genetic algorithm to breed better prediction rules over time &mdash; learning from the market they collectively create. Watch what happens when agents stop being perfectly rational and start <strong>adapting</strong>: bubbles inflate, crashes cascade, and fat-tailed returns emerge &mdash; just like real markets.
+      When all agents use the same rational strategy, the market is <strong>boring and efficient</strong>. Price hugs fundamental value, volatility is low, and nothing interesting happens. The moment agents start <strong>learning and adapting</strong>, the market comes alive with bubbles, crashes, and power laws &mdash; just like the real thing. <strong>The volatility isn't noise. It's the emergent result of evolving strategies competing for dominance.</strong>
     </p>
-    <div class="key-insight">
-      <div class="key-insight-label">Beinhocker's Key Insight</div>
-      <p>
-        When all agents use the same rational strategy, the market is <strong>boring and efficient</strong>. Price hugs fundamental value, volatility is low, and nothing interesting happens. The moment agents start <strong>learning and adapting</strong>, the market comes alive with bubbles, crashes, and power laws &mdash; just like the real thing. <strong>The volatility isn't noise. It's the emergent result of evolving strategies competing for dominance.</strong>
-      </p>
-    </div>
   </div>
 </div>
 
-<!-- ===== CONTROLS HEADER ===== -->
+<!-- CONTROLS HEADER -->
 <div class="header">
   <div class="header-left">
     <span class="header-title">Simulation</span>
@@ -495,7 +539,7 @@ body { font-family: 'Inter', system-ui, sans-serif; background: #0a0e17; color: 
   </div>
 </div>
 
-<!-- ===== MAIN ===== -->
+<!-- MAIN -->
 <div class="main">
   <!-- SIDEBAR -->
   <div class="sidebar">
@@ -568,8 +612,8 @@ body { font-family: 'Inter', system-ui, sans-serif; background: #0a0e17; color: 
     <div class="mood-section">
       <h3>Market Mood</h3>
       <div class="mood-gauge">
-        <div class="mood-emoji" id="moodEmoji">😐</div>
-        <div class="mood-text" id="moodText" style="color: #cccc44">Neutral</div>
+        <div class="mood-emoji" id="moodEmoji">&#128528;</div>
+        <div class="mood-text" id="moodText" style="color: var(--text-tertiary)">Neutral</div>
         <div class="mood-bar-track">
           <div class="mood-bar-thumb" id="moodThumb" style="left: 50%"></div>
         </div>
@@ -583,7 +627,7 @@ body { font-family: 'Inter', system-ui, sans-serif; background: #0a0e17; color: 
     <!-- WHAT'S HAPPENING -->
     <div class="narrative-panel">
       <div class="narrative-header">What's Happening</div>
-      <div class="narrative-icon" id="narrativeIcon">📊</div>
+      <div class="narrative-icon" id="narrativeIcon">&#128202;</div>
       <div class="narrative-text" id="narrativeText">Hit <strong>Start</strong> to begin the simulation. Agents will begin trading and evolving their strategies.</div>
     </div>
 
@@ -614,7 +658,7 @@ body { font-family: 'Inter', system-ui, sans-serif; background: #0a0e17; color: 
     <div class="charts">
       <!-- Price chart -->
       <div class="chart-container wide">
-        <h4>Price & Fundamental Value</h4>
+        <h4>Price &amp; Fundamental Value</h4>
         <div class="chart-annotation">Watch how price deviates from fundamental value (dashed line). These aren't random &mdash; they're bubbles and crashes created by agents' competing strategies.</div>
         <div class="fun-fact">?
           <div class="fun-fact-tooltip"><strong>SFI Fun Fact:</strong> The original 1997 model ran on a Connection Machine supercomputer at the Santa Fe Institute. Brian Arthur convinced the team that markets aren't just information processors &mdash; they're ecologies of competing beliefs.</div>
@@ -663,6 +707,11 @@ body { font-family: 'Inter', system-ui, sans-serif; background: #0a0e17; color: 
       </div>
     </div>
   </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <a href="../">&larr; Back to Dashboard</a>
 </div>
 
 <script>
@@ -999,11 +1048,11 @@ const chartOpts = (title) => ({
   maintainAspectRatio: false,
   animation: false,
   plugins: {
-    legend: { display: true, labels: { color: '#5a6a80', font: { size: 10, family: 'Inter' } } }
+    legend: { display: true, labels: { color: '#7a7a8a', font: { size: 10, family: 'Inter' } } }
   },
   scales: {
-    x: { ticks: { color: '#3a4a5a', maxTicksLimit: 8, font: { size: 10, family: 'JetBrains Mono' } }, grid: { color: '#141c28' } },
-    y: { ticks: { color: '#3a4a5a', font: { size: 10, family: 'JetBrains Mono' } }, grid: { color: '#141c28' } }
+    x: { ticks: { color: '#7a7a8a', maxTicksLimit: 8, font: { size: 10, family: 'JetBrains Mono' } }, grid: { color: '#edecea' } },
+    y: { ticks: { color: '#7a7a8a', font: { size: 10, family: 'JetBrains Mono' } }, grid: { color: '#edecea' } }
   }
 });
 
@@ -1015,9 +1064,9 @@ function initCharts() {
     data: {
       labels: [],
       datasets: [
-        { label: 'Price', data: [], borderColor: '#00cc66', borderWidth: 1.5, pointRadius: 0, fill: false },
-        { label: 'Fundamental', data: [], borderColor: '#ff8844', borderWidth: 1, pointRadius: 0, borderDash: [4, 4], fill: false },
-        { label: 'Price (Compare)', data: [], borderColor: '#ffaa44', borderWidth: 1.5, pointRadius: 0, fill: false, hidden: true }
+        { label: 'Price', data: [], borderColor: '#2a7f7f', borderWidth: 1.5, pointRadius: 0, fill: false },
+        { label: 'Fundamental', data: [], borderColor: '#b08a3a', borderWidth: 1, pointRadius: 0, borderDash: [4, 4], fill: false },
+        { label: 'Price (Compare)', data: [], borderColor: '#c96b5a', borderWidth: 1.5, pointRadius: 0, fill: false, hidden: true }
       ]
     },
     options: chartOpts('Price')
@@ -1028,7 +1077,7 @@ function initCharts() {
     data: {
       labels: [],
       datasets: [
-        { label: 'Volume', data: [], backgroundColor: 'rgba(0,204,102,0.2)', borderColor: '#00cc66', borderWidth: 1 }
+        { label: 'Volume', data: [], backgroundColor: 'rgba(42,127,127,0.2)', borderColor: '#2a7f7f', borderWidth: 1 }
       ]
     },
     options: { ...chartOpts('Volume'), plugins: { legend: { display: false } } }
@@ -1039,7 +1088,7 @@ function initCharts() {
     data: {
       labels: [],
       datasets: [
-        { label: 'Returns', data: [], backgroundColor: 'rgba(0,150,255,0.3)', borderColor: '#0096ff', borderWidth: 1 }
+        { label: 'Returns', data: [], backgroundColor: 'rgba(74,106,154,0.3)', borderColor: '#4a6a9a', borderWidth: 1 }
       ]
     },
     options: { ...chartOpts('Returns'), plugins: { legend: { display: false } } }
@@ -1061,7 +1110,7 @@ function initCharts() {
     data: {
       labels: [],
       datasets: [
-        { label: 'Gini', data: [], borderColor: '#ff4488', borderWidth: 1.5, pointRadius: 0, fill: false }
+        { label: 'Gini', data: [], borderColor: '#c96b5a', borderWidth: 1.5, pointRadius: 0, fill: false }
       ]
     },
     options: { ...chartOpts('Gini'), scales: { ...chartOpts('Gini').scales, y: { ...chartOpts('Gini').scales.y, min: 0, max: 1 } } }
@@ -1209,14 +1258,12 @@ function runLoop() {
   updateCharts();
   updateStatsDisplay(sim1);
 
-  // Update narrative/mood/leaderboard less frequently for performance
   if (frameCount % 3 === 0) {
     updateNarrative(sim1);
     updateMood(sim1);
     updateLeaderboard(sim1);
   }
 
-  // Sound: play tick on significant price moves
   if (soundEnabled && sim1.stock.returnHistory.length > 1) {
     const lastRet = sim1.stock.returnHistory[sim1.stock.returnHistory.length - 1];
     if (Math.abs(lastRet) > 0.02) {
@@ -1224,7 +1271,6 @@ function runLoop() {
       playTick(isUp ? 880 : 220, 0.08, 0.05);
     }
     if (Math.abs(lastRet) > 0.08) {
-      // crash or boom alarm
       playTick(lastRet > 0 ? 1200 : 150, 0.3, 0.12);
     }
   }
@@ -1243,7 +1289,6 @@ function updateCharts() {
   const ginis = downsample(sim1.giniHistory, maxPoints);
   const labels = prices.map((_, i) => i);
 
-  // Price chart
   chartPrice.data.labels = labels;
   chartPrice.data.datasets[0].data = prices;
   chartPrice.data.datasets[0].label = sim2 ? 'Price (Learning)' : 'Price';
@@ -1257,27 +1302,23 @@ function updateCharts() {
     chartPrice.data.datasets[2].hidden = true;
   }
 
-  // Volume - color bars by direction
   const volLabels = volumes.map((_, i) => i);
   chartVolume.data.labels = volLabels;
   chartVolume.data.datasets[0].data = volumes;
 
-  // Returns histogram
   const returns = s.returnHistory;
   if (returns.length > 10) {
     const bins = buildHistogram(returns, 40);
     chartReturns.data.labels = bins.labels;
     chartReturns.data.datasets[0].data = bins.counts;
-    // Color by positive/negative
     chartReturns.data.datasets[0].backgroundColor = bins.labels.map(l =>
-      parseFloat(l) >= 0 ? 'rgba(0,204,102,0.35)' : 'rgba(255,68,68,0.35)'
+      parseFloat(l) >= 0 ? 'rgba(74,138,90,0.35)' : 'rgba(201,107,90,0.35)'
     );
     chartReturns.data.datasets[0].borderColor = bins.labels.map(l =>
-      parseFloat(l) >= 0 ? '#00cc66' : '#ff4444'
+      parseFloat(l) >= 0 ? '#4a8a5a' : '#c96b5a'
     );
   }
 
-  // Wealth distribution - gradient colors
   const wealths = sim1.agents.map(a => a.wealth).sort((a, b) => a - b);
   chartWealth.data.labels = wealths.map((_, i) => 'A' + i);
   chartWealth.data.datasets[0].data = wealths;
@@ -1285,18 +1326,17 @@ function updateCharts() {
   const minW = Math.min(...wealths);
   chartWealth.data.datasets[0].backgroundColor = wealths.map(w => {
     const t = maxW !== minW ? (w - minW) / (maxW - minW) : 0.5;
-    if (t > 0.7) return 'rgba(0,255,136,0.4)';
-    if (t > 0.3) return 'rgba(0,150,255,0.3)';
-    return 'rgba(255,68,68,0.3)';
+    if (t > 0.7) return 'rgba(74,138,90,0.35)';
+    if (t > 0.3) return 'rgba(42,127,127,0.25)';
+    return 'rgba(201,107,90,0.3)';
   });
   chartWealth.data.datasets[0].borderColor = wealths.map(w => {
     const t = maxW !== minW ? (w - minW) / (maxW - minW) : 0.5;
-    if (t > 0.7) return '#00ff88';
-    if (t > 0.3) return '#0096ff';
-    return '#ff4444';
+    if (t > 0.7) return '#4a8a5a';
+    if (t > 0.3) return '#2a7f7f';
+    return '#c96b5a';
   });
 
-  // Gini
   chartGini.data.labels = ginis.map((_, i) => i);
   chartGini.data.datasets[0].data = ginis;
 
@@ -1311,7 +1351,6 @@ function updateStatsDisplay(sim) {
   const priceEl = document.getElementById('statPrice');
   priceEl.textContent = s.price.toFixed(2);
 
-  // Color price by direction
   if (s.priceHistory.length > 1) {
     const prev = s.priceHistory[s.priceHistory.length - 2];
     priceEl.className = 'value ' + (s.price >= prev ? 'positive' : 'negative');
@@ -1341,34 +1380,32 @@ function updateMood(sim) {
   const fv = s.fundamentalValue;
   const ratio = fv > 0 ? s.price / fv : 1;
 
-  // Compute momentum (recent price trend)
   const recent = s.priceHistory.slice(-20);
   let momentum = 0;
   if (recent.length >= 2) {
     momentum = (recent[recent.length - 1] - recent[0]) / (Math.abs(recent[0]) || 1);
   }
 
-  // Mood score: 0 = extreme fear, 100 = extreme greed
   let moodScore = 50;
-  moodScore += (ratio - 1) * 120; // price vs FV
-  moodScore += momentum * 200;     // momentum
+  moodScore += (ratio - 1) * 120;
+  moodScore += momentum * 200;
   moodScore = Math.max(0, Math.min(100, moodScore));
 
   let emoji, text, color;
   if (moodScore < 15) {
-    emoji = '😱'; text = 'Extreme Fear'; color = '#ff4444';
+    emoji = '\u{1F631}'; text = 'Extreme Fear'; color = 'var(--accent-coral)';
   } else if (moodScore < 30) {
-    emoji = '😨'; text = 'Fear'; color = '#ff6644';
+    emoji = '\u{1F628}'; text = 'Fear'; color = '#c07050';
   } else if (moodScore < 45) {
-    emoji = '😟'; text = 'Cautious'; color = '#cc8844';
+    emoji = '\u{1F61F}'; text = 'Cautious'; color = 'var(--accent-amber)';
   } else if (moodScore < 55) {
-    emoji = '😐'; text = 'Neutral'; color = '#aaaaaa';
+    emoji = '\u{1F610}'; text = 'Neutral'; color = 'var(--text-tertiary)';
   } else if (moodScore < 70) {
-    emoji = '🙂'; text = 'Optimistic'; color = '#88cc44';
+    emoji = '\u{1F642}'; text = 'Optimistic'; color = '#6a9a6a';
   } else if (moodScore < 85) {
-    emoji = '😀'; text = 'Greed'; color = '#44cc44';
+    emoji = '\u{1F600}'; text = 'Greed'; color = 'var(--accent-green)';
   } else {
-    emoji = '🤑'; text = 'Extreme Greed'; color = '#00ff88';
+    emoji = '\u{1F911}'; text = 'Extreme Greed'; color = 'var(--accent-teal)';
   }
 
   document.getElementById('moodEmoji').textContent = emoji;
@@ -1386,7 +1423,7 @@ function updateNarrative(sim) {
   const textEl = document.getElementById('narrativeText');
 
   if (s.priceHistory.length < 10) {
-    iconEl.textContent = '📊';
+    iconEl.textContent = '\u{1F4CA}';
     textEl.innerHTML = 'Market is warming up. Agents are calibrating their initial strategies...';
     return;
   }
@@ -1398,27 +1435,26 @@ function updateNarrative(sim) {
   const recentVol = recent.length > 2 ? std(recent) : 0;
   const lastReturn = recent.length > 0 ? recent[recent.length - 1] : 0;
 
-  // Detect regime
   if (ratio > 1.15 && lastReturn > 0.01) {
-    iconEl.textContent = '📈🔥';
+    iconEl.textContent = '\u{1F4C8}\u{1F525}';
     textEl.innerHTML = '<strong>Bubble forming!</strong> Momentum traders are piling in, driving price ' + ((ratio - 1) * 100).toFixed(0) + '% above fundamental value. The herd is charging.';
   } else if (ratio > 1.1) {
-    iconEl.textContent = '📈';
+    iconEl.textContent = '\u{1F4C8}';
     textEl.innerHTML = '<strong>Overvalued.</strong> Price is ' + ((ratio - 1) * 100).toFixed(0) + '% above fundamental value. Momentum strategies are winning, but value traders may stage a correction.';
   } else if (ratio < 0.85 && lastReturn < -0.01) {
-    iconEl.textContent = '📉💥';
+    iconEl.textContent = '\u{1F4C9}\u{1F4A5}';
     textEl.innerHTML = '<strong>Crash!</strong> Value traders overwhelmed the momentum players. Price plunged to ' + ((1 - ratio) * 100).toFixed(0) + '% below fundamental value.';
   } else if (ratio < 0.9) {
-    iconEl.textContent = '📉';
+    iconEl.textContent = '\u{1F4C9}';
     textEl.innerHTML = '<strong>Undervalued.</strong> Price sits ' + ((1 - ratio) * 100).toFixed(0) + '% below fundamental value. A recovery may be brewing as value-oriented rules gain fitness.';
   } else if (recentVol < 0.005) {
-    iconEl.textContent = '😴';
-    textEl.innerHTML = '<strong>Quiet period.</strong> Agents have converged on similar strategies. Low volatility, low volume. ' + (sim.learning ? 'But evolution never stops — a mutation could break the calm.' : 'Rational agents have found equilibrium.');
+    iconEl.textContent = '\u{1F634}';
+    textEl.innerHTML = '<strong>Quiet period.</strong> Agents have converged on similar strategies. Low volatility, low volume. ' + (sim.learning ? 'But evolution never stops -- a mutation could break the calm.' : 'Rational agents have found equilibrium.');
   } else if (recentVol > 0.03) {
-    iconEl.textContent = '⚡';
-    textEl.innerHTML = '<strong>Turbulence!</strong> Volatility is spiking as competing strategies clash. This is complexity in action — order emerging from disagreement.';
+    iconEl.textContent = '\u{26A1}';
+    textEl.innerHTML = '<strong>Turbulence!</strong> Volatility is spiking as competing strategies clash. This is complexity in action -- order emerging from disagreement.';
   } else {
-    iconEl.textContent = '📊';
+    iconEl.textContent = '\u{1F4CA}';
     textEl.innerHTML = 'Normal trading. Price is near fundamental value (ratio: ' + ratio.toFixed(2) + '). Agents are adapting, testing new strategies through genetic evolution.';
   }
 }
@@ -1435,7 +1471,7 @@ function updateLeaderboard(sim) {
   const botEl = document.getElementById('lbBottom');
 
   topEl.innerHTML = top5.map((a, i) =>
-    `<div class="lb-row"><span class="lb-name">${['🥇','🥈','🥉','4.','5.'][i]} Agent #${a.id}</span><span class="lb-val winner">${a.wealth.toFixed(0)}</span></div>`
+    `<div class="lb-row"><span class="lb-name">${['1.','2.','3.','4.','5.'][i]} Agent #${a.id}</span><span class="lb-val winner">${a.wealth.toFixed(0)}</span></div>`
   ).join('');
 
   botEl.innerHTML = bot5.map((a, i) =>
@@ -1496,27 +1532,27 @@ const PRESETS = {
   },
   rational: {
     label: 'Rational Expectations',
-    desc: 'All agents use a fixed equilibrium formula. <strong>Watch the market go flat</strong> — near-zero volume, no volatility clustering, and thin Gaussian tails. The "boring" baseline.',
+    desc: 'All agents use a fixed equilibrium formula. <strong>Watch the market go flat</strong> -- near-zero volume, no volatility clustering, and thin Gaussian tails. The "boring" baseline.',
     params: { paramMode: 'rational', paramAgents: 25, paramMutation: 0.03, paramCrossover: 0.3, paramGA: 250, paramRisk: 0.5, paramRate: 0.10, paramDbar: 10, paramRho: 0.95, paramRules: 100 }
   },
   highMutation: {
     label: 'High Mutation',
-    desc: 'Mutation rate tripled to 0.10. <strong>Heavier tails emerge</strong> — Hill exponent drops to ~2.50, kurtosis rises to ~52. More exploratory agents create larger price displacements.',
+    desc: 'Mutation rate tripled to 0.10. <strong>Heavier tails emerge</strong> -- Hill exponent drops to ~2.50, kurtosis rises to ~52. More exploratory agents create larger price displacements.',
     params: { paramMode: 'learning', paramAgents: 25, paramMutation: 0.10, paramCrossover: 0.3, paramGA: 250, paramRisk: 0.5, paramRate: 0.10, paramDbar: 10, paramRho: 0.95, paramRules: 100 }
   },
   largePop: {
     label: 'Large Population',
-    desc: 'Population quadrupled to 100 agents. <strong>A calmer market</strong> — kurtosis drops ~60%, volatility falls 37%. Strategy diversity acts as a stabilizing buffer against herding.',
+    desc: 'Population quadrupled to 100 agents. <strong>A calmer market</strong> -- kurtosis drops ~60%, volatility falls 37%. Strategy diversity acts as a stabilizing buffer against herding.',
     params: { paramMode: 'learning', paramAgents: 100, paramMutation: 0.03, paramCrossover: 0.3, paramGA: 250, paramRisk: 0.5, paramRate: 0.10, paramDbar: 10, paramRho: 0.95, paramRules: 100 }
   },
   lowRisk: {
     label: 'Low Risk Aversion',
-    desc: 'Risk aversion cut to 0.1. <strong>Bubble-prone market</strong> — kurtosis jumps to ~69.5, positive skewness doubles. Agents take 5x larger positions, amplifying price spikes.',
+    desc: 'Risk aversion cut to 0.1. <strong>Bubble-prone market</strong> -- kurtosis jumps to ~69.5, positive skewness doubles. Agents take 5x larger positions, amplifying price spikes.',
     params: { paramMode: 'learning', paramAgents: 25, paramMutation: 0.03, paramCrossover: 0.3, paramGA: 250, paramRisk: 0.1, paramRate: 0.10, paramDbar: 10, paramRho: 0.95, paramRules: 100 }
   },
   fastGA: {
     label: 'Fast Evolution',
-    desc: 'GA interval cut to 50. <strong>Watch for extreme tail events</strong> from rapid strategy turnover — kurtosis triples to ~141, skewness hits ~5. The Red Queen effect in action.',
+    desc: 'GA interval cut to 50. <strong>Watch for extreme tail events</strong> from rapid strategy turnover -- kurtosis triples to ~141, skewness hits ~5. The Red Queen effect in action.',
     params: { paramMode: 'learning', paramAgents: 25, paramMutation: 0.03, paramCrossover: 0.3, paramGA: 50, paramRisk: 0.5, paramRate: 0.10, paramDbar: 10, paramRho: 0.95, paramRules: 100 }
   }
 };
@@ -1529,7 +1565,6 @@ function applyPreset(key) {
   const preset = PRESETS[key];
   const p = preset.params;
 
-  // Set all parameter inputs
   document.getElementById('paramMode').value = p.paramMode;
   document.getElementById('paramAgents').value = p.paramAgents;
   document.getElementById('paramMutation').value = p.paramMutation;
@@ -1541,15 +1576,12 @@ function applyPreset(key) {
   document.getElementById('paramRho').value = p.paramRho;
   document.getElementById('paramRules').value = p.paramRules;
 
-  // Update mode indicator and reset simulation
   updateModeIndicator();
   resetSim();
 
-  // Show tooltip description
   const toast = document.getElementById('presetToast');
   toast.innerHTML = preset.desc;
   toast.classList.remove('visible');
-  // Force reflow for re-triggering animation
   void toast.offsetWidth;
   toast.classList.add('visible');
 }

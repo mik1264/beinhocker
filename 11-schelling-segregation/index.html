@@ -13,112 +13,265 @@
 <meta name="twitter:description" content="A 30% tolerance threshold produces 75% neighborhood homogeneity. Extreme macro patterns from mild micro preferences.">
 <meta name="description" content="A 30% tolerance threshold produces 75% neighborhood homogeneity. Extreme macro patterns from mild micro preferences.">
 <title>Schelling Segregation Model: The Emergence of Spatial Order</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
+:root {
+  --bg: #faf9f5;
+  --bg-card: #ffffff;
+  --bg-hover: #f5f3ee;
+  --bg-metric: #f0eeea;
+  --text-primary: #1a1a2e;
+  --text-secondary: #4a4a5a;
+  --text-tertiary: #7a7a8a;
+  --accent-teal: #2a7f7f;
+  --accent-teal-light: #e8f4f4;
+  --accent-coral: #c96b5a;
+  --accent-green: #4a8a5a;
+  --accent-amber: #b08a3a;
+  --border: #e2e0da;
+  --border-light: #edecea;
+  --shadow-sm: 0 1px 3px rgba(26,26,46,0.06);
+  --shadow-md: 0 4px 12px rgba(26,26,46,0.08);
+  --radius: 8px;
+  --radius-lg: 12px;
+  --font-sans: 'Inter', -apple-system, sans-serif;
+  --font-serif: Georgia, 'Times New Roman', serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'Courier New', monospace; background: #0a0a0f; color: #e0e0e0; overflow-x: hidden; }
-
-.container { max-width: 1440px; margin: 0 auto; padding: 20px; }
-
-h1 { text-align: center; font-size: 1.8em; margin-bottom: 4px; color: #fff;
-     letter-spacing: 3px; text-transform: uppercase; }
-.subtitle { text-align: center; font-size: 0.85em; color: #888; margin-bottom: 24px; }
-
-/* Intro section */
-.intro-section {
-  background: linear-gradient(135deg, #12121a 0%, #0e1a1a 100%);
-  border: 1px solid #204a4a;
-  border-radius: 12px;
-  padding: 28px 32px;
-  margin-bottom: 24px;
-  position: relative;
-  overflow: hidden;
-}
-.intro-section::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, #e07060, #50b0a0, #e07060, #50b0a0);
-}
-.intro-section h2 {
-  font-size: 1.2em;
-  color: #80d0c0;
-  margin-bottom: 12px;
-  letter-spacing: 1px;
-}
-.intro-section p {
-  font-size: 0.95em;
+body {
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--text-primary);
+  overflow-x: hidden;
+  font-size: 0.9rem;
   line-height: 1.7;
-  color: #bbb;
 }
-.intro-section p strong { color: #fff; }
 
-/* Key insight callout */
+/* ===== NAV BAR ===== */
+.nav-bar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  height: 48px;
+  background: rgba(250,249,245,0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+}
+.nav-title { font-size: 0.85rem; font-weight: 700; color: var(--text-primary); }
+.nav-back { font-size: 0.8rem; color: var(--accent-teal); text-decoration: none; font-weight: 500; }
+.nav-back:hover { text-decoration: underline; }
+
+/* ===== HERO ===== */
+.hero {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 2rem 1.5rem;
+}
+.hero h1 {
+  font-family: var(--font-serif);
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+.hero .subtitle {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+}
+.hero p {
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+}
+.hero p strong { color: var(--text-primary); font-weight: 600; }
+
 .key-insight {
-  background: linear-gradient(135deg, #1a100e, #201510);
-  border: 1px solid #4a3020;
-  border-left: 4px solid #e07060;
-  border-radius: 8px;
-  padding: 20px 24px;
-  margin-bottom: 24px;
+  margin: 1.25rem 0 0;
+  padding: 1rem 1.25rem;
+  background: var(--accent-teal-light);
+  border: 1px solid #c8e8e8;
+  border-left: 4px solid var(--accent-teal);
+  border-radius: 0 var(--radius) var(--radius) 0;
 }
 .key-insight h3 {
-  font-size: 0.9em;
-  color: #e07060;
+  font-size: 0.7rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 2px;
-  margin-bottom: 8px;
+  letter-spacing: 0.08em;
+  color: var(--accent-teal);
+  margin-bottom: 0.5rem;
 }
 .key-insight p {
-  font-size: 0.9em;
-  line-height: 1.7;
-  color: #bba;
+  font-size: 0.85rem;
+  line-height: 1.65;
+  color: var(--text-secondary);
 }
-.key-insight p strong { color: #fff; }
+.key-insight p strong { color: var(--text-primary); }
+
+/* ===== MAIN CONTENT ===== */
+.container { max-width: 1200px; margin: 0 auto; padding: 0 20px 20px; }
 
 /* Controls */
-.controls {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 10px; padding: 16px; background: #12121a; border: 1px solid #2a2a3a;
-  border-radius: 8px; margin-bottom: 20px;
+.controls-bar {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 10px;
+  padding: 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 16px;
 }
 .control-group { display: flex; flex-direction: column; gap: 4px; }
-.control-group label { font-size: 0.72em; color: #aaa; text-transform: uppercase; letter-spacing: 1px; }
-.control-group input, .control-group select {
-  background: #1a1a2e; border: 1px solid #333; color: #fff; padding: 6px 10px;
-  border-radius: 4px; font-family: inherit; font-size: 0.85em;
+.control-group label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--accent-teal);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
-.control-group input[type="range"] { padding: 2px; }
-.range-value { font-size: 0.8em; color: #50b0a0; text-align: right; }
+.control-group input, .control-group select {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+}
+.control-group input:focus, .control-group select:focus {
+  outline: none;
+  border-color: var(--accent-teal);
+}
+.range-value {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--accent-teal);
+  text-align: right;
+  font-weight: 500;
+}
 
 .buttons { display: flex; gap: 10px; align-items: end; flex-wrap: wrap; }
 button {
-  background: #2a2a4a; border: 1px solid #444; color: #fff; padding: 8px 18px;
-  border-radius: 4px; cursor: pointer; font-family: inherit; font-size: 0.85em;
-  transition: background 0.2s;
+  background: var(--bg-metric);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  padding: 8px 18px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: all 0.2s;
 }
-button:hover { background: #3a3a5a; }
-button.active { background: #1a3a3a; border-color: #3a8a7a; }
-button.reset { background: #4a2a2a; border-color: #6a3a3a; }
+button:hover { background: var(--bg-hover); }
+button.active { background: var(--accent-teal); border-color: var(--accent-teal); color: #fff; }
+button.reset { color: var(--accent-coral); border-color: #e0cec8; }
+button.reset:hover { background: #f4ece8; }
 
-/* Preset experiments */
+/* Preset */
 .preset-section {
-  display: flex; gap: 10px; align-items: center; padding: 10px 16px;
-  background: #12121a; border: 1px solid #2a2a3a; border-radius: 8px; margin-bottom: 16px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 16px;
 }
-.preset-section label { font-size: 0.72em; color: #aaa; text-transform: uppercase; letter-spacing: 1px; white-space: nowrap; }
+.preset-section label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--accent-teal);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
 .preset-select {
-  background: #1a1a2e; border: 1px solid #333; color: #fff; padding: 6px 10px;
-  border-radius: 4px; font-family: inherit; font-size: 0.8em; cursor: pointer;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  padding: 6px 10px;
+  border-radius: var(--radius);
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  cursor: pointer;
 }
-.preset-select:hover { border-color: #3a8a7a; }
 .preset-tooltip {
-  font-size: 0.75em; color: #998; line-height: 1.4; display: none; flex: 2; min-width: 0;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  display: none;
+  flex: 2;
+  min-width: 0;
 }
 .preset-tooltip.visible { display: block; }
 
-/* Layout: sidebar + main */
+/* Stats bar */
+.stats-bar {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 12px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 16px;
+  align-items: center;
+}
+.stat { text-align: center; min-width: 80px; }
+.stat-value {
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--accent-teal);
+}
+.stat-label {
+  font-size: 0.65rem;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Narrative box */
+.narrative-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent-teal);
+  border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+  padding: 14px 18px;
+  margin-bottom: 16px;
+  min-height: 46px;
+}
+.narrative-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent-teal);
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+.narrative-text {
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+.narrative-text .hl { color: var(--accent-coral); font-weight: bold; font-style: normal; }
+
+/* Main layout: grid + sidebar */
 .main-layout {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -128,65 +281,41 @@ button.reset { background: #4a2a2a; border-color: #6a3a3a; }
 @media (max-width: 1000px) { .main-layout { grid-template-columns: 1fr; } }
 
 .panel {
-  background: #12121a; border: 1px solid #2a2a3a; border-radius: 8px;
-  padding: 16px; position: relative; min-height: 0; overflow: hidden;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  position: relative;
+  min-height: 0;
+  overflow: hidden;
 }
 .panel-title {
-  font-size: 0.8em; text-transform: uppercase; letter-spacing: 1px;
-  color: #888; margin-bottom: 8px; border-bottom: 1px solid #2a2a3a;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent-teal);
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--border-light);
   padding-bottom: 6px;
+  font-weight: 600;
 }
 .panel-explanation {
-  font-size: 0.78em;
-  color: #777;
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
   line-height: 1.5;
   margin-bottom: 10px;
   padding: 6px 8px;
-  background: rgba(255,255,255,0.02);
+  background: var(--bg-metric);
   border-radius: 4px;
-  border-left: 2px solid #3a3a2a;
+  border-left: 2px solid var(--accent-teal);
 }
-.panel.full-width { grid-column: 1 / -1; }
-
-/* Stats bar */
-.stats-bar {
-  display: flex; gap: 16px; flex-wrap: wrap; padding: 12px 16px;
-  background: #12121a; border: 1px solid #2a2a3a; border-radius: 8px;
-  margin-bottom: 16px; align-items: center;
-}
-.stat { text-align: center; min-width: 80px; }
-.stat-value { font-size: 1.2em; font-weight: bold; color: #50b0a0; }
-.stat-label { font-size: 0.68em; color: #888; text-transform: uppercase; }
-
-/* Narrative box */
-.narrative-box {
-  background: linear-gradient(135deg, #0e0e1a, #141414);
-  border: 1px solid #2a2a3a;
-  border-radius: 8px;
-  padding: 14px 18px;
-  margin-bottom: 16px;
-  min-height: 46px;
-}
-.narrative-label {
-  font-size: 0.7em;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: #666;
-  margin-bottom: 6px;
-}
-.narrative-text {
-  font-size: 0.88em;
-  line-height: 1.5;
-  color: #ccc;
-}
-.narrative-text .hl { color: #e07060; font-weight: bold; }
 
 /* Grid canvas */
 #grid-canvas {
   display: block;
   width: 100%;
   image-rendering: pixelated;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: crosshair;
 }
 
@@ -197,91 +326,109 @@ button.reset { background: #4a2a2a; border-color: #6a3a3a; }
   min-height: 0;
   overflow: hidden;
 }
-.chart-container.wide {
-  height: 340px;
-}
-.chart-container canvas {
-  display: block;
-}
+.chart-container.wide { height: 340px; }
+.chart-container canvas { display: block; }
 
-/* Dashboard grid */
+/* Dashboard charts */
 .dashboard {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
 }
 @media (max-width: 900px) { .dashboard { grid-template-columns: 1fr; } }
 
-/* Fun facts */
-.fun-facts {
-  background: linear-gradient(135deg, #0e0e1a, #12121a);
-  border: 1px solid #2a2a3a;
-  border-radius: 8px;
-  padding: 20px 24px;
-  margin-bottom: 24px;
-}
-.fun-facts h3 {
-  font-size: 0.9em;
-  color: #50b0a0;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  margin-bottom: 14px;
-}
-.fun-facts ul {
-  list-style: none;
-  padding: 0;
-}
-.fun-facts li {
-  font-size: 0.85em;
-  line-height: 1.6;
-  color: #aaa;
-  padding: 6px 0;
-  border-bottom: 1px solid #1a1a2a;
-}
-.fun-facts li:last-child { border-bottom: none; }
-.fun-facts li strong { color: #ddd; }
-.fact-bullet { color: #e07060; margin-right: 8px; }
-
 /* Legend */
 .legend {
-  display: flex; gap: 16px; flex-wrap: wrap; margin-top: 8px;
-  font-size: 0.75em; color: #888;
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
 }
 .legend-item { display: flex; align-items: center; gap: 6px; }
-.legend-swatch { width: 14px; height: 14px; border-radius: 3px; border: 1px solid #444; }
+.legend-swatch { width: 14px; height: 14px; border-radius: 3px; border: 1px solid var(--border); }
 
 /* Tooltip */
 .grid-tooltip {
   position: absolute;
-  background: #1a1a2e;
-  border: 1px solid #444;
-  border-radius: 6px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
   padding: 8px 12px;
-  font-size: 0.78em;
-  color: #ddd;
+  font-size: 0.75rem;
+  color: var(--text-primary);
   pointer-events: none;
   display: none;
   z-index: 10;
   white-space: nowrap;
+  box-shadow: var(--shadow-md);
 }
+
+/* Fun facts */
+.fun-facts {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px 24px;
+  margin-bottom: 24px;
+}
+.fun-facts h3 {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--accent-teal);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 14px;
+}
+.fun-facts ul { list-style: none; padding: 0; }
+.fun-facts li {
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border-light);
+}
+.fun-facts li:last-child { border-bottom: none; }
+.fun-facts li strong { color: var(--text-primary); }
+.fact-bullet { color: var(--accent-coral); margin-right: 8px; }
+
+/* ===== FOOTER ===== */
+.footer {
+  text-align: center;
+  padding: 2rem;
+  border-top: 1px solid var(--border-light);
+}
+.footer a { color: var(--accent-teal); text-decoration: none; font-size: 0.85rem; font-weight: 500; }
+.footer a:hover { text-decoration: underline; }
 </style>
 </head>
 <body>
-<div class="container">
+
+<!-- ===== NAV BAR ===== -->
+<div class="nav-bar">
+  <div class="nav-title">Schelling Segregation</div>
+  <a href="../" class="nav-back">&larr; Dashboard</a>
+</div>
+
+<!-- ===== HERO ===== -->
+<div class="hero">
   <h1>Schelling Segregation</h1>
   <p class="subtitle">The Emergence of Spatial Order from Individual Preference &mdash; Schelling (1971) / Beinhocker Ch. 5</p>
 
-  <!-- Intro -->
-  <div class="intro-section">
-    <h2>How Does Segregation Emerge?</h2>
-    <p>Place two types of agents on a grid &mdash; say red and teal. Give each agent a modest preference: <strong>"I'd like at least 30% of my neighbors to be like me."</strong> That's not prejudice &mdash; it means being perfectly happy as a minority. Yet when unhappy agents relocate to random empty cells, the population spontaneously sorts itself into <strong>stark homogeneous clusters</strong>. Neighborhoods that no one explicitly chose emerge as if drawn by an invisible hand. This is Thomas Schelling's celebrated insight: <strong>individual tolerance does not aggregate into collective integration.</strong> Mild micro-motives produce extreme macro-behavior &mdash; a hallmark of complex adaptive systems.</p>
-  </div>
+  <p>Place two types of agents on a grid &mdash; say coral and teal. Give each agent a modest preference: <strong>"I'd like at least 30% of my neighbors to be like me."</strong> That's not prejudice &mdash; it means being perfectly happy as a minority. Yet when unhappy agents relocate to random empty cells, the population spontaneously sorts itself into <strong>stark homogeneous clusters</strong>. Neighborhoods that no one explicitly chose emerge as if drawn by an invisible hand. This is Thomas Schelling's celebrated insight: <strong>individual tolerance does not aggregate into collective integration.</strong> Mild micro-motives produce extreme macro-behavior &mdash; a hallmark of complex adaptive systems.</p>
 
   <div class="key-insight">
     <h3>Schelling's Paradox</h3>
     <p>With a threshold of just <strong>30%</strong> (agents are happy being a minority), the simulation produces neighborhoods that are <strong>70-80% homogeneous</strong>. The segregation index &mdash; the average fraction of same-type neighbors &mdash; far exceeds what any individual demands. <strong>No one wants segregation, yet everyone gets it.</strong> This is emergence in its purest form: a macro pattern that cannot be predicted from individual rules alone.</p>
   </div>
+</div>
+
+<div class="container">
 
   <!-- Controls -->
-  <div class="controls">
+  <div class="controls-bar">
     <div class="control-group">
       <label>Grid Size</label>
       <input type="number" id="ctrl-grid-size" value="50" min="20" max="100" step="5">
@@ -352,9 +499,9 @@ button.reset { background: #4a2a2a; border-color: #6a3a3a; }
       <div class="panel-title">Grid View</div>
       <canvas id="grid-canvas" width="500" height="500"></canvas>
       <div class="legend">
-        <div class="legend-item"><div class="legend-swatch" style="background:#e07060;"></div> Type A</div>
-        <div class="legend-item"><div class="legend-swatch" style="background:#50b0a0;"></div> Type B</div>
-        <div class="legend-item"><div class="legend-swatch" style="background:#181820;"></div> Empty</div>
+        <div class="legend-item"><div class="legend-swatch" style="background:#c96b5a;"></div> Type A</div>
+        <div class="legend-item"><div class="legend-swatch" style="background:#2a7f7f;"></div> Type B</div>
+        <div class="legend-item"><div class="legend-swatch" style="background:#f0eeea;"></div> Empty</div>
       </div>
     </div>
 
@@ -406,16 +553,21 @@ button.reset { background: #4a2a2a; border-color: #6a3a3a; }
 
 <div class="grid-tooltip" id="grid-tooltip"></div>
 
+<!-- ===== FOOTER ===== -->
+<div class="footer">
+  <a href="../">&larr; Back to Dashboard</a>
+</div>
+
 <script>
 // =========================================================================
 // Schelling Segregation Model - Browser Simulation
 // =========================================================================
 
-const COLOR_A = '#e07060';
-const COLOR_B = '#50b0a0';
-const COLOR_EMPTY = '#181820';
-const COLOR_A_UNHAPPY = '#a04030';
-const COLOR_B_UNHAPPY = '#307060';
+const COLOR_A = '#c96b5a';
+const COLOR_B = '#2a7f7f';
+const COLOR_EMPTY = '#f0eeea';
+const COLOR_A_UNHAPPY = '#a0544a';
+const COLOR_B_UNHAPPY = '#1e5e5e';
 
 // ---- State ----
 let gridSize = 50;
@@ -423,9 +575,9 @@ let density = 0.7;
 let threshold = 0.3;
 let ratio = 0.5;
 let speed = 100;
-let grid = [];       // 2D: 0=empty, 1=A, 2=B
-let happiness = [];  // 2D: bool
-let emptyCells = []; // list of [x,y]
+let grid = [];
+let happiness = [];
+let emptyCells = [];
 let tick = 0;
 let running = false;
 let timerId = null;
@@ -442,8 +594,8 @@ const chartOpts = (label, color, yLabel) => ({
   maintainAspectRatio: false,
   animation: false,
   scales: {
-    x: { title: { display: true, text: 'Tick', color: '#666' }, ticks: { color: '#666' }, grid: { color: '#1a1a2a' } },
-    y: { title: { display: true, text: yLabel, color: '#666' }, ticks: { color: '#666' }, grid: { color: '#1a1a2a' },
+    x: { title: { display: true, text: 'Tick', color: '#7a7a8a', font: { family: "'Inter', sans-serif", size: 10 } }, ticks: { color: '#7a7a8a', font: { family: "'JetBrains Mono', monospace", size: 10 } }, grid: { color: '#edecea' } },
+    y: { title: { display: true, text: yLabel, color: '#7a7a8a', font: { family: "'Inter', sans-serif", size: 10 } }, ticks: { color: '#7a7a8a', font: { family: "'JetBrains Mono', monospace", size: 10 } }, grid: { color: '#edecea' },
          min: 0 }
   },
   plugins: { legend: { display: false } },
@@ -452,23 +604,23 @@ const chartOpts = (label, color, yLabel) => ({
 
 const segChart = new Chart(document.getElementById('chart-segregation'), {
   type: 'line',
-  data: { labels: [], datasets: [{ data: [], borderColor: '#e07060', tension: 0.3 }] },
-  options: chartOpts('Segregation', '#e07060', 'Segregation Index')
+  data: { labels: [], datasets: [{ data: [], borderColor: '#c96b5a', tension: 0.3 }] },
+  options: chartOpts('Segregation', '#c96b5a', 'Segregation Index')
 });
 const happyChart = new Chart(document.getElementById('chart-happiness'), {
   type: 'line',
-  data: { labels: [], datasets: [{ data: [], borderColor: '#50b0a0', tension: 0.3 }] },
-  options: chartOpts('Happiness', '#50b0a0', 'Happiness Rate')
+  data: { labels: [], datasets: [{ data: [], borderColor: '#2a7f7f', tension: 0.3 }] },
+  options: chartOpts('Happiness', '#2a7f7f', 'Happiness Rate')
 });
 const movesChart = new Chart(document.getElementById('chart-moves'), {
   type: 'line',
-  data: { labels: [], datasets: [{ data: [], borderColor: '#e0a050', tension: 0.3 }] },
-  options: chartOpts('Moves', '#e0a050', 'Moves Per Tick')
+  data: { labels: [], datasets: [{ data: [], borderColor: '#b08a3a', tension: 0.3 }] },
+  options: chartOpts('Moves', '#b08a3a', 'Moves Per Tick')
 });
 const interfaceChart = new Chart(document.getElementById('chart-interface'), {
   type: 'line',
-  data: { labels: [], datasets: [{ data: [], borderColor: '#8080d0', tension: 0.3 }] },
-  options: chartOpts('Interface', '#8080d0', 'Interface Density')
+  data: { labels: [], datasets: [{ data: [], borderColor: '#7a6a9a', tension: 0.3 }] },
+  options: chartOpts('Interface', '#7a6a9a', 'Interface Density')
 });
 
 // ---- Grid logic ----
@@ -489,7 +641,6 @@ function initGrid() {
   const numA = Math.floor(numAgents * ratio);
   const numB = numAgents - numA;
 
-  // Build shuffled positions
   let positions = [];
   for (let y = 0; y < gridSize; y++)
     for (let x = 0; x < gridSize; x++)
@@ -508,7 +659,6 @@ function initGrid() {
     emptyCells.push(positions[i]);
   }
 
-  // Clear histories
   segHistory = [];
   happyHistory = [];
   movesHistory = [];
@@ -564,7 +714,6 @@ function updateHappiness() {
 
 function stepSim() {
   let moves = 0;
-  // Collect unhappy agents
   let unhappy = [];
   for (let y = 0; y < gridSize; y++)
     for (let x = 0; x < gridSize; x++)
@@ -575,11 +724,9 @@ function stepSim() {
 
   for (const [ox, oy] of unhappy) {
     if (emptyCells.length === 0) break;
-    // Pick random empty cell
     const idx = Math.floor(Math.random() * emptyCells.length);
     const [nx, ny] = emptyCells[idx];
 
-    // Move
     grid[ny][nx] = grid[oy][ox];
     grid[oy][ox] = 0;
     emptyCells[idx] = [ox, oy];
@@ -627,7 +774,6 @@ function computeInterface() {
   for (let y = 0; y < gridSize; y++) {
     for (let x = 0; x < gridSize; x++) {
       if (grid[y][x] === 0) continue;
-      // Right and down
       for (const [dx, dy] of [[1, 0], [0, 1]]) {
         const nx = (x + dx) % gridSize;
         const ny = (y + dy) % gridSize;
@@ -685,7 +831,6 @@ function updateStats() {
   document.getElementById('stat-moves').textContent = mov;
   document.getElementById('stat-interface').textContent = (ifc * 100).toFixed(1) + '%';
 
-  // Largest cluster is expensive; compute occasionally
   document.getElementById('stat-cluster').textContent = '--';
 
   updateNarrative(seg, hap, mov);
@@ -783,7 +928,6 @@ function runTick() {
   drawGrid();
   updateStats();
   updateCharts();
-  // Auto-stop if converged
   if (moves === 0 && running) {
     running = false;
     clearInterval(timerId);
