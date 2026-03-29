@@ -46,6 +46,32 @@
     gap: 0.25rem;
     font-size: 0.6rem;
     color: var(--text-secondary, #4a4a5a);
+    position: relative;
+    cursor: help;
+  }
+  #mini-prisoners-dilemma .legend-item .legend-tip {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1a1a2e;
+    color: #e0e0ee;
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    line-height: 1.4;
+    width: 200px;
+    text-align: left;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    z-index: 10;
+    pointer-events: none;
+  }
+  #mini-prisoners-dilemma .legend-item .legend-tip strong {
+    color: #88ccff;
+  }
+  #mini-prisoners-dilemma .legend-item:hover .legend-tip {
+    display: block;
   }
   #mini-prisoners-dilemma .legend-swatch {
     width: 10px;
@@ -152,12 +178,12 @@
   const T = 5, R = 3, P = 1, S = 0;
 
   const STRATEGIES = {
-    tft:  { name:'TFT',     color:'#4488ff' },
-    alld: { name:'AllD',    color:'#ff4444' },
-    allc: { name:'AllC',    color:'#00cc66' },
-    pavlov:{ name:'Pavlov', color:'#ffaa00' },
-    grudger:{ name:'Grudger',color:'#cc44ff' },
-    random:{ name:'Random', color:'#888888' }
+    tft:  { name:'TFT',     color:'#4488ff', tip:'<strong>Tit-for-Tat.</strong> Start by cooperating, then copy whatever the opponent did last round. Simple, forgiving, retaliatory.' },
+    alld: { name:'AllD',    color:'#ff4444', tip:'<strong>Always Defect.</strong> Never cooperate. Exploits cooperators but earns only mutual punishment against itself.' },
+    allc: { name:'AllC',    color:'#00cc66', tip:'<strong>Always Cooperate.</strong> Unconditionally cooperate. Vulnerable to exploitation but enables high mutual payoffs.' },
+    pavlov:{ name:'Pavlov', color:'#ffaa00', tip:'<strong>Win-Stay, Lose-Shift.</strong> Repeat last move if it paid well, switch if it didn\'t. Best error-corrector under noise.' },
+    grudger:{ name:'Grudger',color:'#cc44ff', tip:'<strong>Grudger.</strong> Cooperate until betrayed, then defect forever. Permanent punishment — never forgives.' },
+    random:{ name:'Random', color:'#888888', tip:'<strong>Random.</strong> Cooperate or defect with 50/50 probability each round. Unpredictable baseline.' }
   };
   const STRAT_KEYS = Object.keys(STRATEGIES);
 
@@ -166,7 +192,7 @@
   for(const key of STRAT_KEYS) {
     const item = document.createElement('div');
     item.className = 'legend-item';
-    item.innerHTML = '<div class="legend-swatch" style="background:'+STRATEGIES[key].color+'"></div>'+STRATEGIES[key].name;
+    item.innerHTML = '<div class="legend-swatch" style="background:'+STRATEGIES[key].color+'"></div>'+STRATEGIES[key].name+'<span class="legend-tip">'+STRATEGIES[key].tip+'</span>';
     legendEl.appendChild(item);
   }
 
